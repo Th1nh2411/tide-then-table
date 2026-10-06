@@ -1,10 +1,12 @@
 class_name HoldManager
 extends Node
-## Owns the boat hold for the current sea day. Caught fish go straight into a
-## free spot; if none, the hold UI opens in (paused) overflow mode.
+## Owns the boat hold for the current sea day. Catches (rod or net) go
+## straight into free spots; whatever doesn't fit opens the hold UI in
+## (paused) overflow mode.
 
 @export var boat: Boat
 @export var fishing: FishingController
+@export var nets: NetController
 @export var hold_ui: HoldUI
 @export var hud: SeaHud
 
@@ -14,7 +16,8 @@ var hold: GridInventory
 func _ready() -> void:
 	hold = GridInventory.new(boat.boat_data.hold_size)
 	hold_ui.setup(hold)
-	fishing.fish_caught.connect(_on_fish_caught)
+	fishing.fish_caught.connect(add_catch)
+	nets.fish_caught.connect(add_catch)
 	boat.boat_data_changed.connect(_on_boat_data_changed)
 
 
@@ -29,11 +32,15 @@ func get_items() -> Array[InventoryItem]:
 	return hold.items.duplicate()
 
 
-func _on_fish_caught(fish: FishData, quality: float) -> void:
-	var item := InventoryItem.new(fish, quality)
-	if not hold.auto_place(item):
+func add_catch(fish: FishData, quality: float, count: int) -> void:
+	var overflow: Array[InventoryItem] = []
+	for i in count:
+		var item := InventoryItem.new(fish, quality)
+		if not hold.auto_place(item):
+			overflow.append(item)
+	if not overflow.is_empty():
 		hud.flash_message("Khoang đầy!")
-		hold_ui.open_overflow(item)
+		hold_ui.open_overflow(overflow)
 
 
 ## Boat swapped (debug key now, upgrades later): rebuild the hold at the new

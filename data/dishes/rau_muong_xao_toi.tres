@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_dish")
-id = "mi_xao_oc_mong_tay"
-display_name = "Mì xào ốc móng tay"
-ingredients = Dictionary[String, int]({"oc_mong_tay": 2})
+id = "rau_muong_xao_toi"
+display_name = "Rau muống xào tỏi"
 cook_type = 2
-base_price = 65
-color = Color(0.95, 0.75, 0.4, 1)
+base_price = 30
+color = Color(0.35, 0.7, 0.3, 1)
+market_cost = 10

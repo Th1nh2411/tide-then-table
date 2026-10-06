@@ -1,9 +1,10 @@
 class_name FishingMinigame
 extends CanvasLayer
-## Fishing overlay. Picks the TIMING or TENSION game for the fish, shows the
-## result briefly, then reports back with the catch quality.
+## Fishing overlay. Picks the TIMING, TENSION or HAUL game for the fish,
+## shows the result briefly, then reports back with quality and how many
+## were caught (more than 1 when hauling a net).
 
-signal finished(fish: FishData, caught: bool, quality: float)
+signal finished(fish: FishData, caught: bool, quality: float, count: int)
 
 @export var perfect_quality: float = 1.0
 @export var normal_quality: float = 0.7
@@ -29,20 +30,26 @@ func is_running() -> bool:
 	return _game != null
 
 
-## `zone_scale` > 1 widens the green zone (rod upgrade).
-func start(fish: FishData, zone_scale: float = 1.0) -> void:
+## `zone_scale` > 1 makes the game easier (rod/net upgrade).
+## `count` = how many fish are at stake (shellfish in a net).
+func start(fish: FishData, zone_scale: float = 1.0, count: int = 1) -> void:
 	if is_running():
 		return
 	_fish = fish
-	if fish.minigame == FishData.Minigame.TENSION:
-		_game = TensionGame.new()
-	else:
-		_game = TimingGame.new()
+	match fish.minigame:
+		FishData.Minigame.TENSION:
+			_game = TensionGame.new()
+		FishData.Minigame.HAUL:
+			_game = HaulGame.new()
+		_:
+			_game = TimingGame.new()
+	_game.catch_count = count
 	_game.setup(fish, zone_scale)
 	_game.completed.connect(_on_game_completed)
 	_game_holder.add_child(_game)
 
-	_title_label.text = "Câu: %s" % fish.display_name
+	var verb := "Kéo lưới" if fish.minigame == FishData.Minigame.HAUL else "Câu"
+	_title_label.text = "%s: %s" % [verb, fish.display_name]
 	_title_label.modulate = aberrant_title_color if fish.is_aberrant else Color.WHITE
 	_hint_label.text = _game.get_hint()
 	_result_label.text = ""
@@ -56,12 +63,14 @@ func _process(_delta: float) -> void:
 
 func _on_game_completed(success: bool, perfect: bool) -> void:
 	if success:
-		_result_label.text = "Bắt được! (hoàn hảo)" if perfect else "Bắt được!"
+		var amount := " %d con" % _game.catch_count if _game.catch_count > 1 else ""
+		_result_label.text = "Bắt được%s!%s" % [amount, " (hoàn hảo)" if perfect else ""]
 	else:
 		_result_label.text = _game.get_fail_text()
 	var quality := perfect_quality if perfect else normal_quality
+	var count := _game.catch_count if success else 0
 	await get_tree().create_timer(result_seconds).timeout
 	_game.queue_free()
 	_game = null
 	hide()
-	finished.emit(_fish, success, quality)
+	finished.emit(_fish, success, quality, count)

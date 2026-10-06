@@ -4,8 +4,8 @@ extends Node
 ## spends a cast and in-game time, then runs the minigame while the boat
 ## holds still. The day clock keeps running during the minigame.
 
-## Emitted on a successful catch. Phase 5 puts the fish into the hold.
-signal fish_caught(fish: FishData, quality: float)
+## Emitted on a successful catch; the hold manager stores it.
+signal fish_caught(fish: FishData, quality: float, count: int)
 
 @export var catalog: FishCatalog
 @export var spawner: FishingSpotSpawner
@@ -20,6 +20,8 @@ signal fish_caught(fish: FishData, quality: float)
 
 var _rng := RandomNumberGenerator.new()
 var _current_spot: FishingSpot
+## True while the shared minigame overlay is running one of OUR casts.
+var _active: bool = false
 
 
 func _ready() -> void:
@@ -50,6 +52,7 @@ func _on_fishing_requested(spot: FishingSpot) -> void:
 		push_warning("No fish defined for zone %d" % spot.zone)
 		return
 	_current_spot = spot
+	_active = true
 	boat.speed = 0.0
 	boat.set_physics_process(false)
 	hud.hide_prompt()
@@ -58,13 +61,17 @@ func _on_fishing_requested(spot: FishingSpot) -> void:
 	minigame.start(fish, _get_zone_scale())
 
 
-func _on_minigame_finished(fish: FishData, caught: bool, quality: float) -> void:
+func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: int) -> void:
+	# The overlay is shared with net hauling; only handle our own attempts.
+	if not _active:
+		return
+	_active = false
 	# If the deadline hit mid-game, the sea scene is towing us; stay frozen.
 	if DayClock.running:
 		boat.set_physics_process(true)
 	if caught:
 		hud.flash_message("Bắt được %s%s" % [fish.display_name, " ★" if quality >= 1.0 else ""])
-		fish_caught.emit(fish, quality)
+		fish_caught.emit(fish, quality, count)
 	# The spot may have casts left and the boat is still on it.
 	if is_instance_valid(_current_spot) and _current_spot.casts_left > 0:
 		hud.show_prompt("E: Câu (còn %d lượt)" % _current_spot.casts_left)

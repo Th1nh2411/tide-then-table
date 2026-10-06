@@ -103,6 +103,7 @@ res://
 | `rotate_item`                        | R                                               |
 | `open_hold`                          | Tab                                             |
 | `pause`                              | Esc                                             |
+| `drop_net`                           | Q (thả lưới ốc)                                 |
 
 ---
 
@@ -138,14 +139,15 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 
 | id                 | Tên              | Hình dạng | Vùng                     | Minigame | Độ khó | Giá |
 | ------------------ | ---------------- | --------- | ------------------------ | -------- | ------ | --- |
-| `oc_huong`         | Ốc hương         | 1x1       | NEARSHORE, REEF          | TIMING   | 0.1    | 15  |
+| `oc_huong`         | Ốc hương         | 1x1       | NEARSHORE, REEF          | HAUL (lưới) | 0.1 | 15  |
 | `tom`              | Tôm              | 1x2       | NEARSHORE                | TIMING   | 0.2    | 25  |
 | `muc`              | Mực              | 1x2       | NEARSHORE, OPEN_SEA      | TENSION  | 0.3    | 30  |
 | `ca_thu`           | Cá thu           | 1x3       | OPEN_SEA                 | TENSION  | 0.5    | 40  |
 | `cua`              | Cua              | 2x2       | REEF                     | TIMING   | 0.4    | 50  |
 | `ca_mu`            | Cá mú            | 2x3       | REEF, OPEN_SEA           | TENSION  | 0.8    | 90  |
 | `ca_thu_phat_sang` | Cá thu phát sáng | 1x3       | OPEN_SEA (rất hiếm), FOG | TENSION  | 0.9    | 200 |
-| `oc_mong_tay`      | Ốc móng tay      | 1x2       | NEARSHORE                | TIMING   | 0.15   | 20  |
+
+> **Bắt bằng lưới (thêm sau Phase 6):** loài có `catch_method = NET` (hiện là ốc hương) không ra ở điểm câu. Bấm Q để thả lưới ở vùng có loài đó, ngâm càng lâu càng nhiều (đầy sau 3 giờ game, tối đa 8 con), rồi quay lại phao bấm E để chơi minigame **Kéo lưới**: giữ để kéo, dây đỏ (vướng đá) thì nhả, kéo cố sẽ rơi ốc. Thuyền mang 2 lưới; lưới còn ngoài biển khi cập bến sẽ mất ốc.
 
 ### BoatData (Resource)
 
@@ -169,8 +171,7 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 | Tôm rang muối          | 2 tôm       | STIR     | 75  |
 | Cua rang me            | 1 cua       | STIR     | 110 |
 | Cá mú hấp xì dầu       | 1 cá mú     | STEAM    | 150 |
-| Mì xào ốc móng tay     | 2 ốc móng tay | STIR   | 65  |
-| Mì xào rau muống       | Mua chợ 10k/phần (món phụ, không chiếm slot, thừa bỏ đi) | STIR | 35 |
+| Rau muống xào tỏi      | Mua chợ 10k/phần (món phụ, không chiếm slot, thừa bỏ đi) | STIR | 30 |
 
 ### UpgradeData (Resource)
 

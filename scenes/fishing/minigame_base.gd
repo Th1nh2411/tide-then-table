@@ -12,6 +12,9 @@ signal completed(success: bool, perfect: bool)
 var fish: FishData
 ## Above 1 widens the green zone / calms the fish (rod upgrade).
 var zone_scale: float = 1.0
+## How many of the fish this attempt yields (nets can hold several).
+## Set before setup(); games may lower it (e.g. shellfish spilling out).
+var catch_count: int = 1
 
 var _done: bool = false
 var _time: float = 0.0

@@ -6,17 +6,20 @@ extends Resource
 @export var fish: Array[FishData] = []
 
 
-func get_fish_for_zone(zone: FishData.Zone) -> Array[FishData]:
+func get_fish_for_zone(zone: FishData.Zone,
+		method: FishData.CatchMethod = FishData.CatchMethod.ROD) -> Array[FishData]:
 	var result: Array[FishData] = []
 	for f in fish:
-		if f.lives_in(zone):
+		if f.lives_in(zone) and f.catch_method == method:
 			result.append(f)
 	return result
 
 
-## Weighted pick using spawn_weight. Returns null if nothing lives in the zone.
-func pick_random(zone: FishData.Zone, rng: RandomNumberGenerator) -> FishData:
-	var candidates := get_fish_for_zone(zone)
+## Weighted pick using spawn_weight among species caught with `method`.
+## Returns null if nothing matching lives in the zone.
+func pick_random(zone: FishData.Zone, rng: RandomNumberGenerator,
+		method: FishData.CatchMethod = FishData.CatchMethod.ROD) -> FishData:
+	var candidates := get_fish_for_zone(zone, method)
 	var total := 0.0
 	for f in candidates:
 		total += f.spawn_weight

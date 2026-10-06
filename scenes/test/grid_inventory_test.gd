@@ -30,7 +30,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("cast"):
 		var item := InventoryItem.new(catalog.fish[_rng.randi() % catalog.fish.size()], 1.0)
 		if not _demo_hold.auto_place(item):
-			_hold_ui.open_overflow(item)
+			_hold_ui.open_overflow([item] as Array[InventoryItem])
 	elif event.is_action_pressed("open_hold") and not _hold_ui.visible:
 		_hold_ui.open_browse()
 

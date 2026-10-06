@@ -88,7 +88,7 @@ func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
 	_check("auto fill uses stock (cua + 2 ốc)", auto.get_portion_count(cua_dish) == 1 and auto.get_portion_count(oc_dish) == 2 and storage.size() == 1)
 
 	# Market dish: costs money instead of storage, no slot, auto never buys it.
-	var rau := _dish("mi_xao_rau_muong")
+	var rau := _dish("rau_muong_xao_toi")
 	_check("auto fill skips market dish", auto.get_portion_count(rau) == 0)
 	var market := MenuPlan.new(0, 25)  # zero seafood slots, 25k budget
 	_check("market dish ignores slots", market.add_portion(rau, storage))
@@ -99,7 +99,7 @@ func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
 	_check("market portion servable", market.take_portion(rau).is_empty() and market.is_sold_out())
 	market.return_portion(rau, [] as Array[InventoryItem])
 	_check("market portion returns", market.get_portion_count(rau) == 1)
-	_check("market price = base × cook", KitchenLogic.calc_price(rau, 1.3, [] as Array[InventoryItem]) == 46)
+	_check("market price = base × cook", KitchenLogic.calc_price(rau, 1.3, [] as Array[InventoryItem]) == 39)
 
 
 func _check(label: String, ok: bool) -> void:

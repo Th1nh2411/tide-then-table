@@ -20,6 +20,8 @@
 [ext_resource type="PackedScene" path="res://scenes/fishing/fishing_minigame.tscn" id="18_minigame"]
 [ext_resource type="Script" path="res://scenes/sea/hold_manager.gd" id="19_holdmgr"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hold_ui.tscn" id="20_holdui"]
+[ext_resource type="Script" path="res://scenes/sea/net_controller.gd" id="21_nets"]
+[ext_resource type="PackedScene" path="res://scenes/sea/net_buoy.tscn" id="22_buoy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dock"]
 size = Vector2(70, 90)
@@ -204,10 +206,23 @@ minigame = NodePath("../FishingMinigame")
 
 [node name="FishingMinigame" parent="." instance=ExtResource("18_minigame")]
 
-[node name="HoldManager" type="Node" parent="." node_paths=PackedStringArray("boat", "fishing", "hold_ui", "hud")]
+[node name="NetBuoys" type="Node2D" parent="."]
+
+[node name="NetController" type="Node" parent="." node_paths=PackedStringArray("boat", "hud", "minigame", "zones_root", "buoy_parent")]
+script = ExtResource("21_nets")
+catalog = ExtResource("17_catalog")
+boat = NodePath("../Boat")
+hud = NodePath("../SeaHud")
+minigame = NodePath("../FishingMinigame")
+zones_root = NodePath("../Zones")
+buoy_scene = ExtResource("22_buoy")
+buoy_parent = NodePath("../NetBuoys")
+
+[node name="HoldManager" type="Node" parent="." node_paths=PackedStringArray("boat", "fishing", "nets", "hold_ui", "hud")]
 script = ExtResource("19_holdmgr")
 boat = NodePath("../Boat")
 fishing = NodePath("../FishingController")
+nets = NodePath("../NetController")
 hold_ui = NodePath("../HoldUI")
 hud = NodePath("../SeaHud")
 

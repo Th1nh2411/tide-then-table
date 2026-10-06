@@ -12,6 +12,7 @@ var _message_token: int = 0
 @onready var _warning_label: Label = %WarningLabel
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _message_label: Label = %MessageLabel
+@onready var _net_label: Label = %NetLabel
 
 
 func _ready() -> void:
@@ -19,6 +20,10 @@ func _ready() -> void:
 	hide_prompt()
 	_message_label.hide()
 	_on_time_changed(DayClock.current_minutes)
+
+
+func set_nets(available: int, total: int) -> void:
+	_net_label.text = "Lưới %d/%d  [Q] thả" % [available, total]
 
 
 ## Context hint at the bottom of the screen, e.g. "E: Cập bến".

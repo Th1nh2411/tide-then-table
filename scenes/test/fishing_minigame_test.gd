@@ -28,11 +28,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_refresh("")
 	var index := key.physical_keycode - KEY_1
 	if index >= 0 and index < catalog.fish.size():
-		_minigame.start(catalog.fish[index], 1.0 + _rod_level * 0.15)
+		var fish := catalog.fish[index]
+		var count := 6 if fish.minigame == FishData.Minigame.HAUL else 1
+		_minigame.start(fish, 1.0 + _rod_level * 0.15, count)
 
 
-func _on_finished(fish: FishData, caught: bool, quality: float) -> void:
-	_refresh("Kết quả: %s — %s, quality %.1f" % [fish.display_name, "bắt được" if caught else "trượt", quality])
+func _on_finished(fish: FishData, caught: bool, quality: float, count: int) -> void:
+	_refresh("Kết quả: %s — %s x%d, quality %.1f" % [fish.display_name, "bắt được" if caught else "trượt", count, quality])
 
 
 func _refresh(result: String) -> void:
