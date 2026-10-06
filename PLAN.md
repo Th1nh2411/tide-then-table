@@ -145,6 +145,7 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 | `cua`              | Cua              | 2x2       | REEF                     | TIMING   | 0.4    | 50  |
 | `ca_mu`            | Cá mú            | 2x3       | REEF, OPEN_SEA           | TENSION  | 0.8    | 90  |
 | `ca_thu_phat_sang` | Cá thu phát sáng | 1x3       | OPEN_SEA (rất hiếm), FOG | TENSION  | 0.9    | 200 |
+| `oc_mong_tay`      | Ốc móng tay      | 1x2       | NEARSHORE                | TIMING   | 0.15   | 20  |
 
 ### BoatData (Resource)
 
@@ -168,6 +169,8 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 | Tôm rang muối          | 2 tôm       | STIR     | 75  |
 | Cua rang me            | 1 cua       | STIR     | 110 |
 | Cá mú hấp xì dầu       | 1 cá mú     | STEAM    | 150 |
+| Mì xào ốc móng tay     | 2 ốc móng tay | STIR   | 65  |
+| Mì xào rau muống       | Mua chợ 10k/phần (món phụ, không chiếm slot, thừa bỏ đi) | STIR | 35 |
 
 ### UpgradeData (Resource)
 

@@ -348,7 +348,7 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 9
-text = "Chọn món và số phần từ nguyên liệu trong kho. Khách chỉ gọi món có trong menu. Phần chưa bán hết sẽ trả về kho."
+text = "Chọn món và số phần từ nguyên liệu trong kho. Khách chỉ gọi món có trong menu. Hải sản thừa trả về kho; món phụ mua ở chợ, thừa thì bỏ."
 horizontal_alignment = 1
 autowrap_mode = 3
 

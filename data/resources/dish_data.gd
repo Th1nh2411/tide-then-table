@@ -12,3 +12,11 @@ enum CookType { GRILL, STEAM, STIR }
 @export var base_price: int = 50
 ## Placeholder color for the order bubble.
 @export var color: Color = Color.WHITE
+## Market dishes (no `ingredients`) are bought per portion for this price
+## instead of using storage. They don't take a menu slot.
+@export var market_cost: int = 0
+
+
+## Cooked from bought market produce rather than the player's catch.
+func is_market_dish() -> bool:
+	return ingredients.is_empty()

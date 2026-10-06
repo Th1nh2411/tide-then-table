@@ -20,6 +20,7 @@ var _time_left: float = 0.0
 var _shift_running: bool = false
 var _shift_over: bool = false
 var _earned_today: int = 0
+var _market_spent: int = 0
 var _served: int = 0
 var _left_angry: int = 0
 var _message_token: int = 0
@@ -42,7 +43,7 @@ func _ready() -> void:
 	_customers.message_requested.connect(_show_message)
 	_next_day_button.pressed.connect(_on_next_day_pressed)
 
-	_plan = MenuPlan.new(menu_slots)
+	_plan = MenuPlan.new(menu_slots, GameState.money)
 	_plan.changed.connect(_refresh_storage)
 	_menu_panel.setup(_plan, menu, fish_catalog)
 	_menu_panel.confirmed.connect(_open_shop)
@@ -57,6 +58,9 @@ func get_shift_seconds() -> float:
 
 func _open_shop() -> void:
 	_menu_panel.hide()
+	# Market produce is paid for now; unsold portions are wasted at closing.
+	_market_spent = _plan.market_spent
+	GameState.spend_money(_market_spent)
 	_shift_running = true
 	_customers.start_shift(_plan)
 	var late_text := ""
@@ -102,8 +106,8 @@ func _end_shift(reason: String) -> void:
 	var leftover := _plan.total_portions()
 	_plan.clear(GameState.storage)
 	_shift_over = true
-	_summary_label.text = "%s\nThu được: %dk\nKhách đã phục vụ: %d\nKhách bỏ đi: %d\nPhần thừa trả về kho: %d" % [
-		reason, _earned_today, _served, _left_angry, leftover]
+	_summary_label.text = "%s\nThu được: %dk   Tiền chợ: -%dk   Lãi: %dk\nKhách đã phục vụ: %d   Khách bỏ đi: %d\nPhần thừa: %d (hải sản trả về kho, rau bỏ đi)" % [
+		reason, _earned_today, _market_spent, _earned_today - _market_spent, _served, _left_angry, leftover]
 	_summary_panel.show()
 	_next_day_button.grab_focus()
 

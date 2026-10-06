@@ -9,7 +9,8 @@
 [ext_resource type="Resource" path="res://data/fish/cua.tres" id="6_cua"]
 [ext_resource type="Resource" path="res://data/fish/ca_mu.tres" id="7_ca_mu"]
 [ext_resource type="Resource" path="res://data/fish/ca_thu_phat_sang.tres" id="8_ca_thu_phat_sang"]
+[ext_resource type="Resource" path="res://data/fish/oc_mong_tay.tres" id="9_oc_mong_tay"]
 
 [resource]
 script = ExtResource("1_catalog")
-fish = Array[ExtResource("1_fishdata")]([ExtResource("2_oc_huong"), ExtResource("3_tom"), ExtResource("4_muc"), ExtResource("5_ca_thu"), ExtResource("6_cua"), ExtResource("7_ca_mu"), ExtResource("8_ca_thu_phat_sang")])
+fish = Array[ExtResource("1_fishdata")]([ExtResource("2_oc_huong"), ExtResource("3_tom"), ExtResource("4_muc"), ExtResource("5_ca_thu"), ExtResource("6_cua"), ExtResource("7_ca_mu"), ExtResource("8_ca_thu_phat_sang"), ExtResource("9_oc_mong_tay")])

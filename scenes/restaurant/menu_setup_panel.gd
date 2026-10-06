@@ -1,8 +1,8 @@
 class_name MenuSetupPanel
 extends PanelContainer
 ## Pre-shift menu builder (Dave the Diver style). One row per dish with
-## +/- portion buttons; a dish is only addable while there is a free menu
-## slot and enough ingredients left in storage.
+## +/- portion buttons. Seafood dishes need a free menu slot and enough
+## ingredients in storage; market dishes (side dishes) need money instead.
 
 signal confirmed
 
@@ -49,7 +49,8 @@ func _build_row(dish: DishData) -> void:
 	swatch.color = dish.color
 	row.add_child(swatch)
 
-	var name_label := _label("%s · %dk" % [dish.display_name, dish.base_price], 150)
+	var side_text := " (món phụ)" if dish.is_market_dish() else ""
+	var name_label := _label("%s · %dk%s" % [dish.display_name, dish.base_price, side_text], 150)
 	row.add_child(name_label)
 	var stock_label := _label("", 140)
 	row.add_child(stock_label)
@@ -69,8 +70,10 @@ func _build_row(dish: DishData) -> void:
 
 
 func _refresh() -> void:
-	_title_label.text = "Chuẩn bị menu   (%d/%d món · %d phần)" % [
-		_plan.get_dishes().size(), _plan.slots, _plan.total_portions()]
+	_title_label.text = "Chuẩn bị menu   (%d/%d món hải sản · %d phần)" % [
+		_plan.used_slots(), _plan.slots, _plan.total_portions()]
+	if _plan.market_spent > 0:
+		_title_label.text += "\nTiền chợ: %dk (còn %dk)" % [_plan.market_spent, _plan.budget - _plan.market_spent]
 	var counts := KitchenLogic.count_by_fish(GameState.storage)
 	for dish: DishData in _rows:
 		var widgets: Dictionary = _rows[dish]
@@ -82,14 +85,18 @@ func _refresh() -> void:
 		widgets.stock.text = _stock_text(dish, counts)
 		widgets.row.modulate.a = 1.0 if can_add or portions > 0 else unavailable_alpha
 	_clear_button.disabled = _plan.total_portions() == 0
-	_auto_button.disabled = _menu.dishes.all(func(d: DishData) -> bool: return not _plan.can_add(d, GameState.storage))
+	# Auto only plans seafood, so it's useless when no seafood dish can be added.
+	_auto_button.disabled = _menu.dishes.all(func(d: DishData) -> bool:
+		return d.is_market_dish() or not _plan.can_add(d, GameState.storage))
 	_open_button.text = "Mở quán" if _plan.total_portions() > 0 else "Mở quán (không có món)"
 	if OS.is_debug_build() and GameState.storage.is_empty() and _plan.total_portions() == 0:
 		_title_label.text += "\n[debug] Kho trống — F1: thêm cá mẫu"
 
 
-## e.g. "Ốc hương 3/phần · kho 5"
+## e.g. "Ốc hương 3/phần · kho 5", or "Mua chợ 10k/phần" for market dishes.
 func _stock_text(dish: DishData, counts: Dictionary) -> String:
+	if dish.is_market_dish():
+		return "Mua chợ %dk/phần" % dish.market_cost
 	var parts: PackedStringArray = []
 	for fish_id in dish.ingredients:
 		parts.append("%s %d/phần · kho %d" % [

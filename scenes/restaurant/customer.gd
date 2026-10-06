@@ -15,7 +15,8 @@ enum State { WALKING_IN, WAITING, COOKING, LEAVING }
 @export var bubble_size: Vector2 = Vector2(96, 22)
 
 var dish: DishData
-## Ingredients set aside from storage for this order. Empty = can't be cooked.
+## Ingredients of the menu portion this customer ordered
+## (empty for market dishes).
 var ingredients: Array[InventoryItem] = []
 ## 1.0 = full patience, 0.0 = leaving.
 var patience: float = 1.0
@@ -28,10 +29,6 @@ func _ready() -> void:
 	size = body_size
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_shirt_color = Color.from_hsv(randf(), 0.5, 0.85)
-
-
-func can_be_served() -> bool:
-	return not ingredients.is_empty()
 
 
 func walk_to(target: Vector2) -> void:
@@ -84,10 +81,10 @@ func _draw_order_bubble() -> void:
 	var origin := Vector2((body_size.x - bubble_size.x) * 0.5, -bubble_size.y - 10)
 	draw_rect(Rect2(origin, bubble_size), Color(1, 1, 1, 0.92))
 	draw_rect(Rect2(origin + Vector2(3, 3), Vector2(8, 8)), dish.color)
-	var text_color := Color(0.15, 0.1, 0.1) if can_be_served() else Color(0.8, 0.15, 0.15)
+	var text_color := Color(0.15, 0.1, 0.1)
 	draw_string(font, origin + Vector2(14, 10), dish.display_name, HORIZONTAL_ALIGNMENT_LEFT,
 		bubble_size.x - 16, 8, text_color)
-	var status := "Đang nấu..." if state == State.COOKING else ("Bấm để nấu" if can_be_served() else "Hết nguyên liệu!")
+	var status := "Đang nấu..." if state == State.COOKING else "Bấm để nấu"
 	draw_string(font, origin + Vector2(14, 19), status, HORIZONTAL_ALIGNMENT_LEFT, bubble_size.x - 16, 7, text_color)
 	# Patience bar under the bubble: green -> red.
 	var bar := Rect2(origin + Vector2(0, bubble_size.y + 2), Vector2(bubble_size.x, 3))

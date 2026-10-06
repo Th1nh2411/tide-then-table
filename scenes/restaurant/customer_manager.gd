@@ -92,9 +92,6 @@ func _on_customer_clicked(customer: Customer) -> void:
 	if is_cooking():
 		message_requested.emit("Đang nấu món khác")
 		return
-	if not customer.can_be_served():
-		message_requested.emit("Kho không đủ nguyên liệu cho %s" % customer.dish.display_name)
-		return
 	_cooking_customer = customer
 	customer.set_cooking(true)
 	cooking.start(customer.dish)
