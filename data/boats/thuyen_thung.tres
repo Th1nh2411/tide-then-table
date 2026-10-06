@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BoatData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/boat_data.gd" id="1_boat"]
+
+[resource]
+script = ExtResource("1_boat")
+id = "thuyen_thung"
+display_name = "Thuyền thúng"
+max_speed = 60.0
+acceleration = 40.0
+turn_speed = 90.0
+spin_drift = 0.9
+hold_size = Vector2i(4, 3)
+hull_size = Vector2(16, 16)
+color = Color(0.6, 0.45, 0.25, 1)

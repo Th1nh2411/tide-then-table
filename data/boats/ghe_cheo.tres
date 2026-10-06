@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BoatData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/boat_data.gd" id="1_boat"]
+
+[resource]
+script = ExtResource("1_boat")
+id = "ghe_cheo"
+display_name = "Ghe chèo"
+max_speed = 100.0
+acceleration = 70.0
+turn_speed = 110.0
+spin_drift = 0.3
+hold_size = Vector2i(5, 4)
+hull_size = Vector2(24, 10)
+color = Color(0.45, 0.3, 0.18, 1)

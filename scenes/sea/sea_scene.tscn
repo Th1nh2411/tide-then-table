@@ -1,0 +1,188 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/sea/sea_scene.gd" id="1_sea"]
+[ext_resource type="Script" path="res://data/resources/boat_data.gd" id="2_boatdata"]
+[ext_resource type="Resource" path="res://data/boats/thuyen_thung.tres" id="3_thung"]
+[ext_resource type="Resource" path="res://data/boats/ghe_cheo.tres" id="4_cheo"]
+[ext_resource type="Resource" path="res://data/boats/ghe_may.tres" id="5_may"]
+[ext_resource type="Script" path="res://scenes/sea/map_bounds.gd" id="6_bounds"]
+[ext_resource type="Script" path="res://scenes/sea/land_block.gd" id="7_land"]
+[ext_resource type="Script" path="res://scenes/sea/rock.gd" id="8_rock"]
+[ext_resource type="PackedScene" path="res://scenes/sea/boat.tscn" id="9_boat"]
+[ext_resource type="Script" path="res://scenes/sea/dock.gd" id="10_dock"]
+[ext_resource type="Script" path="res://scenes/sea/day_tint.gd" id="11_tint"]
+[ext_resource type="PackedScene" path="res://scenes/ui/sea_hud.tscn" id="12_hud"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dock"]
+size = Vector2(70, 90)
+
+[node name="SeaScene" type="Node2D"]
+script = ExtResource("1_sea")
+debug_boats = Array[ExtResource("2_boatdata")]([ExtResource("3_thung"), ExtResource("4_cheo"), ExtResource("5_may")])
+
+[node name="Zones" type="Node2D" parent="."]
+
+[node name="OpenSea" type="ColorRect" parent="Zones"]
+offset_right = 1920.0
+offset_bottom = 560.0
+mouse_filter = 2
+color = Color(0.1, 0.28, 0.48, 1)
+
+[node name="Reef" type="ColorRect" parent="Zones"]
+offset_top = 560.0
+offset_right = 1920.0
+offset_bottom = 900.0
+mouse_filter = 2
+color = Color(0.16, 0.45, 0.6, 1)
+
+[node name="Nearshore" type="ColorRect" parent="Zones"]
+offset_top = 900.0
+offset_right = 1920.0
+offset_bottom = 1160.0
+mouse_filter = 2
+color = Color(0.35, 0.68, 0.78, 1)
+
+[node name="MapBounds" type="StaticBody2D" parent="."]
+script = ExtResource("6_bounds")
+map_size = Vector2i(1920, 1280)
+
+[node name="Land" type="Node2D" parent="."]
+
+[node name="Shore" type="StaticBody2D" parent="Land"]
+position = Vector2(0, 1160)
+script = ExtResource("7_land")
+size = Vector2(1920, 120)
+color = Color(0.76, 0.7, 0.48, 1)
+
+[node name="Pier" type="StaticBody2D" parent="Land"]
+position = Vector2(940, 1060)
+script = ExtResource("7_land")
+size = Vector2(24, 100)
+color = Color(0.45, 0.3, 0.18, 1)
+
+[node name="House1" type="ColorRect" parent="Land"]
+offset_left = 820.0
+offset_top = 1190.0
+offset_right = 860.0
+offset_bottom = 1220.0
+mouse_filter = 2
+color = Color(0.7, 0.35, 0.25, 1)
+
+[node name="House2" type="ColorRect" parent="Land"]
+offset_left = 1040.0
+offset_top = 1195.0
+offset_right = 1076.0
+offset_bottom = 1225.0
+mouse_filter = 2
+color = Color(0.6, 0.4, 0.3, 1)
+
+[node name="House3" type="ColorRect" parent="Land"]
+offset_left = 1110.0
+offset_top = 1185.0
+offset_right = 1150.0
+offset_bottom = 1215.0
+mouse_filter = 2
+color = Color(0.7, 0.35, 0.25, 1)
+
+[node name="VillageLabel" type="Label" parent="Land"]
+offset_left = 900.0
+offset_top = 1230.0
+offset_right = 1000.0
+offset_bottom = 1253.0
+text = "Làng chài"
+horizontal_alignment = 1
+
+[node name="DockLabel" type="Label" parent="Land"]
+offset_left = 970.0
+offset_top = 1130.0
+offset_right = 1010.0
+offset_bottom = 1153.0
+text = "Bến"
+
+[node name="Obstacles" type="Node2D" parent="."]
+
+[node name="Island1" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(480, 280)
+script = ExtResource("8_rock")
+radius = 70.0
+color = Color(0.35, 0.5, 0.3, 1)
+
+[node name="Island2" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(1450, 200)
+script = ExtResource("8_rock")
+radius = 55.0
+color = Color(0.35, 0.5, 0.3, 1)
+
+[node name="ReefRock1" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(260, 700)
+script = ExtResource("8_rock")
+radius = 18.0
+
+[node name="ReefRock2" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(320, 650)
+script = ExtResource("8_rock")
+radius = 12.0
+
+[node name="ReefRock3" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(700, 780)
+script = ExtResource("8_rock")
+radius = 22.0
+
+[node name="ReefRock4" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(1150, 640)
+script = ExtResource("8_rock")
+radius = 16.0
+
+[node name="ReefRock5" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(1210, 700)
+script = ExtResource("8_rock")
+radius = 24.0
+
+[node name="ReefRock6" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(1650, 760)
+script = ExtResource("8_rock")
+radius = 18.0
+
+[node name="ShoreRock" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(1550, 1000)
+script = ExtResource("8_rock")
+radius = 14.0
+
+[node name="Boat" parent="." instance=ExtResource("9_boat")]
+position = Vector2(1000, 1100)
+rotation = -1.5708
+
+[node name="Dock" type="Area2D" parent="."]
+position = Vector2(1000, 1110)
+script = ExtResource("10_dock")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dock"]
+shape = SubResource("RectangleShape2D_dock")
+
+[node name="Marker" type="ColorRect" parent="Dock"]
+offset_left = -35.0
+offset_top = -45.0
+offset_right = 35.0
+offset_bottom = 45.0
+mouse_filter = 2
+color = Color(1, 1, 1, 0.12)
+
+[node name="DayTint" type="CanvasModulate" parent="."]
+script = ExtResource("11_tint")
+
+[node name="SeaHud" parent="." instance=ExtResource("12_hud")]
+
+[node name="DebugLayer" type="CanvasLayer" parent="."]
+
+[node name="DebugLabel" type="Label" parent="DebugLayer"]
+unique_name_in_owner = true
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -20.0
+offset_right = 400.0
+offset_bottom = -4.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 10
+text = "debug"
