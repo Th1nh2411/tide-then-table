@@ -12,6 +12,11 @@
 [ext_resource type="Script" path="res://scenes/sea/dock.gd" id="10_dock"]
 [ext_resource type="Script" path="res://scenes/sea/day_tint.gd" id="11_tint"]
 [ext_resource type="PackedScene" path="res://scenes/ui/sea_hud.tscn" id="12_hud"]
+[ext_resource type="Script" path="res://scenes/sea/sea_zone.gd" id="13_zone"]
+[ext_resource type="Script" path="res://scenes/sea/fishing_spot_spawner.gd" id="14_spawner"]
+[ext_resource type="PackedScene" path="res://scenes/sea/fishing_spot.tscn" id="15_spot"]
+[ext_resource type="Script" path="res://scenes/sea/fishing_controller.gd" id="16_fishing"]
+[ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="17_catalog"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dock"]
 size = Vector2(70, 90)
@@ -27,6 +32,9 @@ offset_right = 1920.0
 offset_bottom = 560.0
 mouse_filter = 2
 color = Color(0.1, 0.28, 0.48, 1)
+script = ExtResource("13_zone")
+zone = 2
+spot_count = 4
 
 [node name="Reef" type="ColorRect" parent="Zones"]
 offset_top = 560.0
@@ -34,6 +42,9 @@ offset_right = 1920.0
 offset_bottom = 900.0
 mouse_filter = 2
 color = Color(0.16, 0.45, 0.6, 1)
+script = ExtResource("13_zone")
+zone = 1
+spot_count = 4
 
 [node name="Nearshore" type="ColorRect" parent="Zones"]
 offset_top = 900.0
@@ -41,6 +52,9 @@ offset_right = 1920.0
 offset_bottom = 1160.0
 mouse_filter = 2
 color = Color(0.35, 0.68, 0.78, 1)
+script = ExtResource("13_zone")
+zone = 0
+spot_count = 4
 
 [node name="MapBounds" type="StaticBody2D" parent="."]
 script = ExtResource("6_bounds")
@@ -148,6 +162,11 @@ position = Vector2(1550, 1000)
 script = ExtResource("8_rock")
 radius = 14.0
 
+[node name="FishingSpots" type="Node2D" parent="." node_paths=PackedStringArray("zones_root")]
+script = ExtResource("14_spawner")
+spot_scene = ExtResource("15_spot")
+zones_root = NodePath("../Zones")
+
 [node name="Boat" parent="." instance=ExtResource("9_boat")]
 position = Vector2(1000, 1100)
 rotation = -1.5708
@@ -171,6 +190,13 @@ color = Color(1, 1, 1, 0.12)
 script = ExtResource("11_tint")
 
 [node name="SeaHud" parent="." instance=ExtResource("12_hud")]
+
+[node name="FishingController" type="Node" parent="." node_paths=PackedStringArray("spawner", "boat", "hud")]
+script = ExtResource("16_fishing")
+catalog = ExtResource("17_catalog")
+spawner = NodePath("../FishingSpots")
+boat = NodePath("../Boat")
+hud = NodePath("../SeaHud")
 
 [node name="DebugLayer" type="CanvasLayer" parent="."]
 

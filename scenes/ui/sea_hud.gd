@@ -4,6 +4,9 @@ extends CanvasLayer
 
 @export var warning_color: Color = Color(1.0, 0.85, 0.3)
 @export var late_color: Color = Color(1.0, 0.4, 0.35)
+@export var flash_seconds: float = 1.5
+
+var _message_token: int = 0
 
 @onready var _clock_label: Label = %ClockLabel
 @onready var _warning_label: Label = %WarningLabel
@@ -30,8 +33,19 @@ func hide_prompt() -> void:
 
 ## Big centered message, e.g. when the boat gets towed.
 func show_message(text: String) -> void:
+	_message_token += 1
 	_message_label.text = text
 	_message_label.show()
+
+
+## Centered message that hides itself after `seconds`.
+func flash_message(text: String, seconds: float = flash_seconds) -> void:
+	show_message(text)
+	# Token check: a newer message must not be hidden by an older timer.
+	var token := _message_token
+	await get_tree().create_timer(seconds).timeout
+	if token == _message_token:
+		_message_label.hide()
 
 
 func _on_time_changed(_minutes: float) -> void:

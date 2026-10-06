@@ -304,7 +304,7 @@ Lặn biển, thế giới song song, dị biến cơ thể, dụng cụ kết h
 | 0 — Khởi tạo             | ✅         | Godot 4.7.2; autoload GameState/DayClock/SceneRouter, main menu, sea scene trống |
 | 1 — Lái thuyền           | ✅         | Map 1920x1280, 3 BoatData, spin drift, phím debug 1/2/3 đổi thuyền |
 | 2 — Thời gian & về bến   | ✅         | Trễ tính theo phút (pro-rata); màn quán tạm có nút "Ngày mới (tạm)" — thay ở Phase 6/7 |
-| 3 — Điểm câu             | ⬜         |         |
+| 3 — Điểm câu             | ✅         | 7 loài + fish_catalog.tres; 4 spot/zone, 2–4 lượt, mỗi lượt +20 phút game; minigame tạm là thông báo |
 | 4 — Minigame câu         | ⬜         |         |
 | 5 — Khoang xếp hình      | ⬜         |         |
 | 6 — Quán ăn              | ⬜         |         |
