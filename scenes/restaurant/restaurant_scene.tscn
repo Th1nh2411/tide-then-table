@@ -14,6 +14,8 @@
 [ext_resource type="Script" path="res://data/resources/upgrade_data.gd" id="12_updata"]
 [ext_resource type="Script" path="res://scenes/ui/repair_button.gd" id="13_repair"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="14_pause"]
+[ext_resource type="Resource" path="res://data/upgrades/lamp_upgrade.tres" id="15_lampup"]
+[ext_resource type="PackedScene" path="res://scenes/ui/phone_app.tscn" id="16_phone"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -395,7 +397,7 @@ theme_override_constants/separation = 8
 [node name="AutoButton" type="Button" parent="MenuSetupPanel/Margin/VBox/Buttons"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Tự động"
+text = "Chạy script tự động"
 
 [node name="ClearButton" type="Button" parent="MenuSetupPanel/Margin/VBox/Buttons"]
 unique_name_in_owner = true
@@ -418,7 +420,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("8_shop")
-upgrades = Array[ExtResource("12_updata")]([ExtResource("9_boatup"), ExtResource("10_rodup"), ExtResource("11_fridgeup")])
+upgrades = Array[ExtResource("12_updata")]([ExtResource("9_boatup"), ExtResource("10_rodup"), ExtResource("15_lampup"), ExtResource("11_fridgeup")])
 
 [node name="Margin" type="MarginContainer" parent="UpgradeShop"]
 layout_mode = 2
@@ -452,7 +454,7 @@ theme_override_constants/separation = 6
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Ra khơi ngày mới"
+text = "Ra khơi đêm mới"
 
 [node name="CustomerManager" type="Node" parent="." node_paths=PackedStringArray("cooking", "customer_layer")]
 script = ExtResource("2_mgr")
@@ -466,3 +468,5 @@ door_position = Vector2(605, 228)
 [node name="CookingOverlay" parent="." instance=ExtResource("5_cooking")]
 
 [node name="PauseMenu" parent="." instance=ExtResource("14_pause")]
+
+[node name="PhoneApp" parent="." instance=ExtResource("16_phone")]

@@ -3,8 +3,8 @@ extends CanvasLayer
 ## Fishing overlay. For rod fish it runs two stages: BiteGame (wait for the
 ## bite and strike) then the fight (TIMING or TENSION). Nets go straight to
 ## HAUL. Shows the result briefly, then reports quality and how many were
-## caught (more than 1 when hauling a net). The day clock runs slower while
-## the overlay is open so longer fights don't eat the whole day.
+## caught (more than 1 when hauling a net). LampOil burns slower while this
+## overlay is running, so longer fights don't eat the whole night.
 
 signal finished(fish: FishData, caught: bool, quality: float, count: int)
 ## The player pressed the hold button / key during the minigame.
@@ -17,8 +17,6 @@ signal hold_requested
 ## Pause between hooking the fish and the fight starting.
 @export var hooked_pause_seconds: float = 0.6
 @export var aberrant_title_color: Color = Color(0.5, 1.0, 0.9)
-## DayClock speed while fishing (1.0 = normal).
-@export var clock_scale_while_fishing: float = 0.5
 
 var _fish: FishData
 var _game: MinigameBase
@@ -58,7 +56,6 @@ func start(fish: FishData, zone_scale: float = 1.0, count: int = 1) -> void:
 	_bite_clean = true
 	_result_label.text = ""
 	_title_label.modulate = Color.WHITE
-	DayClock.speed_scale = clock_scale_while_fishing
 	if fish.minigame == FishData.Minigame.HAUL:
 		_in_bite_stage = false
 		_title_label.text = "Kéo lưới: %s" % fish.display_name
@@ -112,7 +109,6 @@ func _on_game_completed(success: bool, perfect: bool) -> void:
 	var count := _game.catch_count if success else 0
 	await get_tree().create_timer(result_seconds).timeout
 	_free_game()
-	DayClock.speed_scale = 1.0
 	hide()
 	finished.emit(_fish, success, quality, count)
 

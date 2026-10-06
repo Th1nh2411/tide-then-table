@@ -6,9 +6,9 @@ const MAIN_MENU_PATH: String = "res://scenes/main_menu/main_menu.tscn"
 
 @export_multiline var lines: Array[String] = [
 	"...Nước đang xoáy ngược chiều gió.",
-	"Ánh sáng này... cùng màu với lũ cá phát sáng ngoài khơi.",
+	"App vẫn báo lỗi: tọa độ này không tồn tại trên bản đồ.",
 	"Ông nội từng kể về một vùng biển nằm bên dưới mặt biển.",
-	"Mình phải xuống xem cho rõ.",
+	"Có bug thì phải debug. Mình phải xuống xem cho rõ.",
 ]
 @export var line_fade_seconds: float = 0.8
 @export var seconds_between_lines: float = 1.6

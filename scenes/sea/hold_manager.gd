@@ -41,6 +41,7 @@ func get_items() -> Array[InventoryItem]:
 
 
 func add_catch(fish: FishData, quality: float, count: int) -> void:
+	GameState.record_catch(fish, count)  # for the phone's Dex
 	var overflow: Array[InventoryItem] = []
 	for i in count:
 		var item := InventoryItem.new(fish, quality)

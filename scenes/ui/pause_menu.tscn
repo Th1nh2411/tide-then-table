@@ -67,7 +67,7 @@ custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.6, 1)
 theme_override_font_sizes/font_size = 9
-text = "Game tự lưu lúc 6:00 mỗi sáng."
+text = "Game tự lưu mỗi đêm lúc ra khơi."
 horizontal_alignment = 1
 autowrap_mode = 3
 
@@ -80,6 +80,6 @@ text = "Phím điều khiển
 WASD / mũi tên: lái thuyền
 E: câu · cập bến · kéo lưới      Q: thả lưới ốc
 Tab: mở khoang      R: xoay cá (khi đang kéo)
-F: sửa thuyền (ở bến)      Esc: tạm dừng
+F: sửa thuyền (ở bến)      J: điện thoại      Esc: tạm dừng
 Space / chuột trái: thao tác trong minigame"
 autowrap_mode = 3

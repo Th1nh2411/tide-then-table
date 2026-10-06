@@ -66,6 +66,8 @@ static func to_dict() -> Dictionary:
 		"story_flags": GameState.story_flags.duplicate(),
 		"last_rating": GameState.last_rating,
 		"boat_hp": GameState.boat_hp,
+		"caught_species": GameState.caught_species.duplicate(),
+		"day_history": GameState.day_history.duplicate(true),
 	}
 
 
@@ -91,6 +93,18 @@ static func apply_dict(data: Dictionary) -> void:
 		for upgrade_id: Variant in levels:
 			if upgrade_id is String and (levels[upgrade_id] is int or levels[upgrade_id] is float):
 				GameState.upgrade_levels[upgrade_id] = maxi(int(levels[upgrade_id]), 0)
+
+	var caught: Variant = data.get("caught_species")
+	if caught is Dictionary:
+		for fish_id: Variant in caught:
+			if fish_id is String and (caught[fish_id] is int or caught[fish_id] is float):
+				GameState.caught_species[fish_id] = maxi(int(caught[fish_id]), 0)
+
+	var history: Variant = data.get("day_history")
+	if history is Array:
+		for entry: Variant in history:
+			if entry is Dictionary:
+				GameState.add_day_record(entry)
 
 	var flags: Variant = data.get("story_flags")
 	if flags is Dictionary:

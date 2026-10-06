@@ -1,0 +1,108 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/phone_app.gd" id="1_phone"]
+[ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="2_fish"]
+[ext_resource type="Resource" path="res://data/dishes/menu.tres" id="3_menu"]
+[ext_resource type="Resource" path="res://data/upgrades/boat_upgrade.tres" id="4_boatup"]
+[ext_resource type="Resource" path="res://data/upgrades/lamp_upgrade.tres" id="5_lampup"]
+[ext_resource type="Resource" path="res://data/upgrades/fridge_upgrade.tres" id="6_fridgeup"]
+[ext_resource type="Resource" path="res://data/upgrades/rod_upgrade.tres" id="7_rodup"]
+[ext_resource type="Script" path="res://data/resources/upgrade_data.gd" id="8_updata"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_phone"]
+bg_color = Color(0.07, 0.08, 0.1, 1)
+border_width_left = 3
+border_width_top = 8
+border_width_right = 3
+border_width_bottom = 8
+border_color = Color(0.25, 0.27, 0.3, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="PhoneApp" type="CanvasLayer"]
+process_mode = 3
+layer = 25
+script = ExtResource("1_phone")
+fish_catalog = ExtResource("2_fish")
+menu = ExtResource("3_menu")
+boat_upgrade = ExtResource("4_boatup")
+lamp_upgrade = ExtResource("5_lampup")
+fridge_upgrade = ExtResource("6_fridgeup")
+upgrades = Array[ExtResource("8_updata")]([ExtResource("4_boatup"), ExtResource("7_rodup"), ExtResource("5_lampup"), ExtResource("6_fridgeup")])
+
+[node name="Dim" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="Phone" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -170.0
+offset_right = 200.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_phone")
+
+[node name="Margin" type="MarginContainer" parent="Phone"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="VBox" type="VBoxContainer" parent="Phone/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="AppTitle" type="Label" parent="Phone/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "Rin's Catch"
+
+[node name="TabsRow" type="HBoxContainer" parent="Phone/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Phone/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ContentLabel" type="Label" parent="Phone/Margin/VBox/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.92, 0.95, 1)
+theme_override_font_sizes/font_size = 9
+text = "content"
+autowrap_mode = 3
+
+[node name="LogLabel" type="Label" parent="Phone/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.95, 0.55, 1)
+theme_override_font_sizes/font_size = 8
+text = "[INFO] ..."
+autowrap_mode = 3
+
+[node name="Hint" type="Label" parent="Phone/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1)
+theme_override_font_sizes/font_size = 8
+text = "J / Esc: đóng    A / D: đổi tab    // TODO: làm đẹp UI sau"
+horizontal_alignment = 1

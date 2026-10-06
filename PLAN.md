@@ -7,16 +7,18 @@
 
 ## 1. Bối cảnh
 
-RIN THE FISHER là game 2D: ban ngày nhân vật Rin lái thuyền ra biển câu hải sản, ban đêm bán món ăn tại quán hải sản Việt Nam, kiếm tiền để nâng cấp thuyền, dụng cụ và quán.
+RIN THE FISHER là game 2D: **ban đêm** (0:00–6:00) Rin thắp đèn câu, lái thuyền ra biển câu hải sản; **sáng** (6:00–15:00) về nhà ngủ; **chiều tối** (15:00–24:00) bán món ăn tại quán hải sản Việt Nam, kiếm tiền để nâng cấp thuyền, dụng cụ và quán.
+
+**Nhân vật:** Rin từng là developer ở thành phố, bỏ việc về làng chài nối nghề biển và mở quán hải sản. Rin tự viết app điện thoại **"Rin's Catch"** (phím J) để quản lý kho, menu, sách cá (Dex), thuyền và sổ sách; app ghi log lỗi khi gặp cá biến dị / tọa độ lạ — manh mối cốt truyện ("có bug thì phải debug").
 
 **Mục tiêu MVP:** kiểm chứng vòng lặp cốt lõi có vui không:
 
 ```
-Lái thuyền ra biển → Tìm điểm câu → Câu (minigame) → Xếp vào khoang (lưới xếp hình)
-→ Về bến trước giờ mở quán → Nấu & bán → Nhận tiền → Nâng cấp → Ngày mới
+Thắp đèn ra khơi → Tìm điểm câu → Câu (minigame) → Xếp vào khoang (lưới xếp hình)
+→ Về bến trước khi cạn dầu đèn → Ngủ → Chuẩn bị menu → Nấu & bán → Nhận tiền → Nâng cấp → Đêm mới
 ```
 
-Áp lực chính của game là **thời gian**: ở ngoài biển lâu thì câu được nhiều hơn, nhưng về trễ thì quán mở trễ và bán được ít hơn.
+Áp lực chính ngoài biển là **dầu đèn câu** (kiểu bình oxy của Dave the Diver, không có đồng hồ đếm giờ): dầu cháy dần và tốn thêm mỗi lượt câu/lưới; ở lâu thì câu được nhiều nhưng cạn dầu ngoài khơi là phải gọi cứu hộ (mất tiền). Cùng với chỗ trong khoang và độ bền thuyền. Giờ hiển thị suy ra từ dầu: đầy = 0:00, cạn = bình minh 6:00.
 
 Người chơi trải hết MVP trong khoảng 15–20 phút. Kết thúc bằng một cảnh ngắn: Rin thấy một xoáy nước phát sáng giữa vùng sương mù ngoài khơi.
 
@@ -105,6 +107,7 @@ res://
 | `pause`                              | Esc                                             |
 | `drop_net`                           | Q (thả lưới ốc)                                 |
 | `repair_boat`                        | F (sửa thuyền, chỉ khi ở khu bến)               |
+| `open_phone`                         | J (app điện thoại Rin's Catch)                  |
 
 ---
 
@@ -147,6 +150,8 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 | `cua`              | Cua              | 2x2       | REEF                     | TIMING   | 0.4    | 50  |
 | `ca_mu`            | Cá mú            | 2x3       | REEF, OPEN_SEA           | TENSION  | 0.8    | 90  |
 | `ca_thu_phat_sang` | Cá thu phát sáng | 1x3       | OPEN_SEA (rất hiếm), FOG | TENSION  | 0.9    | 200 |
+
+> **Đổi cơ chế ngày (sau Phase 9, thay Phase 2):** bỏ đồng hồ giới hạn. Ngày = Đêm (ra khơi, giới hạn bằng dầu đèn: 100 = ~4 phút thật, câu −2, thả lưới −1, kéo lưới −2, minigame cháy x0.5, cạn ngoài khơi = cứu hộ −80k) → màn Nghỉ ngơi (giờ cập bến, mẻ cá) → Quán 15:00–24:00 (3 phút thật cố định). Bỏ phạt về trễ. Dầu tự đổ đầy miễn phí mỗi đêm; nâng cấp "Bình dầu đèn" làm bình to hơn: 100 → 140 (150k) → 190 (400k). Lưới đầy sau 90 giây ở biển. Trời đêm xanh đậm, rạng dần khi dầu dưới ~1/3.
 
 > **Tiện ích (sau Phase 9):** Esc = menu tạm dừng (Tiếp tục / Về menu — bấm 2 lần / Thoát + bảng phím) ở biển và quán. Mũi tên mép màn hình chỉ Bến, Lưới, và xoáy nước "???" kèm khoảng cách (m). Ngày 1 có gợi ý theo ngữ cảnh. "Chơi mới" khi đã có save phải bấm 2 lần.
 
@@ -318,7 +323,7 @@ Lặn biển, thế giới song song, dị biến cơ thể, dụng cụ kết h
 | ------------------------ | ---------- | ------- |
 | 0 — Khởi tạo             | ✅         | Godot 4.7.2; autoload GameState/DayClock/SceneRouter, main menu, sea scene trống |
 | 1 — Lái thuyền           | ✅         | Map 1920x1280, 3 BoatData, spin drift, phím debug 1/2/3 đổi thuyền |
-| 2 — Thời gian & về bến   | ✅         | Trễ tính theo phút (pro-rata); màn quán tạm có nút "Ngày mới (tạm)" — thay ở Phase 6/7 |
+| 2 — Thời gian & về bến   | ✅ (đã thay) | Trễ tính theo phút (pro-rata); màn quán tạm có nút "Ngày mới (tạm)" — thay ở Phase 6/7 |
 | 3 — Điểm câu             | ✅         | 7 loài + fish_catalog.tres; 4 spot/zone, 2–4 lượt, mỗi lượt +20 phút game; minigame tạm là thông báo |
 | 4 — Minigame câu         | ✅         | TIMING + TENSION; cần câu tạm = +15% vùng xanh/cấp (đổi sang UpgradeData ở Phase 7); test: scenes/test/fishing_minigame_test.tscn |
 | 5 — Khoang xếp hình      | ✅         | GridInventory thuần + HoldUI kéo-thả, khay "Cá mới" + ô "Bỏ"; overflow = pause; test: scenes/test/grid_inventory_test.tscn |

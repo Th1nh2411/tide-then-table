@@ -1,6 +1,6 @@
 class_name SeaHud
 extends CanvasLayer
-## Sea screen HUD: day + clock, opening-time warnings, context prompts.
+## Sea screen HUD: day + night clock, lamp oil, nets, hull, prompts, tips.
 
 @export var warning_color: Color = Color(1.0, 0.85, 0.3)
 @export var late_color: Color = Color(1.0, 0.4, 0.35)
@@ -13,8 +13,10 @@ var _message_token: int = 0
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _message_label: Label = %MessageLabel
 @onready var _net_label: Label = %NetLabel
+@onready var _oil_label: Label = %OilLabel
 @onready var _hull_label: Label = %HullLabel
 @onready var _tip_label: Label = %TipLabel
+@onready var _money_label: Label = %MoneyLabel
 
 
 func _ready() -> void:
@@ -22,11 +24,29 @@ func _ready() -> void:
 	hide_prompt()
 	_message_label.hide()
 	_tip_label.hide()
+	GameState.money_changed.connect(_on_money_changed)
+	_on_money_changed(GameState.money)
 	_on_time_changed(DayClock.current_minutes)
+
+
+func set_oil(amount: float, capacity: float) -> void:
+	var fraction := amount / capacity
+	_oil_label.text = "Dầu đèn %d%%" % roundi(fraction * 100.0)
+	_oil_label.modulate = late_color if fraction <= 0.25 else (warning_color if fraction <= 0.5 else Color.WHITE)
+	if fraction <= 0.25:
+		_warning_label.text = "Dầu sắp cạn! Về bến trước khi tắt đèn"
+		_warning_label.modulate = late_color
+		_warning_label.show()
+	else:
+		_warning_label.hide()
 
 
 func set_nets(available: int, total: int) -> void:
 	_net_label.text = "Lưới %d/%d  [Q] thả" % [available, total]
+
+
+func _on_money_changed(money: int) -> void:
+	_money_label.text = "%dk   [J] điện thoại" % money
 
 
 ## Persistent tutorial tip (bottom-left) until replaced or hidden.
@@ -68,14 +88,4 @@ func flash_message(text: String, seconds: float = flash_seconds) -> void:
 
 
 func _on_time_changed(_minutes: float) -> void:
-	_clock_label.text = "Ngày %d   %s" % [GameState.day, DayClock.get_time_text()]
-	if DayClock.is_late():
-		_warning_label.text = "Trễ giờ mở quán! Ca bán còn %d%%" % roundi(DayClock.get_shift_ratio() * 100)
-		_warning_label.modulate = late_color
-		_warning_label.show()
-	elif DayClock.is_warning_time():
-		_warning_label.text = "Sắp tới giờ mở quán (18:00)"
-		_warning_label.modulate = warning_color
-		_warning_label.show()
-	else:
-		_warning_label.hide()
+	_clock_label.text = "Đêm %d   %s" % [GameState.day, DayClock.get_time_text()]

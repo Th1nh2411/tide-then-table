@@ -1,7 +1,8 @@
 # Rin The Fisher — notes for coding agents
 
-2D Godot game: fish at sea by day (top-down), cook and sell at a Vietnamese
-seafood restaurant by night (side view), upgrade, repeat. `PLAN.md` is the
+2D Godot game: fish at sea at night (top-down, limited by lamp oil, Dave the
+Diver style — no ticking clock), sleep, then cook and sell at a Vietnamese
+seafood restaurant 15:00–24:00 (side view), upgrade, repeat. `PLAN.md` is the
 design source of truth (data tables, phase list, progress table, out-of-scope
 list). The user is a solo dev new to Godot and writes in Vietnamese; reply in
 Vietnamese, keep code comments in short English.
@@ -59,19 +60,27 @@ Vietnamese, keep code comments in short English.
 
 ## Map of the game
 - Autoloads: `GameState` (money, day, storage, upgrades, flags, boat_hp,
-  rating), `DayClock` (time, `speed_scale`, deadline), `SceneRouter`
-  (`go_to(path, fade_color)`).
-- Flow: main menu → sea (`scenes/sea/sea_scene.tscn`, autosave at 6:00) →
-  dock/tow/rescue → restaurant (menu planning → shift → summary + rating →
-  upgrade shop) → next day (freshness loss) → sea … ending via fog whirlpool.
+  rating, last_catch), `DayClock` (display-only time of day: driven by
+  `LampOil` at sea and by shift progress in the restaurant; `running` = night
+  trip in progress), `SceneRouter` (`go_to(path, fade_color)`).
+- Flow: main menu → sea night trip (`scenes/sea/sea_scene.tscn`, autosave at
+  start) → dock / rescue (broken hull or no oil) → rest card
+  (`scenes/rest/rest_scene.tscn`) → restaurant (menu planning → shift →
+  summary + rating → upgrade shop) → next day (freshness loss) → sea …
+  ending via fog whirlpool.
 - Sea scene controllers: `FishingController` (rod spots → `FishingMinigame`:
   BiteGame then Timing/Tension), `NetController` (Q nets → HaulGame),
   `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab), `HullController`
-  (collision damage, F repair at dock), `FogArea` (story), `DayTint`, `SeaHud`,
+  (collision damage, F repair at dock), `LampOil` (trip limit + displayed
+  time), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,
   `OffscreenMarkers` (edge arrows), `TutorialHints` (day 1), `PauseMenu` (Esc;
   must sit before `HoldUI` in the tree so the hold can eat Esc first).
 - Restaurant: `MenuSetupPanel` + `MenuPlan`, `CustomerManager`,
   `CookingOverlay` (Grill/Steam/Stir), `UpgradeShop`, `RepairButton`.
+- Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and
+  restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is
+  an ex-developer who wrote the app; story clues appear as `[WARN]`/`[ERR]`
+  log lines and glitched aberrant-fish names.
 
 ## Workflow the user expects
 - Propose first when asked for ideas; implement after they agree.

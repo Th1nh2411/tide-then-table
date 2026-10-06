@@ -34,6 +34,8 @@ func _test_round_trip() -> void:
 	var item := InventoryItem.new(_fish("cua"), 0.7)
 	item.freshness = 65.0
 	GameState.storage.append(item)
+	GameState.record_catch(_fish("cua"), 3)
+	GameState.add_day_record({"day": 5, "earned": 300, "market": 20, "rating": 4})
 	_check("save writes file", SaveSystem.save_game(TEST_PATH) and SaveSystem.has_save(TEST_PATH))
 	GameState.reset()
 	_check("load ok", SaveSystem.load_game(TEST_PATH))
@@ -42,6 +44,8 @@ func _test_round_trip() -> void:
 	_check("rating", GameState.last_rating == 4)
 	_check("upgrades", GameState.get_upgrade_level("boat") == 2 and GameState.get_upgrade_level("rod") == 1)
 	_check("story flag", GameState.has_flag("saw_glowing_fish"))
+	_check("dex counts", int(GameState.caught_species.get("cua", 0)) == 3)
+	_check("day history", GameState.day_history.size() == 1 and int(GameState.day_history[0].get("earned", 0)) == 300)
 	var loaded: InventoryItem = GameState.storage[0] if GameState.storage.size() == 1 else null
 	_check("storage item", loaded != null and loaded.fish.id == "cua"
 		and is_equal_approx(loaded.quality, 0.7) and is_equal_approx(loaded.freshness, 65.0))

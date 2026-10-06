@@ -2,7 +2,7 @@ class_name NetController
 extends Node
 ## Nets for shellfish (catch_method = NET). Press `drop_net` while slow in a
 ## zone where such species live to drop a net (a buoy appears). The longer it
-## soaks (in-game time), the more it holds. Come back, press `interact` and
+## soaks (real seconds at sea), the more it holds. Come back, press `interact` and
 ## win the HAUL minigame to bring the catch aboard. Nets left at sea when the
 ## day ends lose their catch.
 
@@ -17,18 +17,20 @@ signal nets_changed(available: int, total: int)
 @export var zones_root: Node
 @export var buoy_scene: PackedScene
 @export var buoy_parent: Node2D
+@export var oil: LampOil
 ## Nets carried on the boat (upgrade later).
 @export var net_count: int = 2
 @export var max_drop_speed: float = 15.0
-## In-game minutes of soaking for a full net.
-@export var minutes_to_full: float = 180.0
+## Seconds at sea for a net to fill up.
+@export var seconds_to_full: float = 90.0
 ## Shellfish in a full net.
 @export var max_catch: int = 8
 @export var min_buoy_distance: float = 80.0
 ## Buoy is placed this far behind the boat so you don't haul it by accident.
 @export var drop_offset: float = 40.0
-@export var minutes_per_drop: float = 5.0
-@export var minutes_per_haul: float = 15.0
+## Lamp oil spent dropping / hauling a net.
+@export var oil_per_drop: float = 1.0
+@export var oil_per_haul: float = 2.0
 ## Fewer snags per "net" upgrade level (same idea as the rod bonus).
 @export var net_bonus_per_level: float = 0.15
 
@@ -56,7 +58,7 @@ func nets_available() -> int:
 
 ## How many shellfish a buoy's net holds right now.
 func expected_catch(buoy: NetBuoy) -> int:
-	return roundi(max_catch * clampf(buoy.soak_minutes() / minutes_to_full, 0.0, 1.0))
+	return roundi(max_catch * buoy.fill_ratio())
 
 
 func _process(_delta: float) -> void:
@@ -93,13 +95,12 @@ func _try_drop() -> void:
 	var buoy: NetBuoy = buoy_scene.instantiate()
 	buoy.global_position = drop_pos
 	buoy.fish = fish
-	buoy.drop_minutes = DayClock.current_minutes
-	buoy.full_minutes = minutes_to_full
+	buoy.full_seconds = seconds_to_full
 	buoy.haulable_changed.connect(_on_buoy_haulable_changed)
 	buoy.haul_requested.connect(_on_haul_requested)
 	buoy_parent.add_child(buoy)
 	_buoys.append(buoy)
-	DayClock.advance(minutes_per_drop)
+	oil.spend(oil_per_drop)
 	hud.flash_message("Đã thả lưới, quay lại sau để kéo")
 	_emit_nets()
 
@@ -116,9 +117,8 @@ func _on_buoy_haulable_changed(buoy: NetBuoy, can_haul: bool) -> void:
 
 
 func _show_haul_prompt(buoy: NetBuoy) -> void:
-	var soak := buoy.soak_minutes()
-	hud.show_prompt("E: Kéo lưới (ngâm %dh%02d · ~%d con)" % [
-		int(soak) / 60, int(soak) % 60, expected_catch(buoy)])
+	hud.show_prompt("E: Kéo lưới (đầy %d%% · ~%d con)" % [
+		roundi(buoy.fill_ratio() * 100.0), expected_catch(buoy)])
 
 
 func _on_haul_requested(buoy: NetBuoy) -> void:
@@ -138,7 +138,7 @@ func _on_haul_requested(buoy: NetBuoy) -> void:
 	_active = true
 	boat.speed = 0.0
 	boat.set_physics_process(false)
-	DayClock.advance(minutes_per_haul)
+	oil.spend(oil_per_haul)
 	var bonus := 1.0 + GameState.get_upgrade_level("net") * net_bonus_per_level
 	minigame.start(fish, bonus, count)
 

@@ -1,13 +1,12 @@
 class_name TutorialHints
 extends Node
-## Day-1 tips shown in the HUD, advancing with what the player does:
-## start -> first catch -> late afternoon. Does nothing on later days.
+## Night-1 tips shown in the HUD, advancing with what the player does:
+## start -> first catch -> lamp oil low. Does nothing on later nights.
 
 @export var hud: SeaHud
 @export var fishing: FishingController
 @export var nets: NetController
-## In-game hour from which the "go back to the dock" tip shows.
-@export var return_hint_hour: int = 16
+@export var oil: LampOil
 
 enum Step { DRIVE, AFTER_CATCH, GO_HOME, DONE }
 
@@ -18,10 +17,10 @@ func _ready() -> void:
 	if GameState.day != 1:
 		return
 	_step = Step.DRIVE
-	hud.show_tip("Lái bằng WASD. Tìm đám bọt trắng, dừng thuyền rồi bấm E để câu.")
+	hud.show_tip("Lái bằng WASD. Tìm đám bọt trắng, dừng thuyền rồi bấm E để câu. Đèn câu tốn dầu: hết dầu là phải về.")
 	fishing.fish_caught.connect(_on_catch)
 	nets.fish_caught.connect(_on_catch)
-	DayClock.time_changed.connect(_on_time_changed)
+	oil.oil_low.connect(_on_oil_low)
 
 
 func _on_catch(_fish: FishData, _quality: float, _count: int) -> void:
@@ -30,7 +29,7 @@ func _on_catch(_fish: FishData, _quality: float, _count: int) -> void:
 		hud.show_tip("Tab: xem khoang. Q: thả lưới ốc ở vùng nước nông, lát quay lại phao bấm E để kéo.")
 
 
-func _on_time_changed(minutes: float) -> void:
-	if _step != Step.DONE and _step != Step.GO_HOME and minutes >= return_hint_hour * 60:
+func _on_oil_low() -> void:
+	if _step != Step.DONE and _step != Step.GO_HOME:
 		_step = Step.GO_HOME
-		hud.show_tip("Theo mũi tên \"Bến\" về cập bến (E) trước 18:00 để mở quán đúng giờ.")
+		hud.show_tip("Dầu sắp cạn, trời sắp sáng. Theo mũi tên \"Bến\" về cập bến (E) trước khi tắt đèn.")

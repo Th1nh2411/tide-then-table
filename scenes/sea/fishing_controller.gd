@@ -1,8 +1,8 @@
 class_name FishingController
 extends Node
 ## Handles a fishing attempt at a spot: picks the species by zone and weight,
-## spends a cast and in-game time, then runs the minigame while the boat
-## holds still. The day clock keeps running during the minigame.
+## spends a cast and some lamp oil, then runs the minigame while the boat
+## holds still. Oil keeps burning (slower) during the minigame.
 
 ## Emitted on a successful catch; the hold manager stores it.
 signal fish_caught(fish: FishData, quality: float, count: int)
@@ -12,8 +12,9 @@ signal fish_caught(fish: FishData, quality: float, count: int)
 @export var boat: Boat
 @export var hud: SeaHud
 @export var minigame: FishingMinigame
-## In-game minutes each cast costs (on top of real minigame time).
-@export var minutes_per_cast: float = 10.0
+@export var oil: LampOil
+## Lamp oil each cast costs (on top of burning during the minigame).
+@export var oil_per_cast: float = 2.0
 ## Rod upgrade: its value is the minigame zone scale (1.0 = no bonus).
 @export var rod_upgrade: UpgradeData
 
@@ -56,7 +57,7 @@ func _on_fishing_requested(spot: FishingSpot) -> void:
 	boat.set_physics_process(false)
 	hud.hide_prompt()
 	spot.use_cast()
-	DayClock.advance(minutes_per_cast)
+	oil.spend(oil_per_cast)
 	minigame.start(fish, _get_zone_scale())
 
 

@@ -30,6 +30,9 @@
 [ext_resource type="Script" path="res://scenes/sea/offscreen_markers.gd" id="28_markers"]
 [ext_resource type="Script" path="res://scenes/sea/tutorial_hints.gd" id="29_tutorial"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="30_pause"]
+[ext_resource type="Script" path="res://scenes/sea/lamp_oil.gd" id="31_oil"]
+[ext_resource type="Resource" path="res://data/upgrades/lamp_upgrade.tres" id="32_lampup"]
+[ext_resource type="PackedScene" path="res://scenes/ui/phone_app.tscn" id="33_phone"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_whirl"]
 radius = 24.0
@@ -229,7 +232,12 @@ script = ExtResource("11_tint")
 
 [node name="SeaHud" parent="." instance=ExtResource("12_hud")]
 
-[node name="FishingController" type="Node" parent="." node_paths=PackedStringArray("spawner", "boat", "hud", "minigame")]
+[node name="LampOil" type="Node" parent="." node_paths=PackedStringArray("minigame")]
+script = ExtResource("31_oil")
+lamp_upgrade = ExtResource("32_lampup")
+minigame = NodePath("../FishingMinigame")
+
+[node name="FishingController" type="Node" parent="." node_paths=PackedStringArray("spawner", "boat", "hud", "minigame", "oil")]
 script = ExtResource("16_fishing")
 rod_upgrade = ExtResource("24_rodup")
 catalog = ExtResource("17_catalog")
@@ -237,12 +245,13 @@ spawner = NodePath("../FishingSpots")
 boat = NodePath("../Boat")
 hud = NodePath("../SeaHud")
 minigame = NodePath("../FishingMinigame")
+oil = NodePath("../LampOil")
 
 [node name="FishingMinigame" parent="." instance=ExtResource("18_minigame")]
 
 [node name="NetBuoys" type="Node2D" parent="."]
 
-[node name="NetController" type="Node" parent="." node_paths=PackedStringArray("boat", "hud", "minigame", "zones_root", "buoy_parent")]
+[node name="NetController" type="Node" parent="." node_paths=PackedStringArray("boat", "hud", "minigame", "zones_root", "buoy_parent", "oil")]
 script = ExtResource("21_nets")
 catalog = ExtResource("17_catalog")
 boat = NodePath("../Boat")
@@ -251,6 +260,7 @@ minigame = NodePath("../FishingMinigame")
 zones_root = NodePath("../Zones")
 buoy_scene = ExtResource("22_buoy")
 buoy_parent = NodePath("../NetBuoys")
+oil = NodePath("../LampOil")
 
 [node name="MarkerLayer" type="CanvasLayer" parent="."]
 
@@ -267,11 +277,12 @@ dock = NodePath("../../Dock")
 fog_area = NodePath("../../FogArea")
 boat = NodePath("../../Boat")
 
-[node name="TutorialHints" type="Node" parent="." node_paths=PackedStringArray("hud", "fishing", "nets")]
+[node name="TutorialHints" type="Node" parent="." node_paths=PackedStringArray("hud", "fishing", "nets", "oil")]
 script = ExtResource("29_tutorial")
 hud = NodePath("../SeaHud")
 fishing = NodePath("../FishingController")
 nets = NodePath("../NetController")
+oil = NodePath("../LampOil")
 
 [node name="PauseMenu" parent="." instance=ExtResource("30_pause")]
 
@@ -304,3 +315,5 @@ offset_bottom = -4.0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 10
 text = "debug"
+
+[node name="PhoneApp" parent="." instance=ExtResource("33_phone")]

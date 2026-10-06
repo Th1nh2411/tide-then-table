@@ -1,7 +1,7 @@
 class_name NetBuoy
 extends Area2D
 ## Float marking a net the player dropped. Shellfish collect in the net over
-## in-game time (the ring around the buoy fills up). When the boat is next to
+## time at sea (the ring around the buoy fills up; paused when the game is). When the boat is next to
 ## it and slow, `interact` asks to haul it.
 
 signal haulable_changed(buoy: NetBuoy, can_haul: bool)
@@ -14,9 +14,10 @@ signal haul_requested(buoy: NetBuoy)
 
 ## Set by NetController before the buoy enters the tree.
 var fish: FishData
-var drop_minutes: float = 0.0
-## Soak time (in-game minutes) for a full net; drives the progress ring.
-var full_minutes: float = 180.0
+## Seconds of soaking for a full net.
+var full_seconds: float = 90.0
+
+var _soak_seconds: float = 0.0
 
 var _boat: Boat
 var _can_haul: bool = false
@@ -29,12 +30,14 @@ func _ready() -> void:
 	body_exited.connect(_on_body_exited)
 
 
-func soak_minutes() -> float:
-	return maxf(DayClock.current_minutes - drop_minutes, 0.0)
+## 0..1 how full the net is.
+func fill_ratio() -> float:
+	return clampf(_soak_seconds / full_seconds, 0.0, 1.0)
 
 
 func _process(delta: float) -> void:
 	_time += delta
+	_soak_seconds += delta
 	queue_redraw()
 	var can_haul := _boat != null and absf(_boat.speed) <= max_haul_speed
 	if can_haul != _can_haul:
@@ -61,7 +64,7 @@ func _on_body_exited(body: Node2D) -> void:
 func _draw() -> void:
 	var bob := Vector2(0, sin(_time * 2.5) * 1.5)
 	# Progress ring: how full the net is.
-	var fill := clampf(soak_minutes() / full_minutes, 0.0, 1.0)
+	var fill := fill_ratio()
 	draw_arc(Vector2.ZERO, 9, 0, TAU, 24, Color(0, 0, 0, 0.3), 2.0)
 	if fill > 0.0:
 		draw_arc(Vector2.ZERO, 9, -PI / 2, -PI / 2 + TAU * fill, 24, ring_color, 2.0)

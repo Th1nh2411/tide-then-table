@@ -1,8 +1,8 @@
 extends Control
 ## Restaurant screen (side view).
-## Flow: prepare today's menu from storage -> open -> serve customers until
-## the shift timer runs out (or the player closes early) -> leftovers go back
-## to storage -> summary. Shift length comes from the sea trip (late = shorter).
+## Flow: prepare today's menu from storage -> open at 15:00 -> serve customers
+## until closing at 24:00 (fixed real-time shift, or the player closes early)
+## -> leftovers go back to storage -> summary.
 ## Once the menu sells out, customers can only order snacks (peanuts), so a
 ## poorly prepared menu earns little. A menu with few dishes lowers all prices.
 ## After the summary (with a 1-5 star rating) comes the upgrade shop, then
@@ -10,7 +10,7 @@ extends Control
 
 const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 
-## Full selling shift length in real seconds when back on time.
+## Real seconds for the whole shift (15:00 -> 24:00 on the displayed clock).
 @export var base_shift_seconds: float = 180.0
 @export var menu: DishCatalog
 @export var fish_catalog: FishCatalog
@@ -71,7 +71,7 @@ func _ready() -> void:
 
 
 func get_shift_seconds() -> float:
-	return base_shift_seconds * GameState.shift_ratio
+	return base_shift_seconds
 
 
 func _open_shop() -> void:
@@ -84,15 +84,10 @@ func _open_shop() -> void:
 	_shift_running = true
 	_close_early_button.show()
 	_customers.start_shift(_plan, _variety_multiplier)
-	var late_text := ""
-	if GameState.was_towed:
-		late_text = " (bị kéo về, ca bán ngắn nhất)"
-	elif GameState.shift_ratio < 1.0:
-		late_text = " (về trễ, ca bán còn %d%%)" % roundi(GameState.shift_ratio * 100)
 	if GameState.day == 1:
 		_show_message("Quán mở cửa! Click vào khách để nấu món họ gọi.", 4.0)
 	else:
-		_show_message("Quán mở cửa!" + late_text)
+		_show_message("Quán mở cửa!")
 	_refresh_storage()
 
 
@@ -117,8 +112,10 @@ func _process(delta: float) -> void:
 		elif _plan.is_sold_out() and not _sold_out_announced:
 			_sold_out_announced = true
 			_show_message("Menu đã hết món, khách chỉ còn gọi đậu phộng...")
-	_top_label.text = "Ngày %d   Ca còn %d:%02d   Tiền %dk (hôm nay +%dk)" % [
-		GameState.day, int(_time_left) / 60, int(_time_left) % 60, GameState.money, _earned_today]
+	var progress := 1.0 - _time_left / get_shift_seconds()
+	DayClock.set_progress(progress, DayClock.shop_open_hour, DayClock.shop_close_hour)
+	_top_label.text = "Ngày %d   %s (đóng cửa %02d:00)   Tiền %dk (hôm nay +%dk)" % [
+		GameState.day, DayClock.get_time_text(), DayClock.shop_close_hour, GameState.money, _earned_today]
 
 
 func _end_shift(reason: String) -> void:
@@ -140,6 +137,8 @@ func _end_shift(reason: String) -> void:
 		variety_text += " — đơn điệu, giá x%.1f" % _variety_multiplier
 	var stars := DayRating.stars(_served, _left_angry, monotonous)
 	GameState.last_rating = stars
+	GameState.add_day_record({"day": GameState.day, "earned": _earned_today, "market": _market_spent,
+		"rating": stars, "served": _served, "left": _left_angry})
 	_summary_label.text = "%s\nĐÁNH GIÁ: %d/5 sao\nThu được: %dk   Tiền chợ: -%dk   Lãi: %dk\n%s\nKhách đã phục vụ: %d   Khách bỏ đi: %d\nPhần thừa: %d (hải sản trả về kho, rau bỏ đi)\n%s" % [
 		reason, stars, _earned_today, _market_spent, _earned_today - _market_spent, variety_text,
 		_served, _left_angry, leftover, _rating_hint(stars)]

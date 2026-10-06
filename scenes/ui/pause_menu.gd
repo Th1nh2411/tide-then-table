@@ -37,7 +37,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _open() -> void:
 	_confirm_menu = false
 	_menu_button.text = "Về menu chính"
-	_note_label.text = "Game tự lưu lúc 6:00 mỗi sáng."
+	_note_label.text = "Game tự lưu mỗi đêm lúc ra khơi."
 	get_tree().paused = true
 	show()
 	_resume_button.grab_focus()
@@ -53,7 +53,7 @@ func _on_menu_pressed() -> void:
 	if not _confirm_menu:
 		_confirm_menu = true
 		_menu_button.text = "Chắc chắn? Bấm lần nữa"
-		_note_label.text = "Về menu sẽ mất tiến độ từ 6:00 sáng nay tới giờ."
+		_note_label.text = "Về menu sẽ mất tiến độ từ lúc ra khơi đêm nay tới giờ."
 		return
 	get_tree().paused = false
 	hide()

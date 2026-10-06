@@ -1,9 +1,10 @@
 extends Node2D
-## Sea screen root. Starts the day clock, wires the dock and HUD,
-## ends the sea day (docking or towed at the deadline), runs the story hooks
-## (omen, fog, whirlpool ending) and holds debug tools.
+## Sea screen root for the night trip. Starts the night (lamp oil burns),
+## wires the dock and HUD, ends the trip (docking, or a rescue tow when the
+## hull breaks or the oil runs dry), runs the story hooks (omen, fog,
+## whirlpool ending) and holds debug tools.
 
-const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.tscn"
+const REST_SCENE_PATH: String = "res://scenes/rest/rest_scene.tscn"
 const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 
 ## Boat upgrade track: the player's current level decides today's boat.
@@ -12,10 +13,9 @@ const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 @export var debug_boats: Array[BoatData] = []
 ## How long the "towed home" message stays before switching scenes.
 @export var tow_message_seconds: float = 1.5
-## Rescue when the hull breaks: fee (k, capped at what the player has) and
-## in-game minutes lost waiting to be towed.
+## Rescue tow fees (k, capped at what the player has).
 @export var rescue_fee: int = 150
-@export var rescue_minutes: float = 60.0
+@export var oil_rescue_fee: int = 80
 ## Seconds the boat spins into the whirlpool before the white fade.
 @export var whirlpool_pull_seconds: float = 2.0
 
@@ -32,6 +32,7 @@ var _dock_confirmed: bool = false
 @onready var _fishing: FishingController = $FishingController
 @onready var _fog: FogArea = $FogArea
 @onready var _hull: HullController = $HullController
+@onready var _oil: LampOil = $LampOil
 @onready var _debug_label: Label = %DebugLabel
 
 
@@ -53,16 +54,18 @@ func _ready() -> void:
 	_nets.nets_changed.connect(_hud.set_nets)
 	_fishing.fish_caught.connect(_on_fish_caught)
 	_fog.whirlpool_entered.connect(_on_whirlpool_entered)
-	DayClock.return_deadline_reached.connect(_on_return_deadline_reached)
-	DayClock.start_day()
+	_oil.oil_changed.connect(_hud.set_oil)
+	_oil.oil_low.connect(_hud.flash_message.bind("Dầu đèn còn 1/4, trời sắp rạng. Về bến thôi!", 2.5))
+	_oil.oil_empty.connect(_on_oil_empty)
+	DayClock.start_night()
 	if GameState.last_spoiled_count > 0:
 		_hud.flash_message("Qua đêm %d món trong kho đã hỏng, phải bỏ đi" % GameState.last_spoiled_count, 2.5)
 		GameState.last_spoiled_count = 0
 	if Story.check_day():
-		_hud.flash_message("Biển lặng lạ thường... phía đông bắc sương mù dày lên.", 3.0)
+		_hud.flash_message("Đêm nay biển lặng lạ thường... phía đông bắc sương mù dày lên.", 3.0)
 	elif Story.is_fog_open():
 		_hud.flash_message("Sương mù phủ góc đông bắc. Trong đó có ánh sáng lạ...", 3.0)
-	# Autosave at the start of every day (hold is empty, storage is settled).
+	# Autosave at the start of every night (hold is empty, storage is settled).
 	# Headless test runs pass `-- --no-autosave` so they never touch the real save.
 	if not OS.get_cmdline_user_args().has("--no-autosave"):
 		SaveSystem.save_game()
@@ -91,7 +94,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_fish_caught(fish: FishData, _quality: float, _count: int) -> void:
 	if Story.on_fish_caught(fish):
-		_hud.flash_message("Con cá này phát sáng... Ngoài khơi đông bắc có gì đó lạ.", 3.0)
+		_hud.flash_message("[WARN] App báo: loài này không có trong database... Ngoài khơi đông bắc có gì đó lạ.", 3.0)
 
 
 ## Ending: the whirlpool pulls the boat in, then everything goes white.
@@ -135,36 +138,33 @@ func _refresh_dock_prompt() -> void:
 		_hud.show_prompt("E: Cập bến" + _hull.repair_prompt())
 
 
-## Hull hit 0 at sea: pay the rescue boat, lose time, get towed home.
 func _on_boat_broken() -> void:
+	_rescue("Thuyền hư! Cứu hộ kéo về bến", rescue_fee)
+
+
+func _on_oil_empty() -> void:
+	_rescue("Hết dầu đèn, biển tối om! Cứu hộ kéo về bến", oil_rescue_fee)
+
+
+## Pay the rescue boat (as much as the player has) and get towed home.
+func _rescue(text: String, fee: int) -> void:
 	if _day_ended:
 		return
 	_boat.set_physics_process(false)
-	var fee := mini(rescue_fee, GameState.money)
-	GameState.spend_money(fee)
-	DayClock.advance(rescue_minutes)
-	_hud.show_message("Thuyền hư! Cứu hộ kéo về bến (-%dk)" % fee)
-	await get_tree().create_timer(tow_message_seconds).timeout
-	_end_sea_day(true)
-
-
-func _on_return_deadline_reached() -> void:
-	if _day_ended:
-		return
-	_boat.set_physics_process(false)
-	_hud.show_message("Đã 21:00 — thuyền bị kéo về bến")
+	var paid := mini(fee, GameState.money)
+	GameState.spend_money(paid)
+	_hud.show_message("%s (-%dk)" % [text, paid])
 	await get_tree().create_timer(tow_message_seconds).timeout
 	_end_sea_day(true)
 
 
 func _end_sea_day(towed: bool) -> void:
-	# Guard: docking and the deadline can both fire on the same frame.
+	# Guard: docking and a rescue can both fire on the same frame.
 	if _day_ended:
 		return
 	_day_ended = true
 	DayClock.stop()
 	_boat.set_physics_process(false)
 	_hud.hide_prompt()
-	GameState.finish_sea_day(DayClock.current_minutes, DayClock.get_shift_ratio(), towed,
-		_hold_manager.get_items())
-	SceneRouter.go_to(RESTAURANT_SCENE_PATH)
+	GameState.finish_sea_day(DayClock.current_minutes, towed, _hold_manager.get_items())
+	SceneRouter.go_to(REST_SCENE_PATH)
