@@ -14,7 +14,7 @@ const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 @export var tow_message_seconds: float = 1.5
 ## Rescue when the hull breaks: fee (k, capped at what the player has) and
 ## in-game minutes lost waiting to be towed.
-@export var rescue_fee: int = 60
+@export var rescue_fee: int = 150
 @export var rescue_minutes: float = 60.0
 ## Seconds the boat spins into the whirlpool before the white fade.
 @export var whirlpool_pull_seconds: float = 2.0

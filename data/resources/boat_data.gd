@@ -16,7 +16,7 @@ extends Resource
 ## Cargo hold grid size in cells (used in Phase 5).
 @export var hold_size: Vector2i = Vector2i(4, 3)
 ## Repair price per hull point (k). Bigger boats cost more to fix.
-@export var repair_cost_per_hp: int = 1
+@export var repair_cost_per_hp: float = 2.5
 
 @export_group("Placeholder visuals")
 ## Hull length (x) and width (y) in pixels. Also sizes the collision circle.

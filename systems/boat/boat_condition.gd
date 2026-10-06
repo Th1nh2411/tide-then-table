@@ -29,7 +29,7 @@ static func repair(boat: BoatData) -> int:
 		GameState.boat_hp = MAX_HP
 		return 0
 	var missing := MAX_HP - GameState.boat_hp
-	var affordable := minf(missing, floorf(GameState.money / float(boat.repair_cost_per_hp)))
+	var affordable := minf(missing, floorf(GameState.money / boat.repair_cost_per_hp))
 	var cost := ceili(affordable * boat.repair_cost_per_hp)
 	if affordable <= 0.0 or not GameState.spend_money(cost):
 		return 0

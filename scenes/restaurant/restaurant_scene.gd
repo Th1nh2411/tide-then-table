@@ -89,7 +89,10 @@ func _open_shop() -> void:
 		late_text = " (bị kéo về, ca bán ngắn nhất)"
 	elif GameState.shift_ratio < 1.0:
 		late_text = " (về trễ, ca bán còn %d%%)" % roundi(GameState.shift_ratio * 100)
-	_show_message("Quán mở cửa!" + late_text)
+	if GameState.day == 1:
+		_show_message("Quán mở cửa! Click vào khách để nấu món họ gọi.", 4.0)
+	else:
+		_show_message("Quán mở cửa!" + late_text)
 	_refresh_storage()
 
 
@@ -161,12 +164,12 @@ func _refresh_storage() -> void:
 	_storage_label.text = "\n".join(lines)
 
 
-func _show_message(text: String) -> void:
+func _show_message(text: String, seconds: float = message_seconds) -> void:
 	_message_token += 1
 	var token := _message_token
 	_message_label.text = text
 	_message_label.show()
-	await get_tree().create_timer(message_seconds).timeout
+	await get_tree().create_timer(seconds).timeout
 	if token == _message_token:
 		_message_label.hide()
 

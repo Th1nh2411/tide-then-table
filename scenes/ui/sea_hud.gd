@@ -14,17 +14,25 @@ var _message_token: int = 0
 @onready var _message_label: Label = %MessageLabel
 @onready var _net_label: Label = %NetLabel
 @onready var _hull_label: Label = %HullLabel
+@onready var _tip_label: Label = %TipLabel
 
 
 func _ready() -> void:
 	DayClock.time_changed.connect(_on_time_changed)
 	hide_prompt()
 	_message_label.hide()
+	_tip_label.hide()
 	_on_time_changed(DayClock.current_minutes)
 
 
 func set_nets(available: int, total: int) -> void:
 	_net_label.text = "Lưới %d/%d  [Q] thả" % [available, total]
+
+
+## Persistent tutorial tip (bottom-left) until replaced or hidden.
+func show_tip(text: String) -> void:
+	_tip_label.text = text
+	_tip_label.show()
 
 
 func set_hull(hp: float, critical: bool) -> void:

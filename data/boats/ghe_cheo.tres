@@ -11,6 +11,6 @@ acceleration = 70.0
 turn_speed = 110.0
 spin_drift = 0.3
 hold_size = Vector2i(5, 4)
-repair_cost_per_hp = 2
+repair_cost_per_hp = 4.0
 hull_size = Vector2(24, 10)
 color = Color(0.45, 0.3, 0.18, 1)

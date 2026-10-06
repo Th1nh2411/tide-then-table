@@ -13,6 +13,7 @@
 [ext_resource type="Resource" path="res://data/upgrades/fridge_upgrade.tres" id="11_fridgeup"]
 [ext_resource type="Script" path="res://data/resources/upgrade_data.gd" id="12_updata"]
 [ext_resource type="Script" path="res://scenes/ui/repair_button.gd" id="13_repair"]
+[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="14_pause"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -463,3 +464,5 @@ seat_positions = Array[Vector2]([Vector2(194, 228), Vector2(294, 228), Vector2(3
 door_position = Vector2(605, 228)
 
 [node name="CookingOverlay" parent="." instance=ExtResource("5_cooking")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("14_pause")]

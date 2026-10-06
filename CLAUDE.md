@@ -67,7 +67,9 @@ Vietnamese, keep code comments in short English.
 - Sea scene controllers: `FishingController` (rod spots → `FishingMinigame`:
   BiteGame then Timing/Tension), `NetController` (Q nets → HaulGame),
   `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab), `HullController`
-  (collision damage, F repair at dock), `FogArea` (story), `DayTint`, `SeaHud`.
+  (collision damage, F repair at dock), `FogArea` (story), `DayTint`, `SeaHud`,
+  `OffscreenMarkers` (edge arrows), `TutorialHints` (day 1), `PauseMenu` (Esc;
+  must sit before `HoldUI` in the tree so the hold can eat Esc first).
 - Restaurant: `MenuSetupPanel` + `MenuPlan`, `CustomerManager`,
   `CookingOverlay` (Grill/Steam/Stir), `UpgradeShop`, `RepairButton`.
 

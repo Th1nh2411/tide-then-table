@@ -27,6 +27,9 @@
 [ext_resource type="Script" path="res://scenes/sea/fog_area.gd" id="25_fog"]
 [ext_resource type="Script" path="res://scenes/sea/whirlpool.gd" id="26_whirl"]
 [ext_resource type="Script" path="res://scenes/sea/hull_controller.gd" id="27_hull"]
+[ext_resource type="Script" path="res://scenes/sea/offscreen_markers.gd" id="28_markers"]
+[ext_resource type="Script" path="res://scenes/sea/tutorial_hints.gd" id="29_tutorial"]
+[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="30_pause"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_whirl"]
 radius = 24.0
@@ -248,6 +251,29 @@ minigame = NodePath("../FishingMinigame")
 zones_root = NodePath("../Zones")
 buoy_scene = ExtResource("22_buoy")
 buoy_parent = NodePath("../NetBuoys")
+
+[node name="MarkerLayer" type="CanvasLayer" parent="."]
+
+[node name="OffscreenMarkers" type="Control" parent="MarkerLayer" node_paths=PackedStringArray("dock", "fog_area", "boat")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("28_markers")
+dock = NodePath("../../Dock")
+fog_area = NodePath("../../FogArea")
+boat = NodePath("../../Boat")
+
+[node name="TutorialHints" type="Node" parent="." node_paths=PackedStringArray("hud", "fishing", "nets")]
+script = ExtResource("29_tutorial")
+hud = NodePath("../SeaHud")
+fishing = NodePath("../FishingController")
+nets = NodePath("../NetController")
+
+[node name="PauseMenu" parent="." instance=ExtResource("30_pause")]
 
 [node name="HoldManager" type="Node" parent="." node_paths=PackedStringArray("boat", "fishing", "nets", "hold_ui", "hud")]
 script = ExtResource("19_holdmgr")

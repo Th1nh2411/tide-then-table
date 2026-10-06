@@ -8,6 +8,9 @@ const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 @onready var _quit_button: Button = %QuitButton
 @onready var _status_label: Label = %StatusLabel
 
+## Set after the first "New Game" press when a save exists.
+var _confirm_new_game: bool = false
+
 
 func _ready() -> void:
 	_continue_button.pressed.connect(_on_continue_pressed)
@@ -31,9 +34,23 @@ func _on_continue_pressed() -> void:
 
 
 func _on_new_game_pressed() -> void:
-	# The old save is overwritten when day 1 starts.
+	# The old save is overwritten when day 1 starts, so ask once first.
+	if SaveSystem.has_save() and not _confirm_new_game:
+		_confirm_new_game = true
+		_new_game_button.text = "Chắc chắn? Bấm lần nữa"
+		_status_label.text = "Chơi mới sẽ xóa tiến độ đã lưu (ngày %d)." % _saved_day()
+		return
 	GameState.reset()
 	SceneRouter.go_to(SEA_SCENE_PATH)
+
+
+func _saved_day() -> int:
+	var json := JSON.new()
+	if json.parse(FileAccess.get_file_as_string(SaveSystem.SAVE_PATH)) == OK and json.data is Dictionary:
+		var day: Variant = json.data.get("day")
+		if day is float or day is int:
+			return int(day)
+	return 0
 
 
 func _on_quit_pressed() -> void:
