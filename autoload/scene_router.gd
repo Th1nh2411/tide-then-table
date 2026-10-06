@@ -1,6 +1,7 @@
 extends CanvasLayer
 ## Scene switching with a simple fade-to-black. Autoloaded as `SceneRouter`.
 ## Usage: SceneRouter.go_to("res://scenes/sea/sea_scene.tscn")
+## Pass a color to fade through something other than black (e.g. white).
 
 signal scene_changed(scene_path: String)
 
@@ -25,10 +26,11 @@ func _ready() -> void:
 	add_child(_fade_rect)
 
 
-func go_to(scene_path: String) -> void:
+func go_to(scene_path: String, fade_color: Color = Color.BLACK) -> void:
 	if _is_transitioning:
 		return
 	_is_transitioning = true
+	_fade_rect.color = fade_color
 	# Block input during the transition so buttons can't be double-clicked.
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_STOP
 

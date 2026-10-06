@@ -30,13 +30,14 @@ func _ready() -> void:
 func spawn_spots() -> void:
 	for child in zones_root.get_children():
 		var sea_zone := child as SeaZone
-		if sea_zone == null:
+		if sea_zone == null or not sea_zone.visible:  # hidden = locked (fog)
 			continue
 		for i in sea_zone.spot_count:
 			var found: bool = false
 			for attempt in max_attempts_per_spot:
 				var pos := _random_point_in(sea_zone.get_global_rect().grow(-clearance))
-				if _is_free(pos):
+				# Skip points covered by another zone drawn on top (fog over open sea).
+				if SeaZone.find_at(zones_root, pos) == sea_zone and _is_free(pos):
 					_create_spot(pos, sea_zone.zone)
 					found = true
 					break

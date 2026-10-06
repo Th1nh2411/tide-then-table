@@ -1,8 +1,10 @@
 extends Node2D
 ## Sea screen root. Starts the day clock, wires the dock and HUD,
-## ends the sea day (docking or towed at the deadline), and holds debug tools.
+## ends the sea day (docking or towed at the deadline), runs the story hooks
+## (omen, fog, whirlpool ending) and holds debug tools.
 
 const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.tscn"
+const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 
 ## Boat upgrade track: the player's current level decides today's boat.
 @export var boat_upgrade: UpgradeData
@@ -10,6 +12,8 @@ const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.
 @export var debug_boats: Array[BoatData] = []
 ## How long the "towed home" message stays before switching scenes.
 @export var tow_message_seconds: float = 1.5
+## Seconds the boat spins into the whirlpool before the white fade.
+@export var whirlpool_pull_seconds: float = 2.0
 
 var _day_ended: bool = false
 ## Set after warning about nets still at sea; a second `interact` docks anyway.
@@ -21,6 +25,8 @@ var _dock_confirmed: bool = false
 @onready var _hud: SeaHud = $SeaHud
 @onready var _hold_manager: HoldManager = $HoldManager
 @onready var _nets: NetController = $NetController
+@onready var _fishing: FishingController = $FishingController
+@onready var _fog: FogArea = $FogArea
 @onready var _debug_label: Label = %DebugLabel
 
 
@@ -38,11 +44,17 @@ func _ready() -> void:
 	_dock.boat_exited.connect(_on_dock_exited)
 	_dock.docking_requested.connect(_on_docking_requested)
 	_nets.nets_changed.connect(_hud.set_nets)
+	_fishing.fish_caught.connect(_on_fish_caught)
+	_fog.whirlpool_entered.connect(_on_whirlpool_entered)
 	DayClock.return_deadline_reached.connect(_on_return_deadline_reached)
 	DayClock.start_day()
 	if GameState.last_spoiled_count > 0:
 		_hud.flash_message("Qua đêm %d món trong kho đã hỏng, phải bỏ đi" % GameState.last_spoiled_count, 2.5)
 		GameState.last_spoiled_count = 0
+	if Story.check_day():
+		_hud.flash_message("Biển lặng lạ thường... phía đông bắc sương mù dày lên.", 3.0)
+	elif Story.is_fog_open():
+		_hud.flash_message("Sương mù phủ góc đông bắc. Trong đó có ánh sáng lạ...", 3.0)
 	# Autosave at the start of every day (hold is empty, storage is settled).
 	SaveSystem.save_game()
 
@@ -62,6 +74,32 @@ func _unhandled_input(event: InputEvent) -> void:
 	var index := key.physical_keycode - KEY_1
 	if index >= 0 and index < debug_boats.size():
 		_boat.apply_boat_data(debug_boats[index])
+	elif key.physical_keycode == KEY_F2:
+		# Debug: pretend the omen happened yesterday and reload to open the fog.
+		GameState.set_flag(Story.OMEN_DAY_FLAG, GameState.day - 1)
+		get_tree().reload_current_scene()
+
+
+func _on_fish_caught(fish: FishData, _quality: float, _count: int) -> void:
+	if Story.on_fish_caught(fish):
+		_hud.flash_message("Con cá này phát sáng... Ngoài khơi đông bắc có gì đó lạ.", 3.0)
+
+
+## Ending: the whirlpool pulls the boat in, then everything goes white.
+func _on_whirlpool_entered(_whirlpool: Whirlpool) -> void:
+	if _day_ended:
+		return
+	_day_ended = true
+	DayClock.stop()
+	_boat.set_physics_process(false)
+	_hud.hide_prompt()
+	GameState.set_flag(Story.ENDING_SEEN_FLAG)
+	var tween := create_tween().set_parallel()
+	tween.tween_property(_boat, "global_position", _fog.get_whirlpool_position(), whirlpool_pull_seconds)
+	tween.tween_property(_boat, "rotation", _boat.rotation + TAU * 3.0, whirlpool_pull_seconds)
+	tween.tween_property(_boat, "scale", Vector2(0.3, 0.3), whirlpool_pull_seconds)
+	await tween.finished
+	SceneRouter.go_to(ENDING_SCENE_PATH, Color.WHITE)
 
 
 func _on_docking_requested() -> void:

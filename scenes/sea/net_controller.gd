@@ -77,7 +77,7 @@ func _try_drop() -> void:
 	if absf(boat.speed) > max_drop_speed:
 		hud.flash_message("Dừng thuyền lại để thả lưới")
 		return
-	var sea_zone := _zone_at(boat.global_position)
+	var sea_zone := SeaZone.find_at(zones_root, boat.global_position)
 	var fish: FishData = null
 	if sea_zone:
 		fish = catalog.pick_random(sea_zone.zone, _rng, FishData.CatchMethod.NET)
@@ -152,14 +152,6 @@ func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: 
 	if caught:
 		hud.flash_message("Kéo được %d %s%s" % [count, fish.display_name, " ★" if quality >= 1.0 else ""])
 		fish_caught.emit(fish, quality, count)
-
-
-func _zone_at(pos: Vector2) -> SeaZone:
-	for child in zones_root.get_children():
-		var sea_zone := child as SeaZone
-		if sea_zone and sea_zone.get_global_rect().has_point(pos):
-			return sea_zone
-	return null
 
 
 func _emit_nets() -> void:

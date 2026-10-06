@@ -318,4 +318,4 @@ Lặn biển, thế giới song song, dị biến cơ thể, dụng cụ kết h
 | 6 — Quán ăn              | ✅         | + Chuẩn bị menu kiểu Dave the Diver (MenuPlan, 3 món, phần lấy từ kho, thừa trả kho, bán hết thì đóng sớm); tip 20% nếu kiên nhẫn > 50%; đơn vị "k"; F1 debug thêm cá; test: scenes/test/cooking_test.tscn |
 | 7 — Vòng ngày & nâng cấp | ✅         | Sao = tỉ lệ khách được phục vụ (−1 nếu menu đơn điệu), ảnh hưởng tần suất khách hôm sau; 3 UpgradeData (thuyền 300/800, cần 120/350, tủ lạnh 150/400); tủ lạnh mua tối nay có tác dụng ngay đêm nay |
 | 8 — Lưu game             | ✅         | SaveSystem (static) → user://save.json, ghi file tạm rồi đổi tên; autosave lúc 6:00 mỗi ngày; field thiếu/sai kiểu → mặc định, cá lạ bị bỏ qua; test: scenes/test/save_test.tscn |
-| 9 — Cảnh kết             | ⬜         |         |
+| 9 — Cảnh kết             | ✅         | Điềm báo (cá thu phát sáng / ngày 7) → hôm sau mở FOG góc đông bắc (3 điểm cá biến dị + xoáy nước); xoáy → fade trắng → thoại Rin → "Còn tiếp..." → menu; F2 debug mở sương |

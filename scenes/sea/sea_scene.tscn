@@ -24,6 +24,11 @@
 [ext_resource type="PackedScene" path="res://scenes/sea/net_buoy.tscn" id="22_buoy"]
 [ext_resource type="Resource" path="res://data/upgrades/boat_upgrade.tres" id="23_boatup"]
 [ext_resource type="Resource" path="res://data/upgrades/rod_upgrade.tres" id="24_rodup"]
+[ext_resource type="Script" path="res://scenes/sea/fog_area.gd" id="25_fog"]
+[ext_resource type="Script" path="res://scenes/sea/whirlpool.gd" id="26_whirl"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_whirl"]
+radius = 24.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dock"]
 size = Vector2(70, 90)
@@ -63,6 +68,16 @@ color = Color(0.35, 0.68, 0.78, 1)
 script = ExtResource("13_zone")
 zone = 0
 spot_count = 4
+
+[node name="Fog" type="ColorRect" parent="Zones"]
+offset_left = 1460.0
+offset_right = 1920.0
+offset_bottom = 420.0
+mouse_filter = 2
+color = Color(0.2, 0.32, 0.38, 1)
+script = ExtResource("13_zone")
+zone = 3
+spot_count = 3
 
 [node name="MapBounds" type="StaticBody2D" parent="."]
 script = ExtResource("6_bounds")
@@ -193,6 +208,17 @@ offset_right = 35.0
 offset_bottom = 45.0
 mouse_filter = 2
 color = Color(1, 1, 1, 0.12)
+
+[node name="FogArea" type="Node2D" parent="." node_paths=PackedStringArray("fog_zone")]
+script = ExtResource("25_fog")
+fog_zone = NodePath("../Zones/Fog")
+
+[node name="Whirlpool" type="Area2D" parent="FogArea"]
+position = Vector2(1720, 190)
+script = ExtResource("26_whirl")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FogArea/Whirlpool"]
+shape = SubResource("CircleShape2D_whirl")
 
 [node name="DayTint" type="CanvasModulate" parent="."]
 script = ExtResource("11_tint")
