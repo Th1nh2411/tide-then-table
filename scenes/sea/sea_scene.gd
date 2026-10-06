@@ -12,6 +12,10 @@ const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 @export var debug_boats: Array[BoatData] = []
 ## How long the "towed home" message stays before switching scenes.
 @export var tow_message_seconds: float = 1.5
+## Rescue when the hull breaks: fee (k, capped at what the player has) and
+## in-game minutes lost waiting to be towed.
+@export var rescue_fee: int = 60
+@export var rescue_minutes: float = 60.0
 ## Seconds the boat spins into the whirlpool before the white fade.
 @export var whirlpool_pull_seconds: float = 2.0
 
@@ -27,6 +31,7 @@ var _dock_confirmed: bool = false
 @onready var _nets: NetController = $NetController
 @onready var _fishing: FishingController = $FishingController
 @onready var _fog: FogArea = $FogArea
+@onready var _hull: HullController = $HullController
 @onready var _debug_label: Label = %DebugLabel
 
 
@@ -40,7 +45,9 @@ func _ready() -> void:
 	if boat_upgrade:
 		_boat.apply_boat_data(GameState.get_upgrade_value(boat_upgrade))
 
-	_dock.boat_entered.connect(_hud.show_prompt.bind("E: Cập bến"))
+	_dock.boat_entered.connect(_on_dock_entered)
+	_hull.hull_changed.connect(_refresh_dock_prompt)
+	_hull.boat_broken.connect(_on_boat_broken)
 	_dock.boat_exited.connect(_on_dock_exited)
 	_dock.docking_requested.connect(_on_docking_requested)
 	_nets.nets_changed.connect(_hud.set_nets)
@@ -110,9 +117,33 @@ func _on_docking_requested() -> void:
 	_end_sea_day(false)
 
 
+func _on_dock_entered() -> void:
+	_hull.set_at_dock(true)
+	_refresh_dock_prompt()
+
+
 func _on_dock_exited() -> void:
 	_dock_confirmed = false
+	_hull.set_at_dock(false)
 	_hud.hide_prompt()
+
+
+func _refresh_dock_prompt() -> void:
+	if _hull.is_at_dock() and not _day_ended:
+		_hud.show_prompt("E: Cập bến" + _hull.repair_prompt())
+
+
+## Hull hit 0 at sea: pay the rescue boat, lose time, get towed home.
+func _on_boat_broken() -> void:
+	if _day_ended:
+		return
+	_boat.set_physics_process(false)
+	var fee := mini(rescue_fee, GameState.money)
+	GameState.spend_money(fee)
+	DayClock.advance(rescue_minutes)
+	_hud.show_message("Thuyền hư! Cứu hộ kéo về bến (-%dk)" % fee)
+	await get_tree().create_timer(tow_message_seconds).timeout
+	_end_sea_day(true)
 
 
 func _on_return_deadline_reached() -> void:

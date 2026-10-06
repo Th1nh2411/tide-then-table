@@ -57,6 +57,20 @@ func _finish(success: bool, perfect: bool) -> void:
 	completed.emit(success, perfect)
 
 
+## `cast` input for the games. Ignored while the mouse is over a button
+## (e.g. the hold button on the overlay), since left click is also `cast`.
+func _cast_just_pressed() -> bool:
+	return Input.is_action_just_pressed("cast") and not _pointer_on_button()
+
+
+func _cast_held() -> bool:
+	return Input.is_action_pressed("cast") and not _pointer_on_button()
+
+
+func _pointer_on_button() -> bool:
+	return get_viewport().gui_get_hovered_control() is BaseButton
+
+
 ## Regular fish: color unchanged. Aberrant fish: hue keeps drifting so the
 ## player notices something is off.
 func _tint(base: Color) -> Color:

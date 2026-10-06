@@ -12,6 +12,7 @@
 [ext_resource type="Resource" path="res://data/upgrades/rod_upgrade.tres" id="10_rodup"]
 [ext_resource type="Resource" path="res://data/upgrades/fridge_upgrade.tres" id="11_fridgeup"]
 [ext_resource type="Script" path="res://data/resources/upgrade_data.gd" id="12_updata"]
+[ext_resource type="Script" path="res://scenes/ui/repair_button.gd" id="13_repair"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -297,6 +298,18 @@ offset_right = 634.0
 offset_bottom = 46.0
 theme_override_font_sizes/font_size = 10
 text = "Đóng quán sớm"
+
+[node name="RepairButton" type="Button" parent="HUD"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 490.0
+offset_top = 50.0
+offset_right = 634.0
+offset_bottom = 70.0
+theme_override_font_sizes/font_size = 10
+text = "Sửa thuyền"
+script = ExtResource("13_repair")
+boat_upgrade = ExtResource("9_boatup")
 
 [node name="SummaryPanel" type="PanelContainer" parent="."]
 unique_name_in_owner = true

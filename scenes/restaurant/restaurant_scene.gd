@@ -56,6 +56,8 @@ func _ready() -> void:
 	_customers.message_requested.connect(_show_message)
 	_next_day_button.pressed.connect(_on_continue_pressed)
 	_shop.finished.connect(_start_next_day)
+	(%RepairButton as RepairButton).repaired.connect(func(spent: int, fully: bool) -> void:
+		_show_message("Đã sửa thuyền: -%dk%s" % [spent, "" if fully else " (chưa đủ tiền sửa hết)"]))
 	_close_early_button.pressed.connect(func() -> void: _end_shift("Đóng quán sớm"))
 	_close_early_button.hide()
 

@@ -104,6 +104,7 @@ res://
 | `open_hold`                          | Tab                                             |
 | `pause`                              | Esc                                             |
 | `drop_net`                           | Q (thả lưới ốc)                                 |
+| `repair_boat`                        | F (sửa thuyền, chỉ khi ở khu bến)               |
 
 ---
 
@@ -146,6 +147,10 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 | `cua`              | Cua              | 2x2       | REEF                     | TIMING   | 0.4    | 50  |
 | `ca_mu`            | Cá mú            | 2x3       | REEF, OPEN_SEA           | TENSION  | 0.8    | 90  |
 | `ca_thu_phat_sang` | Cá thu phát sáng | 1x3       | OPEN_SEA (rất hiếm), FOG | TENSION  | 0.9    | 200 |
+
+> **Thân thuyền (sau Phase 9):** đâm đá/đảo nhanh hơn 25px/s thì mất độ bền (0.3%/px/s, đâm chéo nhẹ hơn). Dưới 50% thuyền chậm dần (tối thiểu 60% tốc độ). 0% = hư: cứu hộ kéo về (-60k, +1 giờ game). Sửa: thúng 1k/%, ghe chèo 2k/%, ghe máy 3k/%, sửa được bao nhiêu theo tiền có; sửa ở quán (nút) hoặc ở khu bến (F), không sửa khi đang ra khơi. Sáng ra thuyền còn hư thì không chạy được tới khi sửa. Độ bền được lưu.
+
+> **Câu lâu hơn (sau Phase 9):** câu cần có 2 giai đoạn: **chờ cá cắn** (phao nhấp = cá rỉa, phao chìm hẳn = giật; giật sớm 1 lần được tha, 2 lần cá bỏ đi; không giật kịp = mất mồi) rồi mới đánh cá. TENSION có **sức cá** 3 giai đoạn (vùng vẫy mạnh + lao bứt có báo trước → giằng co → đuối sức), ra ngoài vùng xanh thì thanh kéo tụt. Đồng hồ chạy x0.5 khi câu, mỗi lượt câu tốn 10 phút game. Nút/phím **Khoang [Tab]** trong lúc câu sẽ tạm dừng game.
 
 > **Bắt bằng lưới (thêm sau Phase 6):** loài có `catch_method = NET` (hiện là ốc hương) không ra ở điểm câu. Bấm Q để thả lưới ở vùng có loài đó, ngâm càng lâu càng nhiều (đầy sau 3 giờ game, tối đa 8 con), rồi quay lại phao bấm E để chơi minigame **Kéo lưới**: giữ để kéo, dây đỏ (vướng đá) thì nhả, kéo cố sẽ rơi ốc. Thuyền mang 2 lưới; lưới còn ngoài biển khi cập bến sẽ mất ốc.
 

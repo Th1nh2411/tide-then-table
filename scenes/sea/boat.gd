@@ -6,6 +6,8 @@ extends CharacterBody2D
 ## after release, scaled by BoatData.spin_drift.
 
 signal boat_data_changed(data: BoatData)
+## Hit an obstacle. `impact_speed` = speed straight into the surface (px/s).
+signal collided(impact_speed: float)
 
 @export var boat_data: BoatData
 
@@ -31,6 +33,8 @@ signal boat_data_changed(data: BoatData)
 
 ## Signed forward speed in pixels/second (negative = reversing).
 var speed: float = 0.0
+## Scales top speed (a damaged hull is slower). Set by HullController.
+var speed_multiplier: float = 1.0
 ## Extra angular velocity from spin drift, in degrees/second.
 var _spin: float = 0.0
 
@@ -71,7 +75,8 @@ func _update_speed(throttle: float, delta: float) -> void:
 		speed += throttle * boat_data.acceleration * delta
 	else:
 		speed = move_toward(speed, 0.0, drag * delta)
-	speed = clampf(speed, -boat_data.max_speed * reverse_ratio, boat_data.max_speed)
+	var top := boat_data.max_speed * speed_multiplier
+	speed = clampf(speed, -top * reverse_ratio, top)
 
 
 func _update_rotation(steer: float, delta: float) -> void:
@@ -97,6 +102,8 @@ func _move(delta: float) -> void:
 	velocity = Vector2.RIGHT.rotated(rotation) * speed
 	var collision := move_and_collide(velocity * delta)
 	if collision:
+		# Head-on hits count fully, glancing ones barely.
+		collided.emit(maxf(-velocity.dot(collision.get_normal()), 0.0))
 		# Small bounce: reverse part of the speed and nudge off the surface
 		# so the boat doesn't stay glued to the obstacle.
 		speed = -speed * bounce_factor

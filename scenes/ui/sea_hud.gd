@@ -13,6 +13,7 @@ var _message_token: int = 0
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _message_label: Label = %MessageLabel
 @onready var _net_label: Label = %NetLabel
+@onready var _hull_label: Label = %HullLabel
 
 
 func _ready() -> void:
@@ -24,6 +25,11 @@ func _ready() -> void:
 
 func set_nets(available: int, total: int) -> void:
 	_net_label.text = "Lưới %d/%d  [Q] thả" % [available, total]
+
+
+func set_hull(hp: float, critical: bool) -> void:
+	_hull_label.text = "Thân thuyền %d%%" % roundi(hp)
+	_hull_label.modulate = late_color if critical else Color.WHITE
 
 
 ## Context hint at the bottom of the screen, e.g. "E: Cập bến".

@@ -23,6 +23,8 @@ var current_minutes: float = 6 * 60
 
 ## When false the clock does not advance (menus, restaurant, etc.).
 var running: bool = false
+## Multiplier on clock speed (e.g. 0.5 while fishing). Reset each day.
+var speed_scale: float = 1.0
 
 var _deadline_fired: bool = false
 
@@ -30,7 +32,7 @@ var _deadline_fired: bool = false
 func _process(delta: float) -> void:
 	if not running:
 		return
-	current_minutes += delta * _game_minutes_per_second()
+	current_minutes += delta * _game_minutes_per_second() * speed_scale
 	if current_minutes >= latest_return_hour * 60:
 		current_minutes = latest_return_hour * 60
 		running = false
@@ -43,6 +45,7 @@ func _process(delta: float) -> void:
 ## Reset to the morning and start ticking.
 func start_day() -> void:
 	current_minutes = day_start_hour * 60
+	speed_scale = 1.0
 	_deadline_fired = false
 	running = true
 	time_changed.emit(current_minutes)

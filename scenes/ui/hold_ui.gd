@@ -1,7 +1,8 @@
 class_name HoldUI
 extends CanvasLayer
 ## Boat hold window.
-## - Browse mode (open_hold key): game keeps running, clock keeps ticking.
+## - Browse mode (open_hold key): game keeps running, clock keeps ticking,
+##   unless opened mid-fishing: then the game pauses so the fight can't be lost.
 ## - Overflow mode (new catch doesn't fit): game is paused, the new fish wait
 ##   in the tray one at a time (a net haul can bring several). Closing throws
 ##   away whatever is still waiting.
@@ -10,6 +11,8 @@ extends CanvasLayer
 signal closed
 
 var _overflow: bool = false
+## True if this window paused the game and must unpause it on close.
+var _paused_game: bool = false
 ## Overflow fish waiting behind the one currently in the tray.
 var _queue: Array[InventoryItem] = []
 
@@ -34,9 +37,12 @@ func setup(hold: GridInventory) -> void:
 	_refresh_texts()
 
 
-func open_browse() -> void:
+## `pause_game`: freeze everything else while open (used during fishing).
+func open_browse(pause_game: bool = false) -> void:
 	_overflow = false
 	_view.set_pending(null)
+	if pause_game:
+		_pause()
 	show()
 
 
@@ -47,7 +53,7 @@ func open_overflow(items: Array[InventoryItem]) -> void:
 	_overflow = true
 	if _view.pending == null:
 		_view.set_pending(_queue.pop_front())
-	get_tree().paused = true
+	_pause()
 	show()
 
 
@@ -56,11 +62,18 @@ func close() -> void:
 	# Anything left in the tray or queue is thrown back into the sea.
 	_queue.clear()
 	_view.set_pending(null)
-	if _overflow:
-		_overflow = false
+	_overflow = false
+	if _paused_game:
+		_paused_game = false
 		get_tree().paused = false
 	hide()
 	closed.emit()
+
+
+func _pause() -> void:
+	if not get_tree().paused:
+		get_tree().paused = true
+		_paused_game = true
 
 
 func _process(_delta: float) -> void:

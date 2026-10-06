@@ -53,7 +53,7 @@ func get_fail_text() -> String:
 
 func _update(delta: float) -> void:
 	_update_snag(delta)
-	var pulling := Input.is_action_pressed("cast")
+	var pulling := _cast_held()
 	if not pulling:
 		return
 	if _state == SnagState.SNAGGED:

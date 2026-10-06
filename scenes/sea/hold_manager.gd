@@ -17,14 +17,22 @@ func _ready() -> void:
 	hold = GridInventory.new(boat.boat_data.hold_size)
 	hold_ui.setup(hold)
 	fishing.fish_caught.connect(add_catch)
+	# Hold button on the fishing overlay (shared by rod and net).
+	fishing.minigame.hold_requested.connect(_open_hold)
 	nets.fish_caught.connect(add_catch)
 	boat.boat_data_changed.connect(_on_boat_data_changed)
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("open_hold") and not hold_ui.visible and not fishing.is_fishing():
+	if event.is_action_pressed("open_hold") and not hold_ui.visible:
 		get_viewport().set_input_as_handled()
-		hold_ui.open_browse()
+		_open_hold()
+
+
+## Mid-fishing the game pauses so sorting the hold can't lose the fish.
+func _open_hold() -> void:
+	if not hold_ui.visible:
+		hold_ui.open_browse(fishing.is_fishing())
 
 
 ## Items to unload at the dock.

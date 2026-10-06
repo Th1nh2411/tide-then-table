@@ -56,7 +56,7 @@ func _update(delta: float) -> void:
 	elif _needle <= 0.0:
 		_needle = 0.0
 		_direction = 1.0
-	if Input.is_action_just_pressed("cast"):
+	if _cast_just_pressed():
 		_on_cast()
 
 

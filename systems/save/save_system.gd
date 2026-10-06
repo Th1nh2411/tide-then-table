@@ -65,6 +65,7 @@ static func to_dict() -> Dictionary:
 		"upgrade_levels": GameState.upgrade_levels.duplicate(),
 		"story_flags": GameState.story_flags.duplicate(),
 		"last_rating": GameState.last_rating,
+		"boat_hp": GameState.boat_hp,
 	}
 
 
@@ -73,6 +74,9 @@ static func apply_dict(data: Dictionary) -> void:
 	GameState.money = maxi(_get_int(data, "money", GameState.money), 0)
 	GameState.day = maxi(_get_int(data, "day", GameState.day), 1)
 	GameState.last_rating = clampi(_get_int(data, "last_rating", GameState.last_rating), 1, 5)
+	var hp: Variant = data.get("boat_hp")
+	if hp is float or hp is int:
+		GameState.boat_hp = clampf(float(hp), 0.0, BoatCondition.MAX_HP)
 
 	var catalog: FishCatalog = load(FISH_CATALOG_PATH)
 	var saved_storage: Variant = data.get("storage")

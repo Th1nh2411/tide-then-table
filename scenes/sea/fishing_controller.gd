@@ -13,7 +13,7 @@ signal fish_caught(fish: FishData, quality: float, count: int)
 @export var hud: SeaHud
 @export var minigame: FishingMinigame
 ## In-game minutes each cast costs (on top of real minigame time).
-@export var minutes_per_cast: float = 20.0
+@export var minutes_per_cast: float = 10.0
 ## Rod upgrade: its value is the minigame zone scale (1.0 = no bonus).
 @export var rod_upgrade: UpgradeData
 

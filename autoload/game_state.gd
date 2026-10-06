@@ -42,6 +42,8 @@ var was_towed: bool = false
 var last_rating: int = STARTING_RATING
 ## Storage items that spoiled at the last day change (shown at sea).
 var last_spoiled_count: int = 0
+## Hull condition 0..100 (see BoatCondition). Carries over between days.
+var boat_hp: float = 100.0
 
 
 ## Reset everything to a fresh game. Called by "New Game".
@@ -56,6 +58,7 @@ func reset() -> void:
 	was_towed = false
 	last_rating = STARTING_RATING
 	last_spoiled_count = 0
+	boat_hp = 100.0
 
 
 ## Called when the sea day ends: records the return and moves the catch into storage.

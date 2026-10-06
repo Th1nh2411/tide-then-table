@@ -26,6 +26,7 @@
 [ext_resource type="Resource" path="res://data/upgrades/rod_upgrade.tres" id="24_rodup"]
 [ext_resource type="Script" path="res://scenes/sea/fog_area.gd" id="25_fog"]
 [ext_resource type="Script" path="res://scenes/sea/whirlpool.gd" id="26_whirl"]
+[ext_resource type="Script" path="res://scenes/sea/hull_controller.gd" id="27_hull"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_whirl"]
 radius = 24.0
@@ -257,6 +258,11 @@ hold_ui = NodePath("../HoldUI")
 hud = NodePath("../SeaHud")
 
 [node name="HoldUI" parent="." instance=ExtResource("20_holdui")]
+
+[node name="HullController" type="Node" parent="." node_paths=PackedStringArray("boat", "hud")]
+script = ExtResource("27_hull")
+boat = NodePath("../Boat")
+hud = NodePath("../SeaHud")
 
 [node name="DebugLayer" type="CanvasLayer" parent="."]
 
