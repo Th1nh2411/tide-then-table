@@ -17,6 +17,9 @@
 [ext_resource type="PackedScene" path="res://scenes/sea/fishing_spot.tscn" id="15_spot"]
 [ext_resource type="Script" path="res://scenes/sea/fishing_controller.gd" id="16_fishing"]
 [ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="17_catalog"]
+[ext_resource type="PackedScene" path="res://scenes/fishing/fishing_minigame.tscn" id="18_minigame"]
+[ext_resource type="Script" path="res://scenes/sea/hold_manager.gd" id="19_holdmgr"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hold_ui.tscn" id="20_holdui"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dock"]
 size = Vector2(70, 90)
@@ -191,12 +194,24 @@ script = ExtResource("11_tint")
 
 [node name="SeaHud" parent="." instance=ExtResource("12_hud")]
 
-[node name="FishingController" type="Node" parent="." node_paths=PackedStringArray("spawner", "boat", "hud")]
+[node name="FishingController" type="Node" parent="." node_paths=PackedStringArray("spawner", "boat", "hud", "minigame")]
 script = ExtResource("16_fishing")
 catalog = ExtResource("17_catalog")
 spawner = NodePath("../FishingSpots")
 boat = NodePath("../Boat")
 hud = NodePath("../SeaHud")
+minigame = NodePath("../FishingMinigame")
+
+[node name="FishingMinigame" parent="." instance=ExtResource("18_minigame")]
+
+[node name="HoldManager" type="Node" parent="." node_paths=PackedStringArray("boat", "fishing", "hold_ui", "hud")]
+script = ExtResource("19_holdmgr")
+boat = NodePath("../Boat")
+fishing = NodePath("../FishingController")
+hold_ui = NodePath("../HoldUI")
+hud = NodePath("../SeaHud")
+
+[node name="HoldUI" parent="." instance=ExtResource("20_holdui")]
 
 [node name="DebugLayer" type="CanvasLayer" parent="."]
 

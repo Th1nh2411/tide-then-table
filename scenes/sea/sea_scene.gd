@@ -15,6 +15,7 @@ var _day_ended: bool = false
 @onready var _bounds: MapBounds = $MapBounds
 @onready var _dock: Dock = $Dock
 @onready var _hud: SeaHud = $SeaHud
+@onready var _hold_manager: HoldManager = $HoldManager
 @onready var _debug_label: Label = %DebugLabel
 
 
@@ -67,6 +68,6 @@ func _end_sea_day(towed: bool) -> void:
 	DayClock.stop()
 	_boat.set_physics_process(false)
 	_hud.hide_prompt()
-	# Hold items are passed here once the hold exists (Phase 5).
-	GameState.finish_sea_day(DayClock.current_minutes, DayClock.get_shift_ratio(), towed, [])
+	GameState.finish_sea_day(DayClock.current_minutes, DayClock.get_shift_ratio(), towed,
+		_hold_manager.get_items())
 	SceneRouter.go_to(RESTAURANT_SCENE_PATH)
