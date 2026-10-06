@@ -33,6 +33,30 @@ func get_cells(is_rotated: bool = rotated) -> Array[Vector2i]:
 	return cells
 
 
+## Save data. Grid position/rotation aren't saved: only storage is saved,
+## and storage has no grid.
+func to_dict() -> Dictionary:
+	return {"fish": fish.id, "quality": quality, "freshness": freshness}
+
+
+## Rebuilds an item from save data, or returns null if the fish id is unknown
+## (e.g. a species removed in an update) or the entry is malformed.
+static func from_dict(data: Variant, catalog: FishCatalog) -> InventoryItem:
+	if not data is Dictionary:
+		return null
+	var fish_id: Variant = data.get("fish")
+	for f in catalog.fish:
+		if f.id == fish_id:
+			var item := InventoryItem.new(f, _to_float(data.get("quality"), 1.0))
+			item.freshness = clampf(_to_float(data.get("freshness"), 100.0), 0.0, 100.0)
+			return item
+	return null
+
+
+static func _to_float(value: Variant, fallback: float) -> float:
+	return float(value) if value is float or value is int else fallback
+
+
 ## Width/height of the bounding box in cells.
 func get_size(is_rotated: bool = rotated) -> Vector2i:
 	var max_cell := Vector2i.ZERO

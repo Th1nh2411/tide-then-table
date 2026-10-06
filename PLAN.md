@@ -316,6 +316,6 @@ Lặn biển, thế giới song song, dị biến cơ thể, dụng cụ kết h
 | 4 — Minigame câu         | ✅         | TIMING + TENSION; cần câu tạm = +15% vùng xanh/cấp (đổi sang UpgradeData ở Phase 7); test: scenes/test/fishing_minigame_test.tscn |
 | 5 — Khoang xếp hình      | ✅         | GridInventory thuần + HoldUI kéo-thả, khay "Cá mới" + ô "Bỏ"; overflow = pause; test: scenes/test/grid_inventory_test.tscn |
 | 6 — Quán ăn              | ✅         | + Chuẩn bị menu kiểu Dave the Diver (MenuPlan, 3 món, phần lấy từ kho, thừa trả kho, bán hết thì đóng sớm); tip 20% nếu kiên nhẫn > 50%; đơn vị "k"; F1 debug thêm cá; test: scenes/test/cooking_test.tscn |
-| 7 — Vòng ngày & nâng cấp | ⬜         |         |
-| 8 — Lưu game             | ⬜         |         |
+| 7 — Vòng ngày & nâng cấp | ✅         | Sao = tỉ lệ khách được phục vụ (−1 nếu menu đơn điệu), ảnh hưởng tần suất khách hôm sau; 3 UpgradeData (thuyền 300/800, cần 120/350, tủ lạnh 150/400); tủ lạnh mua tối nay có tác dụng ngay đêm nay |
+| 8 — Lưu game             | ✅         | SaveSystem (static) → user://save.json, ghi file tạm rồi đổi tên; autosave lúc 6:00 mỗi ngày; field thiếu/sai kiểu → mặc định, cá lạ bị bỏ qua; test: scenes/test/save_test.tscn |
 | 9 — Cảnh kết             | ⬜         |         |

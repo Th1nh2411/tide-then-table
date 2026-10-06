@@ -43,6 +43,8 @@ func _ready() -> void:
 	if GameState.last_spoiled_count > 0:
 		_hud.flash_message("Qua đêm %d món trong kho đã hỏng, phải bỏ đi" % GameState.last_spoiled_count, 2.5)
 		GameState.last_spoiled_count = 0
+	# Autosave at the start of every day (hold is empty, storage is settled).
+	SaveSystem.save_game()
 
 
 func _process(_delta: float) -> void:

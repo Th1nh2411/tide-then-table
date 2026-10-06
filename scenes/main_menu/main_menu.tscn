@@ -38,6 +38,12 @@ theme_override_font_sizes/font_size = 32
 text = "RIN THE FISHER"
 horizontal_alignment = 1
 
+[node name="ContinueButton" type="Button" parent="CenterContainer/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "Tiếp tục"
+
 [node name="NewGameButton" type="Button" parent="CenterContainer/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 0)
@@ -48,3 +54,12 @@ text = "Chơi mới"
 unique_name_in_owner = true
 layout_mode = 2
 text = "Thoát"
+
+[node name="StatusLabel" type="Label" parent="CenterContainer/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.6, 0.5, 1)
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+autowrap_mode = 3
