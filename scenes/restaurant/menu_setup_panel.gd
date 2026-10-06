@@ -14,6 +14,7 @@ signal confirmed
 var _plan: MenuPlan
 var _menu: DishCatalog
 var _fish_names: Dictionary = {}  # fish_id -> display name
+var _variety_table: Array[float] = []
 ## DishData -> { "row", "stock", "count", "plus", "minus" }
 var _rows: Dictionary = {}
 
@@ -24,13 +25,16 @@ var _rows: Dictionary = {}
 @onready var _open_button: Button = %OpenButton
 
 
-func setup(plan: MenuPlan, menu: DishCatalog, fish_catalog: FishCatalog) -> void:
+func setup(plan: MenuPlan, menu: DishCatalog, fish_catalog: FishCatalog,
+		variety_table: Array[float]) -> void:
 	_plan = plan
 	_menu = menu
+	_variety_table = variety_table
 	for fish in fish_catalog.fish:
 		_fish_names[fish.id] = fish.display_name
 	for dish in menu.dishes:
-		_build_row(dish)
+		if not dish.always_available:  # snacks are always on, nothing to plan
+			_build_row(dish)
 	_plan.changed.connect(_refresh)
 	_auto_button.pressed.connect(func() -> void: _plan.auto_fill(_menu.dishes, GameState.storage))
 	_clear_button.pressed.connect(func() -> void: _plan.clear(GameState.storage))
@@ -72,6 +76,9 @@ func _build_row(dish: DishData) -> void:
 func _refresh() -> void:
 	_title_label.text = "Chuẩn bị menu   (%d/%d món hải sản · %d phần)" % [
 		_plan.used_slots(), _plan.slots, _plan.total_portions()]
+	var variety := MenuPlan.variety_multiplier(_plan.variety_count(), _variety_table)
+	if variety < 1.0:
+		_title_label.text += "\nMenu đơn điệu: giá mọi món x%.1f (thêm món để hết phạt)" % variety
 	if _plan.market_spent > 0:
 		_title_label.text += "\nTiền chợ: %dk (còn %dk)" % [_plan.market_spent, _plan.budget - _plan.market_spent]
 	var counts := KitchenLogic.count_by_fish(GameState.storage)
@@ -87,7 +94,7 @@ func _refresh() -> void:
 	_clear_button.disabled = _plan.total_portions() == 0
 	# Auto only plans seafood, so it's useless when no seafood dish can be added.
 	_auto_button.disabled = _menu.dishes.all(func(d: DishData) -> bool:
-		return d.is_market_dish() or not _plan.can_add(d, GameState.storage))
+		return d.is_market_dish() or d.always_available or not _plan.can_add(d, GameState.storage))
 	_open_button.text = "Mở quán" if _plan.total_portions() > 0 else "Mở quán (không có món)"
 	if OS.is_debug_build() and GameState.storage.is_empty() and _plan.total_portions() == 0:
 		_title_label.text += "\n[debug] Kho trống — F1: thêm cá mẫu"

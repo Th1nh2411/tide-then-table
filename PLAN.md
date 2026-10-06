@@ -172,6 +172,9 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 | Cua rang me            | 1 cua       | STIR     | 110 |
 | Cá mú hấp xì dầu       | 1 cá mú     | STEAM    | 150 |
 | Rau muống xào tỏi      | Mua chợ 10k/phần (món phụ, không chiếm slot, thừa bỏ đi) | STIR | 30 |
+| Đậu phộng rang         | Luôn có, miễn phí, phục vụ ngay (không minigame) | — | 15 |
+
+> **Menu & phạt (thêm sau Phase 6):** trước ca chọn tối đa 3 món hải sản + món phụ. ~15% khách gọi đậu phộng; menu hết món thì khách chỉ gọi đậu phộng (chuẩn bị kém = thu ít). Menu ít món bị chê đơn điệu: giá mọi món x0.8 (0–1 món), x0.9 (2 món), x1.0 (3+ món). Có nút "Đóng quán sớm".
 
 ### UpgradeData (Resource)
 

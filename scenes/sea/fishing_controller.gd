@@ -14,9 +14,8 @@ signal fish_caught(fish: FishData, quality: float, count: int)
 @export var minigame: FishingMinigame
 ## In-game minutes each cast costs (on top of real minigame time).
 @export var minutes_per_cast: float = 20.0
-## Extra green-zone size per rod upgrade level (0.15 = +15% per level).
-## Replaced by UpgradeData values in Phase 7.
-@export var rod_zone_bonus_per_level: float = 0.15
+## Rod upgrade: its value is the minigame zone scale (1.0 = no bonus).
+@export var rod_upgrade: UpgradeData
 
 var _rng := RandomNumberGenerator.new()
 var _current_spot: FishingSpot
@@ -79,4 +78,4 @@ func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: 
 
 
 func _get_zone_scale() -> float:
-	return 1.0 + GameState.get_upgrade_level("rod") * rod_zone_bonus_per_level
+	return float(GameState.get_upgrade_value(rod_upgrade)) if rod_upgrade else 1.0

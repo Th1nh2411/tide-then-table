@@ -84,7 +84,7 @@ func _draw_order_bubble() -> void:
 	var text_color := Color(0.15, 0.1, 0.1)
 	draw_string(font, origin + Vector2(14, 10), dish.display_name, HORIZONTAL_ALIGNMENT_LEFT,
 		bubble_size.x - 16, 8, text_color)
-	var status := "Đang nấu..." if state == State.COOKING else "Bấm để nấu"
+	var status := "Đang nấu..." if state == State.COOKING else ("Bấm để mang ra" if dish.instant_serve else "Bấm để nấu")
 	draw_string(font, origin + Vector2(14, 19), status, HORIZONTAL_ALIGNMENT_LEFT, bubble_size.x - 16, 7, text_color)
 	# Patience bar under the bubble: green -> red.
 	var bar := Rect2(origin + Vector2(0, bubble_size.y + 2), Vector2(bubble_size.x, 3))

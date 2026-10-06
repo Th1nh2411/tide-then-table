@@ -8,6 +8,8 @@ signal day_changed(new_day: int)
 
 const STARTING_MONEY: int = 100
 const STARTING_DAY: int = 1
+## Rating assumed before the first shift (affects day-1 customer frequency).
+const STARTING_RATING: int = 3
 
 var money: int = STARTING_MONEY:
 	set(value):
@@ -36,6 +38,11 @@ var shift_ratio: float = 1.0
 ## True if the boat was towed home at the deadline.
 var was_towed: bool = false
 
+## Stars (1-5) from the last shift; drives customer frequency the next day.
+var last_rating: int = STARTING_RATING
+## Storage items that spoiled at the last day change (shown at sea).
+var last_spoiled_count: int = 0
+
 
 ## Reset everything to a fresh game. Called by "New Game".
 func reset() -> void:
@@ -47,6 +54,8 @@ func reset() -> void:
 	return_minutes = 0.0
 	shift_ratio = 1.0
 	was_towed = false
+	last_rating = STARTING_RATING
+	last_spoiled_count = 0
 
 
 ## Called when the sea day ends: records the return and moves the catch into storage.
@@ -55,6 +64,20 @@ func finish_sea_day(returned_at: float, ratio: float, towed: bool, hold_items: A
 	shift_ratio = ratio
 	was_towed = towed
 	storage.append_array(hold_items)
+
+
+## Move to the next day: storage loses `freshness_loss` freshness and
+## anything at 0 spoils and is thrown away. Returns how many spoiled.
+func advance_day(freshness_loss: float) -> int:
+	var kept: Array = []
+	for item: InventoryItem in storage:
+		item.freshness = maxf(item.freshness - freshness_loss, 0.0)
+		if item.freshness > 0.0:
+			kept.append(item)
+	last_spoiled_count = storage.size() - kept.size()
+	storage = kept
+	day += 1
+	return last_spoiled_count
 
 
 func add_money(amount: int) -> void:
@@ -71,6 +94,21 @@ func spend_money(amount: int) -> bool:
 
 func get_upgrade_level(upgrade_id: String) -> int:
 	return upgrade_levels.get(upgrade_id, 0)
+
+
+## The upgrade's effect at the player's current level.
+func get_upgrade_value(upgrade: UpgradeData) -> Variant:
+	return upgrade.value_at(get_upgrade_level(upgrade.id))
+
+
+## Buys the next level if affordable. Takes effect from the next day.
+func buy_upgrade(upgrade: UpgradeData) -> bool:
+	var level := get_upgrade_level(upgrade.id)
+	var cost := upgrade.next_cost(level)
+	if cost < 0 or not spend_money(cost):
+		return false
+	upgrade_levels[upgrade.id] = level + 1
+	return true
 
 
 func set_flag(flag_name: String, value: Variant = true) -> void:

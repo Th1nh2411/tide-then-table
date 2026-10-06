@@ -56,9 +56,24 @@ func is_sold_out() -> bool:
 	return total_portions() == 0
 
 
+## Distinct dishes on the menu (snacks never count).
+func variety_count() -> int:
+	return _portions.size()
+
+
+## Price multiplier for a menu with `count` distinct dishes. `table[i]` is the
+## multiplier for i dishes; counts past the end use the last entry.
+static func variety_multiplier(count: int, table: Array[float]) -> float:
+	if table.is_empty():
+		return 1.0
+	return table[clampi(count, 0, table.size() - 1)]
+
+
 ## True if one more portion of `dish` can be added: enough money for a
 ## market dish, or a free slot + enough stock for a seafood dish.
 func can_add(dish: DishData, storage: Array) -> bool:
+	if dish.always_available:
+		return false  # snacks are never planned
 	if dish.is_market_dish():
 		return market_spent + dish.market_cost <= budget
 	if not _portions.has(dish) and used_slots() >= slots:
@@ -102,7 +117,8 @@ func remove_portion(dish: DishData, storage: Array) -> void:
 ## as many portions as possible each. Never buys market dishes (no surprise
 ## spending); the player adds those by hand.
 func auto_fill(menu: Array[DishData], storage: Array) -> void:
-	var by_price := menu.filter(func(d: DishData) -> bool: return not d.is_market_dish())
+	var by_price := menu.filter(func(d: DishData) -> bool:
+		return not d.is_market_dish() and not d.always_available)
 	by_price.sort_custom(func(a: DishData, b: DishData) -> bool: return a.base_price > b.base_price)
 	for dish: DishData in by_price:
 		while add_portion(dish, storage):

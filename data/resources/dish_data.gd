@@ -17,6 +17,14 @@ enum CookType { GRILL, STEAM, STIR }
 @export var market_cost: int = 0
 
 
+## Snack that is always in stock (free, unlimited). Never shown in menu
+## planning; customers sometimes add it, and order only it once the menu is
+## sold out.
+@export var always_available: bool = false
+## Served on click with no cooking minigame (pre-made).
+@export var instant_serve: bool = false
+
+
 ## Cooked from bought market produce rather than the player's catch.
 func is_market_dish() -> bool:
-	return ingredients.is_empty()
+	return ingredients.is_empty() and not always_available

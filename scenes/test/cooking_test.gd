@@ -101,6 +101,15 @@ func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
 	_check("market portion returns", market.get_portion_count(rau) == 1)
 	_check("market price = base × cook", KitchenLogic.calc_price(rau, 1.3, [] as Array[InventoryItem]) == 39)
 
+	# Snack + variety.
+	var peanuts := _dish("dau_phong_rang")
+	_check("snack is not a market dish", not peanuts.is_market_dish())
+	_check("snack can't be planned", not MenuPlan.new(3, 999).can_add(peanuts, storage))
+	var table: Array[float] = [0.8, 0.8, 0.9, 1.0]
+	_check("variety 1 dish x0.8", MenuPlan.variety_multiplier(1, table) == 0.8)
+	_check("variety 2 dishes x0.9", MenuPlan.variety_multiplier(2, table) == 0.9)
+	_check("variety 5 dishes x1.0", MenuPlan.variety_multiplier(5, table) == 1.0)
+
 
 func _check(label: String, ok: bool) -> void:
 	if not ok:

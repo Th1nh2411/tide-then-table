@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/upgrade_data.gd" id="1_upgrade"]
+
+[resource]
+script = ExtResource("1_upgrade")
+id = "rod"
+display_name = "Cần câu"
+description = "Vùng xanh rộng hơn, cá giãy chậm hơn."
+levels = Array[int]([120, 350])
+values = [1.0, 1.2, 1.4]
+value_labels = Array[String](["Vùng xanh +0%", "Vùng xanh +20%", "Vùng xanh +40%"])

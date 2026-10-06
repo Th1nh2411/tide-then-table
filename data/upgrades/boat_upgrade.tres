@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/upgrade_data.gd" id="1_upgrade"]
+[ext_resource type="Resource" path="res://data/boats/thuyen_thung.tres" id="2_thung"]
+[ext_resource type="Resource" path="res://data/boats/ghe_cheo.tres" id="3_cheo"]
+[ext_resource type="Resource" path="res://data/boats/ghe_may.tres" id="4_may"]
+
+[resource]
+script = ExtResource("1_upgrade")
+id = "boat"
+display_name = "Thuyền"
+description = "Nhanh hơn, dễ lái hơn, khoang rộng hơn."
+levels = Array[int]([300, 800])
+values = [ExtResource("2_thung"), ExtResource("3_cheo"), ExtResource("4_may")]
+value_labels = Array[String](["Thuyền thúng (khoang 4x3)", "Ghe chèo (khoang 5x4)", "Ghe máy (khoang 6x5)"])

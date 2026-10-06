@@ -4,6 +4,8 @@ extends Node2D
 
 const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.tscn"
 
+## Boat upgrade track: the player's current level decides today's boat.
+@export var boat_upgrade: UpgradeData
 ## Boats selectable with debug keys 1/2/3 (debug builds only).
 @export var debug_boats: Array[BoatData] = []
 ## How long the "towed home" message stays before switching scenes.
@@ -29,6 +31,8 @@ func _ready() -> void:
 	camera.limit_right = _bounds.map_size.x
 	camera.limit_bottom = _bounds.map_size.y
 	_debug_label.visible = OS.is_debug_build()
+	if boat_upgrade:
+		_boat.apply_boat_data(GameState.get_upgrade_value(boat_upgrade))
 
 	_dock.boat_entered.connect(_hud.show_prompt.bind("E: Cập bến"))
 	_dock.boat_exited.connect(_on_dock_exited)
@@ -36,6 +40,9 @@ func _ready() -> void:
 	_nets.nets_changed.connect(_hud.set_nets)
 	DayClock.return_deadline_reached.connect(_on_return_deadline_reached)
 	DayClock.start_day()
+	if GameState.last_spoiled_count > 0:
+		_hud.flash_message("Qua đêm %d món trong kho đã hỏng, phải bỏ đi" % GameState.last_spoiled_count, 2.5)
+		GameState.last_spoiled_count = 0
 
 
 func _process(_delta: float) -> void:

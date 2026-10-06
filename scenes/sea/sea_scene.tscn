@@ -22,12 +22,15 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hold_ui.tscn" id="20_holdui"]
 [ext_resource type="Script" path="res://scenes/sea/net_controller.gd" id="21_nets"]
 [ext_resource type="PackedScene" path="res://scenes/sea/net_buoy.tscn" id="22_buoy"]
+[ext_resource type="Resource" path="res://data/upgrades/boat_upgrade.tres" id="23_boatup"]
+[ext_resource type="Resource" path="res://data/upgrades/rod_upgrade.tres" id="24_rodup"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dock"]
 size = Vector2(70, 90)
 
 [node name="SeaScene" type="Node2D"]
 script = ExtResource("1_sea")
+boat_upgrade = ExtResource("23_boatup")
 debug_boats = Array[ExtResource("2_boatdata")]([ExtResource("3_thung"), ExtResource("4_cheo"), ExtResource("5_may")])
 
 [node name="Zones" type="Node2D" parent="."]
@@ -198,6 +201,7 @@ script = ExtResource("11_tint")
 
 [node name="FishingController" type="Node" parent="." node_paths=PackedStringArray("spawner", "boat", "hud", "minigame")]
 script = ExtResource("16_fishing")
+rod_upgrade = ExtResource("24_rodup")
 catalog = ExtResource("17_catalog")
 spawner = NodePath("../FishingSpots")
 boat = NodePath("../Boat")
