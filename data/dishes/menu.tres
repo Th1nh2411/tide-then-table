@@ -7,7 +7,8 @@
 [ext_resource type="Resource" path="res://data/dishes/ca_thu_nuong.tres" id="4_ca_thu_nuong"]
 [ext_resource type="Resource" path="res://data/dishes/tom_rang_muoi.tres" id="5_tom_rang_muoi"]
 [ext_resource type="Resource" path="res://data/dishes/cua_rang_me.tres" id="6_cua_rang_me"]
+[ext_resource type="Resource" path="res://data/dishes/ca_mu_hap_xi_dau.tres" id="7_ca_mu_hap_xi_dau"]
 
 [resource]
 script = ExtResource("1_catalog")
-dishes = Array[ExtResource("1_dishdata")]([ExtResource("2_oc_huong_nuong_mo_hanh"), ExtResource("3_muc_hap_gung"), ExtResource("4_ca_thu_nuong"), ExtResource("5_tom_rang_muoi"), ExtResource("6_cua_rang_me")])
+dishes = Array[ExtResource("1_dishdata")]([ExtResource("2_oc_huong_nuong_mo_hanh"), ExtResource("3_muc_hap_gung"), ExtResource("4_ca_thu_nuong"), ExtResource("5_tom_rang_muoi"), ExtResource("6_cua_rang_me"), ExtResource("7_ca_mu_hap_xi_dau")])

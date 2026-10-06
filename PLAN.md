@@ -167,6 +167,7 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 | Cá thu nướng           | 1 cá thu    | GRILL    | 80  |
 | Tôm rang muối          | 2 tôm       | STIR     | 75  |
 | Cua rang me            | 1 cua       | STIR     | 110 |
+| Cá mú hấp xì dầu       | 1 cá mú     | STEAM    | 150 |
 
 ### UpgradeData (Resource)
 
@@ -307,7 +308,7 @@ Lặn biển, thế giới song song, dị biến cơ thể, dụng cụ kết h
 | 3 — Điểm câu             | ✅         | 7 loài + fish_catalog.tres; 4 spot/zone, 2–4 lượt, mỗi lượt +20 phút game; minigame tạm là thông báo |
 | 4 — Minigame câu         | ✅         | TIMING + TENSION; cần câu tạm = +15% vùng xanh/cấp (đổi sang UpgradeData ở Phase 7); test: scenes/test/fishing_minigame_test.tscn |
 | 5 — Khoang xếp hình      | ✅         | GridInventory thuần + HoldUI kéo-thả, khay "Cá mới" + ô "Bỏ"; overflow = pause; test: scenes/test/grid_inventory_test.tscn |
-| 6 — Quán ăn              | ✅         | Nguyên liệu để riêng khi khách gọi, trả kho nếu khách bỏ đi; tip 20% nếu kiên nhẫn > 50%; đơn vị tiền "k"; test: scenes/test/cooking_test.tscn |
+| 6 — Quán ăn              | ✅         | + Chuẩn bị menu kiểu Dave the Diver (MenuPlan, 3 món, phần lấy từ kho, thừa trả kho, bán hết thì đóng sớm); tip 20% nếu kiên nhẫn > 50%; đơn vị "k"; F1 debug thêm cá; test: scenes/test/cooking_test.tscn |
 | 7 — Vòng ngày & nâng cấp | ⬜         |         |
 | 8 — Lưu game             | ⬜         |         |
 | 9 — Cảnh kết             | ⬜         |         |

@@ -46,8 +46,7 @@ func _run_logic_tests() -> void:
 	_check("can cook with 3 ốc", KitchenLogic.can_cook(oc_dish, storage))
 	_check("can't cook cua without cua", not KitchenLogic.can_cook(cua_dish, storage))
 
-	var rng := RandomNumberGenerator.new()
-	_check("order prefers cookable dish", KitchenLogic.pick_order(menu.dishes, storage, rng) == oc_dish)
+	_test_menu_plan(oc_dish, cua_dish)
 
 	var taken := KitchenLogic.take_ingredients(oc_dish, storage)
 	_check("took 3 ốc", taken.size() == 3)
@@ -63,6 +62,30 @@ func _run_logic_tests() -> void:
 	var price := KitchenLogic.calc_price(oc_dish, 1.3, taken)
 	_check("price formula (got %d, want 57)" % price, price == 57)
 	_log.insert(0, "KitchenLogic: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
+
+
+func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
+	var storage: Array = []
+	for i in 7:
+		storage.append(_item("oc_huong", 1.0, 100))
+	storage.append(_item("cua", 1.0, 100))
+	var plan := MenuPlan.new(1)
+	_check("max portions 7 ốc -> 2", MenuPlan.max_portions(oc_dish, storage) == 2)
+	_check("add portion", plan.add_portion(oc_dish, storage) and storage.size() == 5)
+	_check("slot limit blocks 2nd dish", not plan.add_portion(cua_dish, storage))
+	plan.add_portion(oc_dish, storage)
+	_check("no stock for 3rd portion", not plan.add_portion(oc_dish, storage))
+	plan.remove_portion(oc_dish, storage)
+	_check("remove returns ingredients", storage.size() == 5 and plan.get_portion_count(oc_dish) == 1)
+	var portion := plan.take_portion(oc_dish)
+	_check("take portion", portion.size() == 3 and plan.is_sold_out())
+	plan.return_portion(oc_dish, portion)
+	_check("return portion", plan.get_portion_count(oc_dish) == 1)
+	plan.clear(storage)
+	_check("clear returns all", storage.size() == 8 and plan.total_portions() == 0)
+	var auto := MenuPlan.new(3)
+	auto.auto_fill(menu.dishes, storage)
+	_check("auto fill uses stock (cua + 2 ốc)", auto.get_portion_count(cua_dish) == 1 and auto.get_portion_count(oc_dish) == 2 and storage.size() == 1)
 
 
 func _check(label: String, ok: bool) -> void:

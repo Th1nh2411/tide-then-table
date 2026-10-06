@@ -1,18 +1,17 @@
 class_name CustomerManager
 extends Node
 ## Runs the customers during a shift: spawns them at random intervals into
-## free seats, picks their orders (setting the ingredients aside), starts
-## cooking when one is clicked, and pays out when the dish is done.
+## free seats, has them order from today's MenuPlan (taking one portion),
+## starts cooking when one is clicked, and pays out when the dish is done.
+## Customers only come while the menu still has portions left.
 
 signal customer_served(price: int, tip: int)
 signal customer_left_angry
-signal storage_changed
 ## Always emitted when a cooking attempt ends (even if the customer is gone).
 signal cooking_ended
 signal message_requested(text: String)
 
 @export var customer_scene: PackedScene
-@export var menu: DishCatalog
 @export var cooking: CookingOverlay
 ## Parent node for customer nodes (and floating money text).
 @export var customer_layer: Control
@@ -27,6 +26,7 @@ signal message_requested(text: String)
 @export var tip_patience_threshold: float = 0.5
 
 var _seats: Array[Customer] = []
+var _plan: MenuPlan
 var _accepting: bool = false
 var _spawn_left: float = 0.0
 var _cooking_customer: Customer
@@ -39,7 +39,8 @@ func _ready() -> void:
 	cooking.finished.connect(_on_cooking_finished)
 
 
-func start_shift() -> void:
+func start_shift(plan: MenuPlan) -> void:
+	_plan = plan
 	_accepting = true
 	_spawn_left = first_spawn_delay
 
@@ -57,6 +58,11 @@ func is_cooking() -> bool:
 	return _cooking_customer != null
 
 
+## No one seated (or walking in) and nothing on the stove.
+func is_idle() -> bool:
+	return not is_cooking() and _seats.all(func(c: Customer) -> bool: return c == null)
+
+
 func _process(delta: float) -> void:
 	if not _accepting:
 		return
@@ -68,18 +74,18 @@ func _process(delta: float) -> void:
 
 func _try_spawn() -> void:
 	var seat := _seats.find(null)
-	if seat == -1:
+	var dishes := _plan.available_dishes()
+	if seat == -1 or dishes.is_empty():
 		return
 	var customer: Customer = customer_scene.instantiate()
-	customer.dish = KitchenLogic.pick_order(menu.dishes, GameState.storage, _rng)
-	customer.ingredients = KitchenLogic.take_ingredients(customer.dish, GameState.storage)
+	customer.dish = dishes[_rng.randi() % dishes.size()]
+	customer.ingredients = _plan.take_portion(customer.dish)
 	customer.position = door_position
 	customer.clicked.connect(_on_customer_clicked)
 	customer.patience_ran_out.connect(_send_away.bind(true))
 	_seats[seat] = customer
 	customer_layer.add_child(customer)
 	customer.walk_to(seat_positions[seat])
-	storage_changed.emit()
 
 
 func _on_customer_clicked(customer: Customer) -> void:
@@ -109,18 +115,17 @@ func _on_cooking_finished(dish: DishData, _result: CookingGameBase.Result, multi
 	cooking_ended.emit()
 
 
-## Customer leaves without being served; set-aside ingredients go back to storage.
+## Customer leaves without being served; their portion goes back on the menu.
 func _send_away(customer: Customer, angry: bool) -> void:
 	if customer.state == Customer.State.LEAVING:
 		return
-	GameState.storage.append_array(customer.ingredients)
+	_plan.return_portion(customer.dish, customer.ingredients)
 	customer.ingredients.clear()
 	_free_seat(customer)
 	if angry:
 		_float_text(customer.position, "Bỏ đi!")
 		customer_left_angry.emit()
 	customer.leave(door_position)
-	storage_changed.emit()
 
 
 func _free_seat(customer: Customer) -> void:

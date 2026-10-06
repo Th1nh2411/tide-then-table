@@ -28,17 +28,6 @@ static func can_cook(dish: DishData, storage: Array) -> bool:
 	return true
 
 
-## Prefers a dish that can be cooked from storage; otherwise any dish
-## (the customer will end up leaving).
-static func pick_order(menu: Array[DishData], storage: Array, rng: RandomNumberGenerator) -> DishData:
-	var cookable: Array[DishData] = []
-	for dish in menu:
-		if can_cook(dish, storage):
-			cookable.append(dish)
-	var pool := cookable if not cookable.is_empty() else menu
-	return pool[rng.randi() % pool.size()]
-
-
 ## Removes and returns the ingredients for `dish`, oldest (least fresh) first.
 ## Returns an empty array and removes nothing if storage doesn't have enough.
 static func take_ingredients(dish: DishData, storage: Array) -> Array[InventoryItem]:
