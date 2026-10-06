@@ -1,0 +1,96 @@
+class_name Customer
+extends Control
+## A customer: walks in, sits at a table, shows an order bubble and a patience
+## bar, waits to be clicked (served), then walks out. Placeholder drawing only.
+
+signal clicked(customer: Customer)
+signal patience_ran_out(customer: Customer)
+
+enum State { WALKING_IN, WAITING, COOKING, LEAVING }
+
+## Seconds from full patience to leaving.
+@export var patience_seconds: float = 35.0
+@export var walk_seconds: float = 1.5
+@export var body_size: Vector2 = Vector2(18, 34)
+@export var bubble_size: Vector2 = Vector2(96, 22)
+
+var dish: DishData
+## Ingredients set aside from storage for this order. Empty = can't be cooked.
+var ingredients: Array[InventoryItem] = []
+## 1.0 = full patience, 0.0 = leaving.
+var patience: float = 1.0
+var state: State = State.WALKING_IN
+
+var _shirt_color: Color
+
+
+func _ready() -> void:
+	size = body_size
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	_shirt_color = Color.from_hsv(randf(), 0.5, 0.85)
+
+
+func can_be_served() -> bool:
+	return not ingredients.is_empty()
+
+
+func walk_to(target: Vector2) -> void:
+	var tween := create_tween()
+	tween.tween_property(self, "position", target, walk_seconds)
+	await tween.finished
+	if state == State.WALKING_IN:
+		state = State.WAITING
+
+
+func set_cooking(cooking: bool) -> void:
+	state = State.COOKING if cooking else State.WAITING
+
+
+## Walk to the door and disappear.
+func leave(door_position: Vector2) -> void:
+	state = State.LEAVING
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tween := create_tween()
+	tween.tween_property(self, "position", door_position, walk_seconds)
+	tween.tween_callback(queue_free)
+
+
+func _process(delta: float) -> void:
+	# Patience only drops while waiting; the customer being cooked for is calm.
+	if state == State.WAITING:
+		patience = maxf(patience - delta / patience_seconds, 0.0)
+		if patience <= 0.0:
+			patience_ran_out.emit(self)
+	queue_redraw()
+
+
+func _gui_input(event: InputEvent) -> void:
+	var mouse := event as InputEventMouseButton
+	if mouse and mouse.pressed and mouse.button_index == MOUSE_BUTTON_LEFT and state == State.WAITING:
+		accept_event()
+		clicked.emit(self)
+
+
+func _draw() -> void:
+	# Body + head.
+	draw_rect(Rect2(Vector2(0, 12), Vector2(body_size.x, body_size.y - 12)), _shirt_color)
+	draw_circle(Vector2(body_size.x * 0.5, 6), 6, Color(0.95, 0.8, 0.65))
+	if state == State.WAITING or state == State.COOKING:
+		_draw_order_bubble()
+
+
+func _draw_order_bubble() -> void:
+	var font := ThemeDB.fallback_font
+	var origin := Vector2((body_size.x - bubble_size.x) * 0.5, -bubble_size.y - 10)
+	draw_rect(Rect2(origin, bubble_size), Color(1, 1, 1, 0.92))
+	draw_rect(Rect2(origin + Vector2(3, 3), Vector2(8, 8)), dish.color)
+	var text_color := Color(0.15, 0.1, 0.1) if can_be_served() else Color(0.8, 0.15, 0.15)
+	draw_string(font, origin + Vector2(14, 10), dish.display_name, HORIZONTAL_ALIGNMENT_LEFT,
+		bubble_size.x - 16, 8, text_color)
+	var status := "Đang nấu..." if state == State.COOKING else ("Bấm để nấu" if can_be_served() else "Hết nguyên liệu!")
+	draw_string(font, origin + Vector2(14, 19), status, HORIZONTAL_ALIGNMENT_LEFT, bubble_size.x - 16, 7, text_color)
+	# Patience bar under the bubble: green -> red.
+	var bar := Rect2(origin + Vector2(0, bubble_size.y + 2), Vector2(bubble_size.x, 3))
+	draw_rect(bar, Color(0, 0, 0, 0.5))
+	draw_rect(Rect2(bar.position, Vector2(bar.size.x * patience, bar.size.y)),
+		Color(1, 0.3, 0.3).lerp(Color(0.3, 0.9, 0.4), patience))

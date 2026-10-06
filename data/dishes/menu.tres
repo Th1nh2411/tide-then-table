@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DishCatalog" format=3]
+
+[ext_resource type="Script" path="res://data/resources/dish_catalog.gd" id="1_catalog"]
+[ext_resource type="Script" path="res://data/resources/dish_data.gd" id="1_dishdata"]
+[ext_resource type="Resource" path="res://data/dishes/oc_huong_nuong_mo_hanh.tres" id="2_oc_huong_nuong_mo_hanh"]
+[ext_resource type="Resource" path="res://data/dishes/muc_hap_gung.tres" id="3_muc_hap_gung"]
+[ext_resource type="Resource" path="res://data/dishes/ca_thu_nuong.tres" id="4_ca_thu_nuong"]
+[ext_resource type="Resource" path="res://data/dishes/tom_rang_muoi.tres" id="5_tom_rang_muoi"]
+[ext_resource type="Resource" path="res://data/dishes/cua_rang_me.tres" id="6_cua_rang_me"]
+
+[resource]
+script = ExtResource("1_catalog")
+dishes = Array[ExtResource("1_dishdata")]([ExtResource("2_oc_huong_nuong_mo_hanh"), ExtResource("3_muc_hap_gung"), ExtResource("4_ca_thu_nuong"), ExtResource("5_tom_rang_muoi"), ExtResource("6_cua_rang_me")])

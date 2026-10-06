@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DishData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/dish_data.gd" id="1_dish"]
+
+[resource]
+script = ExtResource("1_dish")
+id = "ca_thu_nuong"
+display_name = "Cá thu nướng"
+ingredients = Dictionary[String, int]({"ca_thu": 1})
+cook_type = 0
+base_price = 80
+color = Color(0.75, 0.55, 0.35, 1)
