@@ -37,7 +37,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _open() -> void:
 	_confirm_menu = false
 	_menu_button.text = "Về menu chính"
-	_note_label.text = "Game tự lưu mỗi đêm lúc ra khơi."
+	_note_label.text = "Game tự lưu lúc ra khơi và lúc cập bến về."
 	get_tree().paused = true
 	show()
 	_resume_button.grab_focus()

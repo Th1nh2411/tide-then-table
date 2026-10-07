@@ -7,6 +7,9 @@ extends Control
 ## poorly prepared menu earns little. A menu with few dishes lowers all prices.
 ## After the summary (with a 1-5 star rating) comes the upgrade shop, then
 ## the next day starts at sea (storage loses freshness overnight).
+## Regulars with a fish order: their fish is set aside before menu planning
+## and they come in during the shift (CustomerManager); unserved fish go back
+## to storage and overdue orders are cancelled at closing.
 
 const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 
@@ -22,6 +25,8 @@ const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 @export var message_seconds: float = 1.5
 ## Fridge upgrade: its value is the freshness lost overnight.
 @export var fridge_upgrade: UpgradeData
+## After closing, dishes still on the stove/counter get this long to be served.
+@export var closing_grace_seconds: float = 12.0
 
 var _plan: MenuPlan
 var _time_left: float = 0.0
@@ -35,6 +40,8 @@ var _sold_out_announced: bool = false
 var _served: int = 0
 var _left_angry: int = 0
 var _message_token: int = 0
+## Regulars coming today (FishOrders.reserve_for_shift).
+var _regular_visits: Array[Dictionary] = []
 
 @onready var _customers: CustomerManager = $CustomerManager
 @onready var _menu_panel: MenuSetupPanel = %MenuSetupPanel
@@ -61,6 +68,11 @@ func _ready() -> void:
 	_close_early_button.pressed.connect(func() -> void: _end_shift("Đóng quán sớm"))
 	_close_early_button.hide()
 
+	_regular_visits = FishOrders.reserve_for_shift(menu)
+	(%Decor as RestaurantDecor).setup(_customers.seat_positions,
+		int(GameState.get_upgrade_value(_customers.decor_upgrade)) if _customers.decor_upgrade else 0)
+	_customers.regular_served.connect(func(who: String, price: int) -> void:
+		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
 	_plan = MenuPlan.new(menu_slots, GameState.money)
 	_plan.changed.connect(_refresh_storage)
 	_menu_panel.setup(_plan, menu, fish_catalog, variety_multipliers)
@@ -83,9 +95,9 @@ func _open_shop() -> void:
 	_variety_multiplier = MenuPlan.variety_multiplier(_variety_count, variety_multipliers)
 	_shift_running = true
 	_close_early_button.show()
-	_customers.start_shift(_plan, _variety_multiplier)
+	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
 	if GameState.day == 1:
-		_show_message("Quán mở cửa! Click vào khách để nấu món họ gọi.", 4.0)
+		_show_message("Quán mở cửa! Click khách để nấu. Bảo tự bưng ra; click khách có món xong để Rin bưng giúp.", 5.0)
 	else:
 		_show_message("Quán mở cửa!")
 	_refresh_storage()
@@ -125,11 +137,20 @@ func _end_shift(reason: String) -> void:
 	_close_early_button.hide()
 	_customers.stop_shift()
 	_show_message(reason)
-	# Let the dish on the stove finish before closing up.
-	if _customers.is_cooking():
-		await _customers.cooking_ended
+	# Let dishes already cooking / on the counter reach their tables.
+	var waited := 0.0
+	while not _customers.is_idle() and waited < closing_grace_seconds:
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+	var kitchen: Kitchen = _customers.kitchen
+	if kitchen.is_cooking():
+		await kitchen.cooking_ended
+	_customers.clear_room()
 	var leftover := _plan.total_portions()
 	_plan.clear(GameState.storage)
+	for visit in _customers.unserved_regulars():
+		FishOrders.release(visit)
+	var order_lines := FishOrders.expire_after_shift(fish_catalog)
 	_shift_over = true
 	var monotonous := _variety_multiplier < 1.0
 	var variety_text := "Menu %d món" % _variety_count
@@ -139,9 +160,10 @@ func _end_shift(reason: String) -> void:
 	GameState.last_rating = stars
 	GameState.add_day_record({"day": GameState.day, "earned": _earned_today, "market": _market_spent,
 		"rating": stars, "served": _served, "left": _left_angry})
-	_summary_label.text = "%s\nĐÁNH GIÁ: %d/5 sao\nThu được: %dk   Tiền chợ: -%dk   Lãi: %dk\n%s\nKhách đã phục vụ: %d   Khách bỏ đi: %d\nPhần thừa: %d (hải sản trả về kho, rau bỏ đi)\n%s" % [
+	_summary_label.text = "%s\nĐÁNH GIÁ: %d/5 sao\nThu được: %dk   Tiền chợ: -%dk   Lãi: %dk\n%s\nKhách đã phục vụ: %d   Khách bỏ đi: %d\nPhần thừa: %d (hải sản trả về kho, rau bỏ đi)\n%s%s" % [
 		reason, stars, _earned_today, _market_spent, _earned_today - _market_spent, variety_text,
-		_served, _left_angry, leftover, _rating_hint(stars)]
+		_served, _left_angry, leftover, _rating_hint(stars),
+		("\n" + "\n".join(order_lines)) if not order_lines.is_empty() else ""]
 	_summary_panel.show()
 	_next_day_button.grab_focus()
 
@@ -160,6 +182,12 @@ func _refresh_storage() -> void:
 			menu_parts.append("%s %s" % [dish.display_name, ("còn %d" % left) if left > 0 else "(hết)"])
 		lines.append("Menu: " + " · ".join(menu_parts))
 	lines.append("Kho: " + _storage_text())
+	if not _regular_visits.is_empty():
+		var parts: PackedStringArray = []
+		for visit in _regular_visits:
+			var item: InventoryItem = visit["item"]
+			parts.append("%s %s cho %s" % [item.fish.display_name, item.fish.weight_text(item.size), visit["order"]["who"]])
+		lines.append("Để riêng: " + ", ".join(parts))
 	_storage_label.text = "\n".join(lines)
 
 

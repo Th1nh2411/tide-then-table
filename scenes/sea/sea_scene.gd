@@ -74,8 +74,7 @@ func _ready() -> void:
 		_hud.flash_message("Sương mù phủ góc đông bắc. Trong đó có ánh sáng lạ...", 3.0)
 	# Autosave at the start of every night (hold is empty, storage is settled).
 	# Headless test runs pass `-- --no-autosave` so they never touch the real save.
-	if not OS.get_cmdline_user_args().has("--no-autosave"):
-		SaveSystem.save_game()
+	SaveSystem.autosave("sea")
 
 
 func _capture_map() -> void:

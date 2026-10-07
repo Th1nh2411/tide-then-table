@@ -11,6 +11,8 @@ signal completed(result: Result)
 @export var input_delay: float = 0.25
 
 var dish: DishData
+## Game speed (< 1 = slower = easier). Set from the kitchen upgrade.
+var time_scale: float = 1.0
 
 var _done: bool = false
 var _time: float = 0.0
@@ -23,8 +25,9 @@ func setup(p_dish: DishData) -> void:
 func _process(delta: float) -> void:
 	if _done or dish == null:
 		return
-	_time += delta
-	_update(delta)
+	var scaled := delta * time_scale
+	_time += scaled
+	_update(scaled)
 	queue_redraw()
 
 

@@ -7,6 +7,7 @@ const MAIN_MENU_PATH: String = "res://scenes/main_menu/main_menu.tscn"
 @export_multiline var lines: Array[String] = [
 	"...Nước đang xoáy ngược chiều gió.",
 	"App vẫn báo lỗi: tọa độ này không tồn tại trên bản đồ.",
+	"Cái phao kia gắn đèn đỏ... in chữ THÂM LAM. Ai thả nó ở đây?",
 	"Ông nội từng kể về một vùng biển nằm bên dưới mặt biển.",
 	"Có bug thì phải debug. Mình phải xuống xem cho rõ.",
 ]

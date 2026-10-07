@@ -20,6 +20,7 @@ extends PointOfInterest
 ]
 @export_multiline var fog_rumors: Array[String] = [
 	"\"Cái la bàn của tui cứ quay mòng mòng mỗi lần tới gần đám sương. Con cẩn thận.\"",
+	"\"Mấy đêm nay có tàu lạ sơn xanh đen chạy ra vùng sương, không treo cờ, đèn đỏ nhấp nháy. Không phải dân mình.\"",
 ]
 
 var _rng := RandomNumberGenerator.new()

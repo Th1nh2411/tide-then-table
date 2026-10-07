@@ -1,7 +1,7 @@
 class_name PhoneReports
 extends RefCounted
-## Text for each tab of Rin's phone app ("Rin's Catch" — Rin used to be a
-## developer and wrote it). Pure functions of GameState + data resources, so
+## Text for each tab of Rin's phone app ("Rin's Catch" — what's left of the
+## failed startup Rin built with Bảo; Rin rewrote it for the restaurant). Pure functions of GameState + data resources, so
 ## the UI only displays them and tests can check them directly.
 
 const ZONE_NAMES: Array[String] = ["Gần bờ", "Rạn đá", "Xa bờ", "Sương mù"]
@@ -84,7 +84,7 @@ static func orders_report(catalog: FishCatalog) -> String:
 	for order: Dictionary in GameState.orders:
 		lines.append("[MSG] " + FishOrders.describe(order, catalog))
 	lines.append("")
-	lines.append("> Câu được con đủ ký, sáng ra tự giao và nhận tiền.")
+	lines.append("> Câu được con đủ ký thì khách tự ghé quán ăn, trả tiền khi được phục vụ.")
 	return "\n".join(lines)
 
 
@@ -139,6 +139,7 @@ static func log_lines(fridge_loss: float, weather: WeatherData = null) -> Packed
 		lines.append("[WARN] species_id \"%s\" không có trong database" % Story.OMEN_FISH_ID)
 	if Story.is_fog_open():
 		lines.append("[ERR] GPS: tọa độ NaN ở góc đông bắc")
+		lines.append("[WARN] thiết bị lạ đang phát sóng: THAMLAM-BUOY-07")
 	elif GameState.story_flags.has(Story.OMEN_DAY_FLAG):
 		lines.append("[ERR] GPS: nhiễu tín hiệu ở góc đông bắc")
 	return lines

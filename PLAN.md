@@ -11,7 +11,11 @@ RIN THE FISHER là game 2D: **ban đêm** (0:00–6:00) Rin thắp đèn câu, l
 
 **Bối cảnh địa lý:** vùng biển hư cấu quanh Xóm Đèn và dải đảo Ngủ Quên (tên tự đặt, không dựa trên địa danh thật nào). Bờ phía nam là làng chài Xóm Đèn và bến; càng ra bắc càng sâu, có các đảo Gò Vỏ Ốc, Đá Canh Đêm; góc đông bắc là vùng sương mù. Chất liệu văn hóa: đèn lồng phố cổ, thuyền thúng, câu mực đêm, tục thờ cá Ông (cá voi) của ngư dân.
 
-**Nhân vật:** Rin từng là developer ở thành phố, bỏ việc về làng chài nối nghề biển và mở quán hải sản. Rin tự viết app điện thoại **"Rin's Catch"** (phím J) để quản lý kho, menu, sách cá (Dex), thuyền và sổ sách; app ghi log lỗi khi gặp cá biến dị / tọa độ lạ — manh mối cốt truyện ("có bug thì phải debug").
+**Nhân vật chính (bản ghép với STORY.md):** Rin tốt nghiệp IT, cùng người bạn thân **Bảo** khởi nghiệp làm app ở thành phố; startup thất bại, hai người lâu không gặp. Rin về Xóm Đèn — quê ông nội — mở quán hải sản, đêm đêm tự ra khơi lấy nguyên liệu. App điện thoại **"Rin's Catch"** (phím J) là phần còn sót lại của startup, Rin sửa lại để quản lý kho, menu, sách cá (Dex), thuyền và sổ sách; app ghi log lỗi khi gặp cá biến dị / tọa độ lạ ("có bug thì phải debug"). Bảo bất ngờ tìm về và làm **phục vụ** ở quán từ ngày đầu; Rin là đầu bếp và phụ bưng khi cần.
+
+**Bí ẩn (bản ghép):** vùng sương đông bắc là nơi một **cổng không gian** dẫn tới một vùng biển song song — "lớp biển bên dưới" mà ông nội Rin từng kể. Cá biến dị (cá thu phát sáng...) là sinh vật lọt qua cổng. **Cá Ông** trong tín ngưỡng ngư dân thật ra là một tộc sinh vật thông minh canh giữ thế giới bên kia (ban đầu tưởng là thù địch vì chúng đẩy thuyền ra khỏi sương). Ông nội và người gác đèn Đá Canh Đêm đã thấy dấu hiệu từ xưa (cổng mở chập chờn); gần đây cổng mở rộng vì một nhà khoa học của **tập đoàn Thâm Lam** (tên tự đặt) vô tình kích hoạt nó, và tập đoàn đang lén khai thác sinh vật bên kia làm nguyên liệu công nghệ. MVP dừng ở lúc Rin bị xoáy nước kéo qua cổng. Hướng màn sau: khám phá biển song song, hiểu ra tộc cá Ông chỉ bảo vệ quê hương, cùng họ đánh sập các cơ sở của Thâm Lam, rồi cổng đóng lại.
+- Nhân vật phụ dự kiến (từ STORY.md, chưa làm): chú mèo béo ở bến (thật ra là rồng từ chiều không gian kia), một nhân viên quán (nhân vật nữ chính), một người bạn đến từ thế giới bên kia.
+- Manh mối đang có trong game: log lỗi của app, nhật ký người gác đèn, chai thư (ông nội), lời ông từ ở miếu, tin đồn ông Tám, phao lạ của Thâm Lam ở cảnh kết.
 
 **Mục tiêu MVP:** kiểm chứng vòng lặp cốt lõi có vui không:
 
@@ -160,7 +164,7 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 
 > **Đèn thuyền + bóng tối (Dredge):** màu đêm tối hẳn (0.13, 0.15, 0.27); thuyền có `BoatLamp` (PointLight2D) bán kính 150px khi đầy dầu → 55px khi cạn, chập chờn dưới 15% dầu. Bọt cá, đá, phao chỉ thấy rõ trong vòng đèn (hoặc đèn bến). Rạng sáng làm cả biển sáng dần.
 
-> **Đơn đặt cá (Dave the Diver):** mỗi sáng 70% có tin nhắn đặt cá (tối đa 2 đơn, mỗi khách 1 đơn) — loài câu đã có trong Dex (Dex trống: loài gần bờ), cỡ yêu cầu 1.0/1.2/1.4 (làm tròn ký), thưởng = giá gốc × cỡ × 2.5 (làm tròn 10k), hạn 2 đêm. Đơn hiện ở HUD biển (dưới tiền) và tab "Đơn" của điện thoại. Màn sáng tự giao con nhỏ nhất đủ ký trong kho, cộng tiền; quá hạn thì khách hủy. Lưu trong save. Logic: `FishOrders`; test: scenes/test/orders_test.tscn.
+> **Đơn đặt cá (Dave the Diver):** mỗi sáng 70% có tin nhắn đặt cá (tối đa 2 đơn, mỗi khách 1 đơn) — loài câu đã có trong Dex (Dex trống: loài gần bờ), cỡ yêu cầu 1.0/1.2/1.4 (làm tròn ký), thưởng = giá gốc × cỡ × 2.5 (làm tròn 10k), hạn 2 đêm. Đơn hiện ở HUD biển (dưới tiền) và tab "Đơn" của điện thoại. Đầu ca bán, con nhỏ nhất đủ ký trong kho được **để riêng** và khách quen (áo xanh, bóng thoại vàng, kiên nhẫn x2) **tới quán gọi món nấu từ con cá đó** (món đầu tiên trong menu có loài đó); nấu xong trả tiền đơn × hệ số nấu (hoàn hảo x1.3). Không phục vụ thì cá trả về kho; hết ca của ngày cuối hạn mà chưa phục vụ thì khách hủy (ghi trong bảng tổng kết). Màn sáng chỉ báo "có cá rồi / chưa có cá". Lưu trong save. Logic: `FishOrders`; test: scenes/test/orders_test.tscn.
 
 > **Điểm ghé trên bản đồ (Dredge):** mỗi điểm có đèn riêng (thấy được trong đêm), tên vẽ trên map, ghé bằng E khi thuyền chậm; hộp thoại `PoiDialog` (tạm dừng game, chọn bằng phím số/click, E/Esc đi tiếp). Điểm câu tự tránh xa các điểm ghé.
 > - **Miếu Cá Ông** (bờ Xóm Đèn): thắp nhang 10k → đêm đó va đá chỉ hư 50%. Lời ông từ đổi theo cốt truyện (trước điềm báo / sau điềm báo / sương mở).
@@ -177,6 +181,13 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 > - **Thời tiết** (`WeatherData` trong data/weather/, `WeatherController`): chọn ở màn sáng cho chuyến kế tiếp, hiện dự báo ở màn sáng + log điện thoại + cạnh đồng hồ ở biển; đêm 1 luôn lặng. Lặng (x3): không gì. Trăng (x2): trời sáng x1.8, mực x3. Gió (x2): trôi 22px/s hướng ngẫu nhiên, dầu x1.15. Mưa (x2): đèn x0.7, trời tối x0.8, rarity +3, +1 điểm câu/vùng, vệt mưa trên màn hình.
 > - **Sự kiện đêm** (`NightEvents`, từ đêm 2, 1–2 sự kiện khác loại, chỉ trong tầm thuyền): ghe chết máy (E: kéo về → thuyền chậm x0.65, cập bến +80k; bị cứu hộ thì không tiền), chai thư (5 trang truyện về "lớp biển bên dưới", lưu story_flags; hết trang thì bán ve chai 5k), đàn sứa phát sáng (trôi chậm, trong đàn -3 bền mỗi 1.5s), đàn cá heo (lại gần thì bơi tới điểm câu tốt nhất trong tầm — ưu tiên bóng cá lớn — chờ 25s rồi đi). Ghi chú cuối chuyến hiện ở màn sáng (`GameState.trip_notes`).
 > Test: scenes/test/night_test.tscn.
+
+> **Quán nâng cấp + lưu 2 lần:**
+> - **Bàn ghế** (150k/400k): 4 → 5 → 6 chỗ, bàn vẽ theo số chỗ (`RestaurantDecor`).
+> - **Đèn lồng & trang trí** (200k/500k): khách tới nhanh hơn (khoảng cách x0.85 / x0.72), khách sang 15% / 30% (áo vàng, cà vạt, trả x1.5, kiên nhẫn x0.75); cấp 1 treo đèn lồng, cấp 2 thêm tranh + chậu hoa.
+> - **Bếp** (180k/450k): minigame nấu chạy chậm x0.85 / x0.72 (dễ hoàn hảo).
+> - **Phục vụ kiểu Dave the Diver**: Rin là đầu bếp (click khách đang chờ → minigame nấu; đậu phộng ra quầy ngay), món xong đặt lên **quầy** (tối đa 4; quầy đầy thì không nấu tiếp). **Bảo** (phục vụ) tự lấy tối đa 2 món ở quầy, bưng tới bàn gần nhất trước (110px/s). Rin có thể **phụ bưng**: click khách có món trên quầy → Rin bưng 1 món (140px/s), lúc đó bếp bỏ trống, không nấu được. Kiên nhẫn của khách giảm từ lúc ngồi tới lúc có món (45s). Đóng quán: khách chưa nấu thì về, món đang nấu / trên quầy có 12s để bưng nốt. (`Kitchen`, `Waiter`)
+> - **Lưu 2 lần**: lúc ra khơi (tiếp tục ở biển) và ở màn sáng sau chuyến câu (tiếp tục ở quán, `resume_at`). SAVE_VERSION 2.
 
 > **Tiện ích (sau Phase 9):** Esc = menu tạm dừng (Tiếp tục / Về menu — bấm 2 lần / Thoát + bảng phím) ở biển và quán. Mũi tên mép màn hình chỉ Bến, Lưới, và xoáy nước "???" kèm khoảng cách (m). Ngày 1 có gợi ý theo ngữ cảnh. "Chơi mới" khi đã có save phải bấm 2 lần.
 

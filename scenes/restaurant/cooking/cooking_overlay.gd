@@ -9,6 +9,8 @@ signal finished(dish: DishData, result: CookingGameBase.Result, multiplier: floa
 @export var ok_multiplier: float = 1.0
 @export var burnt_multiplier: float = 0.5
 @export var result_seconds: float = 0.8
+## Kitchen upgrade: its value is the cooking game speed (< 1 = easier).
+@export var kitchen_upgrade: UpgradeData
 
 var _dish: DishData
 var _game: CookingGameBase
@@ -40,6 +42,8 @@ func start(dish: DishData) -> void:
 		_:
 			_game = StirGame.new()
 	_game.setup(dish)
+	if kitchen_upgrade:
+		_game.time_scale = float(GameState.get_upgrade_value(kitchen_upgrade))
 	_game.completed.connect(_on_game_completed)
 	_game_holder.add_child(_game)
 	_title_label.text = "Nấu: %s" % dish.display_name

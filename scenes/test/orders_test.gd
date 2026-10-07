@@ -1,8 +1,10 @@
 extends Control
-## Standalone test for FishOrders (run with F6): order creation, delivery
-## from storage, expiry, phone text and save validation.
+## Standalone test for FishOrders (run with F6): order creation, setting the
+## fish aside for a restaurant visit, release / completion, expiry, phone
+## text and save validation.
 
 @export var fish_catalog: FishCatalog
+@export var menu: DishCatalog
 
 var _failures: int = 0
 var _rng := RandomNumberGenerator.new()
@@ -22,27 +24,30 @@ func _ready() -> void:
 	_check("min weight is round", is_equal_approx(float(order["min_kg"]), roundf(float(order["min_kg"]))))
 	_check("reward rounded to 10k", int(order["reward"]) % 10 == 0 and int(order["reward"]) > 0)
 
-	# Delivery: picks the smallest fish that is big enough.
+	# Shift: the smallest big-enough fish is set aside with its dish.
 	GameState.orders = [{"who": "Chú Ba", "fish": "ca_mu", "min_kg": 4.0, "reward": 300, "due_day": 4}]
 	var small := InventoryItem.new(_fish("ca_mu"), 1.0, 1.0)  # 3kg
 	var ok_fish := InventoryItem.new(_fish("ca_mu"), 1.0, 4.0 / 3.0)  # 4kg
 	var huge := InventoryItem.new(_fish("ca_mu"), 1.0, 5.0 / 3.0)  # 5kg
 	GameState.storage.append_array([small, huge, ok_fish])
-	var money := GameState.money
-	var lines := FishOrders.settle(fish_catalog)
-	_check("delivered smallest big-enough fish", not GameState.storage.has(ok_fish)
-		and GameState.storage.has(huge) and GameState.storage.has(small))
-	_check("paid reward", GameState.money == money + 300 and GameState.orders.is_empty())
-	_check("delivery line", lines.size() == 1 and lines[0].contains("Chú Ba") and lines[0].contains("4kg"))
+	_check("rest: order ready", FishOrders.has_fish_for(GameState.orders[0]))
+	var visits := FishOrders.reserve_for_shift(menu)
+	_check("reserved smallest big-enough fish", visits.size() == 1 and visits[0]["item"] == ok_fish
+		and not GameState.storage.has(ok_fish) and GameState.storage.has(huge) and GameState.storage.has(small))
+	_check("visit has the fish's dish", (visits[0]["dish"] as DishData).ingredients.has("ca_mu"))
+	FishOrders.release(visits[0])
+	_check("unserved fish back to storage", GameState.storage.has(ok_fish) and GameState.orders.size() == 1)
+	FishOrders.complete(GameState.orders[0])
+	_check("served -> order done", GameState.orders.is_empty())
 
-	# Not delivered: kept until its last night, then cancelled.
+	# Not served: kept until its last day, then cancelled after the shift.
 	GameState.orders = [{"who": "Cô Tư", "fish": "cua", "min_kg": 0.5, "reward": 120, "due_day": 4}]
-	FishOrders.settle(fish_catalog)
-	_check("kept before due day", GameState.orders.size() == 1)
+	_check("no fish -> nobody comes", FishOrders.reserve_for_shift(menu).is_empty())
+	_check("kept before due day", FishOrders.expire_after_shift(fish_catalog).is_empty() and GameState.orders.size() == 1)
 	_check("describe nights left", FishOrders.describe(GameState.orders[0], fish_catalog).contains("còn 2 đêm"))
 	GameState.day = 4
-	lines = FishOrders.settle(fish_catalog)
-	_check("expired on due day", GameState.orders.is_empty() and lines[0].contains("hủy đơn"))
+	var lines := FishOrders.expire_after_shift(fish_catalog)
+	_check("expired after due day's shift", GameState.orders.is_empty() and lines[0].contains("hủy đơn"))
 
 	# Limits and phone.
 	GameState.orders = [

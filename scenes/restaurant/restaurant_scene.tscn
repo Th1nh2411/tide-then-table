@@ -16,6 +16,12 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="14_pause"]
 [ext_resource type="Resource" path="res://data/upgrades/lamp_upgrade.tres" id="15_lampup"]
 [ext_resource type="PackedScene" path="res://scenes/ui/phone_app.tscn" id="16_phone"]
+[ext_resource type="Resource" path="res://data/upgrades/seats_upgrade.tres" id="17_seatsup"]
+[ext_resource type="Resource" path="res://data/upgrades/decor_upgrade.tres" id="18_decorup"]
+[ext_resource type="Resource" path="res://data/upgrades/kitchen_upgrade.tres" id="19_kitchenup"]
+[ext_resource type="Script" path="res://scenes/restaurant/restaurant_decor.gd" id="20_decor"]
+[ext_resource type="Script" path="res://scenes/restaurant/kitchen.gd" id="21_kitchen"]
+[ext_resource type="Script" path="res://scenes/restaurant/waiter.gd" id="22_waiter"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -84,16 +90,6 @@ mouse_filter = 2
 color = Color(0.15, 0.15, 0.15, 1)
 
 
-[node name="Rin" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 100.0
-offset_top = 176.0
-offset_right = 116.0
-offset_bottom = 210.0
-mouse_filter = 2
-color = Color(0.2, 0.45, 0.8, 1)
-
-
 [node name="KitchenLabel" type="Label" parent="Room"]
 layout_mode = 0
 offset_left = 60.0
@@ -104,126 +100,6 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 10
 text = "Bếp"
-
-
-[node name="Table1" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 220.0
-offset_top = 246.0
-offset_right = 264.0
-offset_bottom = 252.0
-mouse_filter = 2
-color = Color(0.85, 0.2, 0.2, 1)
-
-
-[node name="Table1Leg" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 239.0
-offset_top = 252.0
-offset_right = 245.0
-offset_bottom = 266.0
-mouse_filter = 2
-color = Color(0.85, 0.2, 0.2, 1)
-
-
-[node name="Stool1" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 196.0
-offset_top = 258.0
-offset_right = 210.0
-offset_bottom = 266.0
-mouse_filter = 2
-color = Color(0.85, 0.2, 0.2, 1)
-
-
-[node name="Table2" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 320.0
-offset_top = 246.0
-offset_right = 364.0
-offset_bottom = 252.0
-mouse_filter = 2
-color = Color(0.2, 0.45, 0.85, 1)
-
-
-[node name="Table2Leg" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 339.0
-offset_top = 252.0
-offset_right = 345.0
-offset_bottom = 266.0
-mouse_filter = 2
-color = Color(0.2, 0.45, 0.85, 1)
-
-
-[node name="Stool2" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 296.0
-offset_top = 258.0
-offset_right = 310.0
-offset_bottom = 266.0
-mouse_filter = 2
-color = Color(0.2, 0.45, 0.85, 1)
-
-
-[node name="Table3" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 420.0
-offset_top = 246.0
-offset_right = 464.0
-offset_bottom = 252.0
-mouse_filter = 2
-color = Color(0.85, 0.2, 0.2, 1)
-
-
-[node name="Table3Leg" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 439.0
-offset_top = 252.0
-offset_right = 445.0
-offset_bottom = 266.0
-mouse_filter = 2
-color = Color(0.85, 0.2, 0.2, 1)
-
-
-[node name="Stool3" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 396.0
-offset_top = 258.0
-offset_right = 410.0
-offset_bottom = 266.0
-mouse_filter = 2
-color = Color(0.85, 0.2, 0.2, 1)
-
-
-[node name="Table4" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 520.0
-offset_top = 246.0
-offset_right = 564.0
-offset_bottom = 252.0
-mouse_filter = 2
-color = Color(0.2, 0.45, 0.85, 1)
-
-
-[node name="Table4Leg" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 539.0
-offset_top = 252.0
-offset_right = 545.0
-offset_bottom = 266.0
-mouse_filter = 2
-color = Color(0.2, 0.45, 0.85, 1)
-
-
-[node name="Stool4" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 496.0
-offset_top = 258.0
-offset_right = 510.0
-offset_bottom = 266.0
-mouse_filter = 2
-color = Color(0.2, 0.45, 0.85, 1)
 
 
 [node name="Door" type="ColorRect" parent="Room"]
@@ -248,9 +124,60 @@ theme_override_font_sizes/font_size = 10
 text = "Cửa"
 
 
+[node name="Decor" type="Control" parent="Room"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("20_decor")
+
 [node name="CustomerLayer" type="Control" parent="."]
 anchors_preset = 0
 mouse_filter = 2
+
+[node name="Kitchen" type="Control" parent="." node_paths=PackedStringArray("cooking")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("21_kitchen")
+cooking = NodePath("../CookingOverlay")
+
+[node name="Waiter" type="Control" parent="." node_paths=PackedStringArray("kitchen")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("22_waiter")
+kitchen = NodePath("../Kitchen")
+
+[node name="RinHelper" type="Control" parent="." node_paths=PackedStringArray("kitchen")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("22_waiter")
+kitchen = NodePath("../Kitchen")
+display_name = "Rin"
+auto_serve = false
+speed = 140.0
+carry_capacity = 1
+home_x = 150.0
+body_color = Color(0.2, 0.45, 0.8, 1)
+visible_at_home = false
 
 [node name="HUD" type="Control" parent="."]
 anchors_preset = 0
@@ -420,7 +347,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("8_shop")
-upgrades = Array[ExtResource("12_updata")]([ExtResource("9_boatup"), ExtResource("10_rodup"), ExtResource("15_lampup"), ExtResource("11_fridgeup")])
+upgrades = Array[ExtResource("12_updata")]([ExtResource("9_boatup"), ExtResource("10_rodup"), ExtResource("15_lampup"), ExtResource("11_fridgeup"), ExtResource("17_seatsup"), ExtResource("18_decorup"), ExtResource("19_kitchenup")])
 
 [node name="Margin" type="MarginContainer" parent="UpgradeShop"]
 layout_mode = 2
@@ -456,16 +383,20 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Ra khơi đêm mới"
 
-[node name="CustomerManager" type="Node" parent="." node_paths=PackedStringArray("cooking", "customer_layer")]
+[node name="CustomerManager" type="Node" parent="." node_paths=PackedStringArray("kitchen", "waiter", "rin_helper", "customer_layer")]
 script = ExtResource("2_mgr")
 customer_scene = ExtResource("3_customer")
 menu = ExtResource("4_menu")
-cooking = NodePath("../CookingOverlay")
+kitchen = NodePath("../Kitchen")
+waiter = NodePath("../Waiter")
+rin_helper = NodePath("../RinHelper")
 customer_layer = NodePath("../CustomerLayer")
-seat_positions = Array[Vector2]([Vector2(194, 228), Vector2(294, 228), Vector2(394, 228), Vector2(494, 228)])
+seats_upgrade = ExtResource("17_seatsup")
+decor_upgrade = ExtResource("18_decorup")
 door_position = Vector2(605, 228)
 
 [node name="CookingOverlay" parent="." instance=ExtResource("5_cooking")]
+kitchen_upgrade = ExtResource("19_kitchenup")
 
 [node name="PauseMenu" parent="." instance=ExtResource("14_pause")]
 

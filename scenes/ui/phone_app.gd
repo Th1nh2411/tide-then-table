@@ -1,7 +1,7 @@
 class_name PhoneApp
 extends CanvasLayer
-## Rin's phone with "Rin's Catch", the app Rin wrote back when Rin was a
-## developer. `open_phone` (J) toggles it anywhere at sea or in the restaurant;
+## Rin's phone with "Rin's Catch", the app left over from the startup Rin
+## and Bảo built (Rin is an IT graduate). `open_phone` (J) toggles it anywhere at sea or in the restaurant;
 ## the game pauses while it's open. Tabs: storage, menu, orders, map (PhoneMap),
 ## dex, boat, ledger,
 ## plus a console log where story clues appear. Content comes from PhoneReports.

@@ -1,8 +1,8 @@
 extends Control
 ## Morning rest card between the night trip and the restaurant (6:00-15:00 is
 ## Rin's sleep, shown as one short screen): when Rin got back, what came home
-## in the hold, fish orders delivered / expired (FishOrders), notes from night
-## events, and the weather forecast for the next trip; then the restaurant.
+## in the hold, notes from night events, fish orders (ready or not), and the
+## weather forecast for the next trip; then the restaurant (autosaved here).
 
 const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.tscn"
 
@@ -25,17 +25,22 @@ func _ready() -> void:
 	else:
 		_return_label.text = "Rin cập bến lúc %s." % time
 	_catch_label.text = _catch_text()
-	var order_lines := FishOrders.settle(fish_catalog)
-	order_lines.append_array(GameState.trip_notes)
+	var notes := PackedStringArray(GameState.trip_notes)
 	GameState.trip_notes.clear()
-	_order_label.text = "\n".join(order_lines)
-	_order_label.visible = not order_lines.is_empty()
+	for order: Dictionary in GameState.orders:
+		var ready := FishOrders.has_fish_for(order)
+		notes.append("%s %s" % [FishOrders.describe(order, fish_catalog),
+			"→ có cá rồi, khách sẽ ghé quán chiều nay" if ready else "→ chưa có cá đủ ký"])
+	_order_label.text = "\n".join(notes)
+	_order_label.visible = not notes.is_empty()
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	var weather := weather_catalog.pick(rng)
 	GameState.weather_id = weather.id
 	_sleep_label.text = "Rin về nhà ngủ một giấc... tới %02d:00 dậy mở quán.\nDự báo chuyến tới: %s (%s)." % [
 		DayClock.shop_open_hour, weather.display_name, weather.forecast]
+	# Second autosave: right after the trip, so the catch is never lost.
+	SaveSystem.autosave("restaurant")
 	_wake_button.pressed.connect(func() -> void: SceneRouter.go_to(RESTAURANT_SCENE_PATH))
 	_wake_button.grab_focus()
 

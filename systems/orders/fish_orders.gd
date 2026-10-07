@@ -1,12 +1,14 @@
 class_name FishOrders
 extends RefCounted
-## Fish orders from regulars (Dave the Diver style requests): "bring me a
-## grouper of at least 4kg within 2 nights for 300k". Orders live in
+## Fish orders from regulars (Dave the Diver style requests): "cook me a
+## grouper of at least 4kg within 2 nights, I'll pay 300k". Orders live in
 ## GameState.orders as Dictionaries:
 ##   {"who": String, "fish": fish id, "min_kg": float, "reward": int, "due_day": int}
-## New orders arrive at the start of a day; they are delivered automatically
-## on the rest screen (after the night trip) if storage has a big enough fish,
-## and expire after the rest screen of `due_day`. Pure logic, no nodes.
+## New orders arrive at the start of a day. At the start of a restaurant shift
+## a big enough fish in storage is set aside (reserve_for_shift) and the
+## regular comes to eat it (CustomerManager); unserved fish go back to storage
+## (release). Orders not served by the end of the shift on `due_day` are
+## cancelled (expire_after_shift). Pure logic, no nodes.
 
 const MAX_ACTIVE: int = 2
 ## Chance of a new order each morning (when below MAX_ACTIVE).
@@ -61,25 +63,50 @@ static func make_order(rng: RandomNumberGenerator, catalog: FishCatalog, day: in
 	}
 
 
-## Rest screen: delivers what storage can fill (smallest fish that is big
-## enough, paid at once), then drops orders whose last night has passed.
-## Returns player-facing lines.
-static func settle(catalog: FishCatalog) -> PackedStringArray:
+## Shift start: for each order with a big enough fish in storage (and a dish
+## to cook it as), takes the smallest such fish out of storage. Returns
+## [{"order": Dictionary, "item": InventoryItem, "dish": DishData}] — the
+## regulars who will come today.
+static func reserve_for_shift(dishes: DishCatalog) -> Array[Dictionary]:
+	var visits: Array[Dictionary] = []
+	for order: Dictionary in GameState.orders:
+		var item := _best_item_for(order)
+		var dish := dish_for(str(order["fish"]), dishes)
+		if item and dish:
+			GameState.storage.erase(item)
+			visits.append({"order": order, "item": item, "dish": dish})
+	return visits
+
+
+## A reserved fish that wasn't served goes back to storage.
+static func release(visit: Dictionary) -> void:
+	GameState.storage.append(visit["item"])
+
+
+## The regular was served: the order is done.
+static func complete(order: Dictionary) -> void:
+	GameState.orders.erase(order)
+
+
+## After a shift: drops orders whose last day was today. Returns lines.
+static func expire_after_shift(catalog: FishCatalog) -> PackedStringArray:
 	var lines: PackedStringArray = []
 	var kept: Array = []
 	for order: Dictionary in GameState.orders:
-		var item := _best_item_for(order)
-		if item:
-			GameState.storage.erase(item)
-			GameState.add_money(int(order["reward"]))
-			lines.append("Giao %s %s cho %s: +%dk" % [item.fish.display_name,
-				item.fish.weight_text(item.size), order["who"], order["reward"]])
-		elif GameState.day >= int(order["due_day"]):
+		if GameState.day >= int(order["due_day"]):
 			lines.append("%s hủy đơn %s (quá hạn)" % [order["who"], fish_name(order, catalog)])
 		else:
 			kept.append(order)
 	GameState.orders = kept
 	return lines
+
+
+## The dish a regular eats for this fish: the first menu dish using it.
+static func dish_for(fish_id: String, dishes: DishCatalog) -> DishData:
+	for dish in dishes.dishes:
+		if dish.ingredients.has(fish_id):
+			return dish
+	return null
 
 
 ## "Chú Ba: Cá mú từ 4kg · 300k · còn 2 đêm"
@@ -112,6 +139,11 @@ static func from_save(data: Variant, catalog: FishCatalog) -> Dictionary:
 		return {}
 	return {"who": who, "fish": fish_id, "min_kg": maxf(float(min_kg), 0.0),
 		"reward": maxi(int(reward), 0), "due_day": int(due)}
+
+
+## True if storage has a fish big enough for this order.
+static func has_fish_for(order: Dictionary) -> bool:
+	return _best_item_for(order) != null
 
 
 static func _best_item_for(order: Dictionary) -> InventoryItem:

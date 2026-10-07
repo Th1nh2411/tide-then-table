@@ -2,6 +2,7 @@ extends Control
 ## Main menu: Continue (only if a save exists) / New Game / Quit.
 
 const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
+const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.tscn"
 
 @onready var _continue_button: Button = %ContinueButton
 @onready var _new_game_button: Button = %NewGameButton
@@ -30,7 +31,7 @@ func _on_continue_pressed() -> void:
 		_continue_button.hide()
 		_new_game_button.grab_focus()
 		return
-	SceneRouter.go_to(SEA_SCENE_PATH)
+	SceneRouter.go_to(RESTAURANT_SCENE_PATH if GameState.resume_at == "restaurant" else SEA_SCENE_PATH)
 
 
 func _on_new_game_pressed() -> void:

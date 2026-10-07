@@ -1,12 +1,15 @@
 class_name SaveSystem
 extends RefCounted
-## Saves/loads GameState as JSON. Saved at the start of every sea day.
+## Saves/loads GameState as JSON. Saved at the start of every night trip
+## (resume at sea) and on the rest card after it (resume at the restaurant).
 ## Loading is defensive: a missing or wrongly typed field falls back to the
 ## fresh-game value instead of crashing, and unknown fish are skipped.
 ## `path` parameters exist so tests can use a scratch file.
 
 const SAVE_PATH: String = "user://save.json"
-const SAVE_VERSION: int = 1
+## 2: + orders, map pins, weather, resume point (older saves load fine).
+const SAVE_VERSION: int = 2
+const RESUME_POINTS: Array[String] = ["sea", "restaurant"]
 const FISH_CATALOG_PATH: String = "res://data/fish/fish_catalog.tres"
 
 
@@ -17,6 +20,14 @@ static func has_save(path: String = SAVE_PATH) -> bool:
 static func delete_save(path: String = SAVE_PATH) -> void:
 	if has_save(path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
+## Autosave unless the run was started with `-- --no-autosave` (tests).
+## `resume_at`: where Continue will start ("sea" or "restaurant").
+static func autosave(resume_at: String) -> void:
+	GameState.resume_at = resume_at
+	if not OS.get_cmdline_user_args().has("--no-autosave"):
+		save_game()
 
 
 static func save_game(path: String = SAVE_PATH) -> bool:
@@ -71,6 +82,7 @@ static func to_dict() -> Dictionary:
 		"day_history": GameState.day_history.duplicate(true),
 		"orders": GameState.orders.duplicate(true),
 		"weather_id": GameState.weather_id,
+		"resume_at": GameState.resume_at,
 		"map_pins": GameState.map_pins.map(func(pin: Vector2) -> Array: return [pin.x, pin.y]),
 	}
 
@@ -122,6 +134,10 @@ static func apply_dict(data: Dictionary) -> void:
 			var order := FishOrders.from_save(entry, catalog)
 			if not order.is_empty():
 				GameState.orders.append(order)
+
+	var resume: Variant = data.get("resume_at")
+	if resume is String and RESUME_POINTS.has(resume):
+		GameState.resume_at = resume
 
 	var weather: Variant = data.get("weather_id")
 	if weather is String:

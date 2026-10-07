@@ -50,6 +50,9 @@ var caught_species: Dictionary = {}
 var best_sizes: Dictionary = {}
 ## One Dictionary per finished shift: day, earned, market, rating, served, left.
 var day_history: Array = []
+## Where "Continue" resumes: "sea" (saved at the start of a night) or
+## "restaurant" (saved on the rest card after a trip). See SaveSystem.
+var resume_at: String = "sea"
 ## Weather of the next / current night trip (WeatherData.id), rolled each morning.
 var weather_id: String = "calm"
 ## Extra lines for the rest screen from this trip (night events).
@@ -82,6 +85,7 @@ func reset() -> void:
 	orders.clear()
 	map_pins.clear()
 	weather_id = "calm"
+	resume_at = "sea"
 	trip_notes.clear()
 
 

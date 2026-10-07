@@ -68,7 +68,8 @@ Vietnamese, keep code comments in short English.
   trip in progress), `SceneRouter` (`go_to(path, fade_color)`).
 - Flow: main menu → sea night trip (`scenes/sea/sea_scene.tscn`, autosave at
   start) → dock / rescue (broken hull or no oil) → rest card
-  (`scenes/rest/rest_scene.tscn`) → restaurant (menu planning → shift →
+  (`scenes/rest/rest_scene.tscn`, autosave #2: Continue resumes at the
+  restaurant via `GameState.resume_at`; use `SaveSystem.autosave()`) → restaurant (menu planning → shift →
   summary + rating → upgrade shop) → next day (freshness loss) → sea …
   ending via fog whirlpool.
 - Sea scene controllers: `FishingController` (rod spots → `FishingMinigame`:
@@ -95,13 +96,22 @@ Vietnamese, keep code comments in short English.
   scene (`_capture_map`), live boat (group "boat") + nets; pins in
   `GameState.map_pins` (saved, also edge markers at sea).
 - Fish orders (`FishOrders`, `GameState.orders`): rolled when the next day
-  starts (restaurant), shown on the sea HUD + phone tab, delivered/expired
-  on the rest card.
-- Restaurant: `MenuSetupPanel` + `MenuPlan`, `CustomerManager`,
+  starts, shown on the sea HUD + phone tab; at shift start the fish is set
+  aside (`reserve_for_shift`) and the regular comes to the restaurant;
+  unserved fish released, overdue orders expire after the shift.
+- Restaurant: `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (seats/decor
+  upgrades, rich customers, regulars eating their order), service: Rin
+  cooks on click (`Kitchen` + `CookingOverlay`) → counter → `Waiter` "Bảo"
+  carries dishes automatically; a second `Waiter` (RinHelper, manual) lets
+  Rin carry one while the stove is unattended (`Kitchen.rin_away`),
+  `RestaurantDecor` (tables + lanterns drawn from upgrades),
   `CookingOverlay` (Grill/Steam/Stir), `UpgradeShop`, `RepairButton`.
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and
   restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is
-  an ex-developer who wrote the app; story clues appear as `[WARN]`/`[ERR]`
+  an IT graduate whose failed startup (with friend Bảo, now the restaurant's
+  waiter) left this app; story (PLAN.md §1): the fog hides a portal to a
+  parallel sea, cá Ông are its guardians, the Thâm Lam corporation exploits
+  it. Clues appear as `[WARN]`/`[ERR]`
   log lines and glitched aberrant-fish names.
 
 ## Workflow the user expects

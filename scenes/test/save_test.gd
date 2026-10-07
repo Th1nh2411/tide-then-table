@@ -38,6 +38,7 @@ func _test_round_trip() -> void:
 	item.size = 1.25
 	GameState.map_pins.append(Vector2(120.5, 640))
 	GameState.weather_id = "rain"
+	GameState.resume_at = "restaurant"
 	GameState.orders.append({"who": "Chú Ba", "fish": "cua", "min_kg": 0.5, "reward": 120, "due_day": 7})
 	GameState.add_day_record({"day": 5, "earned": 300, "market": 20, "rating": 4})
 	_check("save writes file", SaveSystem.save_game(TEST_PATH) and SaveSystem.has_save(TEST_PATH))
@@ -50,6 +51,7 @@ func _test_round_trip() -> void:
 	_check("story flag", GameState.has_flag("saw_glowing_fish"))
 	_check("dex counts", int(GameState.caught_species.get("cua", 0)) == 3)
 	_check("weather", GameState.weather_id == "rain")
+	_check("resume point", GameState.resume_at == "restaurant")
 	_check("map pins", GameState.map_pins.size() == 1 and GameState.map_pins[0].is_equal_approx(Vector2(120.5, 640)))
 	_check("orders", GameState.orders.size() == 1 and int(GameState.orders[0]["reward"]) == 120)
 	_check("size record", is_equal_approx(GameState.best_size(_fish("cua")), 1.4))
@@ -68,10 +70,11 @@ func _test_missing_fields() -> void:
 
 
 func _test_wrong_types() -> void:
-	_write('{"money": "abc", "day": -3, "storage": "x", "upgrade_levels": [1, 2], "story_flags": 7, "last_rating": 99}')
+	_write('{"money": "abc", "day": -3, "storage": "x", "upgrade_levels": [1, 2], "story_flags": 7, "last_rating": 99, "resume_at": "moon"}')
 	_check("wrong types still load", SaveSystem.load_game(TEST_PATH))
 	_check("bad money -> default", GameState.money == GameState.STARTING_MONEY)
 	_check("negative day -> 1", GameState.day == 1)
+	_check("bad resume -> sea", GameState.resume_at == "sea")
 	_check("rating clamped", GameState.last_rating == 5)
 	_check("bad containers ignored", GameState.storage.is_empty() and GameState.upgrade_levels.is_empty()
 		and GameState.story_flags.is_empty())
