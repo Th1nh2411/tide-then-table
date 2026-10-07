@@ -72,6 +72,10 @@ func _is_free(pos: Vector2) -> bool:
 	for spot in get_children():
 		if spot.global_position.distance_to(pos) < min_spot_distance:
 			return false
+	# Keep spots away from places on the map (both use `interact`).
+	for poi: Node2D in get_tree().get_nodes_in_group("pois"):
+		if poi.global_position.distance_to(pos) < min_spot_distance:
+			return false
 	var shape := CircleShape2D.new()
 	shape.radius = clearance
 	var query := PhysicsShapeQueryParameters2D.new()

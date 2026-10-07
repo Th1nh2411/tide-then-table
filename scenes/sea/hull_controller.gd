@@ -2,8 +2,8 @@ class_name HullController
 extends Node
 ## Hull damage at sea. Hitting rocks faster than `safe_impact_speed` costs
 ## hull points; a damaged hull slows the boat; at 0 the boat breaks and the
-## sea scene calls a rescue. Repairs only at the dock (`repair_boat` key),
-## never out at sea. A boat still broken from yesterday can't leave the dock.
+## sea scene calls a rescue. Full repairs only at the dock (`repair_boat`
+## key); out at sea only a pricey patch (ông Tám's hut). A boat still broken from yesterday can't leave the dock.
 
 signal boat_broken
 signal hull_changed
@@ -18,6 +18,9 @@ signal hull_changed
 @export var slow_below_hp: float = 50.0
 @export var min_speed_factor: float = 0.6
 @export var warn_below_hp: float = 30.0
+
+## Damage multiplier for tonight (the Lăng Ông blessing lowers it).
+var damage_scale: float = 1.0
 
 var _at_dock: bool = false
 
@@ -67,10 +70,23 @@ func _repair() -> void:
 	_refresh()
 
 
+## Patch at sea: +`hp` for `cost`. Returns false if the hull is fine or the
+## player can't pay.
+func patch(hp: float, cost: int) -> bool:
+	if not BoatCondition.is_damaged() or not GameState.spend_money(cost):
+		return false
+	var was_broken := BoatCondition.is_broken()
+	GameState.boat_hp = minf(GameState.boat_hp + hp, BoatCondition.MAX_HP)
+	if was_broken:
+		boat.set_physics_process(true)
+	_refresh()
+	return true
+
+
 func _on_collided(impact_speed: float) -> void:
 	if BoatCondition.is_broken():
 		return
-	var damage := maxf(impact_speed - safe_impact_speed, 0.0) * damage_per_speed
+	var damage := maxf(impact_speed - safe_impact_speed, 0.0) * damage_per_speed * damage_scale
 	if damage <= 0.0:
 		return
 	var before := GameState.boat_hp

@@ -1,0 +1,44 @@
+class_name LobsterRaft
+extends PointOfInterest
+## Anh Năm's lobster raft on the reef: buys everything in the hold right now
+## at a low "night market" price, to make room without going back to dock.
+
+@export var hold_manager: HoldManager
+## Fraction of base price × size × quality paid per fish.
+@export var sell_ratio: float = 0.5
+
+
+func _interact() -> void:
+	var items := hold_manager.hold.items.duplicate()
+	if items.is_empty():
+		await dialog.ask(title, "Anh Năm: \"Khoang trống trơn mà ghé chi? Đi câu đi em.\"",
+			PackedStringArray(["Đi tiếp"]))
+		return
+	var value := sale_value(items, sell_ratio)
+	var choice := await dialog.ask(title,
+		"Anh Năm: \"Khoang đầy hả? Để anh mua đỡ, giá chợ đêm thôi nghen.\"\n(%d con trong khoang)" % items.size(),
+		PackedStringArray(["Bán hết khoang: %dk" % value, "Thôi, để đem về quán"]))
+	if choice != 0:
+		return
+	for item: InventoryItem in items:
+		hold_manager.hold.remove(item)
+	GameState.add_money(value)
+	hud.flash_message("Bán %d con cho bè tôm hùm: +%dk" % [items.size(), value], 2.0)
+
+
+## What the raft pays for these items.
+static func sale_value(items: Array, ratio: float) -> int:
+	var total := 0.0
+	for item: InventoryItem in items:
+		total += item.fish.base_price * item.size * item.quality * ratio
+	return roundi(total)
+
+
+func _draw() -> void:
+	# Floating frame of bamboo with net cages and a lantern pole.
+	draw_rect(Rect2(-18, -12, 36, 24), Color(0.5, 0.38, 0.22))
+	for x in [-12, 0, 12]:
+		draw_rect(Rect2(x - 5, -8, 10, 16), Color(0.15, 0.3, 0.4))
+	draw_line(Vector2(16, -12), Vector2(16, -24), Color(0.4, 0.3, 0.2), 2.0)
+	draw_circle(Vector2(16, -25), 2.5, lamp_color)
+	super()

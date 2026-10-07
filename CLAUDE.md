@@ -79,6 +79,10 @@ Vietnamese, keep code comments in short English.
   oil; the night tint is dark, so lamps are how the player sees), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,
   `OffscreenMarkers` (edge arrows), `TutorialHints` (day 1), `PauseMenu` (Esc;
   must sit before `HoldUI` in the tree so the hold can eat Esc first).
+- Places (`scenes/sea/poi/`, under `Places` in the sea scene): subclasses of
+  `PointOfInterest` (own lamp, E to visit, `_interact()` awaits
+  `PoiDialog.ask()`): `WhaleShrine`, `OldManHut`, `Lighthouse`, `LobsterRaft`.
+  Lines follow `Story.stage()`. `PoiDialog` sits before `PhoneApp`.
 - Fish orders (`FishOrders`, `GameState.orders`): rolled when the next day
   starts (restaurant), shown on the sea HUD + phone tab, delivered/expired
   on the rest card.

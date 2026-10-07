@@ -29,6 +29,14 @@ static func check_day() -> bool:
 	return GameState.day >= OMEN_DAY and trigger_omen()
 
 
+## 0 = before the omen, 1 = omen seen (fog not open yet), 2 = fog open.
+## Places on the map pick their lines by stage.
+static func stage() -> int:
+	if is_fog_open():
+		return 2
+	return 1 if GameState.story_flags.has(OMEN_DAY_FLAG) else 0
+
+
 static func is_fog_open() -> bool:
 	var omen_day: Variant = GameState.story_flags.get(OMEN_DAY_FLAG)
 	# JSON saves turn ints into floats, so accept both.
