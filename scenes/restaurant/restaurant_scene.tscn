@@ -24,6 +24,7 @@
 [ext_resource type="Script" path="res://scenes/restaurant/rin_walker.gd" id="23_rin"]
 [ext_resource type="Script" path="res://scenes/restaurant/shelf_display.gd" id="24_shelf"]
 [ext_resource type="Script" path="res://scenes/restaurant/kitchen_view.gd" id="25_kview"]
+[ext_resource type="Script" path="res://scenes/restaurant/renovation_mode.gd" id="26_reno"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -80,16 +81,6 @@ offset_right = 160.0
 offset_bottom = 262.0
 mouse_filter = 2
 color = Color(0.6, 0.62, 0.65, 1)
-
-
-[node name="Stove" type="ColorRect" parent="Room"]
-layout_mode = 0
-offset_left = 30.0
-offset_top = 202.0
-offset_right = 74.0
-offset_bottom = 210.0
-mouse_filter = 2
-color = Color(0.15, 0.15, 0.15, 1)
 
 
 [node name="KitchenLabel" type="Label" parent="Room"]
@@ -244,6 +235,23 @@ theme_override_font_sizes/font_size = 10
 text = "Sửa thuyền"
 script = ExtResource("13_repair")
 boat_upgrade = ExtResource("9_boatup")
+
+[node name="RenovationMode" type="Control" parent="." node_paths=PackedStringArray("tables", "decor", "props", "customers")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("26_reno")
+tables = NodePath("../DiningTables")
+decor = NodePath("../Room/Decor")
+props = NodePath("../ShelfDisplay")
+customers = NodePath("../CustomerManager")
+seats_upgrade = ExtResource("17_seatsup")
+decor_upgrade = ExtResource("18_decorup")
+kitchen_upgrade = ExtResource("19_kitchenup")
+fridge_upgrade = ExtResource("11_fridgeup")
 
 [node name="SummaryPanel" type="PanelContainer" parent="."]
 unique_name_in_owner = true

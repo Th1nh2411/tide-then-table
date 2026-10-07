@@ -94,6 +94,13 @@ func decor_level() -> int:
 	return _decor_level
 
 
+## After renovating (no customers inside): re-read seats and decor levels.
+func refresh_upgrades() -> void:
+	var seat_count := int(GameState.get_upgrade_value(seats_upgrade)) if seats_upgrade else 4
+	tables.setup(layout_seats(seat_count, seat_x_range, seat_y))
+	_decor_level = int(GameState.get_upgrade_value(decor_upgrade)) if decor_upgrade else 0
+
+
 ## `visits` from FishOrders.reserve_for_shift() (fish already set aside).
 func start_shift(plan: MenuPlan, variety_multiplier: float = 1.0, visits: Array[Dictionary] = []) -> void:
 	_plan = plan

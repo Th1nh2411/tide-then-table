@@ -50,7 +50,7 @@ func _ready() -> void:
 		elif tab == PhoneApp.SHOP_TAB:
 			var shop: PhoneShop = _phone.get_node("%Shop")
 			_check("shop tab lists upgrades", shop.visible and shop._rows.size() == shop.upgrades.size()
-				and shop.upgrades.size() >= 7)
+				and shop.upgrades.size() >= 3)
 		else:
 			_check("tab %d has content" % tab, _phone.get_node("%ContentLabel").text.length() > 10)
 	_check("pin added", PhoneMap.toggle_pin(Vector2(100, 100), 20.0) and GameState.map_pins.size() == 1)

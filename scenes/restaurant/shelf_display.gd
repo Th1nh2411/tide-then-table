@@ -1,14 +1,22 @@
 class_name ShelfDisplay
 extends Control
-## Draws the kitchen side of the dining room: the shelf with the plates
-## waiting on it (from CustomerManager.shelf), the trash bin and the kitchen
-## door sign, so the player can see what is ready without opening the kitchen.
+## Draws the kitchen side of the dining room: the stove and fridge (looks
+## follow their upgrade levels, also previewed while renovating), the shelf
+## with the plates waiting on it (CustomerManager.shelf), the trash bin and
+## the kitchen door sign.
 
 @export var customers: CustomerManager
 @export var shelf_origin: Vector2 = Vector2(96, 186)
 @export var slot_width: float = 16.0
 @export var door_x: float = 150.0
 @export var bin_position: Vector2 = Vector2(20, 246)
+@export var stove_rect: Rect2 = Rect2(40, 196, 40, 14)
+## Bottom-left of the fridge (it grows upward with its level).
+@export var fridge_base: Vector2 = Vector2(3, 210)
+
+## Upgrade levels shown (set by the restaurant / renovation preview).
+var kitchen_level: int = 0
+var fridge_level: int = 0
 
 
 func _ready() -> void:
@@ -21,6 +29,8 @@ func _process(_delta: float) -> void:
 
 
 func _draw() -> void:
+	_draw_stove()
+	_draw_fridge()
 	var shelf := customers.shelf
 	# Shelf board above the counter.
 	draw_rect(Rect2(shelf_origin + Vector2(-4, 8), Vector2(slot_width * shelf.capacity + 4, 3)), Color(0.45, 0.3, 0.2))
@@ -35,3 +45,47 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	draw_rect(Rect2(Vector2(door_x - 2, 200), Vector2(4, 62)), Color(0.3, 0.2, 0.12))
 	draw_string(font, Vector2(door_x - 14, 196), "BẾP", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(1, 0.9, 0.6))
+
+
+## 0 = charcoal brazier, 1 = gas stove, 2 = steel range with a hood.
+func _draw_stove() -> void:
+	var r := stove_rect
+	match kitchen_level:
+		0:
+			draw_rect(r, Color(0.45, 0.25, 0.18))
+			for i in 3:
+				draw_circle(r.position + Vector2(10 + i * 12, 4), 2.5, Color(1.0, 0.4, 0.15))
+		1:
+			draw_rect(r, Color(0.55, 0.57, 0.6))
+			for i in 2:
+				draw_circle(r.position + Vector2(12 + i * 20, 2), 3.0, Color(0.35, 0.6, 1.0))
+		_:
+			draw_rect(Rect2(r.position - Vector2(8, 0), r.size + Vector2(16, 0)), Color(0.75, 0.78, 0.82))
+			draw_rect(Rect2(r.position + Vector2(-10, -46), Vector2(r.size.x + 20, 10)), Color(0.7, 0.72, 0.75))  # hood
+			for i in 3:
+				draw_circle(r.position + Vector2(6 + i * 16, 2), 3.0, Color(0.35, 0.6, 1.0))
+
+
+## Taller fridge per level.
+func _draw_fridge() -> void:
+	var sizes: Array[Vector2] = [Vector2(16, 30), Vector2(20, 42), Vector2(26, 54)]
+	var size := sizes[clampi(fridge_level, 0, sizes.size() - 1)]
+	var rect := Rect2(fridge_base - Vector2(0, size.y), size)
+	draw_rect(rect, Color(0.85, 0.9, 0.95))
+	draw_line(rect.position + Vector2(0, size.y * 0.35), rect.position + Vector2(size.x, size.y * 0.35), Color(0.6, 0.65, 0.7), 1.0)
+	draw_rect(Rect2(rect.position + Vector2(size.x - 4, 4), Vector2(2, 6)), Color(0.5, 0.5, 0.55))
+
+
+## Areas the renovation mode outlines / makes clickable.
+func stove_area() -> Rect2:
+	return Rect2(stove_rect.position + Vector2(-12, -50), stove_rect.size + Vector2(24, 54))
+
+
+func fridge_area() -> Rect2:
+	return Rect2(fridge_base + Vector2(-2, -58), Vector2(30, 60))
+
+
+func tables_area(seats: Array[Vector2]) -> Rect2:
+	if seats.is_empty():
+		return Rect2()
+	return Rect2(seats[0] + Vector2(-4, -2), Vector2(seats.back().x - seats[0].x + 66, 42))

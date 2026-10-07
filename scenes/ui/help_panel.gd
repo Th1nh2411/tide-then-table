@@ -53,7 +53,11 @@ BẢO VÀ BÀN
   Khách quen (bóng thoại vàng) tới ăn món đã đặt trước.
 
 HẾT CA
-  Bảng tổng kết -> "Đóng" -> "Ra khơi". Nút "Nâng cấp" để mua đồ.""",
+  Bảng tổng kết -> "Đóng" -> "Ra khơi".
+
+SỬA QUÁN (trước giờ mở / sau khi bán xong)
+  Bấm "Sửa quán": đồ sửa được có viền xanh (bàn ghế, trang trí, bếp, tủ lạnh).
+  Bấm vào đồ để chọn cấp, xem trước ngay. "Xác nhận" trả tiền, "Hủy" để bỏ.""",
 	"""ĐIỆN THOẠI (J)
   A / D: đổi tab.   J / Esc: đóng.   Game tạm dừng khi mở.
 
@@ -63,7 +67,8 @@ HẾT CA
   Bản đồ: click để ghim / bỏ ghim (ghim hiện mũi tên khi ra khơi).
   Dex: các loài đã bắt, kỷ lục cân nặng.
   Thuyền / Sổ sách: tình trạng thuyền, lãi từng ngày.
-  Nâng cấp: mua đồ, có hiệu lực cho chuyến / ca sau.""",
+  Nâng cấp: đồ nghề đi biển (thuyền, cần câu, đèn), có hiệu lực từ chuyến sau.
+  (Đồ trong quán thì sửa bằng nút "Sửa quán".)""",
 	"""MẸO
   Màu bọt cho biết loài cá. Càng ra xa bờ cá càng xịn và to.
   Bóng cá lớn dưới bọt = cá to, giá cao.

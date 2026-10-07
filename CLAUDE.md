@@ -111,9 +111,12 @@ Vietnamese, keep code comments in short English.
   at the kitchen door: trays → `CookingOverlay` → shelf, bin, carry out;
   must sit after `PauseMenu` so it gets Esc first), `Waiter` "Bảo" (carry /
   clean jobs), `RinWalker` (player: A/D + E), `ShelfDisplay`,
-  `RestaurantDecor`, `RepairButton`; pinned HUD buttons "Nâng cấp" (when not
-  serving) and "Ra khơi" (after the summary) — no automatic scene changes.
-- Upgrades are bought only in the phone's "Nâng cấp" tab (`PhoneShop`).
+  `RestaurantDecor`, `RepairButton`, `RenovationMode` ("Sửa quán": in-place
+  renovation of seats/decor/kitchen/fridge with preview, Hủy / Xác nhận);
+  pinned HUD buttons "Sửa quán" (when not serving) and "Ra khơi" (after the
+  summary) — no automatic scene changes.
+- Sea gear upgrades (boat, rod, lamp) are bought in the phone's "Nâng cấp"
+  tab (`PhoneShop`); restaurant upgrades only via "Sửa quán".
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and
   restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is
   an IT graduate whose failed startup (with friend Bảo, now the restaurant's

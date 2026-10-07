@@ -11,9 +11,6 @@
 [ext_resource type="Script" path="res://scenes/ui/phone_map.gd" id="9_map"]
 [ext_resource type="Script" path="res://scenes/ui/phone_shop.gd" id="14_shop"]
 [ext_resource type="Resource" path="res://data/weather/weather_catalog.tres" id="10_weather"]
-[ext_resource type="Resource" path="res://data/upgrades/seats_upgrade.tres" id="11_seatsup"]
-[ext_resource type="Resource" path="res://data/upgrades/decor_upgrade.tres" id="12_decorup"]
-[ext_resource type="Resource" path="res://data/upgrades/kitchen_upgrade.tres" id="13_kitchenup"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_phone"]
 bg_color = Color(0.07, 0.08, 0.1, 1)
@@ -37,7 +34,7 @@ boat_upgrade = ExtResource("4_boatup")
 lamp_upgrade = ExtResource("5_lampup")
 fridge_upgrade = ExtResource("6_fridgeup")
 weather_catalog = ExtResource("10_weather")
-upgrades = Array[ExtResource("8_updata")]([ExtResource("4_boatup"), ExtResource("7_rodup"), ExtResource("5_lampup"), ExtResource("6_fridgeup"), ExtResource("11_seatsup"), ExtResource("12_decorup"), ExtResource("13_kitchenup")])
+upgrades = Array[ExtResource("8_updata")]([ExtResource("4_boatup"), ExtResource("7_rodup"), ExtResource("5_lampup")])
 
 [node name="Dim" type="ColorRect" parent="."]
 anchors_preset = 15

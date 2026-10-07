@@ -82,14 +82,6 @@ func open() -> void:
 	_show_tab(_tab)
 
 
-## Opens straight on a tab (e.g. the upgrades button in the restaurant).
-func open_tab(index: int) -> void:
-	_tab = index
-	if visible:
-		_show_tab(index)
-	elif not get_tree().paused:
-		open()
-
 
 func close() -> void:
 	hide()

@@ -32,7 +32,7 @@ func on_shop_opened() -> void:
 func on_evening() -> void:
 	if GameState.is_first_day():
 		_step = Step.DONE
-		tip_requested.emit("Bấm \"Nâng cấp\" để mua đồ (hoặc J -> tab Nâng cấp). Xong thì bấm \"Ra khơi\".")
+		tip_requested.emit("Bấm \"Sửa quán\" để nâng cấp quán, J -> Nâng cấp để mua đồ nghề. Xong thì bấm \"Ra khơi\".")
 
 
 func _process(_delta: float) -> void:

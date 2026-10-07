@@ -47,7 +47,7 @@ var _left_angry: int = 0
 var _message_token: int = 0
 ## Regulars coming today (FishOrders.reserve_for_shift).
 var _regular_visits: Array[Dictionary] = []
-var _upgrade_button: Button
+var _renovate_button: Button
 var _tutorial: RestaurantTutorial
 var _sail_button: Button
 
@@ -60,7 +60,8 @@ var _sail_button: Button
 @onready var _summary_label: Label = %SummaryLabel
 @onready var _next_day_button: Button = %NextDayButton
 @onready var _close_early_button: Button = %CloseEarlyButton
-@onready var _phone: PhoneApp = $PhoneApp
+@onready var _renovation: RenovationMode = $RenovationMode
+@onready var _props: ShelfDisplay = $ShelfDisplay
 @onready var _rin: RinWalker = $RinWalker
 @onready var _kitchen_view: KitchenView = $KitchenView
 
@@ -72,8 +73,11 @@ func _ready() -> void:
 	_customers.customer_left_angry.connect(func() -> void: _left_angry += 1)
 	_customers.message_requested.connect(_show_message)
 	_next_day_button.pressed.connect(_on_continue_pressed)
-	_upgrade_button = _pin_button("Nâng cấp", Rect2(530, 26, 104, 20))
-	_upgrade_button.pressed.connect(func() -> void: _phone.open_tab(PhoneApp.SHOP_TAB))
+	_renovate_button = _pin_button("Sửa quán", Rect2(530, 26, 104, 20))
+	_renovate_button.pressed.connect(_open_renovation)
+	_renovation.finished.connect(_on_renovation_finished)
+	_props.kitchen_level = GameState.get_upgrade_level(_renovation.kitchen_upgrade.id)
+	_props.fridge_level = GameState.get_upgrade_level(_renovation.fridge_upgrade.id)
 	_sail_button = _pin_button("Ra khơi  →", Rect2(520, 318, 114, 32))
 	_sail_button.pressed.connect(_start_next_day)
 	_sail_button.hide()
@@ -119,7 +123,7 @@ func _open_shop() -> void:
 	_variety_multiplier = MenuPlan.variety_multiplier(_variety_count, variety_multipliers)
 	_shift_running = true
 	_close_early_button.show()
-	_upgrade_button.hide()
+	_renovate_button.hide()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
 	_rin.active = true
 	_show_message("Quán mở cửa!")
@@ -277,9 +281,32 @@ func _rating_hint(stars: int) -> String:
 ## Summary closed: the evening is free — upgrade, repair, then sail.
 func _on_continue_pressed() -> void:
 	_summary_panel.hide()
-	_upgrade_button.show()
+	_renovate_button.show()
 	_sail_button.show()
 	_tutorial.on_evening()
+
+
+## "Sửa quán": hide people and panels, let RenovationMode take over.
+func _open_renovation() -> void:
+	_set_room_ui_visible(false)
+	_renovation.open()
+
+
+func _on_renovation_finished(applied: bool) -> void:
+	_set_room_ui_visible(true)
+	if applied:
+		_customers.refresh_upgrades()
+		(%Decor as RestaurantDecor).setup(_customers.decor_level())
+		_show_message("Đã sửa quán!")
+
+
+## People, panels and pinned buttons (hidden while renovating).
+func _set_room_ui_visible(on: bool) -> void:
+	for node: CanvasItem in [$CustomerLayer, $Waiter, $RinWalker, $HUD]:
+		node.visible = on
+	_menu_panel.visible = on and not _shift_running and not _shift_over
+	_sail_button.visible = on and _shift_over
+	_renovate_button.visible = on
 
 
 func _pin_button(text: String, rect: Rect2) -> Button:
