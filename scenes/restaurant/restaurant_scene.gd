@@ -30,6 +30,8 @@ const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 @export var message_seconds: float = 1.5
 ## Fridge upgrade: its value is the freshness lost overnight.
 @export var fridge_upgrade: UpgradeData
+## Cutscenes that can play after the summary (first eligible one, once).
+@export var after_shift_cutscenes: Array[Cutscene] = []
 ## After closing, waiting customers get this long to still be served.
 @export var closing_grace_seconds: float = 15.0
 
@@ -64,6 +66,8 @@ var _sail_button: Button
 @onready var _close_early_button: Button = %CloseEarlyButton
 @onready var _renovation: RenovationMode = $RenovationMode
 @onready var _props: ShelfDisplay = $ShelfDisplay
+@onready var _waiter: Waiter = $Waiter
+@onready var _cutscene: CutscenePlayer = $CutscenePlayer
 @onready var _rin: RinWalker = $RinWalker
 @onready var _kitchen_view: KitchenView = $KitchenView
 
@@ -98,6 +102,7 @@ func _ready() -> void:
 	_close_early_button.pressed.connect(func() -> void: _end_shift("Đóng quán sớm"))
 	_close_early_button.hide()
 
+	_waiter.visible = Waiter.is_hired()  # day 1: Rin is alone
 	_regular_visits = FishOrders.reserve_for_shift(menu)
 	(%Decor as RestaurantDecor).setup(_customers.decor_level())
 	_rin.kitchen_requested.connect(_open_kitchen)
@@ -292,6 +297,10 @@ func _rating_hint(stars: int) -> String:
 ## Summary closed: the evening is free — upgrade, repair, then sail.
 func _on_continue_pressed() -> void:
 	_summary_panel.hide()
+	var scene := DialogueLibrary.pick(after_shift_cutscenes) as Cutscene
+	if scene:
+		await _cutscene.play(scene)
+		_waiter.visible = Waiter.is_hired()
 	_renovate_button.show()
 	_sail_button.show()
 	_tutorial.on_evening()
@@ -313,8 +322,9 @@ func _on_renovation_finished(applied: bool) -> void:
 
 ## People, panels and pinned buttons (hidden while renovating).
 func _set_room_ui_visible(on: bool) -> void:
-	for node: CanvasItem in [$CustomerLayer, $Waiter, $RinWalker, $HUD]:
+	for node: CanvasItem in [$CustomerLayer, $RinWalker, $HUD]:
 		node.visible = on
+	_waiter.visible = on and Waiter.is_hired()
 	_menu_panel.visible = false
 	_menu_button.visible = on and not _shift_running and not _shift_over
 	_sail_button.visible = on and _shift_over

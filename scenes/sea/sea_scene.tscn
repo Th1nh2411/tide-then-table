@@ -555,10 +555,10 @@ position = Vector2(995, 1176)
 [node name="rin_pet" type="Marker2D" parent="CutsceneMarkers"]
 position = Vector2(1006, 1178)
 
-[node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers", "day_tint", "hidden_layers")]
+[node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers", "day_tint", "hidden_nodes")]
 script = ExtResource("45_cutscene")
 markers = NodePath("../CutsceneMarkers")
 day_tint = NodePath("../DayTint")
-hidden_layers = [NodePath("../SeaHud"), NodePath("../MarkerLayer")]
+hidden_nodes = [NodePath("../SeaHud"), NodePath("../MarkerLayer")]
 
 [node name="PhoneApp" parent="." instance=ExtResource("33_phone")]

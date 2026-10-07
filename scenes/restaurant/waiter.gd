@@ -10,6 +10,8 @@ signal cleaned(seat: int)
 
 enum Job { NONE, CARRY, CLEAN, RETURN }
 
+const HIRED_FLAG: String = "bao_joined"
+
 @export var display_name: String = "Bảo"
 @export var speed: float = 100.0
 @export var shelf_x: float = 172.0
@@ -32,6 +34,11 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	_x = shelf_x
+
+
+## Bảo works here from day 2 (joins in the cutscene after day 1's shift).
+static func is_hired() -> bool:
+	return GameState.has_flag(HIRED_FLAG) or GameState.day > 1
 
 
 ## Free and standing at the shelf.

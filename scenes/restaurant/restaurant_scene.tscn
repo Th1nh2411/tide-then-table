@@ -26,7 +26,6 @@
 [ext_resource type="Script" path="res://scenes/restaurant/kitchen_view.gd" id="25_kview"]
 [ext_resource type="Script" path="res://scenes/restaurant/renovation_mode.gd" id="26_reno"]
 [ext_resource type="Script" path="res://scenes/common/talker.gd" id="27_talker"]
-[ext_resource type="Resource" path="res://data/dialogues/bao_reunion.tres" id="28_dlg1"]
 [ext_resource type="Resource" path="res://data/dialogues/bao_app.tres" id="29_dlg2"]
 [ext_resource type="Resource" path="res://data/dialogues/bao_cat.tres" id="30_dlg3"]
 [ext_resource type="Resource" path="res://data/dialogues/bao_omen.tres" id="31_dlg4"]
@@ -35,6 +34,9 @@
 [ext_resource type="Resource" path="res://data/dialogues/cat_first.tres" id="34_cat1"]
 [ext_resource type="Resource" path="res://data/dialogues/cat_warm.tres" id="35_cat2"]
 [ext_resource type="Resource" path="res://data/dialogues/cat_omen.tres" id="36_cat3"]
+[ext_resource type="Script" path="res://scenes/cutscene/cutscene_player.gd" id="37_cutscene"]
+[ext_resource type="Resource" path="res://data/cutscenes/bao_arrival.tres" id="38_bao"]
+[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="39_cutdata"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -44,6 +46,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_rest")
+after_shift_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("38_bao")])
 menu = ExtResource("4_menu")
 fish_catalog = ExtResource("6_fish")
 fridge_upgrade = ExtResource("11_fridgeup")
@@ -191,7 +194,7 @@ script = ExtResource("22_waiter")
 [node name="Talker" type="Node" parent="Waiter"]
 script = ExtResource("27_talker")
 display_name = "Bảo"
-dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("28_dlg1"), ExtResource("29_dlg2"), ExtResource("30_dlg3"), ExtResource("31_dlg4")])
+dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("29_dlg2"), ExtResource("30_dlg3"), ExtResource("31_dlg4")])
 idle_lines = Array[String](["Hôm nay đông khách ghê.", "Nhớ hồi tụi mình code xuyên đêm không? Giờ thì rửa chén xuyên đêm.", "Mai câu con gì to to về nha.", "Khách bàn 2 khen món mày nấu đó.", "Tao vẫn giữ con server cũ, tiếc quá không nỡ bán."])
 
 [node name="RinWalker" type="Control" parent="." node_paths=PackedStringArray("tables")]
@@ -400,5 +403,24 @@ script = ExtResource("25_kview")
 cooking = NodePath("../CookingOverlay")
 customers = NodePath("../CustomerManager")
 menu = ExtResource("4_menu")
+
+[node name="CutsceneMarkers" type="Node2D" parent="."]
+
+[node name="room_view" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(320, 180)
+
+[node name="rin_spot" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(300, 262)
+
+[node name="door" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(610, 262)
+
+[node name="bao_stop" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(350, 262)
+
+[node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers", "hidden_nodes")]
+script = ExtResource("37_cutscene")
+markers = NodePath("../CutsceneMarkers")
+hidden_nodes = [NodePath("../HUD"), NodePath("../RinWalker"), NodePath("../Waiter"), NodePath("../CustomerLayer")]
 
 [node name="PhoneApp" parent="." instance=ExtResource("16_phone")]

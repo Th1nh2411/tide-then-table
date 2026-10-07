@@ -165,7 +165,7 @@ func _process(delta: float) -> void:
 
 ## Bảo: carry the oldest order that has a plate, else clean a table.
 func _assign_waiter() -> void:
-	if not waiter.is_idle():
+	if not Waiter.is_hired() or not waiter.is_idle():
 		return
 	var found := shelf.next_delivery(waiting)
 	if not found.is_empty():

@@ -118,7 +118,9 @@ Vietnamese, keep code comments in short English.
 - Cutscenes (Stardew style): write a `Cutscene` .tres in `data/cutscenes/`
   (commands listed in `CutsceneScript`), add marker Node2Ds under the scene's
   `CutsceneMarkers`, play with `CutscenePlayer.play()` (sea scene plays
-  `trip_end_cutscenes` after a trip). It pauses the tree; its actors,
+  `trip_end_cutscenes` after a trip; the restaurant plays
+  `after_shift_cutscenes` when the summary closes, e.g. Bảo joining after
+  day 1 — `Waiter.is_hired()`). It pauses the tree; its actors,
   camera, tweens and DialogueBox run PROCESS_MODE_ALWAYS.
 - The cat: `PetCat` (restaurant), flags `cat_adopted` / `cat_gone` /
   `pet_name`; use `{pet}` in dialogue/cutscene text.

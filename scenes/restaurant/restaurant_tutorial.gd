@@ -50,8 +50,8 @@ func _process(_delta: float) -> void:
 		Step.COOK:
 			if not customers.shelf.plates.is_empty():
 				_step = Step.SERVE
-				tip_requested.emit("Món lên kệ rồi! Bấm E để ra khỏi bếp. Bảo sẽ tự bưng cho khách vào trước.")
+				tip_requested.emit("Món lên kệ rồi! Hôm nay chưa ai phụ: chọn món trên kệ -> \"Rin cầm ra bưng\", tới đúng bàn bấm E.")
 		Step.SERVE:
 			if not customers.tables.dirty_seats().is_empty():
 				_step = Step.CLEAN
-				tip_requested.emit("Khách ăn xong để lại bàn bẩn. Bảo sẽ dọn, hoặc đứng cạnh bàn bấm E để Rin dọn.")
+				tip_requested.emit("Khách ăn xong để lại bàn bẩn: đứng cạnh bàn bấm E để dọn, dọn rồi mới có khách mới ngồi.")

@@ -49,6 +49,13 @@ func _ready() -> void:
 	tables.free()
 	for order in [first, second, no_plate]:
 		order.free()
+	# The restaurant has no camera; nothing (e.g. the cutscene camera) may
+	# become current by itself, or the view shifts to the top-left corner.
+	var room: Node = load("res://scenes/restaurant/restaurant_scene.tscn").instantiate()
+	add_child(room)
+	await get_tree().process_frame
+	_check("restaurant view not moved by a camera", get_viewport().get_camera_2d() == null)
+	room.queue_free()
 	print("Restaurant: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
 
 

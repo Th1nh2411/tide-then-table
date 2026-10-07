@@ -1,7 +1,7 @@
 class_name CutsceneActor
 extends Node2D
 ## A character placed by a cutscene (placeholder drawing by `kind`: "rin",
-## "cat", "crate"). Walks with a small bob, faces left/right and shows emote
+## "bao", "cat", "crate"). Walks with a small bob, faces left/right and shows emote
 ## bubbles (! ? ... heart note) over its head. Runs while the tree is paused.
 
 @export var kind: String = "rin"
@@ -52,6 +52,8 @@ func _draw() -> void:
 	match kind:
 		"rin":
 			_draw_person(Color(0.2, 0.45, 0.8))
+		"bao":
+			_draw_person(Color(0.85, 0.5, 0.2))
 		"cat":
 			_draw_cat()
 		"crate":
@@ -88,7 +90,7 @@ func _draw_crate() -> void:
 
 
 func _draw_emote() -> void:
-	var at := Vector2(-6, -36 if kind == "rin" else -26)
+	var at := Vector2(-6, -36 if kind == "rin" or kind == "bao" else -26)
 	draw_rect(Rect2(at, Vector2(12, 10)), Color(1, 1, 1, 0.95))
 	draw_colored_polygon(PackedVector2Array([at + Vector2(3, 10), at + Vector2(7, 10), at + Vector2(4, 13)]),
 		Color(1, 1, 1, 0.95))

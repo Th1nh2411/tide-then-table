@@ -6,7 +6,7 @@ extends RefCounted
 ##   fade_out <s> / fade_in <s>        screen to black / back
 ##   tint dawn|night|day               world color
 ##   camera <marker> [s] [zoom]        move the cutscene camera to a marker
-##   spawn <actor> <kind> <marker>     kinds: rin, cat, crate
+##   spawn <actor> <kind> <marker> [scale]   kinds: rin, bao, cat, crate
 ##   move_to <actor> <marker> <s>      walk there (waits)
 ##   face <actor> left|right
 ##   emote <actor> !|?|...|heart|note [s]

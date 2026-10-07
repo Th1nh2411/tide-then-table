@@ -11,8 +11,8 @@ signal finished
 
 @export var markers: Node2D
 @export var day_tint: DayTint
-## HUD layers hidden while a cutscene plays.
-@export var hidden_layers: Array[CanvasLayer] = []
+## Nodes hidden while a cutscene plays (HUD layers, the player character...).
+@export var hidden_nodes: Array[Node] = []
 @export var name_max_length: int = 12
 
 var playing: bool = false
@@ -31,6 +31,9 @@ signal _name_entered(text: String)
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_camera = Camera2D.new()
+	# Off until a cutscene plays: in a scene without a camera (restaurant) an
+	# enabled Camera2D becomes current by itself and shifts the whole view.
+	_camera.enabled = false
 	add_child(_camera)
 	var fade_layer := CanvasLayer.new()
 	fade_layer.layer = 23  # under the dialogue box (24)
@@ -52,12 +55,20 @@ func play(cutscene: Cutscene) -> void:
 	_dialogue.hold_pause = true
 	var was_paused := get_tree().paused
 	get_tree().paused = true
-	for layer in hidden_layers:
-		layer.visible = false
+	var shown: Array[Node] = []
+	for node in hidden_nodes:
+		if node.get("visible"):
+			shown.append(node)
+			node.set("visible", false)
 	_previous_camera = get_viewport().get_camera_2d()
 	if _previous_camera:
 		_camera.global_position = _previous_camera.get_screen_center_position()
 		_camera.zoom = _previous_camera.zoom
+	else:
+		# UI scenes (restaurant) have no camera: start on the plain view.
+		_camera.global_position = get_viewport_rect().size * 0.5
+		_camera.zoom = Vector2.ONE
+	_camera.enabled = true
 	_camera.make_current()
 
 	var commands := CutsceneScript.parse(cutscene.script_text)
@@ -76,10 +87,12 @@ func play(cutscene: Cutscene) -> void:
 	_actors.clear()
 	_dialogue.hold_pause = false
 	_dialogue.hide()
-	for layer in hidden_layers:
-		layer.visible = true
+	for node in shown:
+		node.set("visible", true)
 	if _previous_camera:
 		_previous_camera.make_current()
+	else:
+		_camera.enabled = false
 	get_tree().paused = was_paused
 	playing = false
 	finished.emit()
@@ -100,6 +113,8 @@ func _run(command: Dictionary) -> String:
 		"fade_in":
 			await _fade_to(0.0, _float(args, 0, 1.0))
 		"tint":
+			if day_tint == null:
+				return ""
 			match args[0]:
 				"dawn":
 					day_tint.color = day_tint.dawn_color
@@ -113,6 +128,7 @@ func _run(command: Dictionary) -> String:
 			var actor := CutsceneActor.new()
 			actor.kind = args[1]
 			actor.position = _marker(args[2])
+			actor.scale = Vector2.ONE * _float(args, 3, 1.0)
 			add_child(actor)
 			_actors[args[0]] = actor
 		"move_to":
