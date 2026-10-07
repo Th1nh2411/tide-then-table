@@ -14,3 +14,4 @@ difficulty = 0.4
 base_price = 50
 spawn_weight = 0.6
 is_aberrant = false
+typical_kg = 0.5

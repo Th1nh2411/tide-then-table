@@ -17,6 +17,23 @@ signal fishing_requested(spot: FishingSpot)
 @export var min_spot_distance: float = 120.0
 @export var max_attempts_per_spot: int = 30
 
+@export_group("Catch")
+## Picks each spot's featured species.
+@export var catalog: FishCatalog
+## Map y of the shore (depth 0) and of the far edge (depth 1).
+@export var shore_y: float = 1160.0
+@export var deep_y: float = 0.0
+## How strongly depth favors pricier species (see FishCatalog.pick_random).
+@export var rarity_boost: float = 3.0
+## Chance a cast brings up the spot's featured species.
+@export var featured_chance: float = 0.7
+## Chance of a "big shadow" spot, at the shore and at the far edge.
+@export var big_chance_shallow: float = 0.05
+@export var big_chance_deep: float = 0.4
+## Big spots pick their fish as if this deep, with this much extra boost.
+@export var big_rarity_boost: float = 8.0
+@export var big_max_casts: int = 2
+
 var _rng := RandomNumberGenerator.new()
 
 
@@ -68,6 +85,24 @@ func _create_spot(pos: Vector2, zone: FishData.Zone) -> void:
 	spot.global_position = pos
 	spot.zone = zone
 	spot.casts_left = _rng.randi_range(min_casts, max_casts)
+	_roll_catch(spot)
 	spot.fishable_changed.connect(spot_fishable_changed.emit)
 	spot.fishing_requested.connect(fishing_requested.emit)
 	add_child(spot)
+
+
+## Depth, featured species and big-shadow flag. Further out = better fish
+## and more big shadows.
+func _roll_catch(spot: FishingSpot) -> void:
+	spot.depth = CatchRoll.depth_at(spot.global_position.y, shore_y, deep_y)
+	spot.rarity_boost = rarity_boost
+	spot.featured_chance = featured_chance
+	if catalog == null:
+		return
+	var rod := FishData.CatchMethod.ROD
+	spot.big_shadow = _rng.randf() < lerpf(big_chance_shallow, big_chance_deep, spot.depth)
+	if spot.big_shadow:
+		spot.featured = catalog.pick_random(spot.zone, _rng, rod, 1.0, big_rarity_boost)
+		spot.casts_left = mini(spot.casts_left, big_max_casts)
+	else:
+		spot.featured = catalog.pick_random(spot.zone, _rng, rod, spot.depth, rarity_boost)

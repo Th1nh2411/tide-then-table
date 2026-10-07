@@ -6,7 +6,7 @@ extends Node
 ## win the HAUL minigame to bring the catch aboard. Nets left at sea when the
 ## day ends lose their catch.
 
-signal fish_caught(fish: FishData, quality: float, count: int)
+signal fish_caught(fish: FishData, quality: float, count: int, size: float)
 signal nets_changed(available: int, total: int)
 
 @export var catalog: FishCatalog
@@ -150,8 +150,9 @@ func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: 
 	if DayClock.running:
 		boat.set_physics_process(true)
 	if caught:
-		hud.flash_message("Kéo được %d %s%s" % [count, fish.display_name, " ★" if quality >= 1.0 else ""])
-		fish_caught.emit(fish, quality, count)
+		hud.flash_message("Kéo được %d %s%s" % [count, fish.display_name, " (hoàn hảo)" if quality >= 1.0 else ""])
+		# Shellfish in a net are all average size.
+		fish_caught.emit(fish, quality, count, 1.0)
 
 
 func _emit_nets() -> void:

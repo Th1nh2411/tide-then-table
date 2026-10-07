@@ -92,7 +92,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_tree().reload_current_scene()
 
 
-func _on_fish_caught(fish: FishData, _quality: float, _count: int) -> void:
+func _on_fish_caught(fish: FishData, _quality: float, _count: int, _size: float) -> void:
 	if Story.on_fish_caught(fish):
 		_hud.flash_message("[WARN] App báo: loài này không có trong database... Ngoài khơi đông bắc có gì đó lạ.", 3.0)
 

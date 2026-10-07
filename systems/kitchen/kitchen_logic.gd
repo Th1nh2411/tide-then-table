@@ -56,7 +56,7 @@ static func freshness_multiplier(freshness: float) -> float:
 	return OLD_MULTIPLIER
 
 
-## base_price × cook result × average quality × average freshness multiplier.
+## base_price × cook result × average (quality × size) × average freshness multiplier.
 ## Market dishes (no items) count as full quality and fresh.
 static func calc_price(dish: DishData, cook_multiplier: float, items: Array[InventoryItem]) -> int:
 	if items.is_empty():
@@ -64,7 +64,7 @@ static func calc_price(dish: DishData, cook_multiplier: float, items: Array[Inve
 	var quality_sum := 0.0
 	var fresh_sum := 0.0
 	for item in items:
-		quality_sum += item.quality
+		quality_sum += item.quality * item.size
 		fresh_sum += freshness_multiplier(item.freshness)
 	var avg_quality := quality_sum / items.size()
 	var avg_fresh := fresh_sum / items.size()

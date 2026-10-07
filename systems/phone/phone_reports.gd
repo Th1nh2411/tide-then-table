@@ -68,6 +68,8 @@ static func dex_report(catalog: FishCatalog, glitch_seed: int) -> String:
 		var fish_name := glitch(fish.display_name, glitch_seed) if fish.is_aberrant else fish.display_name
 		lines.append("[x] %-16s x%-3d %s · %s · %dk" % [fish_name, caught, ", ".join(zones),
 			METHOD_NAMES[fish.catch_method], fish.base_price])
+		if fish.catch_method == FishData.CatchMethod.ROD and GameState.best_size(fish) > 0.0:
+			lines.append("    kỷ lục: %s" % fish.weight_text(GameState.best_size(fish)))
 		if fish.is_aberrant:
 			lines.append("    [WARN] species_id \"%s\" không có trong database" % fish.id)
 	lines.insert(0, "DEX  %d/%d loài\n" % [known, catalog.fish.size()])

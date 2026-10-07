@@ -67,6 +67,7 @@ static func to_dict() -> Dictionary:
 		"last_rating": GameState.last_rating,
 		"boat_hp": GameState.boat_hp,
 		"caught_species": GameState.caught_species.duplicate(),
+		"best_sizes": GameState.best_sizes.duplicate(),
 		"day_history": GameState.day_history.duplicate(true),
 	}
 
@@ -99,6 +100,12 @@ static func apply_dict(data: Dictionary) -> void:
 		for fish_id: Variant in caught:
 			if fish_id is String and (caught[fish_id] is int or caught[fish_id] is float):
 				GameState.caught_species[fish_id] = maxi(int(caught[fish_id]), 0)
+
+	var sizes: Variant = data.get("best_sizes")
+	if sizes is Dictionary:
+		for fish_id: Variant in sizes:
+			if fish_id is String and (sizes[fish_id] is int or sizes[fish_id] is float):
+				GameState.best_sizes[fish_id] = clampf(float(sizes[fish_id]), 0.0, CatchRoll.MAX_SIZE)
 
 	var history: Variant = data.get("day_history")
 	if history is Array:

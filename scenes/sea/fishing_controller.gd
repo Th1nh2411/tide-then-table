@@ -1,11 +1,14 @@
 class_name FishingController
 extends Node
-## Handles a fishing attempt at a spot: picks the species by zone and weight,
-## spends a cast and some lamp oil, then runs the minigame while the boat
-## holds still. Oil keeps burning (slower) during the minigame.
+## Handles a fishing attempt at a spot: the spot picks the species (featured
+## fish or zone/depth random), the size is rolled (deeper / big shadow =
+## bigger, bigger = harder), a cast and some lamp oil are spent, then the
+## minigame runs while the boat holds still. Oil keeps burning (slower)
+## during the minigame.
 
 ## Emitted on a successful catch; the hold manager stores it.
-signal fish_caught(fish: FishData, quality: float, count: int)
+## `size` 1.0 = average (scales price and weight).
+signal fish_caught(fish: FishData, quality: float, count: int, size: float)
 
 @export var catalog: FishCatalog
 @export var spawner: FishingSpotSpawner
@@ -18,8 +21,18 @@ signal fish_caught(fish: FishData, quality: float, count: int)
 ## Rod upgrade: its value is the minigame zone scale (1.0 = no bonus).
 @export var rod_upgrade: UpgradeData
 
+@export_group("Fish size")
+## Random spread around the mean size (normal distribution).
+@export var size_spread: float = 0.15
+## Mean size added at depth 1 / on a big-shadow spot.
+@export var size_depth_bonus: float = 0.25
+@export var size_big_bonus: float = 0.35
+## How much a bigger fish fights harder (see CatchRoll.size_zone_scale).
+@export var size_difficulty: float = 0.3
+
 var _rng := RandomNumberGenerator.new()
 var _current_spot: FishingSpot
+var _size: float = 1.0
 ## True while the shared minigame overlay is running one of OUR casts.
 var _active: bool = false
 
@@ -39,26 +52,33 @@ func _on_spot_fishable_changed(spot: FishingSpot, can_fish: bool) -> void:
 	if is_fishing():
 		return
 	if can_fish:
-		hud.show_prompt("E: Câu (còn %d lượt)" % spot.casts_left)
+		_show_spot_prompt(spot)
 	else:
 		hud.hide_prompt()
+
+
+func _show_spot_prompt(spot: FishingSpot) -> void:
+	hud.show_prompt("E: Câu - %s (còn %d lượt)" % [spot.hint_text(), spot.casts_left])
 
 
 func _on_fishing_requested(spot: FishingSpot) -> void:
 	if is_fishing():
 		return
-	var fish := catalog.pick_random(spot.zone, _rng)
+	var fish := spot.roll_fish(catalog, _rng)
 	if fish == null:
 		push_warning("No fish defined for zone %d" % spot.zone)
 		return
 	_current_spot = spot
 	_active = true
+	_size = CatchRoll.roll_size(_rng, spot.depth, spot.big_shadow and fish == spot.featured,
+		size_spread, size_depth_bonus, size_big_bonus)
 	boat.speed = 0.0
 	boat.set_physics_process(false)
 	hud.hide_prompt()
 	spot.use_cast()
 	oil.spend(oil_per_cast)
-	minigame.start(fish, _get_zone_scale())
+	var zone_scale := _get_zone_scale() * CatchRoll.size_zone_scale(_size, size_difficulty)
+	minigame.start(fish, zone_scale, 1, _size)
 
 
 func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: int) -> void:
@@ -66,16 +86,29 @@ func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: 
 	if not _active:
 		return
 	_active = false
-	# If the deadline hit mid-game, the sea scene is towing us; stay frozen.
+	# If the boat got towed mid-game (hull/oil), stay frozen.
 	if DayClock.running:
 		boat.set_physics_process(true)
 	if caught:
-		hud.flash_message("Bắt được %s%s" % [fish.display_name, " ★" if quality >= 1.0 else ""])
-		fish_caught.emit(fish, quality, count)
+		hud.flash_message(_catch_message(fish, quality))
+		fish_caught.emit(fish, quality, count, _size)
 	# The spot may have casts left and the boat is still on it.
 	if is_instance_valid(_current_spot) and _current_spot.casts_left > 0:
-		hud.show_prompt("E: Câu (còn %d lượt)" % _current_spot.casts_left)
+		_show_spot_prompt(_current_spot)
 	_current_spot = null
+
+
+## e.g. "Bắt được Cá mú 3.9kg (to!) - kỷ lục mới!"
+func _catch_message(fish: FishData, quality: float) -> String:
+	var text := "Bắt được %s %s" % [fish.display_name, fish.weight_text(_size)]
+	if CatchRoll.is_big(_size):
+		text += " (to!)"
+	if quality >= 1.0:
+		text += " (hoàn hảo)"
+	# Must be checked before the hold manager records this catch.
+	if GameState.caught_species.has(fish.id) and _size > GameState.best_size(fish):
+		text += " - kỷ lục mới!"
+	return text
 
 
 func _get_zone_scale() -> float:

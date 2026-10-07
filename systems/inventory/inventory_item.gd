@@ -5,6 +5,8 @@ extends RefCounted
 var fish: FishData
 ## 1.0 for a perfect catch, 0.7 otherwise.
 var quality: float = 1.0
+## 1.0 = average fish; bigger sells for more (see CatchRoll).
+var size: float = 1.0
 ## 100 = fresh, 0 = spoiled (drops each day from Phase 7).
 var freshness: float = 100.0
 ## Turned 90 degrees clockwise in the grid.
@@ -13,9 +15,10 @@ var rotated: bool = false
 var grid_pos: Vector2i = Vector2i.ZERO
 
 
-func _init(p_fish: FishData = null, p_quality: float = 1.0) -> void:
+func _init(p_fish: FishData = null, p_quality: float = 1.0, p_size: float = 1.0) -> void:
 	fish = p_fish
 	quality = p_quality
+	size = p_size
 
 
 ## Occupied cells relative to grid_pos, for the given orientation.
@@ -36,7 +39,7 @@ func get_cells(is_rotated: bool = rotated) -> Array[Vector2i]:
 ## Save data. Grid position/rotation aren't saved: only storage is saved,
 ## and storage has no grid.
 func to_dict() -> Dictionary:
-	return {"fish": fish.id, "quality": quality, "freshness": freshness}
+	return {"fish": fish.id, "quality": quality, "size": size, "freshness": freshness}
 
 
 ## Rebuilds an item from save data, or returns null if the fish id is unknown
@@ -48,6 +51,7 @@ static func from_dict(data: Variant, catalog: FishCatalog) -> InventoryItem:
 	for f in catalog.fish:
 		if f.id == fish_id:
 			var item := InventoryItem.new(f, _to_float(data.get("quality"), 1.0))
+			item.size = clampf(_to_float(data.get("size"), 1.0), CatchRoll.MIN_SIZE, CatchRoll.MAX_SIZE)
 			item.freshness = clampf(_to_float(data.get("freshness"), 100.0), 0.0, 100.0)
 			return item
 	return null

@@ -22,6 +22,8 @@ var _fish: FishData
 var _game: MinigameBase
 var _zone_scale: float = 1.0
 var _count: int = 1
+## Rolled fish size, shown once hooked (CatchRoll).
+var _size: float = 1.0
 var _in_bite_stage: bool = false
 ## False if the player struck too early while waiting (no perfect catch).
 var _bite_clean: bool = true
@@ -47,12 +49,14 @@ func is_running() -> bool:
 
 ## `zone_scale` > 1 makes the game easier (rod/net upgrade).
 ## `count` = how many fish are at stake (shellfish in a net).
-func start(fish: FishData, zone_scale: float = 1.0, count: int = 1) -> void:
+## `size` only changes the "hooked" title; difficulty comes in via zone_scale.
+func start(fish: FishData, zone_scale: float = 1.0, count: int = 1, size: float = 1.0) -> void:
 	if is_running():
 		return
 	_fish = fish
 	_zone_scale = zone_scale
 	_count = count
+	_size = size
 	_bite_clean = true
 	_result_label.text = ""
 	_title_label.modulate = Color.WHITE
@@ -92,7 +96,8 @@ func _on_game_completed(success: bool, perfect: bool) -> void:
 	if _in_bite_stage and success:
 		_in_bite_stage = false
 		_bite_clean = perfect
-		_title_label.text = "Dính câu: %s!" % _fish.display_name
+		_title_label.text = "Dính câu: %s %s%s!" % [_fish.display_name, _fish.weight_text(_size),
+			" (to!)" if CatchRoll.is_big(_size) else ""]
 		_title_label.modulate = aberrant_title_color if _fish.is_aberrant else Color.WHITE
 		await get_tree().create_timer(hooked_pause_seconds).timeout
 		_free_game()

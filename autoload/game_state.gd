@@ -46,6 +46,8 @@ var last_spoiled_count: int = 0
 var boat_hp: float = 100.0
 ## fish_id -> how many caught in total (the phone's Dex).
 var caught_species: Dictionary = {}
+## Species id -> biggest size caught (CatchRoll size, 1.0 = average).
+var best_sizes: Dictionary = {}
 ## One Dictionary per finished shift: day, earned, market, rating, served, left.
 var day_history: Array = []
 ## History entries kept (older ones are dropped).
@@ -66,6 +68,7 @@ func reset() -> void:
 	last_spoiled_count = 0
 	boat_hp = 100.0
 	caught_species.clear()
+	best_sizes.clear()
 	day_history.clear()
 
 
@@ -91,8 +94,15 @@ func advance_day(freshness_loss: float) -> int:
 	return last_spoiled_count
 
 
-func record_catch(fish: FishData, count: int) -> void:
+func record_catch(fish: FishData, count: int, size: float = 1.0) -> void:
 	caught_species[fish.id] = int(caught_species.get(fish.id, 0)) + count
+	if count > 0 and size > best_size(fish):
+		best_sizes[fish.id] = size
+
+
+## Biggest size caught for this species (0 if never caught).
+func best_size(fish: FishData) -> float:
+	return float(best_sizes.get(fish.id, 0.0))
 
 
 func add_day_record(record: Dictionary) -> void:

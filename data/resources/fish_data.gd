@@ -25,7 +25,19 @@ enum CatchMethod { ROD, NET }
 @export var spawn_weight: float = 1.0
 ## Aberrant (mutated) fish: story clue, special minigame look.
 @export var is_aberrant: bool = false
+## Weight of an average-size catch (size 1.0), only for display and records.
+@export var typical_kg: float = 1.0
 
 
 func lives_in(zone: Zone) -> bool:
 	return zones.has(zone)
+
+
+func weight_kg(size: float) -> float:
+	return typical_kg * size
+
+
+## "3.4kg" or "350g".
+func weight_text(size: float) -> String:
+	var kg := weight_kg(size)
+	return "%.1fkg" % kg if kg >= 1.0 else "%dg" % roundi(kg * 1000.0)

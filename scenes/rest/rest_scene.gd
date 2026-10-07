@@ -23,17 +23,24 @@ func _ready() -> void:
 	_wake_button.grab_focus()
 
 
-## e.g. "Mẻ đêm nay: Mực x2 · Ốc hương x6 (★3)".
+## e.g. "Mẻ đêm nay: Mực x2 · Ốc hương x6 / (3 con hoàn hảo · to nhất: Mực 520g)".
 func _catch_text() -> String:
 	if GameState.last_catch.is_empty():
 		return "Đêm nay không mang về được gì."
 	var counts: Dictionary = {}  # display name -> count, first-seen order
 	var perfect := 0
+	var biggest: InventoryItem = null
 	for item: InventoryItem in GameState.last_catch:
+		if item.fish.catch_method == FishData.CatchMethod.ROD and (biggest == null
+				or item.fish.weight_kg(item.size) > biggest.fish.weight_kg(biggest.size)):
+			biggest = item
 		counts[item.fish.display_name] = counts.get(item.fish.display_name, 0) + 1
 		if item.quality >= 1.0:
 			perfect += 1
 	var parts: PackedStringArray = []
 	for fish_name: String in counts:
 		parts.append("%s x%d" % [fish_name, counts[fish_name]])
-	return "Mẻ đêm nay: %s\n(%d con hoàn hảo)" % [" · ".join(parts), perfect]
+	var extra := ""
+	if biggest:
+		extra = " · to nhất: %s %s" % [biggest.fish.display_name, biggest.fish.weight_text(biggest.size)]
+	return "Mẻ đêm nay: %s\n(%d con hoàn hảo%s)" % [" · ".join(parts), perfect, extra]

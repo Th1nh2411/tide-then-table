@@ -69,7 +69,7 @@ func get_hover_text() -> String:
 		item = pending
 	if item == null:
 		return ""
-	return "%s · chất lượng %.1f" % [item.fish.display_name, item.quality]
+	return "%s %s · chất lượng %.1f" % [item.fish.display_name, item.fish.weight_text(item.size), item.quality]
 
 
 func _process(_delta: float) -> void:

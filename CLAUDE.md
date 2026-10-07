@@ -23,7 +23,8 @@ Vietnamese, keep code comments in short English.
 - Signals between nodes (past-tense names); node refs via `@export` + NodePath,
   not long `get_node("../..")` chains.
 - Pure logic lives in `systems/` (no nodes): `GridInventory`, `KitchenLogic`,
-  `MenuPlan`, `DayRating`, `SaveSystem`, `Story`, `BoatCondition`.
+  `MenuPlan`, `DayRating`, `SaveSystem`, `Story`, `BoatCondition`,
+  `PhoneReports`, `CatchRoll`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
 - Vietnamese for all player-facing text. Money is shown as "70k".
 
@@ -69,7 +70,9 @@ Vietnamese, keep code comments in short English.
   summary + rating → upgrade shop) → next day (freshness loss) → sea …
   ending via fog whirlpool.
 - Sea scene controllers: `FishingController` (rod spots → `FishingMinigame`:
-  BiteGame then Timing/Tension), `NetController` (Q nets → HaulGame),
+  BiteGame then Timing/Tension; spot picks species via its featured fish +
+  depth, `CatchRoll` rolls size: deeper = pricier/bigger, size scales price
+  and difficulty; records in `GameState.best_sizes`), `NetController` (Q nets → HaulGame),
   `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab), `HullController`
   (collision damage, F repair at dock), `LampOil` (trip limit + displayed
   time), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,

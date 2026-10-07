@@ -23,10 +23,10 @@ func _ready() -> void:
 	oil.oil_low.connect(_on_oil_low)
 
 
-func _on_catch(_fish: FishData, _quality: float, _count: int) -> void:
+func _on_catch(_fish: FishData, _quality: float, _count: int, _size: float) -> void:
 	if _step == Step.DRIVE:
 		_step = Step.AFTER_CATCH
-		hud.show_tip("Tab: xem khoang. Q: thả lưới ốc ở vùng nước nông, lát quay lại phao bấm E để kéo.")
+		hud.show_tip("Tab: xem khoang. Q: thả lưới ốc ở vùng nước nông. Màu bọt cho biết loài cá; càng ra xa bờ cá càng xịn và to.")
 
 
 func _on_oil_low() -> void:

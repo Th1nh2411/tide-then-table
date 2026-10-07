@@ -40,11 +40,11 @@ func get_items() -> Array[InventoryItem]:
 	return hold.items.duplicate()
 
 
-func add_catch(fish: FishData, quality: float, count: int) -> void:
-	GameState.record_catch(fish, count)  # for the phone's Dex
+func add_catch(fish: FishData, quality: float, count: int, size: float = 1.0) -> void:
+	GameState.record_catch(fish, count, size)  # for the phone's Dex
 	var overflow: Array[InventoryItem] = []
 	for i in count:
-		var item := InventoryItem.new(fish, quality)
+		var item := InventoryItem.new(fish, quality, size)
 		if not hold.auto_place(item):
 			overflow.append(item)
 	if not overflow.is_empty():
