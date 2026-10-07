@@ -48,6 +48,7 @@ var _message_token: int = 0
 ## Regulars coming today (FishOrders.reserve_for_shift).
 var _regular_visits: Array[Dictionary] = []
 var _renovate_button: Button
+var _menu_button: Button
 var _tutorial: RestaurantTutorial
 var _sail_button: Button
 
@@ -73,6 +74,10 @@ func _ready() -> void:
 	_customers.customer_left_angry.connect(func() -> void: _left_angry += 1)
 	_customers.message_requested.connect(_show_message)
 	_next_day_button.pressed.connect(_on_continue_pressed)
+	_menu_button = _pin_button("Chuẩn bị menu", Rect2(416, 26, 108, 20))
+	_menu_button.pressed.connect(func() -> void:
+		_menu_panel.show()
+		_menu_panel.move_to_front())
 	_renovate_button = _pin_button("Sửa quán", Rect2(530, 26, 104, 20))
 	_renovate_button.pressed.connect(_open_renovation)
 	_renovation.finished.connect(_on_renovation_finished)
@@ -86,6 +91,7 @@ func _ready() -> void:
 	_tutorial.kitchen_view = _kitchen_view
 	add_child(_tutorial)
 	_tutorial.tip_requested.connect(func(text: String) -> void: _show_message(text, _tutorial.tip_seconds))
+	_tutorial.on_restaurant_ready.call_deferred()
 	(%RepairButton as RepairButton).repaired.connect(func(spent: int, fully: bool) -> void:
 		_show_message("Đã sửa thuyền: -%dk%s" % [spent, "" if fully else " (chưa đủ tiền sửa hết)"]))
 	_close_early_button.pressed.connect(func() -> void: _end_shift("Đóng quán sớm"))
@@ -105,7 +111,7 @@ func _ready() -> void:
 	_plan.changed.connect(_refresh_storage)
 	_menu_panel.setup(_plan, menu, fish_catalog, variety_multipliers)
 	_menu_panel.confirmed.connect(_open_shop)
-	_menu_panel.show()
+	_menu_panel.hide()  # opened with the pinned "Chuẩn bị menu" button
 	_time_left = get_shift_seconds()
 	_refresh_storage()
 
@@ -124,6 +130,7 @@ func _open_shop() -> void:
 	_shift_running = true
 	_close_early_button.show()
 	_renovate_button.hide()
+	_menu_button.hide()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
 	_rin.active = true
 	_show_message("Quán mở cửa!")
@@ -304,7 +311,8 @@ func _on_renovation_finished(applied: bool) -> void:
 func _set_room_ui_visible(on: bool) -> void:
 	for node: CanvasItem in [$CustomerLayer, $Waiter, $RinWalker, $HUD]:
 		node.visible = on
-	_menu_panel.visible = on and not _shift_running and not _shift_over
+	_menu_panel.visible = false
+	_menu_button.visible = on and not _shift_running and not _shift_over
 	_sail_button.visible = on and _shift_over
 	_renovate_button.visible = on
 

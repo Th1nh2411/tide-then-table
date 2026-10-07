@@ -113,7 +113,7 @@ Vietnamese, keep code comments in short English.
   clean jobs), `RinWalker` (player: A/D + E), `ShelfDisplay`,
   `RestaurantDecor`, `RepairButton`, `RenovationMode` ("Sửa quán": in-place
   renovation of seats/decor/kitchen/fridge with preview, Hủy / Xác nhận);
-  pinned HUD buttons "Sửa quán" (when not serving) and "Ra khơi" (after the
+  pinned HUD buttons "Chuẩn bị menu" + "Sửa quán" (when not serving) and "Ra khơi" (after the
   summary) — no automatic scene changes.
 - Sea gear upgrades (boat, rod, lamp) are bought in the phone's "Nâng cấp"
   tab (`PhoneShop`); restaurant upgrades only via "Sửa quán".

@@ -33,7 +33,7 @@ BẾN
 ĐIỂM GHÉ
   Lại gần chỗ có đèn (miếu, chòi, hải đăng, bè...) bấm E.""",
 	"""CHUẨN BỊ
-  Chọn món và số phần cho menu, rồi bấm "Mở quán".
+  Bấm "Chuẩn bị menu": chọn món và số phần, rồi "Mở quán" ("Đóng" để làm việc khác trước).
   Hết món thì khách chỉ gọi đậu phộng (rẻ). Menu dưới 3 món bị chê đơn điệu.
   Hải sản thừa trả về kho; rau mua chợ thừa thì bỏ.
 

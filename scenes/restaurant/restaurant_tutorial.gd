@@ -21,6 +21,12 @@ func _ready() -> void:
 		_step = Step.WAIT_OPEN
 
 
+## Arrived at the restaurant (menu not prepared yet).
+func on_restaurant_ready() -> void:
+	if _step == Step.WAIT_OPEN:
+		tip_requested.emit("Bấm \"Chuẩn bị menu\" để chọn món bán hôm nay, xong bấm \"Mở quán\".")
+
+
 ## The shop just opened.
 func on_shop_opened() -> void:
 	if _step == Step.WAIT_OPEN:

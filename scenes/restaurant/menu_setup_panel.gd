@@ -3,8 +3,11 @@ extends PanelContainer
 ## Pre-shift menu builder (Dave the Diver style). One row per dish with
 ## +/- portion buttons. Seafood dishes need a free menu slot and enough
 ## ingredients in storage; market dishes (side dishes) need money instead.
+## Opened by the pinned "Chuẩn bị menu" button; "Đóng" hides it (the plan is
+## kept), "Mở quán" opens the shop.
 
 signal confirmed
+signal closed
 
 @export var font_size: int = 10
 @export var swatch_size: Vector2 = Vector2(10, 10)
@@ -40,6 +43,12 @@ func setup(plan: MenuPlan, menu: DishCatalog, fish_catalog: FishCatalog,
 	_auto_button.pressed.connect(func() -> void: _plan.auto_fill(_menu.dishes, GameState.storage))
 	_clear_button.pressed.connect(func() -> void: _plan.clear(GameState.storage))
 	_open_button.pressed.connect(func() -> void: confirmed.emit())
+	var close_button := Button.new()
+	close_button.text = "Đóng"
+	close_button.pressed.connect(func() -> void:
+		hide()
+		closed.emit())
+	_open_button.add_sibling(close_button)
 	_refresh()
 	_open_button.grab_focus()
 
