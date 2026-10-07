@@ -5,11 +5,11 @@ extends MinigameBase
 ## in the zone fills the reel bar; outside, the reel bar slips back and (after
 ## a grace time) the line wears. Full reel = caught. Line at zero = snapped.
 ##
-## The fish has stamina and fights in three phases:
+## The fish fights in three phases and tires as the fight goes on (no
+## stamina bar; the status text tells the phase):
 ##   STRONG -> small, fast zone with sudden dashes (warned by an orange flash)
 ##   FIGHT  -> normal
 ##   TIRED  -> big, slow zone and faster reeling
-## Holding the fish in the zone tires it faster.
 
 enum Phase { STRONG, FIGHT, TIRED }
 
@@ -36,15 +36,10 @@ enum Phase { STRONG, FIGHT, TIRED }
 @export var outside_grace: float = 0.3
 @export var start_progress: float = 0.1
 
-@export_group("Stamina")
-## Stamina lost per second while held in the zone, at difficulty 0 and 1.
-@export var easy_tire_rate: float = 0.16
-@export var hard_tire_rate: float = 0.07
-## Fraction of the in-zone tire rate applied while outside the zone.
-@export var outside_tire_factor: float = 0.3
-## Stamina thresholds: above STRONG_AT = strong, below TIRED_AT = tired.
-@export var strong_at: float = 0.66
-@export var tired_at: float = 0.3
+@export_group("Phases")
+## Fight seconds the fish stays strong / until it is tired, at difficulty 0 and 1.
+@export var strong_seconds: Vector2 = Vector2(2.0, 5.0)
+@export var tired_seconds: Vector2 = Vector2(4.5, 10.0)
 ## Multipliers per phase [STRONG, FIGHT, TIRED].
 @export var phase_zone_scale: Array[float] = [0.8, 1.0, 1.35]
 @export var phase_speed_scale: Array[float] = [1.4, 1.0, 0.55]
@@ -67,12 +62,12 @@ var _zone_target: float = 0.5
 var _base_zone_size: float = 0.3
 var _base_fish_speed: float = 0.3
 var _reel_rate: float = 0.2
-var _tire_rate: float = 0.1
 var _retarget_left: float = 0.0
 var _progress: float = 0.0
 var _durability: float = 1.0
-var _stamina: float = 1.0
 var _outside_time: float = 0.0
+var _strong_until: float = 3.0
+var _tired_from: float = 7.0
 var _ever_left_zone: bool = false
 ## Dash state: >0 counts down the warning, then the dash itself.
 var _dash_cooldown: float = 0.0
@@ -89,11 +84,12 @@ func setup(p_fish: FishData, p_zone_scale: float) -> void:
 	# A better rod also tires the fish out: slower struggling.
 	_base_fish_speed = lerpf(easy_fish_speed, hard_fish_speed, d) / zone_scale
 	_reel_rate = lerpf(easy_reel_rate, hard_reel_rate, d)
-	_tire_rate = lerpf(easy_tire_rate, hard_tire_rate, d)
+	_strong_until = lerpf(strong_seconds.x, strong_seconds.y, d)
+	_tired_from = lerpf(tired_seconds.x, tired_seconds.y, d)
 	_progress = start_progress
 	_needle = _zone_center  # start fair: needle already inside the zone
 	_dash_cooldown = _next_dash_time()
-	custom_minimum_size = Vector2(170, bar_size.y + 20)
+	custom_minimum_size = Vector2(150, bar_size.y + 20)
 
 
 func get_hint() -> String:
@@ -111,9 +107,9 @@ func get_fail_text() -> String:
 
 
 func _phase() -> Phase:
-	if _stamina > strong_at:
+	if _time < _strong_until:
 		return Phase.STRONG
-	if _stamina > tired_at:
+	if _time < _tired_from:
 		return Phase.FIGHT
 	return Phase.TIRED
 
@@ -130,11 +126,9 @@ func _update(delta: float) -> void:
 	if inside:
 		_outside_time = 0.0
 		_progress += _reel_rate * phase_reel_scale[_phase()] * delta
-		_stamina = maxf(_stamina - _tire_rate * delta, 0.0)
 	else:
 		_ever_left_zone = true
 		_outside_time += delta
-		_stamina = maxf(_stamina - _tire_rate * outside_tire_factor * delta, 0.0)
 		if _outside_time > outside_grace:
 			_progress = maxf(_progress - reel_slip_rate * delta, 0.0)
 			_durability -= line_drain * delta
@@ -194,7 +188,7 @@ func _move_fish(delta: float) -> void:
 
 
 func _draw() -> void:
-	var origin := _centered_origin(Vector2(bar_size.x + 86, bar_size.y))
+	var origin := _centered_origin(Vector2(bar_size.x + 60, bar_size.y))
 	var bar := Rect2(origin, bar_size)
 	draw_rect(bar, Color(0.12, 0.12, 0.18))
 	# 0 = bottom of the bar, 1 = top.
@@ -210,7 +204,6 @@ func _draw() -> void:
 
 	_draw_meter(Vector2(origin.x + bar_size.x + 14, origin.y), _progress, _tint(fish.color), "Kéo")
 	_draw_meter(Vector2(origin.x + bar_size.x + 40, origin.y), _durability, Color(1.0, 0.6, 0.2), "Dây")
-	_draw_meter(Vector2(origin.x + bar_size.x + 66, origin.y), _stamina, Color(0.85, 0.3, 0.3), "Sức")
 
 
 ## Vertical meter filling from the bottom, with a small label underneath.
