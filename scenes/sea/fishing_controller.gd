@@ -58,7 +58,7 @@ func _on_spot_fishable_changed(spot: FishingSpot, can_fish: bool) -> void:
 
 
 func _show_spot_prompt(spot: FishingSpot) -> void:
-	hud.show_prompt("E: Câu - %s (còn %d lượt)" % [spot.hint_text(), spot.casts_left])
+	hud.show_prompt("E: Câu · %s · %d lượt" % [spot.hint_text(), spot.casts_left])
 
 
 func _on_fishing_requested(spot: FishingSpot) -> void:

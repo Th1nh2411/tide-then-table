@@ -138,6 +138,12 @@ func add_day_record(record: Dictionary) -> void:
 		day_history.pop_front()
 
 
+## Day 1 = tutorial day: in-game hint texts only show then (the rest is in
+## the Hướng dẫn screen).
+func is_first_day() -> bool:
+	return day == STARTING_DAY
+
+
 func add_money(amount: int) -> void:
 	money += amount
 

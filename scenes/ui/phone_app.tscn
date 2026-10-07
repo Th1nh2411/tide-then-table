@@ -9,6 +9,7 @@
 [ext_resource type="Resource" path="res://data/upgrades/rod_upgrade.tres" id="7_rodup"]
 [ext_resource type="Script" path="res://data/resources/upgrade_data.gd" id="8_updata"]
 [ext_resource type="Script" path="res://scenes/ui/phone_map.gd" id="9_map"]
+[ext_resource type="Script" path="res://scenes/ui/phone_shop.gd" id="14_shop"]
 [ext_resource type="Resource" path="res://data/weather/weather_catalog.tres" id="10_weather"]
 [ext_resource type="Resource" path="res://data/upgrades/seats_upgrade.tres" id="11_seatsup"]
 [ext_resource type="Resource" path="res://data/upgrades/decor_upgrade.tres" id="12_decorup"]
@@ -105,6 +106,13 @@ layout_mode = 2
 size_flags_vertical = 3
 script = ExtResource("9_map")
 
+[node name="Shop" type="ScrollContainer" parent="Phone/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("14_shop")
+
 [node name="LogLabel" type="Label" parent="Phone/Margin/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
@@ -118,5 +126,5 @@ autowrap_mode = 3
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 1)
 theme_override_font_sizes/font_size = 8
-text = "J / Esc: đóng    A / D: đổi tab    // TODO: làm đẹp UI sau"
+text = "J / Esc: đóng    A / D: đổi tab"
 horizontal_alignment = 1

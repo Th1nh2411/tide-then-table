@@ -27,6 +27,7 @@ var _rows: Dictionary = {}
 
 func setup(plan: MenuPlan, menu: DishCatalog, fish_catalog: FishCatalog,
 		variety_table: Array[float]) -> void:
+	$Margin/VBox/HintLabel.visible = GameState.is_first_day()
 	_plan = plan
 	_menu = menu
 	_variety_table = variety_table

@@ -32,6 +32,7 @@ var _shelf_box: VBoxContainer
 var _trash_button: Button
 var _carry_button: Button
 var _message_label: Label
+var _hint: Label
 
 
 func _ready() -> void:
@@ -45,6 +46,7 @@ func open(plan: MenuPlan) -> void:
 	_plan = plan
 	_selected = null
 	_signature = ""
+	_hint.visible = GameState.is_first_day()
 	show()
 
 
@@ -237,14 +239,14 @@ func _build() -> void:
 
 	var left := VBoxContainer.new()
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	left.add_child(_label("BÀN SƠ CHẾ (bấm để nấu)", 10, Color(0.7, 0.9, 1.0)))
+	left.add_child(_label("BÀN SƠ CHẾ", 10, Color(0.7, 0.9, 1.0)))
 	_trays_box = VBoxContainer.new()
 	left.add_child(_trays_box)
 	columns.add_child(left)
 
 	var right := VBoxContainer.new()
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right.add_child(_label("KỆ BẾP (Bảo tự bưng theo thứ tự khách)", 10, Color(0.7, 0.9, 1.0)))
+	right.add_child(_label("KỆ BẾP", 10, Color(0.7, 0.9, 1.0)))
 	_shelf_box = VBoxContainer.new()
 	right.add_child(_shelf_box)
 	var actions := HBoxContainer.new()
@@ -259,8 +261,9 @@ func _build() -> void:
 
 	_message_label = _label("", 9, Color(1.0, 0.6, 0.5))
 	box.add_child(_message_label)
-	box.add_child(_label("Phím số / click khay để nấu · chọn món trên kệ rồi vứt hoặc cầm ra · E / Esc: ra khỏi bếp (thời gian vẫn chạy)",
-		8, Color(0.6, 0.65, 0.7)))
+	_hint = _label("Phím số / click khay để nấu · chọn món trên kệ rồi vứt hoặc cầm ra · E / Esc: ra khỏi bếp",
+		8, Color(0.6, 0.65, 0.7))
+	box.add_child(_hint)
 
 
 func _label(text: String, size: int, color: Color) -> Label:

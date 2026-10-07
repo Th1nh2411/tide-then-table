@@ -9,8 +9,9 @@ extends Control
 ## a table too.
 ## Once the menu sells out, customers can only order snacks (peanuts), so a
 ## poorly prepared menu earns little. A menu with few dishes lowers all prices.
-## After the summary (with a 1-5 star rating) comes the upgrade shop, then
-## the next day starts at sea (storage loses freshness overnight).
+## After the summary (1-5 stars) nothing moves on by itself: pinned buttons
+## let the player buy upgrades (phone "Nâng cấp" tab) whenever the shop isn't
+## serving, and "Ra khơi" starts the next night (storage loses freshness).
 ## Regulars with a fish order: their fish is set aside before menu planning
 ## and they come in during the shift (CustomerManager); unserved fish go back
 ## to storage and overdue orders are cancelled at closing.
@@ -46,6 +47,9 @@ var _left_angry: int = 0
 var _message_token: int = 0
 ## Regulars coming today (FishOrders.reserve_for_shift).
 var _regular_visits: Array[Dictionary] = []
+var _upgrade_button: Button
+var _tutorial: RestaurantTutorial
+var _sail_button: Button
 
 @onready var _customers: CustomerManager = $CustomerManager
 @onready var _menu_panel: MenuSetupPanel = %MenuSetupPanel
@@ -56,7 +60,7 @@ var _regular_visits: Array[Dictionary] = []
 @onready var _summary_label: Label = %SummaryLabel
 @onready var _next_day_button: Button = %NextDayButton
 @onready var _close_early_button: Button = %CloseEarlyButton
-@onready var _shop: UpgradeShop = %UpgradeShop
+@onready var _phone: PhoneApp = $PhoneApp
 @onready var _rin: RinWalker = $RinWalker
 @onready var _kitchen_view: KitchenView = $KitchenView
 
@@ -68,7 +72,16 @@ func _ready() -> void:
 	_customers.customer_left_angry.connect(func() -> void: _left_angry += 1)
 	_customers.message_requested.connect(_show_message)
 	_next_day_button.pressed.connect(_on_continue_pressed)
-	_shop.finished.connect(_start_next_day)
+	_upgrade_button = _pin_button("Nâng cấp", Rect2(530, 26, 104, 20))
+	_upgrade_button.pressed.connect(func() -> void: _phone.open_tab(PhoneApp.SHOP_TAB))
+	_sail_button = _pin_button("Ra khơi  →", Rect2(520, 318, 114, 32))
+	_sail_button.pressed.connect(_start_next_day)
+	_sail_button.hide()
+	_tutorial = RestaurantTutorial.new()
+	_tutorial.customers = _customers
+	_tutorial.kitchen_view = _kitchen_view
+	add_child(_tutorial)
+	_tutorial.tip_requested.connect(func(text: String) -> void: _show_message(text, _tutorial.tip_seconds))
 	(%RepairButton as RepairButton).repaired.connect(func(spent: int, fully: bool) -> void:
 		_show_message("Đã sửa thuyền: -%dk%s" % [spent, "" if fully else " (chưa đủ tiền sửa hết)"]))
 	_close_early_button.pressed.connect(func() -> void: _end_shift("Đóng quán sớm"))
@@ -106,12 +119,11 @@ func _open_shop() -> void:
 	_variety_multiplier = MenuPlan.variety_multiplier(_variety_count, variety_multipliers)
 	_shift_running = true
 	_close_early_button.show()
+	_upgrade_button.hide()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
 	_rin.active = true
-	if GameState.day == 1:
-		_show_message("A/D: đi · E ở cửa BẾP: vào nấu món khách gọi · Bảo tự bưng và dọn bàn · E ở bàn bẩn: dọn", 6.0)
-	else:
-		_show_message("Quán mở cửa!")
+	_show_message("Quán mở cửa!")
+	_tutorial.on_shop_opened()
 	_refresh_storage()
 
 
@@ -262,9 +274,23 @@ func _rating_hint(stars: int) -> String:
 	return ""
 
 
+## Summary closed: the evening is free — upgrade, repair, then sail.
 func _on_continue_pressed() -> void:
 	_summary_panel.hide()
-	_shop.open()
+	_upgrade_button.show()
+	_sail_button.show()
+	_tutorial.on_evening()
+
+
+func _pin_button(text: String, rect: Rect2) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.position = rect.position
+	button.size = rect.size
+	button.focus_mode = Control.FOCUS_NONE
+	button.add_theme_font_size_override("font_size", 10)
+	$HUD.add_child(button)
+	return button
 
 
 func _start_next_day() -> void:

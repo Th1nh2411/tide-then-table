@@ -104,8 +104,8 @@ func _refresh_texts() -> void:
 	_title_label.text = "Khoang thuyền (%dx%d)" % [_view.hold.size.x, _view.hold.size.y] if _view.hold else "Khoang thuyền"
 	if _view.pending:
 		var waiting := " (còn %d con chờ)" % _queue.size() if not _queue.is_empty() else ""
-		_hint_label.text = "Khoang đầy! Kéo cá mới vào khoang, xoay (R) hoặc bỏ bớt cá cũ.%s" % waiting
+		_hint_label.text = "Khoang đầy!%s" % waiting
 		_close_button.text = "Bỏ cá mới & đóng"
 	else:
-		_hint_label.text = "Kéo-thả để xếp · R: xoay khi đang kéo · thả vào \"Bỏ\" để vứt · Tab: đóng"
+		_hint_label.text = "Kéo-thả để xếp · R: xoay · thả vào \"Bỏ\" để vứt" if GameState.is_first_day() else ""
 		_close_button.text = "Đóng"

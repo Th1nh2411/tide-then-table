@@ -27,6 +27,10 @@ Vietnamese, keep code comments in short English.
   `PhoneReports`, `CatchRoll`, `FishOrders`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
 - Vietnamese for all player-facing text. Money is shown as "70k".
+- Keep on-screen text short. How-to / control hints only show on day 1
+  (`GameState.is_first_day()`, `TutorialHints` at sea, `RestaurantTutorial`);
+  the full guide is the `HelpPanel` ("Hướng dẫn", from the pause menu and the
+  main menu) — add new controls there, not as permanent HUD text.
 - Place names are invented (Xóm Đèn, dải đảo Ngủ Quên, Gò Vỏ Ốc, Đá Canh
   Đêm, Miếu Cá Ông). Never use or echo real place names in game text or docs.
 
@@ -107,7 +111,9 @@ Vietnamese, keep code comments in short English.
   at the kitchen door: trays → `CookingOverlay` → shelf, bin, carry out;
   must sit after `PauseMenu` so it gets Esc first), `Waiter` "Bảo" (carry /
   clean jobs), `RinWalker` (player: A/D + E), `ShelfDisplay`,
-  `RestaurantDecor`, `UpgradeShop`, `RepairButton`.
+  `RestaurantDecor`, `RepairButton`; pinned HUD buttons "Nâng cấp" (when not
+  serving) and "Ra khơi" (after the summary) — no automatic scene changes.
+- Upgrades are bought only in the phone's "Nâng cấp" tab (`PhoneShop`).
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and
   restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is
   an IT graduate whose failed startup (with friend Bảo, now the restaurant's

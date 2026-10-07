@@ -65,14 +65,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var seat := _nearest_table()
 	if seat == -1:
-		message_requested.emit("Tới gần bàn hoặc cửa bếp rồi bấm E")
+		return
 	elif carried:
 		serve_requested.emit(seat)
 	elif tables.states[seat] == DiningTables.State.DIRTY:
 		_cleaning_seat = seat
 		_cleaning_left = clean_seconds
-	else:
-		message_requested.emit("Vào bếp (cửa bên trái) lấy món trên kệ để bưng ra")
 
 
 func _nearest_table() -> int:
@@ -98,6 +96,6 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	draw_string(font, at + Vector2(0, -18 if carried else -10), "Rin", HORIZONTAL_ALIGNMENT_LEFT, -1, 8,
 		Color(1, 1, 1, 0.8))
-	if active and is_at_door() and not carried:
+	if active and is_at_door() and not carried and GameState.is_first_day():
 		draw_string(font, at + Vector2(-14, -28), "[E] Vào bếp", HORIZONTAL_ALIGNMENT_LEFT, -1, 8,
 			Color(1, 0.9, 0.5))

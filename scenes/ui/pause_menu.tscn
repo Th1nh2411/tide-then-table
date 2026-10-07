@@ -67,19 +67,6 @@ custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.6, 1)
 theme_override_font_sizes/font_size = 9
-text = "Game tự lưu lúc ra khơi và lúc cập bến về."
+text = "Tự lưu khi ra khơi và khi về bến."
 horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="Controls" type="Label" parent="Panel/Margin/VBox"]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
-theme_override_font_sizes/font_size = 9
-text = "Phím điều khiển
-WASD / mũi tên: lái thuyền
-E: câu · cập bến · kéo lưới      Q: thả lưới ốc
-Tab: mở khoang      R: xoay cá (khi đang kéo)
-F: sửa thuyền (ở bến)      J: điện thoại      Esc: tạm dừng
-Space / chuột trái: thao tác trong minigame"
 autowrap_mode = 3

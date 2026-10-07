@@ -32,4 +32,4 @@ func _on_catch(_fish: FishData, _quality: float, _count: int, _size: float) -> v
 func _on_oil_low() -> void:
 	if _step != Step.DONE and _step != Step.GO_HOME:
 		_step = Step.GO_HOME
-		hud.show_tip("Dầu sắp cạn, trời sắp sáng. Theo mũi tên \"Bến\" về cập bến (E) trước khi tắt đèn.")
+		hud.show_tip("Dầu sắp cạn, trời sắp sáng. Theo mũi tên \"Bến\" về bến rồi bấm nút \"Về nhà ngủ\" trước khi tắt đèn.")

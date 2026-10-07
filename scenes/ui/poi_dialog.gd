@@ -15,6 +15,7 @@ var _option_count: int = 0
 var _title: Label
 var _body: Label
 var _options: VBoxContainer
+var _hint: Label
 
 
 func _ready() -> void:
@@ -43,6 +44,7 @@ func ask(title: String, body: String, options: PackedStringArray) -> int:
 		button.pressed.connect(_answered.emit.bind(i))
 		_options.add_child(button)
 	_option_count = options.size()
+	_hint.visible = GameState.is_first_day()
 	_opened_pause = not get_tree().paused
 	get_tree().paused = true
 	show()
@@ -94,8 +96,8 @@ func _build() -> void:
 	box.add_child(_body)
 	_options = VBoxContainer.new()
 	box.add_child(_options)
-	var hint := Label.new()
-	hint.text = "Phím số / click để chọn · E / Esc: đi tiếp"
-	hint.add_theme_color_override("font_color", Color(0.6, 0.65, 0.7))
-	hint.add_theme_font_size_override("font_size", 8)
-	box.add_child(hint)
+	_hint = Label.new()
+	_hint.text = "Phím số / click để chọn · E / Esc: đi tiếp"
+	_hint.add_theme_color_override("font_color", Color(0.6, 0.65, 0.7))
+	_hint.add_theme_font_size_override("font_size", 8)
+	box.add_child(_hint)

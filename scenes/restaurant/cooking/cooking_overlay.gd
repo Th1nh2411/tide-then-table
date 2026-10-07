@@ -48,6 +48,7 @@ func start(dish: DishData) -> void:
 	_game_holder.add_child(_game)
 	_title_label.text = "Nấu: %s" % dish.display_name
 	_hint_label.text = _game.get_hint()
+	_hint_label.visible = GameState.is_first_day()
 	_result_label.text = ""
 	show()
 

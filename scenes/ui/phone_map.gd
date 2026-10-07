@@ -114,7 +114,7 @@ func _draw() -> void:
 	for i in GameState.map_pins.size():
 		_draw_pin(font, GameState.map_pins[i], i + 1)
 	_draw_boat()
-	var hint := "Click: ghim / bỏ ghim (%d/%d)" % [GameState.map_pins.size(), GameState.MAX_PINS]
+	var hint := "Ghim %d/%d" % [GameState.map_pins.size(), GameState.MAX_PINS]
 	draw_string(font, Vector2(4, size.y - 4), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(0.6, 0.65, 0.7))
 
 

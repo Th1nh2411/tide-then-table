@@ -17,6 +17,12 @@ func _ready() -> void:
 	_continue_button.pressed.connect(_on_continue_pressed)
 	_new_game_button.pressed.connect(_on_new_game_pressed)
 	_quit_button.pressed.connect(_on_quit_pressed)
+	var help := HelpPanel.new()
+	add_child(help)
+	var help_button := Button.new()
+	help_button.text = "Hướng dẫn"
+	help_button.pressed.connect(help.open)
+	_new_game_button.add_sibling(help_button)
 	_status_label.text = ""
 	_continue_button.visible = SaveSystem.has_save()
 	if _continue_button.visible:

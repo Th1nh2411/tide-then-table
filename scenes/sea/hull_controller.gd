@@ -42,11 +42,11 @@ func is_at_dock() -> bool:
 	return _at_dock
 
 
-## Extra text for the dock prompt, e.g. " · F: Sửa thuyền (40k)".
+## Dock prompt when the hull is damaged, e.g. "F: Sửa thuyền (40k)".
 func repair_prompt() -> String:
 	if not BoatCondition.is_damaged():
 		return ""
-	return " · F: Sửa thuyền (%dk)" % BoatCondition.full_repair_cost(boat.boat_data)
+	return "F: Sửa thuyền (%dk)" % BoatCondition.full_repair_cost(boat.boat_data)
 
 
 func _unhandled_input(event: InputEvent) -> void:

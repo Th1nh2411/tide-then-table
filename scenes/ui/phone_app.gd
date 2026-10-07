@@ -3,20 +3,21 @@ extends CanvasLayer
 ## Rin's phone with "Rin's Catch", the app left over from the startup Rin
 ## and Bảo built (Rin is an IT graduate). `open_phone` (J) toggles it anywhere at sea or in the restaurant;
 ## the game pauses while it's open. Tabs: storage, menu, orders, map (PhoneMap),
-## dex, boat, ledger,
+## dex, boat, ledger, upgrades (PhoneShop, the only place to buy upgrades),
 ## plus a console log where story clues appear. Content comes from PhoneReports.
 ## Put it LAST in the scene tree so it gets J/Esc before other overlays.
 
 const APP_TITLE: String = "Rin's Catch v0.3.1"
-const TAB_NAMES: Array[String] = ["Kho", "Menu", "Đơn", "Bản đồ", "Dex", "Thuyền", "Sổ sách"]
+const TAB_NAMES: Array[String] = ["Kho", "Menu", "Đơn", "Bản đồ", "Dex", "Thuyền", "Sổ sách", "Nâng cấp"]
 const MAP_TAB: int = 3
+const SHOP_TAB: int = 7
 
 @export var fish_catalog: FishCatalog
 @export var menu: DishCatalog
 @export var boat_upgrade: UpgradeData
 @export var lamp_upgrade: UpgradeData
 @export var fridge_upgrade: UpgradeData
-## Upgrades listed in the boat tab.
+## Upgrades listed in the boat tab and sold in the upgrades tab.
 @export var upgrades: Array[UpgradeData] = []
 @export var font_size: int = 9
 ## For the forecast log line.
@@ -32,6 +33,7 @@ var _mono: SystemFont
 @onready var _content_label: Label = %ContentLabel
 @onready var _scroll: ScrollContainer = %Scroll
 @onready var _map: PhoneMap = %Map
+@onready var _shop: PhoneShop = %Shop
 @onready var _log_label: Label = %LogLabel
 
 
@@ -51,6 +53,7 @@ func _ready() -> void:
 		button.pressed.connect(_show_tab.bind(i))
 		_tabs_row.add_child(button)
 		_tab_buttons.append(button)
+	_shop.setup(upgrades)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -74,8 +77,18 @@ func _unhandled_input(event: InputEvent) -> void:
 func open() -> void:
 	_opened_pause = not get_tree().paused
 	get_tree().paused = true
+	$Phone/Margin/VBox/Hint.visible = GameState.is_first_day()
 	show()
 	_show_tab(_tab)
+
+
+## Opens straight on a tab (e.g. the upgrades button in the restaurant).
+func open_tab(index: int) -> void:
+	_tab = index
+	if visible:
+		_show_tab(index)
+	elif not get_tree().paused:
+		open()
 
 
 func close() -> void:
@@ -91,7 +104,10 @@ func _show_tab(index: int) -> void:
 		_tab_buttons[i].button_pressed = i == index
 	_title_label.text = "%s   %s" % [APP_TITLE, DayClock.get_time_text()]
 	_map.visible = index == MAP_TAB
-	_scroll.visible = index != MAP_TAB
+	_shop.visible = index == SHOP_TAB
+	_scroll.visible = index != MAP_TAB and index != SHOP_TAB
+	if index == SHOP_TAB:
+		_shop.refresh()
 	_content_label.text = _tab_text(index)
 	var weather: WeatherData = weather_catalog.find(GameState.weather_id) if weather_catalog else null
 	_log_label.text = "\n".join(PhoneReports.log_lines(_fridge_loss(), weather))
@@ -105,7 +121,7 @@ func _tab_text(index: int) -> String:
 			return PhoneReports.menu_report(menu, _fish_names())
 		2:
 			return PhoneReports.orders_report(fish_catalog)
-		MAP_TAB:
+		MAP_TAB, SHOP_TAB:
 			return ""
 		4:
 			# Seed changes with the day so the glitch "moves" between visits.

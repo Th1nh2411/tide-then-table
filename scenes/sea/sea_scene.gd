@@ -35,7 +35,6 @@ var _day_ended: bool = false
 @onready var _oil: LampOil = $LampOil
 @onready var _range: BoatRange = $BoatRange
 @onready var _events: NightEvents = $NightEvents
-@onready var _dock_dialog: PoiDialog = $PoiDialog
 @onready var _debug_label: Label = %DebugLabel
 
 
@@ -54,6 +53,8 @@ func _ready() -> void:
 	_hull.boat_broken.connect(_on_boat_broken)
 	_dock.boat_exited.connect(_on_dock_exited)
 	_dock.docking_requested.connect(_on_docking_requested)
+	_hud.unload_pressed.connect(_unload_at_dock)
+	_hud.go_home_pressed.connect(_go_home)
 	_nets.nets_changed.connect(_hud.set_nets)
 	_fishing.fish_caught.connect(_on_fish_caught)
 	_fog.whirlpool_entered.connect(_on_whirlpool_entered)
@@ -136,24 +137,25 @@ func _on_whirlpool_entered(_whirlpool: Whirlpool) -> void:
 	SceneRouter.go_to(ENDING_SCENE_PATH, Color.WHITE)
 
 
-## At the dock: unload the hold and keep fishing, or go home to sleep.
+## E at the dock = unload (same as the pinned button).
 func _on_docking_requested() -> void:
-	if _day_ended or _dock_dialog.is_open():
-		return
+	_unload_at_dock()
+
+
+## Dock button: the catch goes to storage, the night goes on.
+func _unload_at_dock() -> void:
 	var count := _hold_manager.get_items().size()
-	var unload := "Dỡ %d con vào kho rồi đi câu tiếp" % count if count > 0 else "Dỡ cá vào kho (khoang đang trống)"
-	var home := "Về nhà ngủ (hết đêm)"
-	if _nets.nets_out() > 0:
-		home += " — bỏ lại %d lưới ngoài biển" % _nets.nets_out()
-	var choice := await _dock_dialog.ask("Bến Xóm Đèn", "Dầu không cháy khi đậu ở bến. Đêm còn tới lúc dầu cạn.",
-		PackedStringArray([unload, home, "Ở lại"]))
-	match choice:
-		0:
-			if count > 0:
-				GameState.unload_catch(_hold_manager.take_all())
-				_hud.flash_message("Đã dỡ %d con vào kho. Ra khơi tiếp thôi!" % count, 2.0)
-		1:
-			_end_sea_day(false)
+	if _day_ended or count == 0:
+		return
+	GameState.unload_catch(_hold_manager.take_all())
+	_hud.flash_message("Đã dỡ %d con vào kho. Ra khơi tiếp thôi!" % count, 2.0)
+	_refresh_dock_prompt()
+
+
+## Dock button: the night ends here (nets still out are lost).
+func _go_home() -> void:
+	if not _day_ended and _hull.is_at_dock():
+		_end_sea_day(false)
 
 
 func _on_dock_entered() -> void:
@@ -164,11 +166,17 @@ func _on_dock_entered() -> void:
 func _on_dock_exited() -> void:
 	_hull.set_at_dock(false)
 	_hud.hide_prompt()
+	_hud.hide_dock()
 
 
 func _refresh_dock_prompt() -> void:
 	if _hull.is_at_dock() and not _day_ended:
-		_hud.show_prompt("E: Bến (dỡ cá / về ngủ)" + _hull.repair_prompt())
+		var repair := _hull.repair_prompt()
+		if repair:
+			_hud.show_prompt(repair)
+		else:
+			_hud.hide_prompt()
+		_hud.show_dock(_hold_manager.get_items().size(), _nets.nets_out())
 
 
 func _on_boat_broken() -> void:

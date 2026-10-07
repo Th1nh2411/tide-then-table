@@ -7,7 +7,6 @@
 [ext_resource type="PackedScene" path="res://scenes/restaurant/cooking/cooking_overlay.tscn" id="5_cooking"]
 [ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="6_fish"]
 [ext_resource type="Script" path="res://scenes/restaurant/menu_setup_panel.gd" id="7_menupanel"]
-[ext_resource type="Script" path="res://scenes/ui/upgrade_shop.gd" id="8_shop"]
 [ext_resource type="Resource" path="res://data/upgrades/boat_upgrade.tres" id="9_boatup"]
 [ext_resource type="Resource" path="res://data/upgrades/rod_upgrade.tres" id="10_rodup"]
 [ext_resource type="Resource" path="res://data/upgrades/fridge_upgrade.tres" id="11_fridgeup"]
@@ -277,7 +276,7 @@ horizontal_alignment = 1
 [node name="NextDayButton" type="Button" parent="SummaryPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Tiếp tục"
+text = "Đóng"
 
 [node name="MenuSetupPanel" type="PanelContainer" parent="."]
 unique_name_in_owner = true
@@ -340,53 +339,6 @@ text = "Xóa hết"
 unique_name_in_owner = true
 layout_mode = 2
 text = "Mở quán"
-
-[node name="UpgradeShop" type="PanelContainer" parent="."]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("8_shop")
-upgrades = Array[ExtResource("12_updata")]([ExtResource("9_boatup"), ExtResource("10_rodup"), ExtResource("15_lampup"), ExtResource("11_fridgeup"), ExtResource("17_seatsup"), ExtResource("18_decorup"), ExtResource("19_kitchenup")])
-
-[node name="Margin" type="MarginContainer" parent="UpgradeShop"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 8
-
-[node name="VBox" type="VBoxContainer" parent="UpgradeShop/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="ShopTitle" type="Label" parent="UpgradeShop/Margin/VBox"]
-layout_mode = 2
-text = "Nâng cấp"
-horizontal_alignment = 1
-
-[node name="ShopMoneyLabel" type="Label" parent="UpgradeShop/Margin/VBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 10
-text = "Tiền"
-horizontal_alignment = 1
-
-[node name="ShopRows" type="VBoxContainer" parent="UpgradeShop/Margin/VBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="ShopDoneButton" type="Button" parent="UpgradeShop/Margin/VBox"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Ra khơi đêm mới"
 
 [node name="CustomerManager" type="Node" parent="." node_paths=PackedStringArray("tables", "waiter", "customer_layer")]
 script = ExtResource("2_mgr")

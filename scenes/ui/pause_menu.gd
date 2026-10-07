@@ -1,7 +1,7 @@
 class_name PauseMenu
 extends CanvasLayer
-## Esc menu for the sea and the restaurant: resume / main menu / quit, plus a
-## controls cheat sheet. Runs while paused (PROCESS_MODE_ALWAYS in the scene).
+## Esc menu for the sea and the restaurant: resume / Hướng dẫn (HelpPanel)
+## / main menu / quit. Runs while paused (PROCESS_MODE_ALWAYS in the scene).
 ## Put it BEFORE other overlays in the tree: later nodes get input first, so
 ## e.g. the hold window can use Esc to close itself before this opens.
 
@@ -14,12 +14,21 @@ var _confirm_menu: bool = false
 @onready var _quit_button: Button = %QuitButton
 @onready var _note_label: Label = %NoteLabel
 
+var _help: HelpPanel
+
 
 func _ready() -> void:
 	hide()
 	_resume_button.pressed.connect(_resume)
 	_menu_button.pressed.connect(_on_menu_pressed)
 	_quit_button.pressed.connect(func() -> void: get_tree().quit())
+	_help = HelpPanel.new()
+	add_child(_help)
+	_help.closed.connect(_resume_button.grab_focus)
+	var help_button := Button.new()
+	help_button.text = "Hướng dẫn"
+	help_button.pressed.connect(_help.open)
+	_resume_button.add_sibling(help_button)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -37,7 +46,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _open() -> void:
 	_confirm_menu = false
 	_menu_button.text = "Về menu chính"
-	_note_label.text = "Game tự lưu lúc ra khơi và lúc cập bến về."
+	_note_label.text = "Tự lưu khi ra khơi và khi về bến."
 	get_tree().paused = true
 	show()
 	_resume_button.grab_focus()
