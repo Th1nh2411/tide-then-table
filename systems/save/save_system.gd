@@ -70,6 +70,7 @@ static func to_dict() -> Dictionary:
 		"best_sizes": GameState.best_sizes.duplicate(),
 		"day_history": GameState.day_history.duplicate(true),
 		"orders": GameState.orders.duplicate(true),
+		"map_pins": GameState.map_pins.map(func(pin: Vector2) -> Array: return [pin.x, pin.y]),
 	}
 
 
@@ -121,11 +122,22 @@ static func apply_dict(data: Dictionary) -> void:
 			if not order.is_empty():
 				GameState.orders.append(order)
 
+	var pins: Variant = data.get("map_pins")
+	if pins is Array:
+		for entry: Variant in pins:
+			if entry is Array and entry.size() == 2 and _is_number(entry[0]) and _is_number(entry[1]) \
+					and GameState.map_pins.size() < GameState.MAX_PINS:
+				GameState.map_pins.append(Vector2(float(entry[0]), float(entry[1])))
+
 	var flags: Variant = data.get("story_flags")
 	if flags is Dictionary:
 		for flag_name: Variant in flags:
 			if flag_name is String:
 				GameState.story_flags[flag_name] = flags[flag_name]
+
+
+static func _is_number(value: Variant) -> bool:
+	return value is int or value is float
 
 
 ## JSON numbers come back as floats; accept int or float, else the fallback.

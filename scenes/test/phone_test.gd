@@ -45,7 +45,15 @@ func _ready() -> void:
 	_check("open pauses game", get_tree().paused and _phone.visible)
 	for tab in PhoneApp.TAB_NAMES.size():
 		_phone._show_tab(tab)
-		_check("tab %d has content" % tab, _phone.get_node("%ContentLabel").text.length() > 10)
+		if tab == PhoneApp.MAP_TAB:
+			_check("map tab shows map", _phone.get_node("%Map").visible and not _phone.get_node("%Scroll").visible)
+		else:
+			_check("tab %d has content" % tab, _phone.get_node("%ContentLabel").text.length() > 10)
+	_check("pin added", PhoneMap.toggle_pin(Vector2(100, 100), 20.0) and GameState.map_pins.size() == 1)
+	_check("pin removed near it", not PhoneMap.toggle_pin(Vector2(110, 105), 20.0) and GameState.map_pins.is_empty())
+	for i in GameState.MAX_PINS + 2:
+		PhoneMap.toggle_pin(Vector2(i * 100, 0), 20.0)
+	_check("pins capped", GameState.map_pins.size() == GameState.MAX_PINS)
 	_phone.close()
 	_check("close unpauses", not get_tree().paused and not _phone.visible)
 	print("PhoneReports: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))

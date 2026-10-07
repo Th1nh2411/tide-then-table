@@ -27,6 +27,8 @@ Vietnamese, keep code comments in short English.
   `PhoneReports`, `CatchRoll`, `FishOrders`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
 - Vietnamese for all player-facing text. Money is shown as "70k".
+- Place names are invented (Xóm Đèn, dải đảo Ngủ Quên, Gò Vỏ Ốc, Đá Canh
+  Đêm, Miếu Cá Ông). Never use or echo real place names in game text or docs.
 
 ## Testing
 - Run everything: `tools/run_tests.sh` (imports, runs `scenes/test/*_test.tscn`,
@@ -83,6 +85,9 @@ Vietnamese, keep code comments in short English.
   `PointOfInterest` (own lamp, E to visit, `_interact()` awaits
   `PoiDialog.ask()`): `WhaleShrine`, `OldManHut`, `Lighthouse`, `LobsterRaft`.
   Lines follow `Story.stage()`. `PoiDialog` sits before `PhoneApp`.
+- Phone map (`PhoneMap`, tab "Bản đồ"): static snapshot captured by the sea
+  scene (`_capture_map`), live boat (group "boat") + nets; pins in
+  `GameState.map_pins` (saved, also edge markers at sea).
 - Fish orders (`FishOrders`, `GameState.orders`): rolled when the next day
   starts (restaurant), shown on the sea HUD + phone tab, delivered/expired
   on the rest card.

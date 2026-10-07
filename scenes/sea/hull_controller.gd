@@ -19,7 +19,7 @@ signal hull_changed
 @export var min_speed_factor: float = 0.6
 @export var warn_below_hp: float = 30.0
 
-## Damage multiplier for tonight (the Lăng Ông blessing lowers it).
+## Damage multiplier for tonight (the Miếu Cá Ông blessing lowers it).
 var damage_scale: float = 1.0
 
 var _at_dock: bool = false

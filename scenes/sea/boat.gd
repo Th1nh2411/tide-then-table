@@ -43,6 +43,7 @@ var _spin: float = 0.0
 
 
 func _ready() -> void:
+	add_to_group("boat")  # the phone map finds the boat through this
 	if boat_data:
 		apply_boat_data(boat_data)
 

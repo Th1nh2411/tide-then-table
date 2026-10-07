@@ -1,6 +1,6 @@
 class_name Lighthouse
 extends PointOfInterest
-## Hải đăng Hòn Khô: a sweeping beam (a light circling the tower) and the old
+## Hải đăng Đá Canh Đêm: a sweeping beam (a light circling the tower) and the old
 ## keeper's logbook. Each visit reads the next page; later pages unlock with
 ## the story (they point at the fog). Pages read are saved in story_flags.
 
@@ -14,7 +14,7 @@ const PAGE_FLAG: String = "lighthouse_pages_read"
 @export var beam_turns_per_second: float = 0.12
 @export var beam_color: Color = Color(1.0, 0.95, 0.8)
 @export_multiline var pages: Array[String] = [
-	"Ngày 3 tháng 4. Đêm lặng. Đếm được mười hai ngọn đèn thuyền chài dưới Cửa Đại.",
+	"Ngày 3 tháng 4. Đêm lặng. Đếm được mười hai ngọn đèn thuyền chài dưới Xóm Đèn.",
 	"Ngày 9 tháng 4. Phía đông bắc có một vùng nước không phản chiếu đèn hải đăng. Như mặt biển bị khoét một lỗ.",
 	"Ngày 17 tháng 4. La bàn quay ngược. Có con cá thu phát sáng xanh nổi lên rồi chìm thẳng xuống, không bơi.",
 	"Ngày 18 tháng 4. Sương phủ góc đông bắc. Dưới sương có tiếng thở dài như cá Ông. Tôi sẽ chèo ra xem. Ai đọc được thì...",

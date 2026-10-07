@@ -50,6 +50,9 @@ var caught_species: Dictionary = {}
 var best_sizes: Dictionary = {}
 ## One Dictionary per finished shift: day, earned, market, rating, served, left.
 var day_history: Array = []
+## Player's map pins (world positions), see PhoneMap.
+var map_pins: Array[Vector2] = []
+const MAX_PINS: int = 5
 ## Active fish orders from regulars (see FishOrders).
 var orders: Array = []
 ## History entries kept (older ones are dropped).
@@ -73,6 +76,7 @@ func reset() -> void:
 	best_sizes.clear()
 	day_history.clear()
 	orders.clear()
+	map_pins.clear()
 
 
 ## Called when the night trip ends: records the return and moves the catch into storage.

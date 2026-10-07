@@ -1,8 +1,8 @@
 class_name OffscreenMarkers
 extends Control
 ## Arrows on the screen edge pointing at important things that are off
-## camera: the dock, the player's nets (group "net_buoys") and, once the fog
-## is open, the whirlpool. Shows the distance in "m" (10 px = 1 m).
+## camera: the dock, the player's nets (group "net_buoys"), map pins set on
+## the phone (GameState.map_pins) and, once the fog is open, the whirlpool. Shows the distance in "m" (10 px = 1 m).
 
 @export var dock: Node2D
 @export var fog_area: FogArea
@@ -12,6 +12,7 @@ extends Control
 @export var dock_color: Color = Color(1.0, 0.9, 0.4)
 @export var net_color: Color = Color(1.0, 0.55, 0.2)
 @export var fog_color: Color = Color(0.4, 1.0, 0.9)
+@export var pin_color: Color = Color(1.0, 0.4, 0.9)
 @export var pixels_per_meter: float = 10.0
 
 
@@ -28,6 +29,8 @@ func _draw() -> void:
 	_draw_marker(dock.global_position, "Bến", dock_color)
 	for buoy: Node2D in get_tree().get_nodes_in_group("net_buoys"):
 		_draw_marker(buoy.global_position, "Lưới", net_color)
+	for i in GameState.map_pins.size():
+		_draw_marker(GameState.map_pins[i], "Ghim %d" % (i + 1), pin_color)
 	if fog_area.visible:
 		_draw_marker(fog_area.get_whirlpool_position(), "???", fog_color)
 

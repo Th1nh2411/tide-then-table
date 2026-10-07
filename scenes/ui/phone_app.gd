@@ -2,12 +2,14 @@ class_name PhoneApp
 extends CanvasLayer
 ## Rin's phone with "Rin's Catch", the app Rin wrote back when Rin was a
 ## developer. `open_phone` (J) toggles it anywhere at sea or in the restaurant;
-## the game pauses while it's open. Tabs: storage, menu, orders, dex, boat, ledger,
+## the game pauses while it's open. Tabs: storage, menu, orders, map (PhoneMap),
+## dex, boat, ledger,
 ## plus a console log where story clues appear. Content comes from PhoneReports.
 ## Put it LAST in the scene tree so it gets J/Esc before other overlays.
 
 const APP_TITLE: String = "Rin's Catch v0.3.1"
-const TAB_NAMES: Array[String] = ["Kho", "Menu", "Đơn", "Dex", "Thuyền", "Sổ sách"]
+const TAB_NAMES: Array[String] = ["Kho", "Menu", "Đơn", "Bản đồ", "Dex", "Thuyền", "Sổ sách"]
+const MAP_TAB: int = 3
 
 @export var fish_catalog: FishCatalog
 @export var menu: DishCatalog
@@ -26,6 +28,8 @@ var _mono: SystemFont
 @onready var _title_label: Label = %AppTitle
 @onready var _tabs_row: HBoxContainer = %TabsRow
 @onready var _content_label: Label = %ContentLabel
+@onready var _scroll: ScrollContainer = %Scroll
+@onready var _map: PhoneMap = %Map
 @onready var _log_label: Label = %LogLabel
 
 
@@ -84,6 +88,8 @@ func _show_tab(index: int) -> void:
 	for i in _tab_buttons.size():
 		_tab_buttons[i].button_pressed = i == index
 	_title_label.text = "%s   %s" % [APP_TITLE, DayClock.get_time_text()]
+	_map.visible = index == MAP_TAB
+	_scroll.visible = index != MAP_TAB
 	_content_label.text = _tab_text(index)
 	_log_label.text = "\n".join(PhoneReports.log_lines(_fridge_loss()))
 
@@ -96,10 +102,12 @@ func _tab_text(index: int) -> String:
 			return PhoneReports.menu_report(menu, _fish_names())
 		2:
 			return PhoneReports.orders_report(fish_catalog)
-		3:
+		MAP_TAB:
+			return ""
+		4:
 			# Seed changes with the day so the glitch "moves" between visits.
 			return PhoneReports.dex_report(fish_catalog, GameState.day)
-		4:
+		5:
 			var boat: BoatData = GameState.get_upgrade_value(boat_upgrade)
 			return PhoneReports.boat_report(boat, float(GameState.get_upgrade_value(lamp_upgrade)), upgrades)
 		_:

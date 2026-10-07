@@ -60,6 +60,8 @@ func _ready() -> void:
 	_oil.oil_low.connect(_hud.flash_message.bind("Dầu đèn còn 1/4, trời sắp rạng. Về bến thôi!", 2.5))
 	_oil.oil_empty.connect(_on_oil_empty)
 	DayClock.start_night()
+	# Deferred: FogArea decides the fog zone's visibility in its own _ready.
+	_capture_map.call_deferred()
 	_show_orders()
 	if GameState.last_spoiled_count > 0:
 		_hud.flash_message("Qua đêm %d món trong kho đã hỏng, phải bỏ đi" % GameState.last_spoiled_count, 2.5)
@@ -72,6 +74,11 @@ func _ready() -> void:
 	# Headless test runs pass `-- --no-autosave` so they never touch the real save.
 	if not OS.get_cmdline_user_args().has("--no-autosave"):
 		SaveSystem.save_game()
+
+
+func _capture_map() -> void:
+	PhoneMap.capture(Vector2(_bounds.map_size), $Zones, $Land, $Obstacles, _dock,
+		_fog.get_whirlpool_position(), get_tree().get_nodes_in_group("pois"))
 
 
 func _show_orders() -> void:

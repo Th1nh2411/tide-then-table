@@ -8,6 +8,7 @@
 [ext_resource type="Resource" path="res://data/upgrades/fridge_upgrade.tres" id="6_fridgeup"]
 [ext_resource type="Resource" path="res://data/upgrades/rod_upgrade.tres" id="7_rodup"]
 [ext_resource type="Script" path="res://data/resources/upgrade_data.gd" id="8_updata"]
+[ext_resource type="Script" path="res://scenes/ui/phone_map.gd" id="9_map"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_phone"]
 bg_color = Color(0.07, 0.08, 0.1, 1)
@@ -78,6 +79,7 @@ layout_mode = 2
 theme_override_constants/separation = 2
 
 [node name="Scroll" type="ScrollContainer" parent="Phone/Margin/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
@@ -90,6 +92,13 @@ theme_override_colors/font_color = Color(0.9, 0.92, 0.95, 1)
 theme_override_font_sizes/font_size = 9
 text = "content"
 autowrap_mode = 3
+
+[node name="Map" type="Control" parent="Phone/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("9_map")
 
 [node name="LogLabel" type="Label" parent="Phone/Margin/VBox"]
 unique_name_in_owner = true

@@ -1,6 +1,6 @@
 class_name WhaleShrine
 extends PointOfInterest
-## Lăng Ông Cửa Đại: shrine of the whale god (cá Ông) that fishermen believe
+## Miếu Cá Ông in Xóm Đèn: shrine of the whale god (cá Ông) that fishermen believe
 ## guides people lost at sea back to shore. Lighting incense blesses tonight's
 ## trip (less hull damage). The keeper's words follow the story stage.
 

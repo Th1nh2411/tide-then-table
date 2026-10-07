@@ -1,18 +1,21 @@
 class_name PointOfInterest
 extends Area2D
-## A place worth visiting on the map (Cù Lao Chàm / Hội An setting). Has its
-## own lamp so it shows in the dark, draws its name, and when the boat is
+## A place worth visiting on the map (invented setting: Xóm Đèn and the
+## Ngủ Quên islands; never use or echo real place names). Has its own lamp
+## so it shows in the dark, draws its name, and when the boat is
 ## inside and slow, `interact` runs `_interact()` (override it; it usually
 ## awaits `dialog.ask(...)`). Fishing spots keep away (group "pois").
 
 @export var title: String = ""
+## Short name on the phone map (falls back to `title`).
+@export var map_label: String = ""
 @export var prompt_text: String = "E: Ghé"
 ## Radius of the visit area (px).
 @export var reach: float = 45.0
 ## Boat must be slower than this (px/s) to visit.
 @export var max_speed: float = 25.0
 @export_group("Lamp")
-## Hội An lantern red by default.
+## Old-town lantern red by default.
 @export var lamp_color: Color = Color(1.0, 0.5, 0.35)
 @export var lamp_radius: float = 70.0
 @export var lamp_energy: float = 1.0

@@ -9,7 +9,7 @@
 
 RIN THE FISHER là game 2D: **ban đêm** (0:00–6:00) Rin thắp đèn câu, lái thuyền ra biển câu hải sản; **sáng** (6:00–15:00) về nhà ngủ; **chiều tối** (15:00–24:00) bán món ăn tại quán hải sản Việt Nam, kiếm tiền để nâng cấp thuyền, dụng cụ và quán.
 
-**Bối cảnh địa lý:** vùng biển Cửa Đại (Hội An) – Cù Lao Chàm, Quảng Nam. Bờ phía nam là làng chài Cửa Đại và bến; càng ra bắc càng sâu, có các hòn đảo Hòn Lao, Hòn Khô; góc đông bắc là vùng sương mù. Chất liệu văn hóa: đèn lồng Hội An, thuyền thúng, câu mực đêm, tục thờ cá Ông (cá voi) của ngư dân miền Trung.
+**Bối cảnh địa lý:** vùng biển hư cấu quanh Xóm Đèn và dải đảo Ngủ Quên (tên tự đặt, không dựa trên địa danh thật nào). Bờ phía nam là làng chài Xóm Đèn và bến; càng ra bắc càng sâu, có các đảo Gò Vỏ Ốc, Đá Canh Đêm; góc đông bắc là vùng sương mù. Chất liệu văn hóa: đèn lồng phố cổ, thuyền thúng, câu mực đêm, tục thờ cá Ông (cá voi) của ngư dân.
 
 **Nhân vật:** Rin từng là developer ở thành phố, bỏ việc về làng chài nối nghề biển và mở quán hải sản. Rin tự viết app điện thoại **"Rin's Catch"** (phím J) để quản lý kho, menu, sách cá (Dex), thuyền và sổ sách; app ghi log lỗi khi gặp cá biến dị / tọa độ lạ — manh mối cốt truyện ("có bug thì phải debug").
 
@@ -163,11 +163,13 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 > **Đơn đặt cá (Dave the Diver):** mỗi sáng 70% có tin nhắn đặt cá (tối đa 2 đơn, mỗi khách 1 đơn) — loài câu đã có trong Dex (Dex trống: loài gần bờ), cỡ yêu cầu 1.0/1.2/1.4 (làm tròn ký), thưởng = giá gốc × cỡ × 2.5 (làm tròn 10k), hạn 2 đêm. Đơn hiện ở HUD biển (dưới tiền) và tab "Đơn" của điện thoại. Màn sáng tự giao con nhỏ nhất đủ ký trong kho, cộng tiền; quá hạn thì khách hủy. Lưu trong save. Logic: `FishOrders`; test: scenes/test/orders_test.tscn.
 
 > **Điểm ghé trên bản đồ (Dredge):** mỗi điểm có đèn riêng (thấy được trong đêm), tên vẽ trên map, ghé bằng E khi thuyền chậm; hộp thoại `PoiDialog` (tạm dừng game, chọn bằng phím số/click, E/Esc đi tiếp). Điểm câu tự tránh xa các điểm ghé.
-> - **Lăng Ông** (bờ Cửa Đại): thắp nhang 10k → đêm đó va đá chỉ hư 50%. Lời ông từ đổi theo cốt truyện (trước điềm báo / sau điềm báo / sương mở).
-> - **Chòi ông Tám** (Hòn Lao): vá thuyền giữa biển +25 bền / 40k (đắt hơn ở bến); hỏi chuyện = mẹo chơi + tin đồn cốt truyện theo giai đoạn.
-> - **Hải đăng Hòn Khô** (sát vùng sương): đèn quét xoay; nhật ký người gác đèn, mỗi lần ghé đọc 1 trang (lưu trong story_flags); đọc được 2 trang trước điềm báo, 3 sau điềm báo, 4 khi sương mở.
+> - **Miếu Cá Ông** (bờ Xóm Đèn): thắp nhang 10k → đêm đó va đá chỉ hư 50%. Lời ông từ đổi theo cốt truyện (trước điềm báo / sau điềm báo / sương mở).
+> - **Chòi ông Tám** (Gò Vỏ Ốc): vá thuyền giữa biển +25 bền / 40k (đắt hơn ở bến); hỏi chuyện = mẹo chơi + tin đồn cốt truyện theo giai đoạn.
+> - **Hải đăng Đá Canh Đêm** (sát vùng sương): đèn quét xoay; nhật ký người gác đèn, mỗi lần ghé đọc 1 trang (lưu trong story_flags); đọc được 2 trang trước điềm báo, 3 sau điềm báo, 4 khi sương mở.
 > - **Bè tôm hùm anh Năm** (rạn đá): bán hết khoang ngay ngoài biển với 50% (giá gốc × cỡ × chất lượng) để lấy chỗ.
 > Test: scenes/test/places_test.tscn (logic thuần; ghé thử cần màn biển nên kiểm bằng test tạm).
+
+> **Bản đồ trên điện thoại (tab "Bản đồ"):** màn biển chụp bố cục map (vùng nước, bờ, đảo/đá, bến, điểm ghé) vào snapshot tĩnh lúc vào biển, nên ở quán vẫn xem được. Ngoài biển hiện thêm thuyền (mũi tên theo hướng) và lưới đang thả. Vùng sương: trước điềm báo không có gì, sau điềm báo nháy "[ERR] NaN" ở góc đông bắc, khi mở thì hiện vùng sương + "???" ở xoáy nước. Click lên bản đồ để ghim/bỏ ghim (tối đa 5, lưu trong save); ghim hiện thành mũi tên "Ghim N" ở mép màn hình khi ra khơi.
 
 > **Tiện ích (sau Phase 9):** Esc = menu tạm dừng (Tiếp tục / Về menu — bấm 2 lần / Thoát + bảng phím) ở biển và quán. Mũi tên mép màn hình chỉ Bến, Lưới, và xoáy nước "???" kèm khoảng cách (m). Ngày 1 có gợi ý theo ngữ cảnh. "Chơi mới" khi đã có save phải bấm 2 lần.
 

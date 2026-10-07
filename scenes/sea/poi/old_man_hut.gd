@@ -1,6 +1,6 @@
 class_name OldManHut
 extends PointOfInterest
-## Ông Tám's hut on Hòn Lao: an old fisherman who patches hulls at sea (the
+## Ông Tám's hut on Gò Vỏ Ốc: an old fisherman who patches hulls at sea (the
 ## only repair away from the dock, and pricier) and shares rumors/tips.
 
 @export var hull: HullController
