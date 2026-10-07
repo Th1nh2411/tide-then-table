@@ -18,6 +18,8 @@ const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 @export var oil_rescue_fee: int = 80
 ## For order texts (fish names).
 @export var fish_catalog: FishCatalog
+## Cutscenes that can play when a trip ends (first eligible one, once).
+@export var trip_end_cutscenes: Array[Cutscene] = []
 ## Seconds the boat spins into the whirlpool before the white fade.
 @export var whirlpool_pull_seconds: float = 2.0
 
@@ -34,6 +36,7 @@ var _day_ended: bool = false
 @onready var _hull: HullController = $HullController
 @onready var _oil: LampOil = $LampOil
 @onready var _range: BoatRange = $BoatRange
+@onready var _cutscene: CutscenePlayer = $CutscenePlayer
 @onready var _events: NightEvents = $NightEvents
 @onready var _debug_label: Label = %DebugLabel
 
@@ -96,7 +99,7 @@ func _show_orders() -> void:
 
 func _process(_delta: float) -> void:
 	if _debug_label.visible:
-		_debug_label.text = "%s | tốc độ %d | [1-3] đổi thuyền" % [
+		_debug_label.text = "%s | tốc độ %d | [1-3] đổi thuyền [F2] mở sương [F3] cutscene mèo" % [
 			_boat.boat_data.display_name, roundi(_boat.speed)]
 
 
@@ -113,6 +116,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		# Debug: pretend the omen happened yesterday and reload to open the fog.
 		GameState.set_flag(Story.OMEN_DAY_FLAG, GameState.day - 1)
 		get_tree().reload_current_scene()
+	elif key.physical_keycode == KEY_F3 and not trip_end_cutscenes.is_empty() and not _cutscene.playing:
+		# Debug: play the trip-end cutscene now (ignores its day / once conditions).
+		_cutscene.play(trip_end_cutscenes[0])
 
 
 func _on_fish_caught(fish: FishData, _quality: float, _count: int, _size: float) -> void:
@@ -207,6 +213,10 @@ func _end_sea_day(towed: bool) -> void:
 	DayClock.stop()
 	_boat.set_physics_process(false)
 	_hud.hide_prompt()
+	_hud.hide_dock()
 	_events.on_trip_end(towed)
 	GameState.finish_sea_day(DayClock.current_minutes, towed, _hold_manager.get_items())
+	var scene := DialogueLibrary.pick(trip_end_cutscenes) as Cutscene
+	if scene:
+		await _cutscene.play(scene)
 	SceneRouter.go_to(REST_SCENE_PATH)

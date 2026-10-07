@@ -48,6 +48,8 @@ signal regular_served(who: String, price: int)
 @export var interval_scale_by_rating: Array[float] = [1.0, 1.3, 1.15, 1.0, 0.85, 0.7]
 ## Chance a customer orders a snack while the menu still has dishes.
 @export var snack_order_chance: float = 0.15
+## Patience multiplier while the restaurant cat is around ("mèo chiêu tài").
+@export var cat_patience_scale: float = 1.1
 
 ## Cooked dishes waiting to be carried out.
 var shelf := DishShelf.new()
@@ -205,6 +207,8 @@ func _spawn(visit: Dictionary) -> void:
 		customer.regular_name = visit["order"]["who"]
 		customer.patience_seconds *= regular_patience_scale
 		message_requested.emit("%s tới ăn món đã đặt!" % customer.regular_name)
+	if PetCat.is_present():
+		customer.patience_seconds *= cat_patience_scale
 	customer.position = door_position
 	customer.ordered.connect(_on_ordered)
 	customer.patience_ran_out.connect(_send_away.bind(true))

@@ -115,6 +115,18 @@ Vietnamese, keep code comments in short English.
   renovation of seats/decor/kitchen/fridge with preview, Hủy / Xác nhận);
   pinned HUD buttons "Chuẩn bị menu" + "Sửa quán" (when not serving) and "Ra khơi" (after the
   summary) — no automatic scene changes.
+- Cutscenes (Stardew style): write a `Cutscene` .tres in `data/cutscenes/`
+  (commands listed in `CutsceneScript`), add marker Node2Ds under the scene's
+  `CutsceneMarkers`, play with `CutscenePlayer.play()` (sea scene plays
+  `trip_end_cutscenes` after a trip). It pauses the tree; its actors,
+  camera, tweens and DialogueBox run PROCESS_MODE_ALWAYS.
+- The cat: `PetCat` (restaurant), flags `cat_adopted` / `cat_gone` /
+  `pet_name`; use `{pet}` in dialogue/cutscene text.
+- Dialogue: write a `Dialogue` .tres in `data/dialogues/` ("Name: line" per
+  line; min_day / requires_flag / once / sets_flag / priority) and add it to
+  a `Talker` child of the character (character needs `talk_x()`, optional
+  `can_talk()`). `DialogueLibrary` picks and marks seen (story_flags →
+  saved); `DialogueBox` shows it (pauses). Rin talks with E (RinWalker).
 - Sea gear upgrades (boat, rod, lamp) are bought in the phone's "Nâng cấp"
   tab (`PhoneShop`); restaurant upgrades only via "Sửa quán".
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and

@@ -2,7 +2,8 @@ class_name Waiter
 extends Control
 ## Bảo, the waiter. Waits by the kitchen shelf; CustomerManager hands out
 ## jobs: carry a plate to a table, or clean a dirty table. Walks along the
-## floor, does the job, walks back to the shelf.
+## floor, does the job, walks back to the shelf. Rin can talk to Bảo while
+## idle (child Talker; "!" when there's a new conversation).
 
 signal delivered(customer: Customer, plate: DishShelf.Plate)
 signal cleaned(seat: int)
@@ -36,6 +37,14 @@ func _ready() -> void:
 ## Free and standing at the shelf.
 func is_idle() -> bool:
 	return job == Job.NONE
+
+
+func talk_x() -> float:
+	return _x
+
+
+func can_talk() -> bool:
+	return is_idle()
 
 
 func deliver(customer: Customer, plate: DishShelf.Plate, table_x: float) -> void:
@@ -94,3 +103,7 @@ func _draw() -> void:
 		draw_line(at + Vector2(16, 14), at + Vector2(22, 10 + sin(_timer * 20.0) * 3.0), Color(0.9, 0.9, 1.0), 2.0)
 	draw_string(ThemeDB.fallback_font, at + Vector2(-2, -12), display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 8,
 		Color(1, 1, 1, 0.8))
+	var talker := get_node_or_null("Talker") as Talker
+	if talker and is_idle() and talker.has_news():
+		draw_string(ThemeDB.fallback_font, at + Vector2(6, -22), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 12,
+			Color(1, 0.85, 0.3))

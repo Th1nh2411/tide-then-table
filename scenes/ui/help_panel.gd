@@ -38,7 +38,8 @@ BẾN
   Hải sản thừa trả về kho; rau mua chợ thừa thì bỏ.
 
 PHỤC VỤ
-  A / D: Rin đi.   E ở cửa BẾP: vào bếp (thời gian vẫn chạy).
+  A / D: Rin đi (cả lúc chưa mở quán).   E ở cửa BẾP: vào bếp (khi đang bán).
+  E cạnh người khác: nói chuyện (dấu "!" = có chuyện mới).
   Trong bếp: bấm khay (hoặc phím số) để nấu, món xong đặt lên kệ.
   Chọn món trên kệ để vứt vào sọt rác, hoặc để Rin cầm ra.
   E / Esc: ra khỏi bếp.

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="Cutscene" format=3]
+
+[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="1_cut"]
+
+[resource]
+script = ExtResource("1_cut")
+id = "cat_arrival"
+min_day = 2
+script_text = "# Sau đêm câu thứ 2: một con mèo mập ăn vụng cá ở bến, Rin nhận nuôi.
+tint dawn
+camera dock_view 0 2.5
+fade_in 1.0
+spawn Crate crate crate_spot
+spawn Rin rin rin_start
+move_to Rin rin_stop 1.0
+speak Rin \"Xong một đêm... Dỡ cá lên rồi về ngủ thôi.\"
+pause 0.4
+spawn Cat cat cat_start
+move_to Cat cat_sneak 3.0
+emote Cat ... 1.0
+narrate \"Một con mèo mập thò đầu vào thùng, ngoạm gọn một con cá.\"
+emote Rin ! 1.0
+face Rin left
+speak Rin \"Ê! Con đó tao định bán mà!\"
+emote Cat ? 1.0
+narrate \"Con mèo không chạy. Nó ngồi xuống, liếm mép, nhìn Rin chằm chằm.\"
+move_to Rin rin_pet 0.8
+narrate \"Rin ngồi xuống, đưa tay xoa đầu nó.\"
+emote Cat heart 1.5
+narrate \"Rừ... rừ... Con mèo dụi đầu vào tay Rin.\"
+speak Rin \"...Mày không có nhà hả? Thôi, về ở với tao. Quán đang thiếu người trông kho.\"
+speak Rin \"Mà phải có tên đã.\"
+name_pet Mỡ
+emote Cat note 1.2
+speak Rin \"{pet}. Từ giờ mày là mèo của quán nha.\"
+set_flag cat_adopted
+pause 0.5
+fade_out 1.2"

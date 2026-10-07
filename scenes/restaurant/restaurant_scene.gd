@@ -48,6 +48,7 @@ var _message_token: int = 0
 ## Regulars coming today (FishOrders.reserve_for_shift).
 var _regular_visits: Array[Dictionary] = []
 var _renovate_button: Button
+var _dialogue_box: DialogueBox
 var _menu_button: Button
 var _tutorial: RestaurantTutorial
 var _sail_button: Button
@@ -103,7 +104,9 @@ func _ready() -> void:
 	_rin.serve_requested.connect(_on_rin_serve)
 	_rin.clean_requested.connect(func(seat: int) -> void: (_customers.tables as DiningTables).clean(seat))
 	_rin.message_requested.connect(_show_message)
-	_kitchen_view.closed.connect(func() -> void: _rin.active = _shift_running or not _customers.is_idle())
+	_rin.talk_requested.connect(func(talker: Talker) -> void: talker.talk(_dialogue_box))
+	_dialogue_box = DialogueBox.new()
+	add_child(_dialogue_box)
 	_kitchen_view.carry_requested.connect(func(plate: DishShelf.Plate) -> void: _rin.carried = plate)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
 		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
@@ -132,7 +135,6 @@ func _open_shop() -> void:
 	_renovate_button.hide()
 	_menu_button.hide()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
-	_rin.active = true
 	_show_message("Quán mở cửa!")
 	_tutorial.on_shop_opened()
 	_refresh_storage()
@@ -152,6 +154,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	# Rin walks freely whenever no panel covers the room.
+	_rin.active = not (_kitchen_view.visible or _renovation.visible or _menu_panel.visible
+		or _summary_panel.visible)
+	_rin.kitchen_open = _shift_running
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
 		if _time_left <= 0.0:
@@ -185,7 +191,6 @@ func _end_shift(reason: String) -> void:
 		await get_tree().process_frame
 	if _kitchen_view.visible:
 		_kitchen_view.close()
-	_rin.active = false
 	_rin.carried = null
 	var leftover := _plan.total_portions()
 	_plan.clear(GameState.storage)
@@ -218,7 +223,6 @@ func _open_kitchen() -> void:
 		else:
 			_show_message("Kệ đầy, bưng món đang cầm ra trước đã")
 			return
-	_rin.active = false
 	_kitchen_view.open(_plan)
 
 

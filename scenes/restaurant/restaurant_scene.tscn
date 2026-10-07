@@ -25,6 +25,16 @@
 [ext_resource type="Script" path="res://scenes/restaurant/shelf_display.gd" id="24_shelf"]
 [ext_resource type="Script" path="res://scenes/restaurant/kitchen_view.gd" id="25_kview"]
 [ext_resource type="Script" path="res://scenes/restaurant/renovation_mode.gd" id="26_reno"]
+[ext_resource type="Script" path="res://scenes/common/talker.gd" id="27_talker"]
+[ext_resource type="Resource" path="res://data/dialogues/bao_reunion.tres" id="28_dlg1"]
+[ext_resource type="Resource" path="res://data/dialogues/bao_app.tres" id="29_dlg2"]
+[ext_resource type="Resource" path="res://data/dialogues/bao_cat.tres" id="30_dlg3"]
+[ext_resource type="Resource" path="res://data/dialogues/bao_omen.tres" id="31_dlg4"]
+[ext_resource type="Script" path="res://data/resources/dialogue.gd" id="32_dlgdata"]
+[ext_resource type="Script" path="res://scenes/restaurant/pet_cat.gd" id="33_cat"]
+[ext_resource type="Resource" path="res://data/dialogues/cat_first.tres" id="34_cat1"]
+[ext_resource type="Resource" path="res://data/dialogues/cat_warm.tres" id="35_cat2"]
+[ext_resource type="Resource" path="res://data/dialogues/cat_omen.tres" id="36_cat3"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -149,6 +159,21 @@ mouse_filter = 2
 script = ExtResource("24_shelf")
 customers = NodePath("../CustomerManager")
 
+[node name="PetCat" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("33_cat")
+
+[node name="Talker" type="Node" parent="PetCat"]
+script = ExtResource("27_talker")
+dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("34_cat1"), ExtResource("35_cat2"), ExtResource("36_cat3")])
+idle_lines = Array[String](["Meo.", "Rừ... rừ...", "Meo~ (liếc cái kệ cá)", "...", "Meo! (đuôi phẩy phẩy)"])
+
 [node name="CustomerLayer" type="Control" parent="."]
 anchors_preset = 0
 mouse_filter = 2
@@ -162,6 +187,12 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("22_waiter")
+
+[node name="Talker" type="Node" parent="Waiter"]
+script = ExtResource("27_talker")
+display_name = "Bảo"
+dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("28_dlg1"), ExtResource("29_dlg2"), ExtResource("30_dlg3"), ExtResource("31_dlg4")])
+idle_lines = Array[String](["Hôm nay đông khách ghê.", "Nhớ hồi tụi mình code xuyên đêm không? Giờ thì rửa chén xuyên đêm.", "Mai câu con gì to to về nha.", "Khách bàn 2 khen món mày nấu đó.", "Tao vẫn giữ con server cũ, tiếc quá không nỡ bán."])
 
 [node name="RinWalker" type="Control" parent="." node_paths=PackedStringArray("tables")]
 layout_mode = 3

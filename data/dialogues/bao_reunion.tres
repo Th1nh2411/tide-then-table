@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Dialogue" format=3]
+
+[ext_resource type="Script" path="res://data/resources/dialogue.gd" id="1_dlg"]
+
+[resource]
+script = ExtResource("1_dlg")
+id = "bao_reunion"
+priority = 10
+script_text = "Bảo: Ê Rin! Tưởng mày bỏ nghề code luôn rồi chứ.
+Rin: ...Bảo? Sao mày tìm được tới đây?
+Bảo: Startup sập rồi thì tao cũng thất nghiệp. Nghe nói mày mở quán ở quê ông nội.
+Bảo: Cho tao làm phục vụ đi. Bưng bê dọn dẹp tao lo, mày lo nấu.
+Rin: ...Lương thấp lắm đó.
+Bảo: Có cơm ăn là được. Với lại cái app Rin's Catch, mày vẫn xài hả? Tao tưởng xoá rồi."

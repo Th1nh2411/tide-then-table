@@ -1,14 +1,16 @@
 class_name RinWalker
 extends Control
-## Rin on the restaurant floor (the player, Dave the Diver style): A/D walks,
-## `interact` (E) acts on the spot — at the kitchen door it opens the kitchen
-## view; at a table it serves the carried plate, or cleans a dirty table.
-## Only active while the shop is open and the kitchen view is closed.
+## Rin on the restaurant floor (the player, Dave the Diver style): A/D walks
+## any time no panel is open; `interact` (E) acts on the spot — at the kitchen
+## door it opens the kitchen view (only while the shop is open); at a table
+## it serves the carried plate or cleans a dirty table; next to someone with
+## a Talker (group "talkers") it starts a conversation.
 
 signal kitchen_requested
 ## E at a table while carrying a plate.
 signal serve_requested(seat: int)
 signal clean_requested(seat: int)
+signal talk_requested(talker: Talker)
 signal message_requested(text: String)
 
 @export var tables: DiningTables
@@ -22,6 +24,8 @@ signal message_requested(text: String)
 @export var body_color: Color = Color(0.2, 0.45, 0.8)
 
 var active: bool = false
+## The kitchen door works (the shop is open).
+var kitchen_open: bool = false
 ## Plate Rin is carrying out (null = empty hands).
 var carried: DishShelf.Plate
 
@@ -60,17 +64,28 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not active or _cleaning_left > 0.0 or not event.is_action_pressed("interact"):
 		return
 	get_viewport().set_input_as_handled()
-	if is_at_door():
+	if kitchen_open and is_at_door():
 		kitchen_requested.emit()
 		return
 	var seat := _nearest_table()
-	if seat == -1:
-		return
-	elif carried:
+	if seat != -1 and carried:
 		serve_requested.emit(seat)
-	elif tables.states[seat] == DiningTables.State.DIRTY:
+		return
+	if seat != -1 and tables.states[seat] == DiningTables.State.DIRTY:
 		_cleaning_seat = seat
 		_cleaning_left = clean_seconds
+		return
+	var talker := _nearest_talker()
+	if talker:
+		talk_requested.emit(talker)
+
+
+func _nearest_talker() -> Talker:
+	for node in get_tree().get_nodes_in_group("talkers"):
+		var talker := node as Talker
+		if talker and talker.can_talk() and absf(talker.talk_x() - _x) <= reach * 1.5:
+			return talker
+	return null
 
 
 func _nearest_table() -> int:
@@ -96,6 +111,6 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	draw_string(font, at + Vector2(0, -18 if carried else -10), "Rin", HORIZONTAL_ALIGNMENT_LEFT, -1, 8,
 		Color(1, 1, 1, 0.8))
-	if active and is_at_door() and not carried and GameState.is_first_day():
+	if active and kitchen_open and is_at_door() and not carried and GameState.is_first_day():
 		draw_string(font, at + Vector2(-14, -28), "[E] Vào bếp", HORIZONTAL_ALIGNMENT_LEFT, -1, 8,
 			Color(1, 0.9, 0.5))

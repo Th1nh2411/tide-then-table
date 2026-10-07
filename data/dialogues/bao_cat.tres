@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Dialogue" format=3]
+
+[ext_resource type="Script" path="res://data/resources/dialogue.gd" id="1_dlg"]
+
+[resource]
+script = ExtResource("1_dlg")
+id = "bao_cat"
+min_day = 3
+requires_flag = "cat_adopted"
+priority = 6
+script_text = "Bảo: Ủa, con mèo trên quầy là sao? Mày nuôi mèo hồi nào vậy?
+Rin: Hôm qua ở bến. Nó ăn vụng cá rồi... ở luôn. Tên {pet}.
+Bảo: Tao cho nó con tôm, nó ngửi rồi bỏ đi. Mèo gì chê tôm.
+Bảo: Mà nó ngồi trên quầy, khách vô ai cũng vuốt. Coi bộ chiêu tài đó."

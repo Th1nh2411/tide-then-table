@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Dialogue" format=3]
+
+[ext_resource type="Script" path="res://data/resources/dialogue.gd" id="1_dlg"]
+
+[resource]
+script = ExtResource("1_dlg")
+id = "bao_omen"
+requires_flag = "fog_omen_day"
+priority = 8
+script_text = "Bảo: Mấy ông chài ngoài quán nói đêm qua thấy ánh sáng xanh dưới nước phía đông bắc.
+Bảo: Mày có thấy gì không?
+Rin: ...Có. Mà app của mình cũng thấy. Nó báo \"species_id không có trong database\".
+Bảo: Có bug thì phải debug, hồi xưa mày nói vậy mà."

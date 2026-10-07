@@ -133,6 +133,8 @@ static func log_lines(fridge_loss: float, weather: WeatherData = null) -> Packed
 		lines.append("[WARN] %d món sẽ hỏng qua đêm nay" % spoiling)
 	if not GameState.orders.is_empty():
 		lines.append("[MSG] %d đơn đặt cá đang chờ" % GameState.orders.size())
+	if GameState.has_flag("cat_adopted") and not GameState.has_flag("cat_gone"):
+		lines.append("[WARN] cảm biến nhiệt: sinh vật trong quán 60°C (?)")
 	if GameState.boat_hp < 30.0:
 		lines.append("[WARN] thân thuyền %d%%, nên sửa" % roundi(GameState.boat_hp))
 	if int(GameState.caught_species.get(Story.OMEN_FISH_ID, 0)) > 0:

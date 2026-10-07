@@ -44,6 +44,9 @@
 [ext_resource type="Resource" path="res://data/weather/weather_catalog.tres" id="42_weathercat"]
 [ext_resource type="Script" path="res://scenes/sea/rain_overlay.gd" id="43_rain"]
 [ext_resource type="Script" path="res://scenes/sea/events/night_events.gd" id="44_events"]
+[ext_resource type="Script" path="res://scenes/cutscene/cutscene_player.gd" id="45_cutscene"]
+[ext_resource type="Resource" path="res://data/cutscenes/cat_arrival.tres" id="46_cat"]
+[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="47_cutdata"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_whirl"]
 radius = 24.0
@@ -66,6 +69,7 @@ size = Vector2(70, 90)
 script = ExtResource("1_sea")
 boat_upgrade = ExtResource("23_boatup")
 fish_catalog = ExtResource("17_catalog")
+trip_end_cutscenes = Array[ExtResource("47_cutdata")]([ExtResource("46_cat")])
 debug_boats = Array[ExtResource("2_boatdata")]([ExtResource("3_thung"), ExtResource("4_cheo"), ExtResource("5_may")])
 
 [node name="Zones" type="Node2D" parent="."]
@@ -527,5 +531,34 @@ text = "debug"
 
 [node name="PoiDialog" type="CanvasLayer" parent="."]
 script = ExtResource("35_dialog")
+
+[node name="CutsceneMarkers" type="Node2D" parent="."]
+
+[node name="dock_view" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(990, 1150)
+
+[node name="crate_spot" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(1010, 1172)
+
+[node name="rin_start" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(1000, 1150)
+
+[node name="rin_stop" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(1022, 1176)
+
+[node name="cat_start" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(890, 1192)
+
+[node name="cat_sneak" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(995, 1176)
+
+[node name="rin_pet" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(1006, 1178)
+
+[node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers", "day_tint", "hidden_layers")]
+script = ExtResource("45_cutscene")
+markers = NodePath("../CutsceneMarkers")
+day_tint = NodePath("../DayTint")
+hidden_layers = [NodePath("../SeaHud"), NodePath("../MarkerLayer")]
 
 [node name="PhoneApp" parent="." instance=ExtResource("33_phone")]

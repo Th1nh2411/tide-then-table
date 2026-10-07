@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Dialogue" format=3]
+
+[ext_resource type="Script" path="res://data/resources/dialogue.gd" id="1_dlg"]
+
+[resource]
+script = ExtResource("1_dlg")
+id = "bao_app"
+min_day = 2
+priority = 5
+script_text = "Bảo: Hôm qua tao mở app xem kho, thấy log toàn [WARN] với [ERR].
+Rin: Kệ nó. Code hồi đó viết vội mà.
+Bảo: Ừ... mà có dòng \"tọa độ không tồn tại\". Mày đi câu ở đâu vậy?
+Rin: Ngoài khơi thôi. Chắc GPS lỗi."
