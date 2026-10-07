@@ -3,8 +3,8 @@ extends Node
 ## Handles a fishing attempt at a spot: the spot picks the species (featured
 ## fish or zone/depth random), the size is rolled (deeper / big shadow =
 ## bigger, bigger = harder), a cast and some lamp oil are spent, then the
-## minigame runs while the boat holds still. Oil keeps burning (slower)
-## during the minigame.
+## minigame runs while the boat holds still. Oil doesn't burn during the
+## minigame (time stops while fishing).
 
 ## Emitted on a successful catch; the hold manager stores it.
 ## `size` 1.0 = average (scales price and weight).
@@ -70,8 +70,9 @@ func _on_fishing_requested(spot: FishingSpot) -> void:
 		return
 	_current_spot = spot
 	_active = true
-	_size = CatchRoll.roll_size(_rng, spot.depth, spot.big_shadow and fish == spot.featured,
-		size_spread, size_depth_bonus, size_big_bonus)
+	_size = CatchRoll.snap_size(CatchRoll.roll_size(_rng, spot.depth,
+		spot.big_shadow and fish == spot.featured, size_spread, size_depth_bonus, size_big_bonus),
+		fish.typical_kg)
 	boat.speed = 0.0
 	boat.set_physics_process(false)
 	hud.hide_prompt()

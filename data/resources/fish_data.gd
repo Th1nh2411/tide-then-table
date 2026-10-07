@@ -37,7 +37,7 @@ func weight_kg(size: float) -> float:
 	return typical_kg * size
 
 
-## "3.4kg" or "350g".
+## Whole kg from 1kg up ("4kg"), else grams to the nearest 10 ("520g").
 func weight_text(size: float) -> String:
 	var kg := weight_kg(size)
-	return "%.1fkg" % kg if kg >= 1.0 else "%dg" % roundi(kg * 1000.0)
+	return "%dkg" % roundi(kg) if kg >= 0.995 else "%dg" % (roundi(kg * 100.0) * 10)

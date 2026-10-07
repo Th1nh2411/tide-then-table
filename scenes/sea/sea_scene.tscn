@@ -37,6 +37,17 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_whirl"]
 radius = 24.0
 
+[sub_resource type="Gradient" id="Gradient_docklight"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_docklight"]
+gradient = SubResource("Gradient_docklight")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dock"]
 size = Vector2(70, 90)
 
@@ -217,6 +228,12 @@ offset_bottom = 45.0
 mouse_filter = 2
 color = Color(1, 1, 1, 0.12)
 
+[node name="Light" type="PointLight2D" parent="Dock"]
+color = Color(1, 0.82, 0.5, 1)
+energy = 1.3
+texture = SubResource("GradientTexture2D_docklight")
+texture_scale = 2.0
+
 [node name="FogArea" type="Node2D" parent="." node_paths=PackedStringArray("fog_zone")]
 script = ExtResource("25_fog")
 fog_zone = NodePath("../Zones/Fog")
@@ -233,10 +250,11 @@ script = ExtResource("11_tint")
 
 [node name="SeaHud" parent="." instance=ExtResource("12_hud")]
 
-[node name="LampOil" type="Node" parent="." node_paths=PackedStringArray("minigame")]
+[node name="LampOil" type="Node" parent="." node_paths=PackedStringArray("minigame", "dock")]
 script = ExtResource("31_oil")
 lamp_upgrade = ExtResource("32_lampup")
 minigame = NodePath("../FishingMinigame")
+dock = NodePath("../Dock")
 
 [node name="FishingController" type="Node" parent="." node_paths=PackedStringArray("spawner", "boat", "hud", "minigame", "oil")]
 script = ExtResource("16_fishing")

@@ -3,8 +3,8 @@ extends CanvasLayer
 ## Fishing overlay. For rod fish it runs two stages: BiteGame (wait for the
 ## bite and strike) then the fight (TIMING or TENSION). Nets go straight to
 ## HAUL. Shows the result briefly, then reports quality and how many were
-## caught (more than 1 when hauling a net). LampOil burns slower while this
-## overlay is running, so longer fights don't eat the whole night.
+## caught (more than 1 when hauling a net). LampOil doesn't burn while this
+## overlay is running: time stops while fishing.
 
 signal finished(fish: FishData, caught: bool, quality: float, count: int)
 ## The player pressed the hold button / key during the minigame.

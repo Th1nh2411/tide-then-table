@@ -77,8 +77,11 @@ func _test_size() -> void:
 
 
 func _test_weight_and_price() -> void:
-	_check("weight kg text", _fish("ca_mu").weight_text(1.3) == "3.9kg")
-	_check("weight g text", _fish("tom").weight_text(1.0) == "60g")
+	_check("weight kg text", _fish("ca_mu").weight_text(1.3) == "4kg")
+	_check("weight g text", _fish("muc").weight_text(1.3) == "520g")
+	var snapped := CatchRoll.snap_size(1.3, 3.0)
+	_check("snap to whole kg", is_equal_approx(_fish("ca_mu").weight_kg(snapped), 4.0))
+	_check("snap small to 10g", is_equal_approx(_fish("tom").weight_kg(CatchRoll.snap_size(1.17, 0.06)), 0.07))
 	var small: Array[InventoryItem] = [InventoryItem.new(_fish("ca_thu"), 1.0, 1.0)]
 	var large: Array[InventoryItem] = [InventoryItem.new(_fish("ca_thu"), 1.0, 1.5)]
 	var p_small := KitchenLogic.calc_price(grill_dish, 1.0, small)

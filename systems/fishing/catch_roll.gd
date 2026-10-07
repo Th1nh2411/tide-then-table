@@ -6,6 +6,9 @@ extends RefCounted
 
 const MIN_SIZE: float = 0.6
 const MAX_SIZE: float = 1.8
+## Valid range for stored sizes (save data); snapping can leave MIN/MAX.
+const STORED_MIN: float = 0.1
+const STORED_MAX: float = 3.0
 ## At or above this size the catch is called "to" (big) in messages.
 const BIG_SIZE: float = 1.3
 
@@ -20,6 +23,16 @@ static func roll_size(rng: RandomNumberGenerator, depth: float, big_spot: bool,
 		spread: float = 0.15, depth_bonus: float = 0.25, big_bonus: float = 0.35) -> float:
 	var mean := 1.0 + depth * depth_bonus + (big_bonus if big_spot else 0.0)
 	return clampf(rng.randfn(mean, spread), MIN_SIZE, MAX_SIZE)
+
+
+## Snaps `size` so the fish weighs a round number: whole kg from 1kg up,
+## else a multiple of 10g. Price and display then agree.
+static func snap_size(size: float, typical_kg: float) -> float:
+	if typical_kg <= 0.0:
+		return size
+	var kg := typical_kg * size
+	var snapped_kg := float(roundi(kg)) if kg >= 0.995 else maxf(roundi(kg * 100.0), 1) / 100.0
+	return snapped_kg / typical_kg
 
 
 ## Fight difficulty multiplier for minigames' zone_scale (> 1 = easier):

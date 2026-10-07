@@ -1,8 +1,8 @@
 class_name LampOil
 extends Node
 ## Lamp oil for night fishing: the limit of a sea trip, like the oxygen tank
-## in Dave the Diver. Burns over real time (slower during minigames, frozen
-## while paused) and a little per action (cast, net). It also drives the
+## in Dave the Diver. Burns over real time (not during minigames, not at the
+## dock, not while paused) and a little per action (cast, net). It also drives the
 ## displayed time: full tank = midnight, empty = dawn. Running dry at sea
 ## means a rescue tow (handled by the sea scene). The tank refills for free
 ## every night; the "lamp" upgrade makes the tank bigger.
@@ -15,11 +15,14 @@ signal oil_empty
 @export var lamp_upgrade: UpgradeData
 ## Tank size without the upgrade; 100 lasts about 240 real seconds of sailing.
 @export var base_capacity: float = 100.0
-## Used to burn slower while a minigame is running.
+## No burning while a minigame is running (time stops while fishing).
 @export var minigame: FishingMinigame
+## No burning while the boat is at the dock.
+@export var dock: Dock
 ## Base tank (100) lasts ~240 real seconds of sailing.
 @export var burn_per_second: float = 100.0 / 240.0
-@export var minigame_burn_scale: float = 0.5
+## 0 = time frozen during minigames.
+@export var minigame_burn_scale: float = 0.0
 ## Warn once when the tank drops to this fraction.
 @export var low_fraction: float = 0.25
 
@@ -52,6 +55,8 @@ func spend(units: float) -> void:
 
 func _process(delta: float) -> void:
 	if not DayClock.running or is_empty():
+		return
+	if dock and dock.is_boat_inside():
 		return
 	var scale := minigame_burn_scale if minigame and minigame.is_running() else 1.0
 	amount = maxf(amount - burn_per_second * scale * delta, 0.0)

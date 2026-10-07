@@ -105,7 +105,7 @@ static func apply_dict(data: Dictionary) -> void:
 	if sizes is Dictionary:
 		for fish_id: Variant in sizes:
 			if fish_id is String and (sizes[fish_id] is int or sizes[fish_id] is float):
-				GameState.best_sizes[fish_id] = clampf(float(sizes[fish_id]), 0.0, CatchRoll.MAX_SIZE)
+				GameState.best_sizes[fish_id] = clampf(float(sizes[fish_id]), 0.0, CatchRoll.STORED_MAX)
 
 	var history: Variant = data.get("day_history")
 	if history is Array:

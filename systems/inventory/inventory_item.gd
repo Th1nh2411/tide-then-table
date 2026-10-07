@@ -51,7 +51,7 @@ static func from_dict(data: Variant, catalog: FishCatalog) -> InventoryItem:
 	for f in catalog.fish:
 		if f.id == fish_id:
 			var item := InventoryItem.new(f, _to_float(data.get("quality"), 1.0))
-			item.size = clampf(_to_float(data.get("size"), 1.0), CatchRoll.MIN_SIZE, CatchRoll.MAX_SIZE)
+			item.size = clampf(_to_float(data.get("size"), 1.0), CatchRoll.STORED_MIN, CatchRoll.STORED_MAX)
 			item.freshness = clampf(_to_float(data.get("freshness"), 100.0), 0.0, 100.0)
 			return item
 	return null
