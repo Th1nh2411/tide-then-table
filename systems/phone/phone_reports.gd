@@ -76,6 +76,18 @@ static func dex_report(catalog: FishCatalog, glitch_seed: int) -> String:
 	return "\n".join(lines)
 
 
+## Active fish orders from regulars (messages).
+static func orders_report(catalog: FishCatalog) -> String:
+	if GameState.orders.is_empty():
+		return "TIN NHẮN: chưa có đơn nào\n\n> Khách quen sẽ nhắn đặt cá vào buổi sáng."
+	var lines: PackedStringArray = ["ĐƠN ĐẶT CÁ (%d)" % GameState.orders.size(), ""]
+	for order: Dictionary in GameState.orders:
+		lines.append("[MSG] " + FishOrders.describe(order, catalog))
+	lines.append("")
+	lines.append("> Câu được con đủ ký, sáng ra tự giao và nhận tiền.")
+	return "\n".join(lines)
+
+
 static func boat_report(boat: BoatData, lamp_capacity: float, upgrades: Array[UpgradeData]) -> String:
 	var lines: PackedStringArray = [
 		"THUYỀN: %s" % boat.display_name,
@@ -116,6 +128,8 @@ static func log_lines(fridge_loss: float) -> PackedStringArray:
 	var spoiling := GameState.storage.filter(func(item: InventoryItem) -> bool: return item.freshness <= fridge_loss).size()
 	if spoiling > 0:
 		lines.append("[WARN] %d món sẽ hỏng qua đêm nay" % spoiling)
+	if not GameState.orders.is_empty():
+		lines.append("[MSG] %d đơn đặt cá đang chờ" % GameState.orders.size())
 	if GameState.boat_hp < 30.0:
 		lines.append("[WARN] thân thuyền %d%%, nên sửa" % roundi(GameState.boat_hp))
 	if int(GameState.caught_species.get(Story.OMEN_FISH_ID, 0)) > 0:

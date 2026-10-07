@@ -33,6 +33,7 @@
 [ext_resource type="Script" path="res://scenes/sea/lamp_oil.gd" id="31_oil"]
 [ext_resource type="Resource" path="res://data/upgrades/lamp_upgrade.tres" id="32_lampup"]
 [ext_resource type="PackedScene" path="res://scenes/ui/phone_app.tscn" id="33_phone"]
+[ext_resource type="Script" path="res://scenes/sea/boat_lamp.gd" id="34_lamp"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_whirl"]
 radius = 24.0
@@ -54,6 +55,7 @@ size = Vector2(70, 90)
 [node name="SeaScene" type="Node2D"]
 script = ExtResource("1_sea")
 boat_upgrade = ExtResource("23_boatup")
+fish_catalog = ExtResource("17_catalog")
 debug_boats = Array[ExtResource("2_boatdata")]([ExtResource("3_thung"), ExtResource("4_cheo"), ExtResource("5_may")])
 
 [node name="Zones" type="Node2D" parent="."]
@@ -212,6 +214,13 @@ catalog = ExtResource("17_catalog")
 [node name="Boat" parent="." instance=ExtResource("9_boat")]
 position = Vector2(1000, 1100)
 rotation = -1.5708
+
+[node name="Lamp" type="PointLight2D" parent="Boat" node_paths=PackedStringArray("oil")]
+color = Color(1, 0.88, 0.65, 1)
+energy = 1.1
+texture = SubResource("GradientTexture2D_docklight")
+script = ExtResource("34_lamp")
+oil = NodePath("../../LampOil")
 
 [node name="Dock" type="Area2D" parent="."]
 position = Vector2(1000, 1110)

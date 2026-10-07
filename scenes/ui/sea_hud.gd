@@ -17,6 +17,7 @@ var _message_token: int = 0
 @onready var _hull_label: Label = %HullLabel
 @onready var _tip_label: Label = %TipLabel
 @onready var _money_label: Label = %MoneyLabel
+@onready var _order_label: Label = %OrderLabel
 
 
 func _ready() -> void:
@@ -50,6 +51,12 @@ func _on_money_changed(money: int) -> void:
 
 
 ## Persistent tutorial tip (bottom-left) until replaced or hidden.
+## Active fish orders under the money (one line each), hidden when none.
+func set_orders(lines: PackedStringArray) -> void:
+	_order_label.text = "\n".join(lines)
+	_order_label.visible = not lines.is_empty()
+
+
 func show_tip(text: String) -> void:
 	_tip_label.text = text
 	_tip_label.show()

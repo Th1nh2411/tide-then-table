@@ -24,7 +24,7 @@ Vietnamese, keep code comments in short English.
   not long `get_node("../..")` chains.
 - Pure logic lives in `systems/` (no nodes): `GridInventory`, `KitchenLogic`,
   `MenuPlan`, `DayRating`, `SaveSystem`, `Story`, `BoatCondition`,
-  `PhoneReports`, `CatchRoll`.
+  `PhoneReports`, `CatchRoll`, `FishOrders`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
 - Vietnamese for all player-facing text. Money is shown as "70k".
 
@@ -75,9 +75,13 @@ Vietnamese, keep code comments in short English.
   and difficulty; records in `GameState.best_sizes`), `NetController` (Q nets → HaulGame),
   `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab), `HullController`
   (collision damage, F repair at dock), `LampOil` (trip limit + displayed
-  time), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,
+  time; no burn in minigames or at the dock), `BoatLamp` (light radius from
+  oil; the night tint is dark, so lamps are how the player sees), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,
   `OffscreenMarkers` (edge arrows), `TutorialHints` (day 1), `PauseMenu` (Esc;
   must sit before `HoldUI` in the tree so the hold can eat Esc first).
+- Fish orders (`FishOrders`, `GameState.orders`): rolled when the next day
+  starts (restaurant), shown on the sea HUD + phone tab, delivered/expired
+  on the rest card.
 - Restaurant: `MenuSetupPanel` + `MenuPlan`, `CustomerManager`,
   `CookingOverlay` (Grill/Steam/Stir), `UpgradeShop`, `RepairButton`.
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and

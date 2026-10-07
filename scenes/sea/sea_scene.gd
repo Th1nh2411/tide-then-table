@@ -16,6 +16,8 @@ const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 ## Rescue tow fees (k, capped at what the player has).
 @export var rescue_fee: int = 150
 @export var oil_rescue_fee: int = 80
+## For order texts (fish names).
+@export var fish_catalog: FishCatalog
 ## Seconds the boat spins into the whirlpool before the white fade.
 @export var whirlpool_pull_seconds: float = 2.0
 
@@ -58,6 +60,7 @@ func _ready() -> void:
 	_oil.oil_low.connect(_hud.flash_message.bind("Dầu đèn còn 1/4, trời sắp rạng. Về bến thôi!", 2.5))
 	_oil.oil_empty.connect(_on_oil_empty)
 	DayClock.start_night()
+	_show_orders()
 	if GameState.last_spoiled_count > 0:
 		_hud.flash_message("Qua đêm %d món trong kho đã hỏng, phải bỏ đi" % GameState.last_spoiled_count, 2.5)
 		GameState.last_spoiled_count = 0
@@ -69,6 +72,18 @@ func _ready() -> void:
 	# Headless test runs pass `-- --no-autosave` so they never touch the real save.
 	if not OS.get_cmdline_user_args().has("--no-autosave"):
 		SaveSystem.save_game()
+
+
+func _show_orders() -> void:
+	var lines: PackedStringArray = []
+	var fresh := false
+	for order: Dictionary in GameState.orders:
+		lines.append("Đơn " + FishOrders.describe(order, fish_catalog))
+		# Arrived this morning: all its nights are still ahead.
+		fresh = fresh or int(order["due_day"]) - GameState.day + 1 == FishOrders.NIGHTS_TO_DELIVER
+	_hud.set_orders(lines)
+	if fresh:
+		_hud.flash_message("[MSG] Tin nhắn mới: có khách đặt cá (J xem)", 2.5)
 
 
 func _process(_delta: float) -> void:

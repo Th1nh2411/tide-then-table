@@ -69,6 +69,7 @@ static func to_dict() -> Dictionary:
 		"caught_species": GameState.caught_species.duplicate(),
 		"best_sizes": GameState.best_sizes.duplicate(),
 		"day_history": GameState.day_history.duplicate(true),
+		"orders": GameState.orders.duplicate(true),
 	}
 
 
@@ -112,6 +113,13 @@ static func apply_dict(data: Dictionary) -> void:
 		for entry: Variant in history:
 			if entry is Dictionary:
 				GameState.add_day_record(entry)
+
+	var saved_orders: Variant = data.get("orders")
+	if saved_orders is Array:
+		for entry: Variant in saved_orders:
+			var order := FishOrders.from_save(entry, catalog)
+			if not order.is_empty():
+				GameState.orders.append(order)
 
 	var flags: Variant = data.get("story_flags")
 	if flags is Dictionary:

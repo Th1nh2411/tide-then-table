@@ -1,12 +1,17 @@
 extends Control
 ## Morning rest card between the night trip and the restaurant (6:00-15:00 is
 ## Rin's sleep, shown as one short screen): when Rin got back, what came home
-## in the hold, then on to the restaurant.
+## in the hold, fish orders delivered / expired (FishOrders), then on to the
+## restaurant.
 
 const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.tscn"
 
+## For order texts (fish names).
+@export var fish_catalog: FishCatalog
+
 @onready var _return_label: Label = %ReturnLabel
 @onready var _catch_label: Label = %CatchLabel
+@onready var _order_label: Label = %OrderLabel
 @onready var _sleep_label: Label = %SleepLabel
 @onready var _wake_button: Button = %WakeButton
 
@@ -18,6 +23,9 @@ func _ready() -> void:
 	else:
 		_return_label.text = "Rin cập bến lúc %s." % time
 	_catch_label.text = _catch_text()
+	var order_lines := FishOrders.settle(fish_catalog)
+	_order_label.text = "\n".join(order_lines)
+	_order_label.visible = not order_lines.is_empty()
 	_sleep_label.text = "Rin về nhà ngủ một giấc... tới %02d:00 dậy mở quán." % DayClock.shop_open_hour
 	_wake_button.pressed.connect(func() -> void: SceneRouter.go_to(RESTAURANT_SCENE_PATH))
 	_wake_button.grab_focus()

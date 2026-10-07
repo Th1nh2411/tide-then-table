@@ -3,7 +3,8 @@ extends CanvasModulate
 ## Tints the sea by time of night: deep blue night -> pink/orange dawn as the
 ## lamp oil runs low (DayClock time is driven by oil). HUD is unaffected.
 
-@export var night_color: Color = Color(0.42, 0.48, 0.75)
+## Dark on purpose: away from lamps (BoatLamp, dock light) the sea is barely visible.
+@export var night_color: Color = Color(0.13, 0.15, 0.27)
 @export var dawn_color: Color = Color(1.0, 0.78, 0.7)
 @export var day_color: Color = Color.WHITE
 ## Night colour holds until this hour, then fades to dawn by dawn_hour.

@@ -204,4 +204,8 @@ func _on_continue_pressed() -> void:
 func _start_next_day() -> void:
 	var loss: float = float(GameState.get_upgrade_value(fridge_upgrade)) if fridge_upgrade else 35.0
 	GameState.advance_day(loss)
+	# Morning messages: maybe a new fish order (shown at sea and in the phone).
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	FishOrders.roll_new_order(rng, fish_catalog)
 	SceneRouter.go_to(SEA_SCENE_PATH)

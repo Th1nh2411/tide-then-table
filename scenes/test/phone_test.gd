@@ -43,7 +43,7 @@ func _ready() -> void:
 
 	_phone.open()
 	_check("open pauses game", get_tree().paused and _phone.visible)
-	for tab in 5:
+	for tab in PhoneApp.TAB_NAMES.size():
 		_phone._show_tab(tab)
 		_check("tab %d has content" % tab, _phone.get_node("%ContentLabel").text.length() > 10)
 	_phone.close()

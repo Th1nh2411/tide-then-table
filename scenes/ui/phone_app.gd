@@ -2,12 +2,12 @@ class_name PhoneApp
 extends CanvasLayer
 ## Rin's phone with "Rin's Catch", the app Rin wrote back when Rin was a
 ## developer. `open_phone` (J) toggles it anywhere at sea or in the restaurant;
-## the game pauses while it's open. Tabs: storage, menu, dex, boat, ledger,
+## the game pauses while it's open. Tabs: storage, menu, orders, dex, boat, ledger,
 ## plus a console log where story clues appear. Content comes from PhoneReports.
 ## Put it LAST in the scene tree so it gets J/Esc before other overlays.
 
 const APP_TITLE: String = "Rin's Catch v0.3.1"
-const TAB_NAMES: Array[String] = ["Kho", "Menu", "Dex", "Thuyền", "Sổ sách"]
+const TAB_NAMES: Array[String] = ["Kho", "Menu", "Đơn", "Dex", "Thuyền", "Sổ sách"]
 
 @export var fish_catalog: FishCatalog
 @export var menu: DishCatalog
@@ -95,9 +95,11 @@ func _tab_text(index: int) -> String:
 		1:
 			return PhoneReports.menu_report(menu, _fish_names())
 		2:
+			return PhoneReports.orders_report(fish_catalog)
+		3:
 			# Seed changes with the day so the glitch "moves" between visits.
 			return PhoneReports.dex_report(fish_catalog, GameState.day)
-		3:
+		4:
 			var boat: BoatData = GameState.get_upgrade_value(boat_upgrade)
 			return PhoneReports.boat_report(boat, float(GameState.get_upgrade_value(lamp_upgrade)), upgrades)
 		_:
