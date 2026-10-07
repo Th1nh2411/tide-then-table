@@ -7,6 +7,8 @@ extends CanvasLayer
 @export var flash_seconds: float = 1.5
 
 var _message_token: int = 0
+## Tonight's weather name, shown next to the clock.
+var _weather_name: String = ""
 
 @onready var _clock_label: Label = %ClockLabel
 @onready var _warning_label: Label = %WarningLabel
@@ -94,5 +96,11 @@ func flash_message(text: String, seconds: float = flash_seconds) -> void:
 		_message_label.hide()
 
 
+func set_weather(weather_name: String) -> void:
+	_weather_name = weather_name
+	_on_time_changed(DayClock.current_minutes)
+
+
 func _on_time_changed(_minutes: float) -> void:
-	_clock_label.text = "Đêm %d   %s" % [GameState.day, DayClock.get_time_text()]
+	var weather := "  · %s" % _weather_name if _weather_name else ""
+	_clock_label.text = "Đêm %d   %s%s" % [GameState.day, DayClock.get_time_text(), weather]

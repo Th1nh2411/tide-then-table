@@ -39,6 +39,11 @@
 [ext_resource type="Script" path="res://scenes/sea/poi/old_man_hut.gd" id="37_hut"]
 [ext_resource type="Script" path="res://scenes/sea/poi/lighthouse.gd" id="38_lighthouse"]
 [ext_resource type="Script" path="res://scenes/sea/poi/lobster_raft.gd" id="39_raft"]
+[ext_resource type="Script" path="res://scenes/sea/boat_range.gd" id="40_range"]
+[ext_resource type="Script" path="res://scenes/sea/weather_controller.gd" id="41_weather"]
+[ext_resource type="Resource" path="res://data/weather/weather_catalog.tres" id="42_weathercat"]
+[ext_resource type="Script" path="res://scenes/sea/rain_overlay.gd" id="43_rain"]
+[ext_resource type="Script" path="res://scenes/sea/events/night_events.gd" id="44_events"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_whirl"]
 radius = 24.0
@@ -210,6 +215,95 @@ position = Vector2(1550, 1000)
 script = ExtResource("8_rock")
 radius = 14.0
 
+[node name="Submerged1" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(400, 820)
+script = ExtResource("8_rock")
+radius = 12.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged2" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(620, 700)
+script = ExtResource("8_rock")
+radius = 10.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged3" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(880, 850)
+script = ExtResource("8_rock")
+radius = 9.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged4" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(980, 610)
+script = ExtResource("8_rock")
+radius = 13.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged5" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(1300, 870)
+script = ExtResource("8_rock")
+radius = 10.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged6" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(1520, 640)
+script = ExtResource("8_rock")
+radius = 12.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged7" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(1780, 860)
+script = ExtResource("8_rock")
+radius = 11.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged8" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(170, 600)
+script = ExtResource("8_rock")
+radius = 10.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged9" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(760, 420)
+script = ExtResource("8_rock")
+radius = 14.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged10" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(1100, 300)
+script = ExtResource("8_rock")
+radius = 12.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged11" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(300, 160)
+script = ExtResource("8_rock")
+radius = 11.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="Submerged12" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(1700, 520)
+script = ExtResource("8_rock")
+radius = 13.0
+color = Color(0.3, 0.32, 0.3, 1)
+submerged = true
+
+[node name="BoatRange" type="Node2D" parent="." node_paths=PackedStringArray("boat", "hud")]
+script = ExtResource("40_range")
+boat = NodePath("../Boat")
+hud = NodePath("../SeaHud")
+
 [node name="Places" type="Node2D" parent="."]
 
 [node name="WhaleShrine" type="Area2D" parent="Places" node_paths=PackedStringArray("hull", "hud", "dialog")]
@@ -246,7 +340,7 @@ hud = NodePath("../../SeaHud")
 dialog = NodePath("../../PoiDialog")
 
 [node name="LobsterRaft" type="Area2D" parent="Places" node_paths=PackedStringArray("hold_manager", "hud", "dialog")]
-position = Vector2(1400, 780)
+position = Vector2(1400, 800)
 script = ExtResource("39_raft")
 hold_manager = NodePath("../../HoldManager")
 title = "Bè tôm hùm anh Năm"
@@ -255,6 +349,16 @@ lamp_radius = 60.0
 lamp_offset = Vector2(16, -25)
 hud = NodePath("../../SeaHud")
 dialog = NodePath("../../PoiDialog")
+
+[node name="NightEvents" type="Node2D" parent="." node_paths=PackedStringArray("boat", "hud", "dialog", "hull", "boat_range", "spawner", "dock")]
+script = ExtResource("44_events")
+boat = NodePath("../Boat")
+hud = NodePath("../SeaHud")
+dialog = NodePath("../PoiDialog")
+hull = NodePath("../HullController")
+boat_range = NodePath("../BoatRange")
+spawner = NodePath("../FishingSpots")
+dock = NodePath("../Dock")
 
 [node name="FishingSpots" type="Node2D" parent="." node_paths=PackedStringArray("zones_root")]
 script = ExtResource("14_spawner")
@@ -308,6 +412,19 @@ shape = SubResource("CircleShape2D_whirl")
 [node name="DayTint" type="CanvasModulate" parent="."]
 script = ExtResource("11_tint")
 
+[node name="RainLayer" type="CanvasLayer" parent="."]
+
+[node name="RainOverlay" type="Control" parent="RainLayer"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("43_rain")
+
 [node name="SeaHud" parent="." instance=ExtResource("12_hud")]
 
 [node name="LampOil" type="Node" parent="." node_paths=PackedStringArray("minigame", "dock")]
@@ -315,6 +432,18 @@ script = ExtResource("31_oil")
 lamp_upgrade = ExtResource("32_lampup")
 minigame = NodePath("../FishingMinigame")
 dock = NodePath("../Dock")
+
+[node name="WeatherController" type="Node" parent="." node_paths=PackedStringArray("day_tint", "lamp", "oil", "spawner", "boat", "dock", "hud", "rain_overlay")]
+script = ExtResource("41_weather")
+catalog = ExtResource("42_weathercat")
+day_tint = NodePath("../DayTint")
+lamp = NodePath("../Boat/Lamp")
+oil = NodePath("../LampOil")
+spawner = NodePath("../FishingSpots")
+boat = NodePath("../Boat")
+dock = NodePath("../Dock")
+hud = NodePath("../SeaHud")
+rain_overlay = NodePath("../RainLayer/RainOverlay")
 
 [node name="FishingController" type="Node" parent="." node_paths=PackedStringArray("spawner", "boat", "hud", "minigame", "oil")]
 script = ExtResource("16_fishing")

@@ -2,8 +2,8 @@ class_name PhoneMap
 extends Control
 ## Map tab of the phone app. The sea scene captures its layout (zones, land,
 ## islands/rocks, dock, places) into a static snapshot, so the map also works
-## from the restaurant. Live extras when at sea: the boat (group "boat") and
-## nets (group "net_buoys"). Click to add/remove a pin (GameState.map_pins);
+## from the restaurant, plus the current boat's range line. Live extras at
+## sea: the boat (group "boat") and nets (group "net_buoys"). Click to add/remove a pin (GameState.map_pins);
 ## pins also show as edge markers at sea.
 
 const PIN_HIT_RADIUS_PX: float = 8.0
@@ -24,7 +24,7 @@ static var _snap: Dictionary = {}
 
 ## Called by the sea scene once its nodes are ready.
 static func capture(map_size: Vector2, zones_root: Node, land_root: Node, obstacles_root: Node,
-		dock: Node2D, whirlpool_pos: Vector2, places: Array[Node]) -> void:
+		dock: Node2D, whirlpool_pos: Vector2, places: Array[Node], range_y: float = -INF) -> void:
 	var zones: Array = []
 	for child in zones_root.get_children():
 		var zone := child as SeaZone
@@ -39,7 +39,8 @@ static func capture(map_size: Vector2, zones_root: Node, land_root: Node, obstac
 	var rocks: Array = []
 	for child in obstacles_root.get_children():
 		var rock := child as Rock
-		if rock:
+		# Submerged rocks are unknown to the map.
+		if rock and not rock.submerged:
 			rocks.append({"pos": rock.global_position, "radius": rock.radius, "color": rock.color})
 	var poi_list: Array = []
 	for place in places:
@@ -47,7 +48,7 @@ static func capture(map_size: Vector2, zones_root: Node, land_root: Node, obstac
 		if poi:
 			poi_list.append({"pos": poi.global_position, "label": poi.map_label if poi.map_label else poi.title})
 	_snap = {"size": map_size, "zones": zones, "land": land, "rocks": rocks,
-		"dock": dock.global_position, "whirlpool": whirlpool_pos, "places": poi_list}
+		"dock": dock.global_position, "whirlpool": whirlpool_pos, "places": poi_list, "range_y": range_y}
 
 
 static func has_snapshot() -> bool:
@@ -103,6 +104,7 @@ func _draw() -> void:
 		draw_rect(_to_map_rect(rect), land_color)
 	for rock: Dictionary in _snap["rocks"]:
 		draw_circle(_to_map(rock["pos"]), maxf(float(rock["radius"]) * _scale(), 1.5), rock["color"])
+	_draw_range(font)
 	_draw_story_marks(font, fog_open)
 	_draw_dot(font, _snap["dock"], "Bến", dock_color, 3.0)
 	for place: Dictionary in _snap["places"]:
@@ -114,6 +116,18 @@ func _draw() -> void:
 	_draw_boat()
 	var hint := "Click: ghim / bỏ ghim (%d/%d)" % [GameState.map_pins.size(), GameState.MAX_PINS]
 	draw_string(font, Vector2(4, size.y - 4), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(0.6, 0.65, 0.7))
+
+
+## Dashed foam line: how far the current boat can go.
+func _draw_range(font: Font) -> void:
+	var range_y: float = _snap.get("range_y", -INF)
+	if not is_finite(range_y):
+		return
+	var map_size: Vector2 = _snap["size"]
+	var left := _to_map(Vector2(0, range_y))
+	var right := _to_map(Vector2(map_size.x, range_y))
+	draw_dashed_line(left, right, Color(0.85, 0.95, 1.0, 0.8), 1.0, 4.0)
+	draw_string(font, left + Vector2(2, -2), "sóng lớn", HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(0.85, 0.95, 1.0))
 
 
 func _draw_story_marks(font: Font, fog_open: bool) -> void:

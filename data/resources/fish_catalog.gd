@@ -17,11 +17,12 @@ func get_fish_for_zone(zone: FishData.Zone,
 
 ## Weighted pick using spawn_weight among species caught with `method`.
 ## `depth` (0 = shore, 1 = far out) × `rarity_boost` raises the weight of
-## pricier species: the further out, the better the fish.
+## pricier species: the further out, the better the fish. `species_bonus`
+## (id -> multiplier) comes from tonight's weather.
 ## Returns null if nothing matching lives in the zone.
 func pick_random(zone: FishData.Zone, rng: RandomNumberGenerator,
 		method: FishData.CatchMethod = FishData.CatchMethod.ROD,
-		depth: float = 0.0, rarity_boost: float = 0.0) -> FishData:
+		depth: float = 0.0, rarity_boost: float = 0.0, species_bonus: Dictionary = {}) -> FishData:
 	var candidates := get_fish_for_zone(zone, method)
 	var weights: Array[float] = []
 	var max_price := 1
@@ -32,7 +33,7 @@ func pick_random(zone: FishData.Zone, rng: RandomNumberGenerator,
 	var total := 0.0
 	for f in candidates:
 		var value := 0.0 if f.is_aberrant else float(f.base_price) / max_price
-		var w := f.spawn_weight * (1.0 + rarity_boost * depth * value)
+		var w := f.spawn_weight * (1.0 + rarity_boost * depth * value) * float(species_bonus.get(f.id, 1.0))
 		weights.append(w)
 		total += w
 	if total <= 0.0:

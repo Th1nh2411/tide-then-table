@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/test/night_test.gd" id="1_test"]
+[ext_resource type="Resource" path="res://data/weather/weather_catalog.tres" id="2_weather"]
+[ext_resource type="Resource" path="res://data/boats/thuyen_thung.tres" id="3_thung"]
+[ext_resource type="Resource" path="res://data/boats/ghe_cheo.tres" id="4_cheo"]
+[ext_resource type="Resource" path="res://data/boats/ghe_may.tres" id="5_may"]
+[ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="6_fish"]
+[ext_resource type="Script" path="res://data/resources/boat_data.gd" id="7_boatdata"]
+
+[node name="NightTest" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_test")
+weather_catalog = ExtResource("2_weather")
+boats = Array[ExtResource("7_boatdata")]([ExtResource("3_thung"), ExtResource("4_cheo"), ExtResource("5_may")])
+fish_catalog = ExtResource("6_fish")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 600.0
+offset_bottom = 40.0
+text = "Xem kết quả trong Output (PASS / FAIL)."

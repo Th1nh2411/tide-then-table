@@ -86,7 +86,15 @@ func patch(hp: float, cost: int) -> bool:
 func _on_collided(impact_speed: float) -> void:
 	if BoatCondition.is_broken():
 		return
-	var damage := maxf(impact_speed - safe_impact_speed, 0.0) * damage_per_speed * damage_scale
+	apply_damage(maxf(impact_speed - safe_impact_speed, 0.0) * damage_per_speed)
+
+
+## Hull damage from any source (rocks, jellyfish...). Tonight's damage_scale
+## applies; breaking the hull emits boat_broken.
+func apply_damage(amount: float) -> void:
+	if BoatCondition.is_broken():
+		return
+	var damage := amount * damage_scale
 	if damage <= 0.0:
 		return
 	var before := GameState.boat_hp

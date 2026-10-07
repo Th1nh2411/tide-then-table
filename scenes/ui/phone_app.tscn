@@ -9,6 +9,7 @@
 [ext_resource type="Resource" path="res://data/upgrades/rod_upgrade.tres" id="7_rodup"]
 [ext_resource type="Script" path="res://data/resources/upgrade_data.gd" id="8_updata"]
 [ext_resource type="Script" path="res://scenes/ui/phone_map.gd" id="9_map"]
+[ext_resource type="Resource" path="res://data/weather/weather_catalog.tres" id="10_weather"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_phone"]
 bg_color = Color(0.07, 0.08, 0.1, 1)
@@ -31,6 +32,7 @@ menu = ExtResource("3_menu")
 boat_upgrade = ExtResource("4_boatup")
 lamp_upgrade = ExtResource("5_lampup")
 fridge_upgrade = ExtResource("6_fridgeup")
+weather_catalog = ExtResource("10_weather")
 upgrades = Array[ExtResource("8_updata")]([ExtResource("4_boatup"), ExtResource("7_rodup"), ExtResource("5_lampup"), ExtResource("6_fridgeup")])
 
 [node name="Dim" type="ColorRect" parent="."]

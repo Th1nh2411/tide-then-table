@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/rest/rest_scene.gd" id="1_rest"]
 [ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="2_fish"]
+[ext_resource type="Resource" path="res://data/weather/weather_catalog.tres" id="3_weather"]
 
 [node name="RestScene" type="Control"]
 layout_mode = 3
@@ -12,6 +13,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_rest")
 fish_catalog = ExtResource("2_fish")
+weather_catalog = ExtResource("3_weather")
 
 [node name="Sky" type="ColorRect" parent="."]
 layout_mode = 1

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WeatherData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/weather_data.gd" id="1_weather"]
+
+[resource]
+script = ExtResource("1_weather")
+id = "rain"
+display_name = "Mưa"
+forecast = "mưa rải rác, tầm nhìn kém, cá ăn mạnh"
+start_message = "Trời mưa: đèn soi gần lại, nhưng cá ăn mạnh, nhiều cá xịn."
+weight = 2.0
+night_brightness = 0.8
+lamp_scale = 0.7
+rain = true
+rarity_bonus = 3.0
+extra_spots = 1

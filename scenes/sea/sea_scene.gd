@@ -35,6 +35,8 @@ var _dock_confirmed: bool = false
 @onready var _fog: FogArea = $FogArea
 @onready var _hull: HullController = $HullController
 @onready var _oil: LampOil = $LampOil
+@onready var _range: BoatRange = $BoatRange
+@onready var _events: NightEvents = $NightEvents
 @onready var _debug_label: Label = %DebugLabel
 
 
@@ -78,7 +80,7 @@ func _ready() -> void:
 
 func _capture_map() -> void:
 	PhoneMap.capture(Vector2(_bounds.map_size), $Zones, $Land, $Obstacles, _dock,
-		_fog.get_whirlpool_position(), get_tree().get_nodes_in_group("pois"))
+		_fog.get_whirlpool_position(), get_tree().get_nodes_in_group("pois"), _range.limit_y)
 
 
 func _show_orders() -> void:
@@ -188,5 +190,6 @@ func _end_sea_day(towed: bool) -> void:
 	DayClock.stop()
 	_boat.set_physics_process(false)
 	_hud.hide_prompt()
+	_events.on_trip_end(towed)
 	GameState.finish_sea_day(DayClock.current_minutes, towed, _hold_manager.get_items())
 	SceneRouter.go_to(REST_SCENE_PATH)

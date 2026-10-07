@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="WeatherCatalog" format=3]
+
+[ext_resource type="Script" path="res://data/resources/weather_catalog.gd" id="1_catalog"]
+[ext_resource type="Resource" path="res://data/weather/calm.tres" id="2_calm"]
+[ext_resource type="Resource" path="res://data/weather/moon.tres" id="3_moon"]
+[ext_resource type="Resource" path="res://data/weather/wind.tres" id="4_wind"]
+[ext_resource type="Resource" path="res://data/weather/rain.tres" id="5_rain"]
+[ext_resource type="Script" path="res://data/resources/weather_data.gd" id="6_data"]
+
+[resource]
+script = ExtResource("1_catalog")
+weathers = Array[ExtResource("6_data")]([ExtResource("2_calm"), ExtResource("3_moon"), ExtResource("4_wind"), ExtResource("5_rain")])

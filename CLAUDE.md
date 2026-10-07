@@ -81,6 +81,12 @@ Vietnamese, keep code comments in short English.
   oil; the night tint is dark, so lamps are how the player sees), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,
   `OffscreenMarkers` (edge arrows), `TutorialHints` (day 1), `PauseMenu` (Esc;
   must sit before `HoldUI` in the tree so the hold can eat Esc first).
+- Night variety: `BoatRange` (foam line from `BoatData.max_depth`, pushes
+  back), submerged `Rock`s (LIGHT_ONLY material), `WeatherController` +
+  `WeatherData`/`WeatherCatalog` (GameState.weather_id rolled on the rest
+  card), `NightEvents` in `scenes/sea/events/` (stranded boat, bottle,
+  jellyfish, dolphins; tow pay + `GameState.trip_notes` at trip end).
+  Over-bright colors (x3-x5) are how things glow through the night tint.
 - Places (`scenes/sea/poi/`, under `Places` in the sea scene): subclasses of
   `PointOfInterest` (own lamp, E to visit, `_interact()` awaits
   `PoiDialog.ask()`): `WhaleShrine`, `OldManHut`, `Lighthouse`, `LobsterRaft`.

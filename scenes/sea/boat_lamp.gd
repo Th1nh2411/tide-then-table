@@ -12,6 +12,11 @@ extends PointLight2D
 @export var sputter_fraction: float = 0.15
 @export var sputter_amount: float = 0.25
 
+## Tonight's weather radius multiplier (rain shortens the light).
+var weather_scale: float = 1.0:
+	set(value):
+		weather_scale = value
+		_apply_radius()
 var _fraction: float = 1.0
 var _time: float = 0.0
 var _base_energy: float = 1.0
@@ -40,6 +45,6 @@ func _on_oil_changed(amount: float, capacity: float) -> void:
 func _apply_radius() -> void:
 	if texture == null:
 		return
-	var radius := lerpf(radius_empty, radius_full, _fraction)
+	var radius := lerpf(radius_empty, radius_full, _fraction) * weather_scale
 	# The gradient fades out at the texture edge: scale so its half-width = radius.
 	texture_scale = radius * 2.0 / texture.get_width()

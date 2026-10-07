@@ -14,3 +14,5 @@ hold_size = Vector2i(4, 3)
 repair_cost_per_hp = 2.5
 hull_size = Vector2(16, 16)
 color = Color(0.6, 0.45, 0.25, 1)
+max_depth = 0.32
+range_label = "gần bờ"

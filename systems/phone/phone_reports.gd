@@ -96,6 +96,7 @@ static func boat_report(boat: BoatData, lamp_capacity: float, upgrades: Array[Up
 		"Sửa           %.1fk / %%  (sửa đầy: %dk)" % [boat.repair_cost_per_hp, BoatCondition.full_repair_cost(boat)],
 		"Khoang        %dx%d ô" % [boat.hold_size.x, boat.hold_size.y],
 		"Dầu đèn       %d (đổ đầy mỗi đêm)" % roundi(lamp_capacity),
+		"Đi được       %s" % boat.range_label,
 		"",
 		"NÂNG CẤP",
 	]
@@ -123,8 +124,10 @@ static func ledger_report(bar_width: int = 16) -> String:
 
 
 ## Console lines at the bottom of the app. Story clues show up here.
-static func log_lines(fridge_loss: float) -> PackedStringArray:
+static func log_lines(fridge_loss: float, weather: WeatherData = null) -> PackedStringArray:
 	var lines: PackedStringArray = ["[INFO] sync kho... OK (%d món)" % GameState.storage.size()]
+	if weather:
+		lines.append("[INFO] forecast: %s" % weather.forecast)
 	var spoiling := GameState.storage.filter(func(item: InventoryItem) -> bool: return item.freshness <= fridge_loss).size()
 	if spoiling > 0:
 		lines.append("[WARN] %d món sẽ hỏng qua đêm nay" % spoiling)

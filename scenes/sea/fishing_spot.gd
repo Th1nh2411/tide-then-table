@@ -33,6 +33,8 @@ var featured: FishData
 var featured_chance: float = 0.7
 ## Passed to FishCatalog.pick_random for the non-featured casts.
 var rarity_boost: float = 3.0
+## Tonight's weather species multipliers (FishCatalog.pick_random).
+var species_bonus: Dictionary = {}
 var big_shadow: bool = false
 
 var _boat: Boat
@@ -62,7 +64,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func roll_fish(catalog: FishCatalog, rng: RandomNumberGenerator) -> FishData:
 	if featured and rng.randf() < featured_chance:
 		return featured
-	return catalog.pick_random(zone, rng, FishData.CatchMethod.ROD, depth, rarity_boost)
+	return catalog.pick_random(zone, rng, FishData.CatchMethod.ROD, depth, rarity_boost, species_bonus)
 
 
 ## Prompt hint: the featured fish's name once it's in the Dex, else "???".

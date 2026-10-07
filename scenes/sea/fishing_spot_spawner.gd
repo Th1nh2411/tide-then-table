@@ -34,6 +34,10 @@ signal fishing_requested(spot: FishingSpot)
 @export var big_rarity_boost: float = 8.0
 @export var big_max_casts: int = 2
 
+# Tonight's weather (set by WeatherController before spots spawn).
+var extra_spots: int = 0
+var species_bonus: Dictionary = {}
+
 var _rng := RandomNumberGenerator.new()
 
 
@@ -49,7 +53,7 @@ func spawn_spots() -> void:
 		var sea_zone := child as SeaZone
 		if sea_zone == null or not sea_zone.visible:  # hidden = locked (fog)
 			continue
-		for i in sea_zone.spot_count:
+		for i in sea_zone.spot_count + extra_spots:
 			var found: bool = false
 			for attempt in max_attempts_per_spot:
 				var pos := _random_point_in(sea_zone.get_global_rect().grow(-clearance))
@@ -101,12 +105,13 @@ func _roll_catch(spot: FishingSpot) -> void:
 	spot.depth = CatchRoll.depth_at(spot.global_position.y, shore_y, deep_y)
 	spot.rarity_boost = rarity_boost
 	spot.featured_chance = featured_chance
+	spot.species_bonus = species_bonus
 	if catalog == null:
 		return
 	var rod := FishData.CatchMethod.ROD
 	spot.big_shadow = _rng.randf() < lerpf(big_chance_shallow, big_chance_deep, spot.depth)
 	if spot.big_shadow:
-		spot.featured = catalog.pick_random(spot.zone, _rng, rod, 1.0, big_rarity_boost)
+		spot.featured = catalog.pick_random(spot.zone, _rng, rod, 1.0, big_rarity_boost, species_bonus)
 		spot.casts_left = mini(spot.casts_left, big_max_casts)
 	else:
-		spot.featured = catalog.pick_random(spot.zone, _rng, rod, spot.depth, rarity_boost)
+		spot.featured = catalog.pick_random(spot.zone, _rng, rod, spot.depth, rarity_boost, species_bonus)

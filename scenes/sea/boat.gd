@@ -35,6 +35,8 @@ signal collided(impact_speed: float)
 var speed: float = 0.0
 ## Scales top speed (a damaged hull is slower). Set by HullController.
 var speed_multiplier: float = 1.0
+## Scales top speed while towing another boat (night events).
+var tow_multiplier: float = 1.0
 ## Extra angular velocity from spin drift, in degrees/second.
 var _spin: float = 0.0
 
@@ -76,7 +78,7 @@ func _update_speed(throttle: float, delta: float) -> void:
 		speed += throttle * boat_data.acceleration * delta
 	else:
 		speed = move_toward(speed, 0.0, drag * delta)
-	var top := boat_data.max_speed * speed_multiplier
+	var top := boat_data.max_speed * speed_multiplier * tow_multiplier
 	speed = clampf(speed, -top * reverse_ratio, top)
 
 

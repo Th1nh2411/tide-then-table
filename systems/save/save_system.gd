@@ -70,6 +70,7 @@ static func to_dict() -> Dictionary:
 		"best_sizes": GameState.best_sizes.duplicate(),
 		"day_history": GameState.day_history.duplicate(true),
 		"orders": GameState.orders.duplicate(true),
+		"weather_id": GameState.weather_id,
 		"map_pins": GameState.map_pins.map(func(pin: Vector2) -> Array: return [pin.x, pin.y]),
 	}
 
@@ -121,6 +122,10 @@ static func apply_dict(data: Dictionary) -> void:
 			var order := FishOrders.from_save(entry, catalog)
 			if not order.is_empty():
 				GameState.orders.append(order)
+
+	var weather: Variant = data.get("weather_id")
+	if weather is String:
+		GameState.weather_id = weather
 
 	var pins: Variant = data.get("map_pins")
 	if pins is Array:

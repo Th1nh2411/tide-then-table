@@ -37,6 +37,7 @@ func _test_round_trip() -> void:
 	GameState.record_catch(_fish("cua"), 3, 1.4)
 	item.size = 1.25
 	GameState.map_pins.append(Vector2(120.5, 640))
+	GameState.weather_id = "rain"
 	GameState.orders.append({"who": "Chú Ba", "fish": "cua", "min_kg": 0.5, "reward": 120, "due_day": 7})
 	GameState.add_day_record({"day": 5, "earned": 300, "market": 20, "rating": 4})
 	_check("save writes file", SaveSystem.save_game(TEST_PATH) and SaveSystem.has_save(TEST_PATH))
@@ -48,6 +49,7 @@ func _test_round_trip() -> void:
 	_check("upgrades", GameState.get_upgrade_level("boat") == 2 and GameState.get_upgrade_level("rod") == 1)
 	_check("story flag", GameState.has_flag("saw_glowing_fish"))
 	_check("dex counts", int(GameState.caught_species.get("cua", 0)) == 3)
+	_check("weather", GameState.weather_id == "rain")
 	_check("map pins", GameState.map_pins.size() == 1 and GameState.map_pins[0].is_equal_approx(Vector2(120.5, 640)))
 	_check("orders", GameState.orders.size() == 1 and int(GameState.orders[0]["reward"]) == 120)
 	_check("size record", is_equal_approx(GameState.best_size(_fish("cua")), 1.4))

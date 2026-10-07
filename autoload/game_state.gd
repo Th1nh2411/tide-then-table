@@ -50,6 +50,10 @@ var caught_species: Dictionary = {}
 var best_sizes: Dictionary = {}
 ## One Dictionary per finished shift: day, earned, market, rating, served, left.
 var day_history: Array = []
+## Weather of the next / current night trip (WeatherData.id), rolled each morning.
+var weather_id: String = "calm"
+## Extra lines for the rest screen from this trip (night events).
+var trip_notes: Array[String] = []
 ## Player's map pins (world positions), see PhoneMap.
 var map_pins: Array[Vector2] = []
 const MAX_PINS: int = 5
@@ -77,6 +81,8 @@ func reset() -> void:
 	day_history.clear()
 	orders.clear()
 	map_pins.clear()
+	weather_id = "calm"
+	trip_notes.clear()
 
 
 ## Called when the night trip ends: records the return and moves the catch into storage.

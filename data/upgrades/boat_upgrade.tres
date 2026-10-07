@@ -9,7 +9,7 @@
 script = ExtResource("1_upgrade")
 id = "boat"
 display_name = "Thuyền"
-description = "Nhanh hơn, dễ lái hơn, khoang rộng hơn."
+description = "Nhanh hơn, khoang rộng hơn, và đi được xa hơn (sóng ngoài khơi đánh lùi thuyền nhỏ)."
 levels = Array[int]([300, 800])
 values = [ExtResource("2_thung"), ExtResource("3_cheo"), ExtResource("4_may")]
-value_labels = Array[String](["Thuyền thúng (khoang 4x3)", "Ghe chèo (khoang 5x4)", "Ghe máy (khoang 6x5)"])
+value_labels = Array[String](["Thuyền thúng (4x3, gần bờ)", "Ghe chèo (5x4, tới rạn đá)", "Ghe máy (6x5, ra khơi xa)"])

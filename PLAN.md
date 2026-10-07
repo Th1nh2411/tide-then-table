@@ -171,6 +171,13 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 
 > **Bản đồ trên điện thoại (tab "Bản đồ"):** màn biển chụp bố cục map (vùng nước, bờ, đảo/đá, bến, điểm ghé) vào snapshot tĩnh lúc vào biển, nên ở quán vẫn xem được. Ngoài biển hiện thêm thuyền (mũi tên theo hướng) và lưới đang thả. Vùng sương: trước điềm báo không có gì, sau điềm báo nháy "[ERR] NaN" ở góc đông bắc, khi mở thì hiện vùng sương + "???" ở xoáy nước. Click lên bản đồ để ghim/bỏ ghim (tối đa 5, lưu trong save); ghim hiện thành mũi tên "Ghim N" ở mép màn hình khi ra khơi.
 
+> **Đi đêm thêm chiều sâu (sau Phase 9):**
+> - **Tầm đi theo thuyền** (`BoatData.max_depth`, `BoatRange`): thuyền thúng 0.32 (gần bờ + mép rạn), ghe chèo 0.6 (rạn đá + mép khơi), ghe máy 1.0 (cả map). Vượt vạch sóng (bọt trắng, cả trên bản đồ điện thoại) thì bị đẩy lùi 90px/s và giới hạn tốc độ 20. Chòi ông Tám, hải đăng và vùng sương cần ghe máy; bè tôm hùm thuyền thúng tới được.
+> - **Đá ngầm**: 12 viên `Rock.submerged` ở rạn đá và ngoài khơi, chỉ vẽ ở chỗ có đèn chiếu (CanvasItemMaterial LIGHT_ONLY), không có trên bản đồ.
+> - **Thời tiết** (`WeatherData` trong data/weather/, `WeatherController`): chọn ở màn sáng cho chuyến kế tiếp, hiện dự báo ở màn sáng + log điện thoại + cạnh đồng hồ ở biển; đêm 1 luôn lặng. Lặng (x3): không gì. Trăng (x2): trời sáng x1.8, mực x3. Gió (x2): trôi 22px/s hướng ngẫu nhiên, dầu x1.15. Mưa (x2): đèn x0.7, trời tối x0.8, rarity +3, +1 điểm câu/vùng, vệt mưa trên màn hình.
+> - **Sự kiện đêm** (`NightEvents`, từ đêm 2, 1–2 sự kiện khác loại, chỉ trong tầm thuyền): ghe chết máy (E: kéo về → thuyền chậm x0.65, cập bến +80k; bị cứu hộ thì không tiền), chai thư (5 trang truyện về "lớp biển bên dưới", lưu story_flags; hết trang thì bán ve chai 5k), đàn sứa phát sáng (trôi chậm, trong đàn -3 bền mỗi 1.5s), đàn cá heo (lại gần thì bơi tới điểm câu tốt nhất trong tầm — ưu tiên bóng cá lớn — chờ 25s rồi đi). Ghi chú cuối chuyến hiện ở màn sáng (`GameState.trip_notes`).
+> Test: scenes/test/night_test.tscn.
+
 > **Tiện ích (sau Phase 9):** Esc = menu tạm dừng (Tiếp tục / Về menu — bấm 2 lần / Thoát + bảng phím) ở biển và quán. Mũi tên mép màn hình chỉ Bến, Lưới, và xoáy nước "???" kèm khoảng cách (m). Ngày 1 có gợi ý theo ngữ cảnh. "Chơi mới" khi đã có save phải bấm 2 lần.
 
 > **Thân thuyền (sau Phase 9):** đâm đá/đảo nhanh hơn 25px/s thì mất độ bền (0.3%/px/s, đâm chéo nhẹ hơn). Dưới 50% thuyền chậm dần (tối thiểu 60% tốc độ). 0% = hư: cứu hộ kéo về (-150k, +1 giờ game). Sửa: thúng 2.5k/%, ghe chèo 4k/%, ghe máy 7k/%, sửa được bao nhiêu theo tiền có; sửa ở quán (nút) hoặc ở khu bến (F), không sửa khi đang ra khơi. Sáng ra thuyền còn hư thì không chạy được tới khi sửa. Độ bền được lưu.

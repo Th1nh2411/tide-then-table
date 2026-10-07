@@ -26,6 +26,8 @@ signal oil_empty
 ## Warn once when the tank drops to this fraction.
 @export var low_fraction: float = 0.25
 
+## Tonight's weather burn multiplier (WeatherController).
+var weather_burn_scale: float = 1.0
 var capacity: float = 100.0
 var amount: float = 100.0
 
@@ -59,7 +61,7 @@ func _process(delta: float) -> void:
 	if dock and dock.is_boat_inside():
 		return
 	var scale := minigame_burn_scale if minigame and minigame.is_running() else 1.0
-	amount = maxf(amount - burn_per_second * scale * delta, 0.0)
+	amount = maxf(amount - burn_per_second * scale * weather_burn_scale * delta, 0.0)
 	_apply()
 
 

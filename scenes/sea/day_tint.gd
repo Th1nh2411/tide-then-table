@@ -18,6 +18,11 @@ func _ready() -> void:
 	_on_time_changed(DayClock.current_minutes)
 
 
+## Re-apply after night_color changed (weather).
+func refresh() -> void:
+	_on_time_changed(DayClock.current_minutes)
+
+
 func _on_time_changed(minutes: float) -> void:
 	var hour := minutes / 60.0
 	if hour <= dawn_start_hour:

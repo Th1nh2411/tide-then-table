@@ -19,6 +19,8 @@ const MAP_TAB: int = 3
 ## Upgrades listed in the boat tab.
 @export var upgrades: Array[UpgradeData] = []
 @export var font_size: int = 9
+## For the forecast log line.
+@export var weather_catalog: WeatherCatalog
 
 var _tab: int = 0
 var _opened_pause: bool = false
@@ -91,7 +93,8 @@ func _show_tab(index: int) -> void:
 	_map.visible = index == MAP_TAB
 	_scroll.visible = index != MAP_TAB
 	_content_label.text = _tab_text(index)
-	_log_label.text = "\n".join(PhoneReports.log_lines(_fridge_loss()))
+	var weather: WeatherData = weather_catalog.find(GameState.weather_id) if weather_catalog else null
+	_log_label.text = "\n".join(PhoneReports.log_lines(_fridge_loss(), weather))
 
 
 func _tab_text(index: int) -> String:
