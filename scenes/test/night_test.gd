@@ -55,6 +55,14 @@ func _ready() -> void:
 	_check("bottles default 0", MessageBottle.pages_read() == 0)
 	GameState.set_flag(MessageBottle.READ_FLAG, 3.0)
 	_check("bottles from save", MessageBottle.pages_read() == 3)
+	# Dock unload mid-night: storage now, still counted in tonight's catch.
+	GameState.reset()
+	var tom: FishData = fish_catalog.fish.filter(func(f: FishData) -> bool: return f.id == "tom")[0]
+	GameState.unload_catch([InventoryItem.new(tom), InventoryItem.new(tom)])
+	_check("unload -> storage", GameState.storage.size() == 2 and GameState.trip_catch.size() == 2)
+	GameState.finish_sea_day(120.0, false, [InventoryItem.new(tom)])
+	_check("trip catch joins last catch", GameState.last_catch.size() == 3 and GameState.storage.size() == 3
+		and GameState.trip_catch.is_empty())
 	GameState.reset()
 	print("Night: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
 

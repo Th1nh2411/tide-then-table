@@ -67,7 +67,8 @@ Vietnamese, keep code comments in short English.
   `LampOil` at sea and by shift progress in the restaurant; `running` = night
   trip in progress), `SceneRouter` (`go_to(path, fade_color)`).
 - Flow: main menu → sea night trip (`scenes/sea/sea_scene.tscn`, autosave at
-  start) → dock / rescue (broken hull or no oil) → rest card
+  start) → dock (E: unload the hold and keep fishing, or go home) / rescue (broken
+  hull or no oil) → rest card
   (`scenes/rest/rest_scene.tscn`, autosave #2: Continue resumes at the
   restaurant via `GameState.resume_at`; use `SaveSystem.autosave()`) → restaurant (menu planning → shift →
   summary + rating → upgrade shop) → next day (freshness loss) → sea …

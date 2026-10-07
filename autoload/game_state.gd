@@ -37,6 +37,8 @@ var return_minutes: float = 0.0
 var was_towed: bool = false
 ## Items unloaded from the hold this trip (already added to storage).
 var last_catch: Array = []
+## Unloaded at the dock earlier tonight (night goes on); joins last_catch.
+var trip_catch: Array = []
 
 ## Stars (1-5) from the last shift; drives customer frequency the next day.
 var last_rating: int = STARTING_RATING
@@ -76,6 +78,7 @@ func reset() -> void:
 	return_minutes = 0.0
 	was_towed = false
 	last_catch.clear()
+	trip_catch.clear()
 	last_rating = STARTING_RATING
 	last_spoiled_count = 0
 	boat_hp = 100.0
@@ -93,8 +96,15 @@ func reset() -> void:
 func finish_sea_day(returned_at: float, towed: bool, hold_items: Array) -> void:
 	return_minutes = returned_at
 	was_towed = towed
-	last_catch = hold_items.duplicate()
+	last_catch = trip_catch + hold_items
+	trip_catch.clear()
 	storage.append_array(hold_items)
+
+
+## Mid-night unload at the dock: the catch goes to storage, the trip goes on.
+func unload_catch(items: Array) -> void:
+	trip_catch.append_array(items)
+	storage.append_array(items)
 
 
 ## Move to the next day: storage loses `freshness_loss` freshness and

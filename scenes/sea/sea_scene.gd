@@ -22,8 +22,6 @@ const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 @export var whirlpool_pull_seconds: float = 2.0
 
 var _day_ended: bool = false
-## Set after warning about nets still at sea; a second `interact` docks anyway.
-var _dock_confirmed: bool = false
 
 @onready var _boat: Boat = $Boat
 @onready var _bounds: MapBounds = $MapBounds
@@ -37,6 +35,7 @@ var _dock_confirmed: bool = false
 @onready var _oil: LampOil = $LampOil
 @onready var _range: BoatRange = $BoatRange
 @onready var _events: NightEvents = $NightEvents
+@onready var _dock_dialog: PoiDialog = $PoiDialog
 @onready var _debug_label: Label = %DebugLabel
 
 
@@ -137,12 +136,24 @@ func _on_whirlpool_entered(_whirlpool: Whirlpool) -> void:
 	SceneRouter.go_to(ENDING_SCENE_PATH, Color.WHITE)
 
 
+## At the dock: unload the hold and keep fishing, or go home to sleep.
 func _on_docking_requested() -> void:
-	if _nets.nets_out() > 0 and not _dock_confirmed:
-		_dock_confirmed = true
-		_hud.flash_message("Còn %d lưới ngoài biển! E lần nữa để bỏ lại (mất ốc trong lưới)" % _nets.nets_out(), 2.5)
+	if _day_ended or _dock_dialog.is_open():
 		return
-	_end_sea_day(false)
+	var count := _hold_manager.get_items().size()
+	var unload := "Dỡ %d con vào kho rồi đi câu tiếp" % count if count > 0 else "Dỡ cá vào kho (khoang đang trống)"
+	var home := "Về nhà ngủ (hết đêm)"
+	if _nets.nets_out() > 0:
+		home += " — bỏ lại %d lưới ngoài biển" % _nets.nets_out()
+	var choice := await _dock_dialog.ask("Bến Xóm Đèn", "Dầu không cháy khi đậu ở bến. Đêm còn tới lúc dầu cạn.",
+		PackedStringArray([unload, home, "Ở lại"]))
+	match choice:
+		0:
+			if count > 0:
+				GameState.unload_catch(_hold_manager.take_all())
+				_hud.flash_message("Đã dỡ %d con vào kho. Ra khơi tiếp thôi!" % count, 2.0)
+		1:
+			_end_sea_day(false)
 
 
 func _on_dock_entered() -> void:
@@ -151,14 +162,13 @@ func _on_dock_entered() -> void:
 
 
 func _on_dock_exited() -> void:
-	_dock_confirmed = false
 	_hull.set_at_dock(false)
 	_hud.hide_prompt()
 
 
 func _refresh_dock_prompt() -> void:
 	if _hull.is_at_dock() and not _day_ended:
-		_hud.show_prompt("E: Cập bến" + _hull.repair_prompt())
+		_hud.show_prompt("E: Bến (dỡ cá / về ngủ)" + _hull.repair_prompt())
 
 
 func _on_boat_broken() -> void:

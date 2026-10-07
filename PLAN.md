@@ -180,6 +180,7 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 > - **Đá ngầm**: 12 viên `Rock.submerged` ở rạn đá và ngoài khơi, chỉ vẽ ở chỗ có đèn chiếu (CanvasItemMaterial LIGHT_ONLY), không có trên bản đồ.
 > - **Thời tiết** (`WeatherData` trong data/weather/, `WeatherController`): chọn ở màn sáng cho chuyến kế tiếp, hiện dự báo ở màn sáng + log điện thoại + cạnh đồng hồ ở biển; đêm 1 luôn lặng. Lặng (x3): không gì. Trăng (x2): trời sáng x1.8, mực x3. Gió (x2): trôi 22px/s hướng ngẫu nhiên, dầu x1.15. Mưa (x2): đèn x0.7, trời tối x0.8, rarity +3, +1 điểm câu/vùng, vệt mưa trên màn hình.
 > - **Sự kiện đêm** (`NightEvents`, từ đêm 2, 1–2 sự kiện khác loại, chỉ trong tầm thuyền): ghe chết máy (E: kéo về → thuyền chậm x0.65, cập bến +80k; bị cứu hộ thì không tiền), chai thư (5 trang truyện về "lớp biển bên dưới", lưu story_flags; hết trang thì bán ve chai 5k), đàn sứa phát sáng (trôi chậm, trong đàn -3 bền mỗi 1.5s), đàn cá heo (lại gần thì bơi tới điểm câu tốt nhất trong tầm — ưu tiên bóng cá lớn — chờ 25s rồi đi). Ghi chú cuối chuyến hiện ở màn sáng (`GameState.trip_notes`).
+> - **Dỡ cá ở bến**: cập bến bấm E → hộp thoại: "Dỡ N con vào kho rồi đi câu tiếp" / "Về nhà ngủ (hết đêm)" (báo nếu còn lưới ngoài biển) / "Ở lại". Cá dỡ giữa đêm vào kho ngay (`GameState.unload_catch`, `trip_catch`) và vẫn tính vào mẻ đêm nay ở màn sáng. Khoang vẫn giới hạn mỗi chuyến; cái giá là dầu cho quãng đường quay về.
 > Test: scenes/test/night_test.tscn.
 
 > **Quán nâng cấp + lưu 2 lần:**

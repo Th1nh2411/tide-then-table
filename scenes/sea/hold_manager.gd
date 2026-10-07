@@ -40,6 +40,14 @@ func get_items() -> Array[InventoryItem]:
 	return hold.items.duplicate()
 
 
+## Empties the hold (unloading at the dock) and returns what was in it.
+func take_all() -> Array[InventoryItem]:
+	var items := get_items()
+	for item in items:
+		hold.remove(item)
+	return items
+
+
 func add_catch(fish: FishData, quality: float, count: int, size: float = 1.0) -> void:
 	GameState.record_catch(fish, count, size)  # for the phone's Dex
 	var overflow: Array[InventoryItem] = []
