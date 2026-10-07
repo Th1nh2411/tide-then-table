@@ -1,22 +1,12 @@
 class_name RestaurantDecor
 extends Control
-## Draws the dining room furniture that depends on upgrades: one table +
-## stool per seat (seats upgrade) and the decorations (decor upgrade):
-## level 1 = red lanterns along the wall, level 2 = + flower pots and a
-## painting. Placeholder drawing only.
-
-@export var table_offset: Vector2 = Vector2(24, 18)
-@export var table_size: Vector2 = Vector2(36, 6)
-@export var leg_size: Vector2 = Vector2(6, 14)
-@export var stool_offset: Vector2 = Vector2(2, 30)
-@export var stool_size: Vector2 = Vector2(14, 8)
-@export var table_colors: Array[Color] = [Color(0.85, 0.2, 0.2), Color(0.2, 0.6, 0.35),
-	Color(0.9, 0.7, 0.2), Color(0.2, 0.45, 0.85)]
+## Draws the decorations from the decor upgrade: level 1 = red lanterns
+## along the wall, level 2 = + flower pots and a painting. (Tables are drawn
+## by DiningTables.) Placeholder drawing only.
 @export var lantern_y: float = 70.0
 @export var lantern_x_range: Vector2 = Vector2(180.0, 570.0)
 @export var lantern_count: int = 6
 
-var _seats: Array[Vector2] = []
 var _level: int = 0
 var _time: float = 0.0
 
@@ -26,8 +16,7 @@ func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 
 
-func setup(seats: Array[Vector2], decor_level: int) -> void:
-	_seats = seats
+func setup(decor_level: int) -> void:
 	_level = decor_level
 	queue_redraw()
 
@@ -43,12 +32,6 @@ func _draw() -> void:
 		_draw_painting(Vector2(440, 100))
 		for x in [168.0, 590.0]:
 			_draw_flower_pot(Vector2(x, 262))
-	for i in _seats.size():
-		var seat := _seats[i]
-		var color := table_colors[i % table_colors.size()]
-		draw_rect(Rect2(seat + table_offset, table_size), color)
-		draw_rect(Rect2(seat + table_offset + Vector2((table_size.x - leg_size.x) * 0.5, table_size.y), leg_size), color)
-		draw_rect(Rect2(seat + stool_offset, stool_size), color.darkened(0.2))
 	if _level >= 1:
 		_draw_lanterns()
 

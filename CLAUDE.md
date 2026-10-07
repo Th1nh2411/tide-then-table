@@ -99,13 +99,14 @@ Vietnamese, keep code comments in short English.
   starts, shown on the sea HUD + phone tab; at shift start the fish is set
   aside (`reserve_for_shift`) and the regular comes to the restaurant;
   unserved fish released, overdue orders expire after the shift.
-- Restaurant: `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (seats/decor
-  upgrades, rich customers, regulars eating their order), service: Rin
-  cooks on click (`Kitchen` + `CookingOverlay`) → counter → `Waiter` "Bảo"
-  carries dishes automatically; a second `Waiter` (RinHelper, manual) lets
-  Rin carry one while the stove is unattended (`Kitchen.rin_away`),
-  `RestaurantDecor` (tables + lanterns drawn from upgrades),
-  `CookingOverlay` (Grill/Steam/Stir), `UpgradeShop`, `RepairButton`.
+- Restaurant: `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (spawning,
+  ordering, waiter jobs, payment; seats/decor upgrades, rich customers,
+  regulars), `DishShelf` (pure: plates + arrival-order matching),
+  `DiningTables` (free/taken/dirty), `KitchenView` (CanvasLayer opened by E
+  at the kitchen door: trays → `CookingOverlay` → shelf, bin, carry out;
+  must sit after `PauseMenu` so it gets Esc first), `Waiter` "Bảo" (carry /
+  clean jobs), `RinWalker` (player: A/D + E), `ShelfDisplay`,
+  `RestaurantDecor`, `UpgradeShop`, `RepairButton`.
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and
   restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is
   an IT graduate whose failed startup (with friend Bảo, now the restaurant's

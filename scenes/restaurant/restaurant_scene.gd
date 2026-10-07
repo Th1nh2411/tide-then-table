@@ -3,6 +3,10 @@ extends Control
 ## Flow: prepare today's menu from storage -> open at 15:00 -> serve customers
 ## until closing at 24:00 (fixed real-time shift, or the player closes early)
 ## -> leftovers go back to storage -> summary.
+## Service (Dave the Diver style): Rin walks with A/D, E at the kitchen door
+## opens the KitchenView (cook from prepared trays onto the shelf); Bảo
+## carries plates in order and cleans tables; Rin can carry a plate or clean
+## a table too.
 ## Once the menu sells out, customers can only order snacks (peanuts), so a
 ## poorly prepared menu earns little. A menu with few dishes lowers all prices.
 ## After the summary (with a 1-5 star rating) comes the upgrade shop, then
@@ -25,8 +29,8 @@ const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 @export var message_seconds: float = 1.5
 ## Fridge upgrade: its value is the freshness lost overnight.
 @export var fridge_upgrade: UpgradeData
-## After closing, dishes still on the stove/counter get this long to be served.
-@export var closing_grace_seconds: float = 12.0
+## After closing, waiting customers get this long to still be served.
+@export var closing_grace_seconds: float = 15.0
 
 var _plan: MenuPlan
 var _time_left: float = 0.0
@@ -53,6 +57,8 @@ var _regular_visits: Array[Dictionary] = []
 @onready var _next_day_button: Button = %NextDayButton
 @onready var _close_early_button: Button = %CloseEarlyButton
 @onready var _shop: UpgradeShop = %UpgradeShop
+@onready var _rin: RinWalker = $RinWalker
+@onready var _kitchen_view: KitchenView = $KitchenView
 
 
 func _ready() -> void:
@@ -69,8 +75,13 @@ func _ready() -> void:
 	_close_early_button.hide()
 
 	_regular_visits = FishOrders.reserve_for_shift(menu)
-	(%Decor as RestaurantDecor).setup(_customers.seat_positions,
-		int(GameState.get_upgrade_value(_customers.decor_upgrade)) if _customers.decor_upgrade else 0)
+	(%Decor as RestaurantDecor).setup(_customers.decor_level())
+	_rin.kitchen_requested.connect(_open_kitchen)
+	_rin.serve_requested.connect(_on_rin_serve)
+	_rin.clean_requested.connect(func(seat: int) -> void: (_customers.tables as DiningTables).clean(seat))
+	_rin.message_requested.connect(_show_message)
+	_kitchen_view.closed.connect(func() -> void: _rin.active = _shift_running or not _customers.is_idle())
+	_kitchen_view.carry_requested.connect(func(plate: DishShelf.Plate) -> void: _rin.carried = plate)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
 		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
 	_plan = MenuPlan.new(menu_slots, GameState.money)
@@ -96,8 +107,9 @@ func _open_shop() -> void:
 	_shift_running = true
 	_close_early_button.show()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
+	_rin.active = true
 	if GameState.day == 1:
-		_show_message("Quán mở cửa! Click khách để nấu. Bảo tự bưng ra; click khách có món xong để Rin bưng giúp.", 5.0)
+		_show_message("A/D: đi · E ở cửa BẾP: vào nấu món khách gọi · Bảo tự bưng và dọn bàn · E ở bàn bẩn: dọn", 6.0)
 	else:
 		_show_message("Quán mở cửa!")
 	_refresh_storage()
@@ -137,18 +149,25 @@ func _end_shift(reason: String) -> void:
 	_close_early_button.hide()
 	_customers.stop_shift()
 	_show_message(reason)
-	# Let dishes already cooking / on the counter reach their tables.
+	# Customers already inside can still be served for a while.
 	var waited := 0.0
 	while not _customers.is_idle() and waited < closing_grace_seconds:
 		await get_tree().process_frame
 		waited += get_process_delta_time()
-	var kitchen: Kitchen = _customers.kitchen
-	if kitchen.is_cooking():
-		await kitchen.cooking_ended
 	_customers.clear_room()
+	while not _customers.is_idle():  # the last ones finish eating
+		await get_tree().process_frame
+	var cooking: CookingOverlay = $CookingOverlay
+	while cooking.is_running():
+		await get_tree().process_frame
+	if _kitchen_view.visible:
+		_kitchen_view.close()
+	_rin.active = false
+	_rin.carried = null
 	var leftover := _plan.total_portions()
 	_plan.clear(GameState.storage)
-	for visit in _customers.unserved_regulars():
+	# Plates left on the shelf are wasted; uncooked trays go back to storage.
+	for visit in _customers.uncooked_regular_visits():
 		FishOrders.release(visit)
 	var order_lines := FishOrders.expire_after_shift(fish_catalog)
 	_shift_over = true
@@ -166,6 +185,25 @@ func _end_shift(reason: String) -> void:
 		("\n" + "\n".join(order_lines)) if not order_lines.is_empty() else ""]
 	_summary_panel.show()
 	_next_day_button.grab_focus()
+
+
+func _open_kitchen() -> void:
+	if _rin.carried:
+		# Coming back in with a plate: put it back on the shelf if there's room.
+		if _customers.shelf.add(_rin.carried):
+			_rin.carried = null
+		else:
+			_show_message("Kệ đầy, bưng món đang cầm ra trước đã")
+			return
+	_rin.active = false
+	_kitchen_view.open(_plan)
+
+
+func _on_rin_serve(seat: int) -> void:
+	if _customers.serve_at(seat, _rin.carried):
+		_rin.carried = null
+	else:
+		_show_message("Bàn %d không gọi món này" % (seat + 1))
 
 
 func _on_customer_served(price: int, tip: int) -> void:

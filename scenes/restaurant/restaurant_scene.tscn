@@ -20,8 +20,11 @@
 [ext_resource type="Resource" path="res://data/upgrades/decor_upgrade.tres" id="18_decorup"]
 [ext_resource type="Resource" path="res://data/upgrades/kitchen_upgrade.tres" id="19_kitchenup"]
 [ext_resource type="Script" path="res://scenes/restaurant/restaurant_decor.gd" id="20_decor"]
-[ext_resource type="Script" path="res://scenes/restaurant/kitchen.gd" id="21_kitchen"]
+[ext_resource type="Script" path="res://scenes/restaurant/dining_tables.gd" id="21_tables"]
 [ext_resource type="Script" path="res://scenes/restaurant/waiter.gd" id="22_waiter"]
+[ext_resource type="Script" path="res://scenes/restaurant/rin_walker.gd" id="23_rin"]
+[ext_resource type="Script" path="res://scenes/restaurant/shelf_display.gd" id="24_shelf"]
+[ext_resource type="Script" path="res://scenes/restaurant/kitchen_view.gd" id="25_kview"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -135,22 +138,32 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("20_decor")
 
+[node name="DiningTables" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("21_tables")
+
+[node name="ShelfDisplay" type="Control" parent="." node_paths=PackedStringArray("customers")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("24_shelf")
+customers = NodePath("../CustomerManager")
+
 [node name="CustomerLayer" type="Control" parent="."]
 anchors_preset = 0
 mouse_filter = 2
 
-[node name="Kitchen" type="Control" parent="." node_paths=PackedStringArray("cooking")]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-script = ExtResource("21_kitchen")
-cooking = NodePath("../CookingOverlay")
-
-[node name="Waiter" type="Control" parent="." node_paths=PackedStringArray("kitchen")]
+[node name="Waiter" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -159,9 +172,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("22_waiter")
-kitchen = NodePath("../Kitchen")
 
-[node name="RinHelper" type="Control" parent="." node_paths=PackedStringArray("kitchen")]
+[node name="RinWalker" type="Control" parent="." node_paths=PackedStringArray("tables")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -169,15 +181,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-script = ExtResource("22_waiter")
-kitchen = NodePath("../Kitchen")
-display_name = "Rin"
-auto_serve = false
-speed = 140.0
-carry_capacity = 1
-home_x = 150.0
-body_color = Color(0.2, 0.45, 0.8, 1)
-visible_at_home = false
+script = ExtResource("23_rin")
+tables = NodePath("../DiningTables")
 
 [node name="HUD" type="Control" parent="."]
 anchors_preset = 0
@@ -383,13 +388,12 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Ra khơi đêm mới"
 
-[node name="CustomerManager" type="Node" parent="." node_paths=PackedStringArray("kitchen", "waiter", "rin_helper", "customer_layer")]
+[node name="CustomerManager" type="Node" parent="." node_paths=PackedStringArray("tables", "waiter", "customer_layer")]
 script = ExtResource("2_mgr")
 customer_scene = ExtResource("3_customer")
 menu = ExtResource("4_menu")
-kitchen = NodePath("../Kitchen")
+tables = NodePath("../DiningTables")
 waiter = NodePath("../Waiter")
-rin_helper = NodePath("../RinHelper")
 customer_layer = NodePath("../CustomerLayer")
 seats_upgrade = ExtResource("17_seatsup")
 decor_upgrade = ExtResource("18_decorup")
@@ -399,5 +403,11 @@ door_position = Vector2(605, 228)
 kitchen_upgrade = ExtResource("19_kitchenup")
 
 [node name="PauseMenu" parent="." instance=ExtResource("14_pause")]
+
+[node name="KitchenView" type="CanvasLayer" parent="." node_paths=PackedStringArray("cooking", "customers")]
+script = ExtResource("25_kview")
+cooking = NodePath("../CookingOverlay")
+customers = NodePath("../CustomerManager")
+menu = ExtResource("4_menu")
 
 [node name="PhoneApp" parent="." instance=ExtResource("16_phone")]

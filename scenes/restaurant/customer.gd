@@ -1,46 +1,50 @@
 class_name Customer
 extends Control
-## A customer: walks in, sits at a table and orders, shows an order bubble
-## and a patience bar, waits until the dish is cooked (Rin, on click) and
-## carried out (Bảo, or Rin helping), then walks out. Placeholder drawing only.
+## A customer: walks in to a table, reads the menu for a moment, orders
+## (bubble + patience bar), waits until a waiter brings the dish, eats for a
+## few seconds, then pays and leaves (CustomerManager handles money and the
+## dirty table). Runs out of patience while waiting = leaves angry.
 ## Special kinds: a regular coming for their fish order (name tag, gold
 ## bubble, more patient) and a well-off customer (gold shirt, pays more).
+## Placeholder drawing only.
 
-signal clicked(customer: Customer)
+signal ordered(customer: Customer)
 signal patience_ran_out(customer: Customer)
+signal finished_eating(customer: Customer)
 
-## WAITING = ordered; COOKING = Rin is cooking it; READY = dish on the
-## counter or being carried out.
-enum State { WALKING_IN, WAITING, COOKING, READY, LEAVING }
+enum State { WALKING_IN, READING, WAITING, EATING, LEAVING }
 
-## Seconds from full patience to leaving.
+## Seconds from full patience to leaving (only while WAITING).
 @export var patience_seconds: float = 45.0
 @export var walk_seconds: float = 1.5
+## Reading the menu before ordering (random in range).
+@export var read_seconds: Vector2 = Vector2(1.5, 3.0)
+@export var eat_seconds: Vector2 = Vector2(4.0, 6.0)
 @export var body_size: Vector2 = Vector2(18, 34)
 @export var bubble_size: Vector2 = Vector2(96, 22)
 
+## Ordered dish (chosen by the manager when the customer orders).
 var dish: DishData
-## Ingredients of the menu portion this customer ordered
-## (empty for market dishes).
-var ingredients: Array[InventoryItem] = []
-## 1.0 = full patience, 0.0 = leaving.
-var patience: float = 1.0
-var state: State = State.WALKING_IN
-## Set for a regular eating their order (FishOrders); empty otherwise.
+## Set for a regular eating their order (the FishOrders visit); {} otherwise.
+var visit: Dictionary = {}
 var regular_name: String = ""
-## The order Dictionary and price for a regular.
-var order: Dictionary = {}
 ## Well-off customer (decor upgrade): pays more, less patient.
 var rich: bool = false
-## Price multiplier of the cooked dish (1.0 from Bảo, more if Rin seasoned it).
-var cook_multiplier: float = 1.0
+## Table index.
+var seat: int = -1
+## 1.0 = full patience, 0.0 = leaving.
+var patience: float = 1.0
+## The dish being eaten (set when served).
+var plate: DishShelf.Plate
+var state: State = State.WALKING_IN
 
+var _timer: float = 0.0
 var _shirt_color: Color
 
 
 func _ready() -> void:
 	size = body_size
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_shirt_color = Color.from_hsv(randf(), 0.5, 0.85)
 	if rich:
 		_shirt_color = Color(0.95, 0.8, 0.3)
@@ -53,51 +57,69 @@ func walk_to(target: Vector2) -> void:
 	tween.tween_property(self, "position", target, walk_seconds)
 	await tween.finished
 	if state == State.WALKING_IN:
-		state = State.WAITING
+		state = State.READING
+		_timer = randf_range(read_seconds.x, read_seconds.y)
 
 
-func set_cooking(cooking: bool) -> void:
-	state = State.COOKING if cooking else State.WAITING
+## The dish arrives at the table.
+func serve(p_plate: DishShelf.Plate) -> void:
+	plate = p_plate
+	state = State.EATING
+	_timer = randf_range(eat_seconds.x, eat_seconds.y)
 
 
-func set_ready() -> void:
-	state = State.READY
+func is_waiting() -> bool:
+	return state == State.WAITING
 
 
 ## Walk to the door and disappear.
 func leave(door_position: Vector2) -> void:
 	state = State.LEAVING
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var tween := create_tween()
 	tween.tween_property(self, "position", door_position, walk_seconds)
 	tween.tween_callback(queue_free)
 
 
 func _process(delta: float) -> void:
-	# Patience drops from sitting down until the dish arrives.
-	if state == State.WAITING or state == State.COOKING or state == State.READY:
-		patience = maxf(patience - delta / patience_seconds, 0.0)
-		if patience <= 0.0:
-			patience_ran_out.emit(self)
 	queue_redraw()
-
-
-func _gui_input(event: InputEvent) -> void:
-	var mouse := event as InputEventMouseButton
-	if mouse and mouse.pressed and mouse.button_index == MOUSE_BUTTON_LEFT \
-			and state != State.WALKING_IN and state != State.LEAVING:
-		accept_event()
-		clicked.emit(self)
+	match state:
+		State.READING:
+			_timer -= delta
+			if _timer <= 0.0:
+				state = State.WAITING
+				ordered.emit(self)
+		State.WAITING:
+			patience = maxf(patience - delta / patience_seconds, 0.0)
+			if patience <= 0.0:
+				patience_ran_out.emit(self)
+		State.EATING:
+			_timer -= delta
+			if _timer <= 0.0:
+				finished_eating.emit(self)
 
 
 func _draw() -> void:
-	# Body + head.
 	draw_rect(Rect2(Vector2(0, 12), Vector2(body_size.x, body_size.y - 12)), _shirt_color)
 	draw_circle(Vector2(body_size.x * 0.5, 6), 6, Color(0.95, 0.8, 0.65))
 	if rich:
 		draw_rect(Rect2(Vector2(body_size.x * 0.5 - 1, 14), Vector2(2, 8)), Color(0.6, 0.15, 0.15))  # tie
-	if state == State.WAITING or state == State.COOKING or state == State.READY:
-		_draw_order_bubble()
+	match state:
+		State.READING:
+			_draw_thinking()
+		State.WAITING:
+			_draw_order_bubble()
+		State.EATING:
+			# Chopsticks going up and down.
+			var lift := absf(sin(_timer * 6.0)) * 4.0
+			draw_line(Vector2(body_size.x + 2, 16 - lift), Vector2(body_size.x + 10, 22 - lift), Color(0.6, 0.45, 0.3), 1.0)
+
+
+func _draw_thinking() -> void:
+	var font := ThemeDB.fallback_font
+	var origin := Vector2(body_size.x * 0.5 - 12, -18)
+	draw_rect(Rect2(origin, Vector2(24, 12)), Color(1, 1, 1, 0.85))
+	var dots := ".".repeat(1 + int(_timer * 3.0) % 3)
+	draw_string(font, origin + Vector2(4, 9), dots, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.2, 0.2, 0.2))
 
 
 func _draw_order_bubble() -> void:
@@ -109,15 +131,11 @@ func _draw_order_bubble() -> void:
 	var text_color := Color(0.15, 0.1, 0.1)
 	draw_string(font, origin + Vector2(14, 10), dish.display_name, HORIZONTAL_ALIGNMENT_LEFT,
 		bubble_size.x - 16, 8, text_color)
+	draw_string(font, origin + Vector2(14, 19), "Bàn %d" % (seat + 1), HORIZONTAL_ALIGNMENT_LEFT,
+		bubble_size.x - 16, 7, text_color)
 	if regular_name:
 		draw_string(font, origin + Vector2(0, -3), "%s (đặt trước)" % regular_name, HORIZONTAL_ALIGNMENT_LEFT,
 			-1, 8, Color(1.0, 0.9, 0.55))
-	var status := "Bấm để nấu"
-	if state == State.COOKING:
-		status = "Rin đang nấu"
-	elif state == State.READY:
-		status = "Món xong, chờ bưng"
-	draw_string(font, origin + Vector2(14, 19), status, HORIZONTAL_ALIGNMENT_LEFT, bubble_size.x - 16, 7, text_color)
 	# Patience bar under the bubble: green -> red.
 	var bar := Rect2(origin + Vector2(0, bubble_size.y + 2), Vector2(bubble_size.x, 3))
 	draw_rect(bar, Color(0, 0, 0, 0.5))

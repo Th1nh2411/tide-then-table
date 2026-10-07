@@ -1,103 +1,96 @@
 class_name Waiter
 extends Control
-## Someone carrying dishes from the counter to the tables. Bảo (auto_serve)
-## picks up whatever is ready (up to carry_capacity) and serves the nearest
-## table first. Rin uses the same walk when helping out: `deliver()` one
-## dish, walk it out, come back (the stove is unattended meanwhile).
+## Bảo, the waiter. Waits by the kitchen shelf; CustomerManager hands out
+## jobs: carry a plate to a table, or clean a dirty table. Walks along the
+## floor, does the job, walks back to the shelf.
 
-signal served(customer: Customer)
-## Back at home with empty hands.
-signal returned_home
+signal delivered(customer: Customer, plate: DishShelf.Plate)
+signal cleaned(seat: int)
 
-@export var kitchen: Kitchen
+enum Job { NONE, CARRY, CLEAN, RETURN }
+
 @export var display_name: String = "Bảo"
-## True for Bảo: picks up ready dishes on its own.
-@export var auto_serve: bool = true
-@export var speed: float = 110.0
-@export var carry_capacity: int = 2
-@export var home_x: float = 168.0
+@export var speed: float = 100.0
+@export var shelf_x: float = 172.0
 @export var floor_y: float = 228.0
-@export var x_range: Vector2 = Vector2(150.0, 585.0)
+@export var clean_seconds: float = 1.2
 @export var body_color: Color = Color(0.85, 0.5, 0.2)
-## False for Rin: drawn by the Kitchen while at the stove.
-@export var visible_at_home: bool = true
 
-## Customers whose dishes are being carried, in serving order.
-var carried: Array[Customer] = []
+var job: Job = Job.NONE
 
-var _x: float = 168.0
+var _x: float = 172.0
+var _goal_x: float = 172.0
+var _customer: Customer
+var _plate: DishShelf.Plate
+var _seat: int = -1
+var _timer: float = 0.0
 var _facing: float = 1.0
-var _was_home: bool = true
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_preset(Control.PRESET_FULL_RECT)
-	_x = home_x
+	_x = shelf_x
 
 
-func is_home() -> bool:
-	return carried.is_empty() and absf(_x - home_x) < 1.0
+## Free and standing at the shelf.
+func is_idle() -> bool:
+	return job == Job.NONE
 
 
-## Take this customer's dish off the counter and serve it (manual helper).
-## False if hands are full or the dish isn't on the counter any more.
-func deliver(customer: Customer) -> bool:
-	if carried.size() >= carry_capacity or not kitchen.counter.has(customer):
-		return false
-	kitchen.counter.erase(customer)
-	carried.append(customer)
-	return true
+func deliver(customer: Customer, plate: DishShelf.Plate, table_x: float) -> void:
+	_customer = customer
+	_plate = plate
+	_goal_x = table_x
+	job = Job.CARRY
 
 
-## The customer left: their carried dish is thrown away.
-func drop(customer: Customer) -> void:
-	carried.erase(customer)
+func clean(seat: int, table_x: float) -> void:
+	_seat = seat
+	_goal_x = table_x
+	_timer = clean_seconds
+	job = Job.CLEAN
 
 
 func _process(delta: float) -> void:
 	queue_redraw()
-	for i in range(carried.size() - 1, -1, -1):
-		if not is_instance_valid(carried[i]):
-			carried.remove_at(i)
-	if carried.is_empty():
-		if auto_serve and is_home() and not kitchen.counter.is_empty():
-			carried = kitchen.take(carry_capacity)
-			carried.sort_custom(func(a: Customer, b: Customer) -> bool: return a.position.x < b.position.x)
-			return
-		_walk_to(home_x, delta)
-		var home := is_home()
-		if home and not _was_home:
-			returned_home.emit()
-		_was_home = home
+	if job == Job.NONE:
 		return
-	_was_home = false
-	var customer := carried[0]
-	var goal := clampf(customer.position.x - 10.0, x_range.x, x_range.y)
-	_walk_to(goal, delta)
-	if absf(goal - _x) < 1.0:
-		carried.pop_front()
-		served.emit(customer)
-
-
-func _walk_to(goal: float, delta: float) -> void:
-	var step := clampf(goal - _x, -speed * delta, speed * delta)
+	if job == Job.RETURN:
+		_goal_x = shelf_x
+	var step := clampf(_goal_x - _x, -speed * delta, speed * delta)
 	if step != 0.0:
 		_facing = signf(step)
 	_x += step
+	if absf(_goal_x - _x) > 0.5:
+		return
+	match job:
+		Job.CARRY:
+			var customer := _customer
+			var plate := _plate
+			_customer = null
+			_plate = null
+			job = Job.RETURN
+			delivered.emit(customer, plate)
+		Job.CLEAN:
+			_timer -= delta
+			if _timer <= 0.0:
+				job = Job.RETURN
+				cleaned.emit(_seat)
+		Job.RETURN:
+			job = Job.NONE
 
 
 func _draw() -> void:
-	if not visible_at_home and is_home():
-		return
 	var at := Vector2(_x - 8, floor_y)
 	draw_rect(Rect2(at + Vector2(0, 12), Vector2(16, 22)), body_color)
 	draw_rect(Rect2(at + Vector2(2, 20), Vector2(12, 14)), Color(0.95, 0.9, 0.8))  # apron
 	draw_circle(at + Vector2(8, 6), 6, Color(0.95, 0.8, 0.65))
 	draw_circle(at + Vector2(8 + _facing * 3, 5), 1.0, Color.BLACK)
-	for i in carried.size():
-		var tray := at + Vector2(-2 + i * 10, -4 - i * 2)
-		draw_rect(Rect2(tray, Vector2(10, 3)), Color.WHITE)
-		draw_rect(Rect2(tray + Vector2(1, -4), Vector2(8, 4)), carried[i].dish.color)
-	draw_string(ThemeDB.fallback_font, at + Vector2(-2, -12 - carried.size() * 2), display_name,
-		HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(1, 1, 1, 0.8))
+	if _plate:
+		draw_rect(Rect2(at + Vector2(-2, -4), Vector2(12, 3)), Color.WHITE)
+		draw_rect(Rect2(at + Vector2(0, -8), Vector2(8, 4)), _plate.dish.color)
+	if job == Job.CLEAN and absf(_goal_x - _x) <= 0.5:
+		draw_line(at + Vector2(16, 14), at + Vector2(22, 10 + sin(_timer * 20.0) * 3.0), Color(0.9, 0.9, 1.0), 2.0)
+	draw_string(ThemeDB.fallback_font, at + Vector2(-2, -12), display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 8,
+		Color(1, 1, 1, 0.8))

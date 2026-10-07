@@ -1,17 +1,14 @@
 class_name CustomerManager
 extends Node
-## Runs the customers during a shift: spawns them at random intervals into
-## free seats and has them order from today's MenuPlan (taking one portion).
-## Service (Dave the Diver style): clicking a waiting customer makes Rin cook
-## their dish (Kitchen); finished dishes wait on the counter until Bảo (Waiter,
-## automatic) carries them out — or the player clicks the customer again to
-## have Rin carry it (the stove is unattended meanwhile). Paid on arrival.
-## Snacks (DishData.always_available) are sometimes ordered instead, and are
-## all customers can order once the menu is sold out. Every price is scaled
-## by the menu variety multiplier.
-## Upgrades: seats (how many tables), decor (customers come more often and
-## some are well-off, paying more). Regulars with a fish order (FishOrders)
-## come early in the shift and pay the order's price for their dish.
+## Runs the dining room during a shift (Dave the Diver style service):
+## spawns customers into free tables; after reading the menu each orders a
+## dish that can still be served (menu portions + plates on the shelf, minus
+## orders already waiting); Rin cooks in the KitchenView and puts plates on
+## the shelf; Bảo (Waiter) carries the oldest order that has a plate, and
+## cleans dirty tables when there's nothing to carry. Customers eat, pay
+## (+ tip if they didn't wait long) and leave a dirty table.
+## Upgrades: seats (tables), decor (more often + well-off customers).
+## Regulars with a fish order (FishOrders) come early in the shift.
 
 signal customer_served(price: int, tip: int)
 signal customer_left_angry
@@ -22,15 +19,12 @@ signal regular_served(who: String, price: int)
 @export var customer_scene: PackedScene
 ## Full dish catalog; snacks are taken from here.
 @export var menu: DishCatalog
-@export var kitchen: Kitchen
-## Bảo, carrying dishes on their own.
+@export var tables: DiningTables
 @export var waiter: Waiter
-## Rin's walk when helping to serve.
-@export var rin_helper: Waiter
 ## Parent node for customer nodes (and floating money text).
 @export var customer_layer: Control
 ## Seats are spread evenly over this x range at seat_y (top-left of the customer).
-@export var seat_x_range: Vector2 = Vector2(180.0, 520.0)
+@export var seat_x_range: Vector2 = Vector2(200.0, 520.0)
 @export var seat_y: float = 228.0
 ## Seats upgrade: its value is the number of seats (default 4 without it).
 @export var seats_upgrade: UpgradeData
@@ -45,29 +39,29 @@ signal regular_served(who: String, price: int)
 @export var regular_delay: float = 6.0
 @export var door_position: Vector2 = Vector2(605, 226)
 @export var first_spawn_delay: float = 1.5
-@export var min_spawn_interval: float = 5.0
-@export var max_spawn_interval: float = 10.0
+@export var min_spawn_interval: float = 6.0
+@export var max_spawn_interval: float = 11.0
 ## Tip = price × tip_ratio, only if served with patience above the threshold.
 @export var tip_ratio: float = 0.2
 @export var tip_patience_threshold: float = 0.5
 ## Spawn interval multiplier by yesterday's rating (index = stars, 0 unused).
-## Good reviews bring customers more often.
 @export var interval_scale_by_rating: Array[float] = [1.0, 1.3, 1.15, 1.0, 0.85, 0.7]
 ## Chance a customer orders a snack while the menu still has dishes.
 @export var snack_order_chance: float = 0.15
 
-## Where each seated customer stands (built from the seats upgrade).
-var seat_positions: Array[Vector2] = []
-var _seats: Array[Customer] = []
-## Regulars still to come: [{"order", "item", "dish"}].
-var _regulars_waiting: Array[Dictionary] = []
-## Regular visits that didn't end with a meal (fish goes back to storage).
-var _regulars_unserved: Array[Dictionary] = []
+## Cooked dishes waiting to be carried out.
+var shelf := DishShelf.new()
+## Customers who ordered and wait for food, in order of ordering.
+var waiting: Array[Customer] = []
+## Regular visits for today: [{"order", "item", "dish", "cooked"?}].
+var regular_visits: Array[Dictionary] = []
+
+var _customers: Array[Customer] = []
+var _regulars_to_spawn: Array[Dictionary] = []
 var _shift_time: float = 0.0
 var _decor_level: int = 0
 var _plan: MenuPlan
 var _snacks: Array[DishData] = []
-## Price multiplier from menu variety (set at the start of the shift).
 var _variety_multiplier: float = 1.0
 var _interval_scale: float = 1.0
 var _accepting: bool = false
@@ -87,114 +81,149 @@ static func layout_seats(count: int, x_range: Vector2, y: float) -> Array[Vector
 func _ready() -> void:
 	_rng.randomize()
 	var seat_count := int(GameState.get_upgrade_value(seats_upgrade)) if seats_upgrade else 4
-	seat_positions = layout_seats(seat_count, seat_x_range, seat_y)
-	_seats.resize(seat_positions.size())
+	tables.setup(layout_seats(seat_count, seat_x_range, seat_y))
 	_decor_level = int(GameState.get_upgrade_value(decor_upgrade)) if decor_upgrade else 0
-	waiter.served.connect(_on_served)
-	rin_helper.served.connect(_on_served)
-	rin_helper.returned_home.connect(func() -> void: kitchen.rin_away = false)
+	waiter.delivered.connect(_on_delivered)
+	waiter.cleaned.connect(tables.clean)
 	for dish in menu.dishes:
 		if dish.always_available:
 			_snacks.append(dish)
 
 
-## `regular_visits` from FishOrders.reserve_for_shift() (fish already set aside).
-func start_shift(plan: MenuPlan, variety_multiplier: float = 1.0, regular_visits: Array[Dictionary] = []) -> void:
+func decor_level() -> int:
+	return _decor_level
+
+
+## `visits` from FishOrders.reserve_for_shift() (fish already set aside).
+func start_shift(plan: MenuPlan, variety_multiplier: float = 1.0, visits: Array[Dictionary] = []) -> void:
 	_plan = plan
 	_variety_multiplier = variety_multiplier
 	_interval_scale = interval_scale_by_rating[clampi(GameState.last_rating, 0, interval_scale_by_rating.size() - 1)]
 	_interval_scale *= _by_decor(decor_interval_scale)
-	_regulars_waiting = regular_visits.duplicate()
+	regular_visits = visits
+	_regulars_to_spawn = visits.duplicate()
 	_shift_time = 0.0
 	_accepting = true
 	_spawn_left = first_spawn_delay
 
 
-## Stop spawning and send customers whose dish isn't cooking yet home (not
-## counted as angry). Dishes on the stove or the counter still get served.
+## No new customers; those already inside may still be served and eat.
 func stop_shift() -> void:
 	_accepting = false
-	_regulars_unserved.append_array(_regulars_waiting)
-	_regulars_waiting.clear()
-	for customer in _seats:
-		if customer and customer.state == Customer.State.WAITING:
-			_send_away(customer, false)
+	_regulars_to_spawn.clear()
 
 
-## Everyone still seated leaves now (closing up after the grace time).
+## Everyone not eating leaves now (not counted as angry).
 func clear_room() -> void:
-	for customer in _seats:
-		if customer:
+	for customer in _customers.duplicate():
+		if customer.state != Customer.State.EATING:
 			_send_away(customer, false)
 
 
-## No one seated (or walking in).
+## Nobody inside.
 func is_idle() -> bool:
-	return _seats.all(func(c: Customer) -> bool: return c == null)
+	return _customers.is_empty()
 
 
-## Regular visits that ended without a meal (call after the shift).
-func unserved_regulars() -> Array[Dictionary]:
-	return _regulars_unserved
+## Regular visits whose fish was never cooked (it goes back to storage).
+func uncooked_regular_visits() -> Array[Dictionary]:
+	return regular_visits.filter(func(v: Dictionary) -> bool: return not v.get("cooked", false))
+
+
+## A plate Rin carried to `seat`: serve it if that table ordered this dish.
+func serve_at(seat: int, plate: DishShelf.Plate) -> bool:
+	for customer in waiting:
+		if customer.seat == seat and customer.dish == plate.dish and customer.visit == plate.visit:
+			waiting.erase(customer)
+			_give_plate(customer, plate)
+			return true
+	return false
 
 
 func _process(delta: float) -> void:
+	_assign_waiter()
 	if not _accepting:
 		return
 	_shift_time += delta
-	if not _regulars_waiting.is_empty() and _shift_time >= regular_delay and _seats.has(null):
-		_spawn_regular(_regulars_waiting.pop_front())
+	if not _regulars_to_spawn.is_empty() and _shift_time >= regular_delay and tables.free_seat() != -1:
+		_spawn(_regulars_to_spawn.pop_front())
 	_spawn_left -= delta
 	if _spawn_left <= 0.0:
 		_spawn_left = _rng.randf_range(min_spawn_interval, max_spawn_interval) * _interval_scale
-		_try_spawn()
+		if tables.free_seat() != -1 and _anything_to_order():
+			_spawn({})
 
 
-func _try_spawn() -> void:
-	var seat := _seats.find(null)
-	var dish := _pick_order()
-	if seat == -1 or dish == null:
+## Bảo: carry the oldest order that has a plate, else clean a table.
+func _assign_waiter() -> void:
+	if not waiter.is_idle():
 		return
+	var found := shelf.next_delivery(waiting)
+	if not found.is_empty():
+		var customer: Customer = found["order"]
+		var plate: DishShelf.Plate = found["plate"]
+		shelf.remove(plate)
+		waiting.erase(customer)
+		waiter.deliver(customer, plate, tables.stand_x(customer.seat))
+		return
+	var dirty := tables.dirty_seats()
+	if not dirty.is_empty():
+		waiter.clean(dirty[0], tables.stand_x(dirty[0]))
+
+
+func _on_delivered(customer: Customer, plate: DishShelf.Plate) -> void:
+	if is_instance_valid(customer) and customer.state == Customer.State.WAITING:
+		_give_plate(customer, plate)
+	elif not shelf.add(plate):
+		message_requested.emit("Khách đã về, kệ đầy: món bị bỏ")
+
+
+func _give_plate(customer: Customer, plate: DishShelf.Plate) -> void:
+	customer.serve(plate)
+	tables.put_plate(customer.seat, plate)
+
+
+## `visit` = a regular's visit, or {} for a walk-in customer.
+func _spawn(visit: Dictionary) -> void:
+	var seat := tables.free_seat()
 	var customer: Customer = customer_scene.instantiate()
-	customer.dish = dish
-	if not dish.always_available:
-		customer.ingredients = _plan.take_portion(dish)
-	customer.rich = _rng.randf() < _by_decor(rich_chance_by_decor)
-	if customer.rich:
-		customer.patience_seconds *= rich_patience_scale
-	_seat_customer(customer, seat)
-
-
-func _spawn_regular(visit: Dictionary) -> void:
-	var customer: Customer = customer_scene.instantiate()
-	customer.dish = visit["dish"]
-	customer.ingredients.append(visit["item"])
-	customer.order = visit
-	customer.regular_name = visit["order"]["who"]
-	customer.patience_seconds *= regular_patience_scale
-	_seat_customer(customer, _seats.find(null))
-	message_requested.emit("%s tới ăn món đã đặt!" % customer.regular_name)
-
-
-func _seat_customer(customer: Customer, seat: int) -> void:
+	customer.seat = seat
+	if visit.is_empty():
+		customer.rich = _rng.randf() < _by_decor(rich_chance_by_decor)
+		if customer.rich:
+			customer.patience_seconds *= rich_patience_scale
+	else:
+		customer.visit = visit
+		customer.dish = visit["dish"]
+		customer.regular_name = visit["order"]["who"]
+		customer.patience_seconds *= regular_patience_scale
+		message_requested.emit("%s tới ăn món đã đặt!" % customer.regular_name)
 	customer.position = door_position
-	customer.clicked.connect(_on_customer_clicked)
+	customer.ordered.connect(_on_ordered)
 	customer.patience_ran_out.connect(_send_away.bind(true))
-	_seats[seat] = customer
+	customer.finished_eating.connect(_on_finished_eating)
+	tables.take(seat)
+	_customers.append(customer)
 	customer_layer.add_child(customer)
-	customer.walk_to(seat_positions[seat])
+	customer.walk_to(tables.seat_positions[seat])
 
 
-func _by_decor(table: Array[float]) -> float:
-	if table.is_empty():
-		return 1.0
-	return table[clampi(_decor_level, 0, table.size() - 1)]
+func _on_ordered(customer: Customer) -> void:
+	if customer.dish == null:
+		customer.dish = _pick_order()
+	if customer.dish == null:
+		_send_away(customer, false)
+		return
+	waiting.append(customer)
 
 
-## A menu dish with portions left, or a snack (sometimes by choice, always
-## once the menu is sold out). Null only if there is nothing at all.
+## A dish that can still be served, or a snack (sometimes by choice, always
+## once nothing else is left). Null only if there is nothing at all.
 func _pick_order() -> DishData:
-	var dishes := _plan.available_dishes()
+	var dishes: Array[DishData] = []
+	for dish in _plan.get_dishes():
+		if _servable(dish) > 0:
+			dishes.append(dish)
 	var wants_snack := dishes.is_empty() or _rng.randf() < snack_order_chance
 	if wants_snack and not _snacks.is_empty():
 		return _snacks[_rng.randi() % _snacks.size()]
@@ -203,87 +232,55 @@ func _pick_order() -> DishData:
 	return dishes[_rng.randi() % dishes.size()]
 
 
-## Waiting customer: Rin cooks. Dish on the counter: Rin carries it out.
-func _on_customer_clicked(customer: Customer) -> void:
-	match customer.state:
-		Customer.State.WAITING:
-			if kitchen.rin_away:
-				message_requested.emit("Rin đang đi bưng món")
-			elif kitchen.is_cooking():
-				message_requested.emit("Đang nấu món khác")
-			elif kitchen.is_counter_full():
-				message_requested.emit("Quầy đầy, chờ bưng bớt ra")
-			else:
-				kitchen.cook(customer)
-		Customer.State.READY:
-			if kitchen.is_cooking():
-				message_requested.emit("Đang nấu, không rời bếp được")
-			elif rin_helper.deliver(customer):
-				kitchen.rin_away = true
-			else:
-				message_requested.emit("Bảo đang bưng món này rồi")
+## Portions not yet promised to a waiting customer.
+func _servable(dish: DishData) -> int:
+	var promised := waiting.filter(func(c: Customer) -> bool: return c.dish == dish and c.visit.is_empty()).size()
+	return _plan.get_portion_count(dish) + shelf.count(dish) - promised
 
 
-func _on_served(customer: Customer) -> void:
-	if is_instance_valid(customer) and customer.state == Customer.State.READY:
-		_serve(customer, customer.cook_multiplier)
+func _anything_to_order() -> bool:
+	return not _snacks.is_empty() or _plan.get_dishes().any(func(d: DishData) -> bool: return _servable(d) > 0)
 
 
-func _serve(customer: Customer, cook_multiplier: float) -> void:
-	if customer.regular_name:
-		_serve_regular(customer, cook_multiplier)
+func _on_finished_eating(customer: Customer) -> void:
+	if customer.state != Customer.State.EATING:
 		return
-	var price := roundi(KitchenLogic.calc_price(customer.dish, cook_multiplier, customer.ingredients)
-		* _variety_multiplier * (rich_price_scale if customer.rich else 1.0))
-	var tip := roundi(price * tip_ratio) if customer.patience > tip_patience_threshold else 0
-	customer.ingredients.clear()  # eaten
+	var plate := customer.plate
+	var price := 0
+	var tip := 0
+	if customer.regular_name:
+		price = roundi(int(customer.visit["order"]["reward"]) * plate.cook_multiplier)
+		FishOrders.complete(customer.visit["order"])
+		regular_served.emit(customer.regular_name, price)
+	else:
+		price = roundi(KitchenLogic.calc_price(plate.dish, plate.cook_multiplier, plate.ingredients)
+			* _variety_multiplier * (rich_price_scale if customer.rich else 1.0))
+		tip = roundi(price * tip_ratio) if customer.patience > tip_patience_threshold else 0
 	GameState.add_money(price + tip)
 	_float_text(customer.position, "+%dk" % (price + tip) + (" (tip)" if tip > 0 else ""))
-	_free_seat(customer)
+	tables.make_dirty(customer.seat)
+	_customers.erase(customer)
 	customer.leave(door_position)
 	customer_served.emit(price, tip)
 
 
-## The order's price, scaled by how well it was cooked.
-func _serve_regular(customer: Customer, cook_multiplier: float) -> void:
-	var order: Dictionary = customer.order["order"]
-	var price := roundi(int(order["reward"]) * cook_multiplier)
-	FishOrders.complete(order)
-	customer.ingredients.clear()
-	GameState.add_money(price)
-	_float_text(customer.position, "+%dk (đơn %s)" % [price, customer.regular_name])
-	_free_seat(customer)
-	customer.leave(door_position)
-	customer_served.emit(price, 0)
-	regular_served.emit(customer.regular_name, price)
-
-
-## Customer leaves without being served; their portion goes back on the menu
-## (a regular's reserved fish goes back to storage after the shift).
+## Leaves without eating: the order is dropped, the table stays clean.
 func _send_away(customer: Customer, angry: bool) -> void:
 	if customer.state == Customer.State.LEAVING:
 		return
-	kitchen.cancel(customer)
-	waiter.drop(customer)
-	rin_helper.drop(customer)
-	var uncooked := customer.state == Customer.State.WAITING
-	if customer.regular_name:
-		if uncooked:  # once cooked, the reserved fish is gone
-			_regulars_unserved.append(customer.order)
-	elif not customer.dish.always_available and uncooked:
-		_plan.return_portion(customer.dish, customer.ingredients)
-	customer.ingredients.clear()
-	_free_seat(customer)
+	waiting.erase(customer)
+	tables.release(customer.seat)
+	_customers.erase(customer)
 	if angry:
 		_float_text(customer.position, "Bỏ đi!")
 		customer_left_angry.emit()
 	customer.leave(door_position)
 
 
-func _free_seat(customer: Customer) -> void:
-	var seat := _seats.find(customer)
-	if seat != -1:
-		_seats[seat] = null
+func _by_decor(table: Array[float]) -> float:
+	if table.is_empty():
+		return 1.0
+	return table[clampi(_decor_level, 0, table.size() - 1)]
 
 
 func _float_text(at: Vector2, text: String) -> void:
