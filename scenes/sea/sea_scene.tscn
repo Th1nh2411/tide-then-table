@@ -370,12 +370,13 @@ catalog = ExtResource("17_catalog")
 position = Vector2(1000, 1100)
 rotation = -1.5708
 
-[node name="Lamp" type="PointLight2D" parent="Boat" node_paths=PackedStringArray("oil")]
+[node name="Lamp" type="PointLight2D" parent="Boat" node_paths=PackedStringArray("oil", "dock")]
 color = Color(1, 0.88, 0.65, 1)
 energy = 1.1
 texture = SubResource("GradientTexture2D_docklight")
 script = ExtResource("34_lamp")
 oil = NodePath("../../LampOil")
+dock = NodePath("../../Dock")
 
 [node name="Dock" type="Area2D" parent="."]
 position = Vector2(1000, 1110)
