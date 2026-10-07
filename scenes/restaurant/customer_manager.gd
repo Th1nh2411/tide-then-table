@@ -116,17 +116,11 @@ func start_shift(plan: MenuPlan, variety_multiplier: float = 1.0, visits: Array[
 	_spawn_left = first_spawn_delay
 
 
-## No new customers; those already inside may still be served and eat.
+## No new customers; those already inside are still served and eat (or
+## run out of patience) before the shop really closes.
 func stop_shift() -> void:
 	_accepting = false
 	_regulars_to_spawn.clear()
-
-
-## Everyone not eating leaves now (not counted as angry).
-func clear_room() -> void:
-	for customer in _customers.duplicate():
-		if customer.state != Customer.State.EATING:
-			_send_away(customer, false)
 
 
 ## Nobody inside.

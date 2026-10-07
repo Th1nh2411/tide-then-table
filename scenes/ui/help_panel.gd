@@ -54,6 +54,7 @@ BẢO VÀ BÀN
   Khách quen (bóng thoại vàng) tới ăn món đã đặt trước.
 
 HẾT CA
+  Đóng quán (sớm / hết giờ): không có khách mới, phục vụ nốt khách trong quán.
   Bảng tổng kết -> "Đóng" -> "Ra khơi".
 
 SỬA QUÁN (trước giờ mở / sau khi bán xong)

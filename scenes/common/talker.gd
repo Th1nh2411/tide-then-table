@@ -21,6 +21,9 @@ func talk_x() -> float:
 
 func can_talk() -> bool:
 	var owner_node := get_parent()
+	# Hidden characters (not here yet / gone) can't be talked to.
+	if owner_node is CanvasItem and not (owner_node as CanvasItem).is_visible_in_tree():
+		return false
 	return owner_node.call("can_talk") if owner_node.has_method("can_talk") else true
 
 

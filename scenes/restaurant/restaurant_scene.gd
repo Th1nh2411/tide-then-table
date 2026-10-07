@@ -32,13 +32,13 @@ const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 @export var fridge_upgrade: UpgradeData
 ## Cutscenes that can play after the summary (first eligible one, once).
 @export var after_shift_cutscenes: Array[Cutscene] = []
-## After closing, waiting customers get this long to still be served.
-@export var closing_grace_seconds: float = 15.0
 
 var _plan: MenuPlan
 var _time_left: float = 0.0
 var _shift_running: bool = false
 var _shift_over: bool = false
+## Closed to new customers, still serving the ones inside.
+var _closing: bool = false
 var _earned_today: int = 0
 var _market_spent: int = 0
 var _variety_count: int = 0
@@ -162,7 +162,7 @@ func _process(delta: float) -> void:
 	# Rin walks freely whenever no panel covers the room.
 	_rin.active = not (_kitchen_view.visible or _renovation.visible or _menu_panel.visible
 		or _summary_panel.visible)
-	_rin.kitchen_open = _shift_running
+	_rin.kitchen_open = _shift_running or _closing
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
 		if _time_left <= 0.0:
@@ -180,17 +180,17 @@ func _end_shift(reason: String) -> void:
 	if not _shift_running:
 		return
 	_shift_running = false
+	_closing = true
 	_close_early_button.hide()
 	_customers.stop_shift()
-	_show_message(reason)
-	# Customers already inside can still be served for a while.
-	var waited := 0.0
-	while not _customers.is_idle() and waited < closing_grace_seconds:
+	if _customers.is_idle():
+		_show_message(reason)
+	else:
+		_show_message("%s Không nhận khách mới, phục vụ nốt khách trong quán." % reason, 3.0)
+	# Everyone inside gets served and eats (or runs out of patience) first.
+	while not _customers.is_idle():
 		await get_tree().process_frame
-		waited += get_process_delta_time()
-	_customers.clear_room()
-	while not _customers.is_idle():  # the last ones finish eating
-		await get_tree().process_frame
+	_closing = false
 	var cooking: CookingOverlay = $CookingOverlay
 	while cooking.is_running():
 		await get_tree().process_frame

@@ -51,7 +51,7 @@ func talk_x() -> float:
 
 
 func can_talk() -> bool:
-	return is_idle()
+	return is_hired() and is_idle()
 
 
 func deliver(customer: Customer, plate: DishShelf.Plate, table_x: float) -> void:
