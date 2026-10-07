@@ -6,8 +6,8 @@ extends Control
 ## the kitchen door sign.
 
 @export var customers: CustomerManager
-@export var shelf_origin: Vector2 = Vector2(96, 186)
-@export var slot_width: float = 16.0
+@export var shelf_origin: Vector2 = Vector2(78, 186)
+@export var slot_width: float = 20.0
 @export var door_x: float = 150.0
 @export var bin_position: Vector2 = Vector2(20, 246)
 @export var stove_rect: Rect2 = Rect2(40, 196, 40, 14)
@@ -35,7 +35,7 @@ func _draw() -> void:
 	# Shelf board above the counter.
 	draw_rect(Rect2(shelf_origin + Vector2(-4, 8), Vector2(slot_width * shelf.capacity + 4, 3)), Color(0.45, 0.3, 0.2))
 	for i in shelf.plates.size():
-		var at := shelf_origin + Vector2(i * slot_width, 0)
+		var at := plate_rect(i).position
 		draw_rect(Rect2(at + Vector2(0, 5), Vector2(12, 3)), Color.WHITE)
 		draw_rect(Rect2(at + Vector2(2, 1), Vector2(8, 4)), shelf.plates[i].dish.color)
 	# Trash bin.
@@ -74,6 +74,21 @@ func _draw_fridge() -> void:
 	draw_rect(rect, Color(0.85, 0.9, 0.95))
 	draw_line(rect.position + Vector2(0, size.y * 0.35), rect.position + Vector2(size.x, size.y * 0.35), Color(0.6, 0.65, 0.7), 1.0)
 	draw_rect(Rect2(rect.position + Vector2(size.x - 4, 4), Vector2(2, 6)), Color(0.5, 0.5, 0.55))
+
+
+## Where plate `i` sits on the shelf.
+func plate_rect(i: int) -> Rect2:
+	return Rect2(shelf_origin + Vector2(i * slot_width, 0), Vector2(12, 8))
+
+
+func bin_rect() -> Rect2:
+	return Rect2(bin_position + Vector2(-1, -2), Vector2(14, 16))
+
+
+## Index of the plate Rin standing at floor `x` faces (-1 = none).
+func plate_index_at(x: float) -> int:
+	var index := floori((x - shelf_origin.x + (slot_width - 12.0) * 0.5) / slot_width)
+	return index if index >= 0 and index < customers.shelf.plates.size() else -1
 
 
 ## Areas the renovation mode outlines / makes clickable.

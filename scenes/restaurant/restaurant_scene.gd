@@ -3,8 +3,9 @@ extends Control
 ## Flow: prepare today's menu from storage -> open at 15:00 -> serve customers
 ## until closing at 24:00 (fixed real-time shift, or the player closes early)
 ## -> leftovers go back to storage -> summary.
-## Service (Dave the Diver style): Rin walks with A/D, E at the kitchen door
-## opens the KitchenView (cook from prepared trays onto the shelf); Bảo
+## Service (Dave the Diver style): Rin walks with A/D; in the kitchen corner
+## the KitchenStation cooks from prepared trays onto the shelf (compact
+## minigame above the stove, no pop-up); Bảo
 ## carries plates in order and cleans tables; Rin can carry a plate or clean
 ## a table too.
 ## Once the menu sells out, customers can only order snacks (peanuts), so a
@@ -69,7 +70,7 @@ var _sail_button: Button
 @onready var _waiter: Waiter = $Waiter
 @onready var _cutscene: CutscenePlayer = $CutscenePlayer
 @onready var _rin: RinWalker = $RinWalker
-@onready var _kitchen_view: KitchenView = $KitchenView
+@onready var _kitchen: KitchenStation = $KitchenStation
 
 
 func _ready() -> void:
@@ -93,7 +94,7 @@ func _ready() -> void:
 	_sail_button.hide()
 	_tutorial = RestaurantTutorial.new()
 	_tutorial.customers = _customers
-	_tutorial.kitchen_view = _kitchen_view
+	_tutorial.kitchen = _kitchen
 	add_child(_tutorial)
 	_tutorial.tip_requested.connect(func(text: String) -> void: _show_message(text, _tutorial.tip_seconds))
 	_tutorial.on_restaurant_ready.call_deferred()
@@ -105,18 +106,19 @@ func _ready() -> void:
 	_waiter.visible = Waiter.is_hired()  # day 1: Rin is alone
 	_regular_visits = FishOrders.reserve_for_shift(menu)
 	(%Decor as RestaurantDecor).setup(_customers.decor_level())
-	_rin.kitchen_requested.connect(_open_kitchen)
+	_rin.kitchen_action.connect(_kitchen.act)
+	_kitchen.message_requested.connect(_show_message)
 	_rin.serve_requested.connect(_on_rin_serve)
 	_rin.clean_requested.connect(func(seat: int) -> void: (_customers.tables as DiningTables).clean(seat))
 	_rin.message_requested.connect(_show_message)
 	_rin.talk_requested.connect(func(talker: Talker) -> void: talker.talk(_dialogue_box))
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
-	_kitchen_view.carry_requested.connect(func(plate: DishShelf.Plate) -> void: _rin.carried = plate)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
 		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
 	_plan = MenuPlan.new(menu_slots, GameState.money)
 	_plan.changed.connect(_refresh_storage)
+	_kitchen.setup(_plan)
 	_menu_panel.setup(_plan, menu, fish_catalog, variety_multipliers)
 	_menu_panel.confirmed.connect(_open_shop)
 	_menu_panel.hide()  # opened with the pinned "Chuẩn bị menu" button
@@ -160,7 +162,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	# Rin walks freely whenever no panel covers the room.
-	_rin.active = not (_kitchen_view.visible or _renovation.visible or _menu_panel.visible
+	_rin.active = not ($CookingOverlay.is_running() or _renovation.visible or _menu_panel.visible
 		or _summary_panel.visible)
 	_rin.kitchen_open = _shift_running or _closing
 	if _shift_running:
@@ -194,8 +196,6 @@ func _end_shift(reason: String) -> void:
 	var cooking: CookingOverlay = $CookingOverlay
 	while cooking.is_running():
 		await get_tree().process_frame
-	if _kitchen_view.visible:
-		_kitchen_view.close()
 	_rin.carried = null
 	var leftover := _plan.total_portions()
 	_plan.clear(GameState.storage)
@@ -218,17 +218,6 @@ func _end_shift(reason: String) -> void:
 		("\n" + "\n".join(order_lines)) if not order_lines.is_empty() else ""]
 	_summary_panel.show()
 	_next_day_button.grab_focus()
-
-
-func _open_kitchen() -> void:
-	if _rin.carried:
-		# Coming back in with a plate: put it back on the shelf if there's room.
-		if _customers.shelf.add(_rin.carried):
-			_rin.carried = null
-		else:
-			_show_message("Kệ đầy, bưng món đang cầm ra trước đã")
-			return
-	_kitchen_view.open(_plan)
 
 
 func _on_rin_serve(seat: int) -> void:

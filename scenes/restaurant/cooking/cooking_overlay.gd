@@ -1,7 +1,8 @@
 class_name CookingOverlay
 extends CanvasLayer
-## Cooking popup. Picks the minigame by the dish's cook_type, shows the result
-## briefly, then reports the price multiplier.
+## Compact cooking panel shown above the kitchen (top-left, the dining room
+## stays visible — no pop-up over the screen). Picks the minigame by the
+## dish's cook_type, shows the result briefly, then reports the multiplier.
 
 signal finished(dish: DishData, result: CookingGameBase.Result, multiplier: float)
 
@@ -11,6 +12,8 @@ signal finished(dish: DishData, result: CookingGameBase.Result, multiplier: floa
 @export var result_seconds: float = 0.8
 ## Kitchen upgrade: its value is the cooking game speed (< 1 = easier).
 @export var kitchen_upgrade: UpgradeData
+## Minigame bar size inside the compact panel.
+@export var bar_size: Vector2 = Vector2(196, 12)
 
 var _dish: DishData
 var _game: CookingGameBase
@@ -41,6 +44,7 @@ func start(dish: DishData) -> void:
 			_game = SteamGame.new()
 		_:
 			_game = StirGame.new()
+	_game.set("bar_size", bar_size)
 	_game.setup(dish)
 	if kitchen_upgrade:
 		_game.time_scale = float(GameState.get_upgrade_value(kitchen_upgrade))

@@ -23,7 +23,7 @@
 [ext_resource type="Script" path="res://scenes/restaurant/waiter.gd" id="22_waiter"]
 [ext_resource type="Script" path="res://scenes/restaurant/rin_walker.gd" id="23_rin"]
 [ext_resource type="Script" path="res://scenes/restaurant/shelf_display.gd" id="24_shelf"]
-[ext_resource type="Script" path="res://scenes/restaurant/kitchen_view.gd" id="25_kview"]
+[ext_resource type="Script" path="res://scenes/restaurant/kitchen_station.gd" id="25_kstation"]
 [ext_resource type="Script" path="res://scenes/restaurant/renovation_mode.gd" id="26_reno"]
 [ext_resource type="Script" path="res://scenes/common/talker.gd" id="27_talker"]
 [ext_resource type="Resource" path="res://data/dialogues/bao_app.tres" id="29_dlg2"]
@@ -37,6 +37,7 @@
 [ext_resource type="Script" path="res://scenes/cutscene/cutscene_player.gd" id="37_cutscene"]
 [ext_resource type="Resource" path="res://data/cutscenes/bao_arrival.tres" id="38_bao"]
 [ext_resource type="Script" path="res://data/resources/cutscene.gd" id="39_cutdata"]
+[ext_resource type="Script" path="res://scenes/restaurant/service_markers.gd" id="40_markers"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -45,6 +46,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_rest")
 after_shift_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("38_bao")])
 menu = ExtResource("4_menu")
@@ -180,6 +182,36 @@ idle_lines = Array[String](["Meo.", "Rừ... rừ...", "Meo~ (liếc cái kệ c
 [node name="CustomerLayer" type="Control" parent="."]
 anchors_preset = 0
 mouse_filter = 2
+
+[node name="KitchenStation" type="Control" parent="." node_paths=PackedStringArray("cooking", "customers", "rin", "shelf_display")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("25_kstation")
+cooking = NodePath("../CookingOverlay")
+customers = NodePath("../CustomerManager")
+menu = ExtResource("4_menu")
+rin = NodePath("../RinWalker")
+shelf_display = NodePath("../ShelfDisplay")
+
+[node name="ServiceMarkers" type="Control" parent="." node_paths=PackedStringArray("rin", "kitchen", "customers", "tables", "shelf_display")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("40_markers")
+rin = NodePath("../RinWalker")
+kitchen = NodePath("../KitchenStation")
+customers = NodePath("../CustomerManager")
+tables = NodePath("../DiningTables")
+shelf_display = NodePath("../ShelfDisplay")
 
 [node name="Waiter" type="Control" parent="."]
 layout_mode = 3
@@ -398,12 +430,6 @@ kitchen_upgrade = ExtResource("19_kitchenup")
 
 [node name="PauseMenu" parent="." instance=ExtResource("14_pause")]
 
-[node name="KitchenView" type="CanvasLayer" parent="." node_paths=PackedStringArray("cooking", "customers")]
-script = ExtResource("25_kview")
-cooking = NodePath("../CookingOverlay")
-customers = NodePath("../CustomerManager")
-menu = ExtResource("4_menu")
-
 [node name="CutsceneMarkers" type="Node2D" parent="."]
 
 [node name="room_view" type="Marker2D" parent="CutsceneMarkers"]
@@ -421,6 +447,6 @@ position = Vector2(350, 262)
 [node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers", "hidden_nodes")]
 script = ExtResource("37_cutscene")
 markers = NodePath("../CutsceneMarkers")
-hidden_nodes = [NodePath("../HUD"), NodePath("../RinWalker"), NodePath("../Waiter"), NodePath("../CustomerLayer")]
+hidden_nodes = [NodePath("../HUD"), NodePath("../RinWalker"), NodePath("../Waiter"), NodePath("../CustomerLayer"), NodePath("../KitchenStation"), NodePath("../ServiceMarkers")]
 
 [node name="PhoneApp" parent="." instance=ExtResource("16_phone")]

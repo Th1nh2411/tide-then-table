@@ -3,7 +3,7 @@ extends Node
 ## Runs the dining room during a shift (Dave the Diver style service):
 ## spawns customers into free tables; after reading the menu each orders a
 ## dish that can still be served (menu portions + plates on the shelf, minus
-## orders already waiting); Rin cooks in the KitchenView and puts plates on
+## orders already waiting); Rin cooks at the KitchenStation and puts plates on
 ## the shelf; Bảo (Waiter) carries the oldest order that has a plate, and
 ## cleans dirty tables when there's nothing to carry. Customers eat, pay
 ## (+ tip if they didn't wait long) and leave a dirty table.

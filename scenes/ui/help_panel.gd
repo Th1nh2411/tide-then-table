@@ -38,11 +38,12 @@ BẾN
   Hải sản thừa trả về kho; rau mua chợ thừa thì bỏ.
 
 PHỤC VỤ
-  A / D: Rin đi (cả lúc chưa mở quán).   E ở cửa BẾP: vào bếp (khi đang bán).
+  A / D: Rin đi (cả lúc chưa mở quán). Phiếu order hiện ở trên cùng.
+  Đi vào khu BẾP bên trái (khi đang bán):
+    1-9 (hoặc click): nấu món số đó trên bảng menu trong bếp.   Viền xanh trên phiếu = món đã có trên kệ.
+    Đứng trước đĩa trên kệ (mũi tên xanh chỉ đĩa): E cầm ra.   E ở sọt rác (góc trái): vứt món đang cầm.
+  Minigame nấu hiện nhỏ phía trên bếp, quán vẫn chạy.
   E cạnh người khác: nói chuyện (dấu "!" = có chuyện mới).
-  Trong bếp: bấm khay (hoặc phím số) để nấu, món xong đặt lên kệ.
-  Chọn món trên kệ để vứt vào sọt rác, hoặc để Rin cầm ra.
-  E / Esc: ra khỏi bếp.
 
 NẤU
   Nướng: bấm khi kim vào vùng xanh.   Hấp: giữ rồi thả đúng lúc.

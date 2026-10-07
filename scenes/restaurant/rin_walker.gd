@@ -1,12 +1,14 @@
 class_name RinWalker
 extends Control
 ## Rin on the restaurant floor (the player, Dave the Diver style): A/D walks
-## any time no panel is open; `interact` (E) acts on the spot — at the kitchen
-## door it opens the kitchen view (only while the shop is open); at a table
-## it serves the carried plate or cleans a dirty table; next to someone with
-## a Talker (group "talkers") it starts a conversation.
+## any time no panel is open, into the kitchen corner too; `interact` (E)
+## acts on the spot — in the kitchen (while the shop is open) it's handled by
+## KitchenStation (cook / shelf / bin); at a table it serves the carried plate
+## or cleans a dirty table; next to someone with a Talker (group "talkers")
+## it starts a conversation.
 
-signal kitchen_requested
+## E in the kitchen corner while the shop is open.
+signal kitchen_action
 ## E at a table while carrying a plate.
 signal serve_requested(seat: int)
 signal clean_requested(seat: int)
@@ -15,16 +17,17 @@ signal message_requested(text: String)
 
 @export var tables: DiningTables
 @export var speed: float = 140.0
-## Kitchen door: E within `reach` of this x opens the kitchen.
+## Start position (by the kitchen); x at or below kitchen_zone_x = kitchen.
 @export var door_x: float = 150.0
+@export var kitchen_zone_x: float = 162.0
 @export var floor_y: float = 228.0
 @export var reach: float = 18.0
-@export var x_range: Vector2 = Vector2(140.0, 585.0)
+@export var x_range: Vector2 = Vector2(24.0, 585.0)
 @export var clean_seconds: float = 0.8
 @export var body_color: Color = Color(0.2, 0.45, 0.8)
 
 var active: bool = false
-## The kitchen door works (the shop is open).
+## The kitchen works (the shop is open).
 var kitchen_open: bool = false
 ## Plate Rin is carrying out (null = empty hands).
 var carried: DishShelf.Plate
@@ -41,8 +44,12 @@ func _ready() -> void:
 	_x = door_x
 
 
-func is_at_door() -> bool:
-	return absf(_x - door_x) <= reach
+func position_x() -> float:
+	return _x
+
+
+func is_in_kitchen() -> bool:
+	return _x <= kitchen_zone_x
 
 
 func _process(delta: float) -> void:
@@ -64,10 +71,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not active or _cleaning_left > 0.0 or not event.is_action_pressed("interact"):
 		return
 	get_viewport().set_input_as_handled()
-	if kitchen_open and is_at_door():
-		kitchen_requested.emit()
+	if kitchen_open and is_in_kitchen():
+		kitchen_action.emit()
 		return
-	var seat := _nearest_table()
+	var seat := nearest_table()
 	if seat != -1 and carried:
 		serve_requested.emit(seat)
 		return
@@ -88,7 +95,8 @@ func _nearest_talker() -> Talker:
 	return null
 
 
-func _nearest_table() -> int:
+## Table Rin stands at (-1 = none).
+func nearest_table() -> int:
 	var best := -1
 	for i in tables.seat_positions.size():
 		if absf(tables.stand_x(i) - _x) <= reach and (best == -1
@@ -111,6 +119,4 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	draw_string(font, at + Vector2(0, -18 if carried else -10), "Rin", HORIZONTAL_ALIGNMENT_LEFT, -1, 8,
 		Color(1, 1, 1, 0.8))
-	if active and kitchen_open and is_at_door() and not carried and GameState.is_first_day():
-		draw_string(font, at + Vector2(-14, -28), "[E] Vào bếp", HORIZONTAL_ALIGNMENT_LEFT, -1, 8,
-			Color(1, 0.9, 0.5))
+

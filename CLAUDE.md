@@ -107,10 +107,11 @@ Vietnamese, keep code comments in short English.
 - Restaurant: `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (spawning,
   ordering, waiter jobs, payment; seats/decor upgrades, rich customers,
   regulars), `DishShelf` (pure: plates + arrival-order matching),
-  `DiningTables` (free/taken/dirty), `KitchenView` (CanvasLayer opened by E
-  at the kitchen door: trays → `CookingOverlay` → shelf, bin, carry out;
-  must sit after `PauseMenu` so it gets Esc first), `Waiter` "Bảo" (carry /
-  clean jobs), `RinWalker` (player: A/D + E), `ShelfDisplay`,
+  `DiningTables` (free/taken/dirty), `KitchenStation` (in-world kitchen:
+  numbered menu board on the wall, 1-9 / click cooks that dish, E takes the plate Rin faces on the shelf, bin by
+  position, ticket rail; `CookingOverlay` is a compact top-left panel — no
+  full-screen pop-ups), `ServiceMarkers` (visual cues instead of prompt text: carried plate → its table + ticket pulse, unordered → bin red, arrow over the faced plate, small "E" key over what E acts on), `Waiter` "Bảo" (carry / clean jobs), `RinWalker`
+  (player: A/D + E, forwards E in the kitchen corner), `ShelfDisplay`,
   `RestaurantDecor`, `RepairButton`, `RenovationMode` ("Sửa quán": in-place
   renovation of seats/decor/kitchen/fridge with preview, Hủy / Xác nhận);
   pinned HUD buttons "Chuẩn bị menu" + "Sửa quán" (when not serving) and "Ra khơi" (after the
