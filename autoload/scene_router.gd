@@ -26,6 +26,16 @@ func _ready() -> void:
 	add_child(_fade_rect)
 
 
+## F11 toggles fullscreen anywhere in the game.
+func _input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if key and key.pressed and not key.echo and key.physical_keycode == KEY_F11:
+		var fullscreen := DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if fullscreen
+			else DisplayServer.WINDOW_MODE_FULLSCREEN)
+		get_viewport().set_input_as_handled()
+
+
 func go_to(scene_path: String, fade_color: Color = Color.BLACK) -> void:
 	if _is_transitioning:
 		return

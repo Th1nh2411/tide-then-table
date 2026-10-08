@@ -12,7 +12,9 @@ Vietnamese, keep code comments in short English.
 - Typed GDScript only. "Inferred from Variant" is an error here: annotate
   (`var x: float = dict.get(...)`), including in throwaway test scripts.
 - No plugins. Placeholder art only (`ColorRect`, `_draw()`); no images/audio.
-- 640x360 viewport, stretch `viewport`, integer scaling.
+- 640x360 viewport, stretch `viewport`, integer scaling; default window
+  1920x1080 (x3). F11 toggles fullscreen anywhere (`SceneRouter._input`).
+  Top-down art uses Stardew-scale 16 px tiles (characters 16x32).
 
 ## Conventions (from PLAN.md §3)
 - One responsibility per script, aim for < ~200 lines; split when growing.
