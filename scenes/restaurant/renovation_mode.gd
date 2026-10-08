@@ -9,15 +9,11 @@ extends Control
 ## `applied` = the player confirmed and paid.
 signal finished(applied: bool)
 
-@export var tables: DiningTables
-@export var decor: RestaurantDecor
-@export var props: ShelfDisplay
-@export var customers: CustomerManager
+@export var room: StreetRoom
 @export var seats_upgrade: UpgradeData
 @export var decor_upgrade: UpgradeData
 @export var kitchen_upgrade: UpgradeData
 @export var fridge_upgrade: UpgradeData
-@export var decor_area: Rect2 = Rect2(166, 54, 430, 100)
 @export var outline_color: Color = Color(0.3, 1.0, 0.45)
 
 ## UpgradeData -> previewed level.
@@ -61,7 +57,7 @@ func _upgrades() -> Array[UpgradeData]:
 
 ## The clickable areas, in the same order as _upgrades().
 func _areas() -> Array[Rect2]:
-	var list: Array[Rect2] = [props.tables_area(tables.seat_positions), decor_area, props.stove_area(), props.fridge_area()]
+	var list: Array[Rect2] = [room.tables_area(), room.decor_area(), room.stove_area(), room.fridge_area()]
 	return list
 
 
@@ -118,11 +114,10 @@ func _show_options(upgrade: UpgradeData, area: Rect2) -> void:
 
 ## Shows the previewed levels on the room (tables, decor, stove, fridge).
 func _apply_preview() -> void:
-	var seat_count := int(seats_upgrade.value_at(int(_preview[seats_upgrade])))
-	tables.setup(CustomerManager.layout_seats(seat_count, customers.seat_x_range, customers.seat_y))
-	decor.setup(int(decor_upgrade.value_at(int(_preview[decor_upgrade]))))
-	props.kitchen_level = int(_preview[kitchen_upgrade])
-	props.fridge_level = int(_preview[fridge_upgrade])
+	room.setup_tables(int(seats_upgrade.value_at(int(_preview[seats_upgrade]))))
+	room.decor_level = int(decor_upgrade.value_at(int(_preview[decor_upgrade])))
+	room.kitchen_level = int(_preview[kitchen_upgrade])
+	room.fridge_level = int(_preview[fridge_upgrade])
 	var cost := total_cost()
 	_confirm_button.text = "Xác nhận" if cost == 0 else "Xác nhận (-%dk)" % cost
 	_confirm_button.disabled = cost > GameState.money
@@ -153,7 +148,7 @@ func _draw() -> void:
 	var color := Color(outline_color, pulse)
 	var font := ThemeDB.fallback_font
 	var areas := _areas()
-	var names: Array[String] = ["Bàn ghế", "Trang trí", "Bếp", "Tủ lạnh"]
+	var names: Array[String] = ["Bàn ghế", "Trang trí", "Bếp", "Thùng đá"]
 	for i in areas.size():
 		draw_rect(areas[i], color, false, 2.0)
 		draw_string(font, areas[i].position + Vector2(3, 10), names[i], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, color)

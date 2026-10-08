@@ -2,7 +2,7 @@
 
 2D Godot game: fish at sea at night (top-down, limited by lamp oil, Dave the
 Diver style — no ticking clock), sleep, then cook and sell at a Vietnamese
-seafood restaurant 15:00–24:00 (side view), upgrade, repeat. `PLAN.md` is the
+sidewalk seafood restaurant 15:00–24:00 (top-down 3/4), upgrade, repeat. `PLAN.md` is the
 design source of truth (data tables, phase list, progress table, out-of-scope
 list). The user is a solo dev new to Godot and writes in Vietnamese; reply in
 Vietnamese, keep code comments in short English.
@@ -106,18 +106,29 @@ Vietnamese, keep code comments in short English.
   starts, shown on the sea HUD + phone tab; at shift start the fish is set
   aside (`reserve_for_shift`) and the regular comes to the restaurant;
   unserved fish released, overdue orders expire after the shift.
-- Restaurant: `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (spawning,
-  ordering, waiter jobs, payment; seats/decor upgrades, rich customers,
-  regulars), `DishShelf` (pure: plates + arrival-order matching),
-  `DiningTables` (free/taken/dirty), `KitchenStation` (in-world kitchen:
-  numbered menu board on the wall, 1-9 / click cooks that dish, E takes the plate Rin faces on the shelf, bin by
-  position, ticket rail; `CookingOverlay` is a compact top-left panel — no
-  full-screen pop-ups), `ServiceMarkers` (visual cues instead of prompt text: carried plate → its table + ticket pulse, unordered → bin red, arrow over the faced plate, small "E" key over what E acts on), `Waiter` "Bảo" (carry / clean jobs), `RinWalker`
-  (player: A/D + E, forwards E in the kitchen corner), `ShelfDisplay`,
-  `RestaurantDecor`, `RepairButton`, `RenovationMode` ("Sửa quán": in-place
-  renovation of seats/decor/kitchen/fridge with preview, Hủy / Xác nhận);
-  pinned HUD buttons "Chuẩn bị menu" + "Sửa quán" (when not serving) and "Ra khơi" (after the
-  summary) — no automatic scene changes.
+- Restaurant (top-down 3/4 Vietnamese sidewalk, 40x23 tiles of 16 px):
+  `StreetRoom` (ASCII map -> `RoomGrid` with A* paths; shop front at the top,
+  pavement, only the near part of the road at the bottom; Rin's kitchen =
+  ice box + food cart with the stove + plate table set lengthwise + bin; tables =
+  first N slots from the seats upgrade; draws upgrade looks, also previewed
+  while renovating), `StreetBackdrop` (shop front + traffic), `StreetProps`
+  (static drawings), `StreetPerson` (16x32 body, path walking) -> `RinChef`
+  (player: WASD, E on the faced cell), `Waiter` "Bảo" (A* jobs: pick the plate
+  from its plate-table slot, carry; clean), `Customer` (most come by motorbike:
+  `CustomerBikes` road -> park by the curb -> walk to the table and back).
+  `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (spawning, ordering, waiter
+  jobs, payment; seats/decor upgrades, rich customers, regulars), `DishShelf`
+  (pure: plate-table slots + arrival-order matching), `DiningTables` (pure:
+  free/taken/dirty), `KitchenStation` (menu rows; 1-9 / click a chip near the
+  cart walks Rin behind the stove, then the compact `CookingOverlay` over the
+  road; the dish lands in her hands; E on the plate table / tables),
+  `ServiceHud` (menu chips + tickets over the shop front, dim away from the
+  cart), `ServiceMarkers` (bubbles, carried plate -> its table pulses, "E"
+  key over what E acts on — no prompt text), `RepairButton`, `RenovationMode`
+  ("Sửa quán": in-place renovation of seats/decor/kitchen/ice box with
+  preview, Hủy / Xác nhận); pinned HUD buttons "Chuẩn bị menu" + "Sửa quán"
+  (when not serving) and "Ra khơi" (after the summary) — no automatic scene
+  changes.
 - Cutscenes (Stardew style): write a `Cutscene` .tres in `data/cutscenes/`
   (commands listed in `CutsceneScript`), add marker Node2Ds under the scene's
   `CutsceneMarkers`, play with `CutscenePlayer.play()` (sea scene plays
@@ -129,9 +140,9 @@ Vietnamese, keep code comments in short English.
   `pet_name`; use `{pet}` in dialogue/cutscene text.
 - Dialogue: write a `Dialogue` .tres in `data/dialogues/` ("Name: line" per
   line; min_day / requires_flag / once / sets_flag / priority) and add it to
-  a `Talker` child of the character (character needs `talk_x()`, optional
+  a `Talker` child of the character (character needs `talk_position()`, optional
   `can_talk()`). `DialogueLibrary` picks and marks seen (story_flags →
-  saved); `DialogueBox` shows it (pauses). Rin talks with E (RinWalker).
+  saved); `DialogueBox` shows it (pauses). Rin talks with E next to them.
 - Sea gear upgrades (boat, rod, lamp) are bought in the phone's "Nâng cấp"
   tab (`PhoneShop`); restaurant upgrades only via "Sửa quán".
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and

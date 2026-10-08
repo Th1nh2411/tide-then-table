@@ -1,7 +1,7 @@
 class_name DishShelf
 extends RefCounted
-## The kitchen shelf: cooked dishes (Plates) waiting to be carried out, up to
-## `capacity`. Also the matching rule for service: go through the waiting
+## The pass (plate table): cooked dishes (Plates) waiting to be carried
+## out, one per fixed slot, up to `capacity`. Also the matching rule for service: go through the waiting
 ## customers in arrival order and take the oldest plate of the dish the first
 ## one ordered. A regular's plate (cooked from their reserved fish) only goes
 ## to that regular. Pure logic, no nodes.
@@ -27,26 +27,48 @@ class Plate:
 
 
 var capacity: int = 4
+## Plates in the order they were put down (oldest first).
 var plates: Array[Plate] = []
+## Fixed spots on the table: slot index -> Plate (null = empty).
+var slots: Array[Plate] = []
 
 
 func _init(p_capacity: int = 4) -> void:
 	capacity = p_capacity
+	slots.resize(capacity)
 
 
 func is_full() -> bool:
 	return plates.size() >= capacity
 
 
-func add(plate: Plate) -> bool:
+## Puts the plate on `slot` (or the first empty one when -1).
+func add(plate: Plate, slot: int = -1) -> bool:
 	if is_full():
 		return false
+	if slot < 0:
+		slot = slots.find(null)
+	if slot < 0 or slot >= capacity or slots[slot] != null:
+		return false
+	slots[slot] = plate
 	plates.append(plate)
 	return true
 
 
 func remove(plate: Plate) -> void:
 	plates.erase(plate)
+	var slot := slots.find(plate)
+	if slot >= 0:
+		slots[slot] = null
+
+
+func plate_at(slot: int) -> Plate:
+	return slots[slot] if slot >= 0 and slot < capacity else null
+
+
+func clear() -> void:
+	plates.clear()
+	slots.fill(null)
 
 
 ## Plates of `dish` free for anyone (not a regular's).

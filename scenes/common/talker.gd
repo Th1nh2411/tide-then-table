@@ -1,8 +1,8 @@
 class_name Talker
 extends Node
 ## Makes its parent someone Rin can talk to. Add it as a child of a character
-## node that has `talk_x() -> float` (where it stands) and optionally
-## `can_talk() -> bool`. Picks the next story conversation (DialogueLibrary),
+## node that has `talk_position() -> Vector2` (where it stands) and
+## optionally `can_talk() -> bool`. Picks the next story conversation (DialogueLibrary),
 ## or a random small-talk line when there's nothing new.
 
 @export var display_name: String = ""
@@ -15,8 +15,8 @@ func _ready() -> void:
 	add_to_group("talkers")
 
 
-func talk_x() -> float:
-	return get_parent().call("talk_x")
+func talk_position() -> Vector2:
+	return get_parent().call("talk_position")
 
 
 func can_talk() -> bool:

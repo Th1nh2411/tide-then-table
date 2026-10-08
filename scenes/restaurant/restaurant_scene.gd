@@ -1,13 +1,13 @@
 extends Control
-## Restaurant screen (side view).
+## Restaurant screen: a sidewalk seafood spot seen top-down (StreetRoom).
 ## Flow: prepare today's menu from storage -> open at 15:00 -> serve customers
 ## until closing at 24:00 (fixed real-time shift, or the player closes early)
 ## -> leftovers go back to storage -> summary.
-## Service (Dave the Diver style): Rin walks with A/D; in the kitchen corner
-## the KitchenStation cooks from prepared trays onto the shelf (compact
-## minigame above the stove, no pop-up); Bảo
-## carries plates in order and cleans tables; Rin can carry a plate or clean
-## a table too.
+## Service (Dave the Diver style): Rin walks with WASD and E acts on the cell
+## she faces; near the food cart, a menu chip / number key walks her to the
+## stove and starts the compact cooking minigame (no pop-up), the dish lands
+## in her hands; she serves it herself or leaves it on the plate table, from
+## where Bảo carries plates in order (and cleans tables).
 ## Once the menu sells out, customers can only order snacks (peanuts), so a
 ## poorly prepared menu earns little. A menu with few dishes lowers all prices.
 ## After the summary (1-5 stars) nothing moves on by itself: pinned buttons
@@ -33,6 +33,8 @@ const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 @export var fridge_upgrade: UpgradeData
 ## Cutscenes that can play after the summary (first eligible one, once).
 @export var after_shift_cutscenes: Array[Cutscene] = []
+## How close Rin must be to someone to talk (px).
+@export var talk_reach: float = 22.0
 
 var _plan: MenuPlan
 var _time_left: float = 0.0
@@ -66,10 +68,10 @@ var _sail_button: Button
 @onready var _next_day_button: Button = %NextDayButton
 @onready var _close_early_button: Button = %CloseEarlyButton
 @onready var _renovation: RenovationMode = $RenovationMode
-@onready var _props: ShelfDisplay = $ShelfDisplay
-@onready var _waiter: Waiter = $Waiter
+@onready var _room: StreetRoom = $World/Room
+@onready var _waiter: Waiter = $World/People/Waiter
 @onready var _cutscene: CutscenePlayer = $CutscenePlayer
-@onready var _rin: RinWalker = $RinWalker
+@onready var _rin: RinChef = $World/People/Rin
 @onready var _kitchen: KitchenStation = $KitchenStation
 
 
@@ -80,15 +82,21 @@ func _ready() -> void:
 	_customers.customer_left_angry.connect(func() -> void: _left_angry += 1)
 	_customers.message_requested.connect(_show_message)
 	_next_day_button.pressed.connect(_on_continue_pressed)
-	_menu_button = _pin_button("Chuẩn bị menu", Rect2(416, 26, 108, 20))
+	_menu_button = _pin_button("Chuẩn bị menu", Rect2(416, 42, 108, 18))
 	_menu_button.pressed.connect(func() -> void:
 		_menu_panel.show()
 		_menu_panel.move_to_front())
-	_renovate_button = _pin_button("Sửa quán", Rect2(530, 26, 104, 20))
+	_renovate_button = _pin_button("Sửa quán", Rect2(530, 42, 104, 18))
 	_renovate_button.pressed.connect(_open_renovation)
 	_renovation.finished.connect(_on_renovation_finished)
-	_props.kitchen_level = GameState.get_upgrade_level(_renovation.kitchen_upgrade.id)
-	_props.fridge_level = GameState.get_upgrade_level(_renovation.fridge_upgrade.id)
+	_room.kitchen_level = GameState.get_upgrade_level(_renovation.kitchen_upgrade.id)
+	_room.fridge_level = GameState.get_upgrade_level(_renovation.fridge_upgrade.id)
+	# The minigame pops over the road below the kitchen.
+	var cooking_panel := $CookingOverlay/Panel as Control
+	cooking_panel.offset_left = 8.0
+	cooking_panel.offset_right = 238.0
+	cooking_panel.offset_top = 196.0
+	cooking_panel.offset_bottom = 312.0
 	_sail_button = _pin_button("Ra khơi  →", Rect2(520, 318, 114, 32))
 	_sail_button.pressed.connect(_start_next_day)
 	_sail_button.hide()
@@ -105,13 +113,8 @@ func _ready() -> void:
 
 	_waiter.visible = Waiter.is_hired()  # day 1: Rin is alone
 	_regular_visits = FishOrders.reserve_for_shift(menu)
-	(%Decor as RestaurantDecor).setup(_customers.decor_level())
-	_rin.kitchen_action.connect(_kitchen.act)
 	_kitchen.message_requested.connect(_show_message)
-	_rin.serve_requested.connect(_on_rin_serve)
-	_rin.clean_requested.connect(func(seat: int) -> void: (_customers.tables as DiningTables).clean(seat))
-	_rin.message_requested.connect(_show_message)
-	_rin.talk_requested.connect(func(talker: Talker) -> void: talker.talk(_dialogue_box))
+	_rin.interacted.connect(_on_rin_interacted)
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
@@ -162,8 +165,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	# Rin walks freely whenever no panel covers the room.
-	_rin.active = not ($CookingOverlay.is_running() or _renovation.visible or _menu_panel.visible
-		or _summary_panel.visible)
+	_rin.active = not ($CookingOverlay.is_running() or _kitchen.busy or _renovation.visible
+		or _menu_panel.visible or _summary_panel.visible)
 	_rin.kitchen_open = _shift_running or _closing
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
@@ -197,9 +200,10 @@ func _end_shift(reason: String) -> void:
 	while cooking.is_running():
 		await get_tree().process_frame
 	_rin.carried = null
+	_customers.shelf.clear()  # plates left on the table are wasted
 	var leftover := _plan.total_portions()
 	_plan.clear(GameState.storage)
-	# Plates left on the shelf are wasted; uncooked trays go back to storage.
+	# Uncooked regular orders go back to storage.
 	for visit in _customers.uncooked_regular_visits():
 		FishOrders.release(visit)
 	var order_lines := FishOrders.expire_after_shift(fish_catalog)
@@ -220,11 +224,17 @@ func _end_shift(reason: String) -> void:
 	_next_day_button.grab_focus()
 
 
-func _on_rin_serve(seat: int) -> void:
-	if _customers.serve_at(seat, _rin.carried):
-		_rin.carried = null
-	else:
-		_show_message("Bàn %d không gọi món này" % (seat + 1))
+## E: the kitchen / tables first, else talk to whoever stands right there.
+func _on_rin_interacted(cell: Vector2i) -> void:
+	if _kitchen.interact(cell):
+		return
+	var spot := _room.grid.to_world(cell)
+	for node in get_tree().get_nodes_in_group("talkers"):
+		var talker := node as Talker
+		if talker and talker.can_talk() and (talker.talk_position().distance_to(spot) <= talk_reach
+				or talker.talk_position().distance_to(_rin.position) <= talk_reach):
+			talker.talk(_dialogue_box)
+			return
 
 
 func _on_customer_served(price: int, tip: int) -> void:
@@ -305,15 +315,14 @@ func _on_renovation_finished(applied: bool) -> void:
 	_set_room_ui_visible(true)
 	if applied:
 		_customers.refresh_upgrades()
-		(%Decor as RestaurantDecor).setup(_customers.decor_level())
 		_show_message("Đã sửa quán!")
 
 
 ## People, panels and pinned buttons (hidden while renovating).
 func _set_room_ui_visible(on: bool) -> void:
-	for node: CanvasItem in [$CustomerLayer, $RinWalker, $HUD]:
+	for node: CanvasItem in [$World/People, $World/Bikes, $World/Markers, $HUD]:
 		node.visible = on
-	_waiter.visible = on and Waiter.is_hired()
+	_waiter.visible = Waiter.is_hired()
 	_menu_panel.visible = false
 	_menu_button.visible = on and not _shift_running and not _shift_over
 	_sail_button.visible = on and _shift_over

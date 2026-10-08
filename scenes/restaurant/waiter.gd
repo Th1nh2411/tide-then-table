@@ -1,39 +1,31 @@
 class_name Waiter
-extends Control
-## Bảo, the waiter. Waits by the kitchen shelf; CustomerManager hands out
-## jobs: carry a plate to a table, or clean a dirty table. Walks along the
-## floor, does the job, walks back to the shelf. Rin can talk to Bảo while
-## idle (child Talker; "!" when there's a new conversation).
+extends StreetPerson
+## Bảo, the waiter, walking the street restaurant grid (A*). Waits beside the
+## plate table; CustomerManager hands out jobs: carry a plate (walk to its
+## pass slot, pick it up, take it to the table) or clean a dirty table.
+## Rin can talk to Bảo while idle (child Talker; "!" when there's news).
 
+signal picked_up(customer: Customer, plate: DishShelf.Plate)
 signal delivered(customer: Customer, plate: DishShelf.Plate)
 signal cleaned(seat: int)
-
-enum Job { NONE, CARRY, CLEAN, RETURN }
 
 const HIRED_FLAG: String = "bao_joined"
 
 @export var display_name: String = "Bảo"
-@export var speed: float = 100.0
-@export var shelf_x: float = 172.0
-@export var floor_y: float = 228.0
 @export var clean_seconds: float = 1.2
-@export var body_color: Color = Color(0.85, 0.5, 0.2)
+## Where Bảo waits (pavement side of the plate table).
+@export var home_cell: Vector2i = Vector2i(8, 8)
 
-var job: Job = Job.NONE
+@export var room: StreetRoom
 
-var _x: float = 172.0
-var _goal_x: float = 172.0
-var _customer: Customer
-var _plate: DishShelf.Plate
-var _seat: int = -1
-var _timer: float = 0.0
-var _facing: float = 1.0
+var _busy: bool = false
 
 
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_preset(Control.PRESET_FULL_RECT)
-	_x = shelf_x
+	body_color = Color(0.85, 0.5, 0.2)
+	apron = true
+	label = display_name
+	speed = 80.0
 
 
 ## Bảo works here from day 2 (joins in the cutscene after day 1's shift).
@@ -41,76 +33,58 @@ static func is_hired() -> bool:
 	return GameState.has_flag(HIRED_FLAG) or GameState.day > 1
 
 
-## Free and standing at the shelf.
 func is_idle() -> bool:
-	return job == Job.NONE
-
-
-func talk_x() -> float:
-	return _x
+	return not _busy
 
 
 func can_talk() -> bool:
 	return is_hired() and is_idle()
 
 
-func deliver(customer: Customer, plate: DishShelf.Plate, table_x: float) -> void:
-	_customer = customer
-	_plate = plate
-	_goal_x = table_x
-	job = Job.CARRY
+func go_home() -> void:
+	position = room.grid.to_world(home_cell)
 
 
-func clean(seat: int, table_x: float) -> void:
-	_seat = seat
-	_goal_x = table_x
-	_timer = clean_seconds
-	job = Job.CLEAN
-
-
-func _process(delta: float) -> void:
-	queue_redraw()
-	if job == Job.NONE:
+func deliver(customer: Customer, plate: DishShelf.Plate) -> void:
+	_busy = true
+	var slot := room.shelf.slots.find(plate)
+	if slot >= 0:
+		await _go_next_to(room.pass_cells()[slot], Vector2i(2, 0))
+	if slot < 0 or room.shelf.plate_at(slot) != plate:
+		_finish()  # Rin took it meanwhile
 		return
-	if job == Job.RETURN:
-		_goal_x = shelf_x
-	var step := clampf(_goal_x - _x, -speed * delta, speed * delta)
-	if step != 0.0:
-		_facing = signf(step)
-	_x += step
-	if absf(_goal_x - _x) > 0.5:
-		return
-	match job:
-		Job.CARRY:
-			var customer := _customer
-			var plate := _plate
-			_customer = null
-			_plate = null
-			job = Job.RETURN
-			delivered.emit(customer, plate)
-		Job.CLEAN:
-			_timer -= delta
-			if _timer <= 0.0:
-				job = Job.RETURN
-				cleaned.emit(_seat)
-		Job.RETURN:
-			job = Job.NONE
+	carried = plate
+	picked_up.emit(customer, plate)
+	if is_instance_valid(customer) and customer.seat >= 0:
+		await _go_next_to(room.tables[customer.seat]["table"], Vector2i(-1, -1))
+	carried = null
+	delivered.emit(customer, plate)
+	_finish()
+
+
+func clean(seat: int) -> void:
+	_busy = true
+	await _go_next_to(room.tables[seat]["table"], Vector2i(-1, -1))
+	await get_tree().create_timer(clean_seconds).timeout
+	cleaned.emit(seat)
+	_finish()
+
+
+func _finish() -> void:
+	_busy = false
+	walk(room.grid.path(room.grid.to_cell(position), home_cell))
+
+
+## Walks beside `target` (the free cell nearest target + `side`), faces it.
+func _go_next_to(target: Vector2i, side: Vector2i) -> void:
+	var stand := room.grid.stand_cell(target, target + side)
+	await walk_and_wait(room.grid.path(room.grid.to_cell(position), stand))
+	facing = target - stand
 
 
 func _draw() -> void:
-	var at := Vector2(_x - 8, floor_y)
-	draw_rect(Rect2(at + Vector2(0, 12), Vector2(16, 22)), body_color)
-	draw_rect(Rect2(at + Vector2(2, 20), Vector2(12, 14)), Color(0.95, 0.9, 0.8))  # apron
-	draw_circle(at + Vector2(8, 6), 6, Color(0.95, 0.8, 0.65))
-	draw_circle(at + Vector2(8 + _facing * 3, 5), 1.0, Color.BLACK)
-	if _plate:
-		draw_rect(Rect2(at + Vector2(-2, -4), Vector2(12, 3)), Color.WHITE)
-		draw_rect(Rect2(at + Vector2(0, -8), Vector2(8, 4)), _plate.dish.color)
-	if job == Job.CLEAN and absf(_goal_x - _x) <= 0.5:
-		draw_line(at + Vector2(16, 14), at + Vector2(22, 10 + sin(_timer * 20.0) * 3.0), Color(0.9, 0.9, 1.0), 2.0)
-	draw_string(ThemeDB.fallback_font, at + Vector2(-2, -12), display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 8,
-		Color(1, 1, 1, 0.8))
+	super()
 	var talker := get_node_or_null("Talker") as Talker
 	if talker and is_idle() and talker.has_news():
-		draw_string(ThemeDB.fallback_font, at + Vector2(6, -22), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 12,
+		draw_string(ThemeDB.fallback_font, Vector2(-3, -44), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 12,
 			Color(1, 0.85, 0.3))

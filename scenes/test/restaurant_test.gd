@@ -1,7 +1,7 @@
 extends Control
 ## Standalone test for restaurant service logic (run with F6): the kitchen
 ## shelf (capacity, regular plates), arrival-order matching for the waiter,
-## and table states (free -> taken -> dirty -> cleaned).
+## plate table slots and table states (free -> taken -> dirty -> cleaned).
 
 @export var menu: DishCatalog
 
@@ -33,10 +33,17 @@ func _ready() -> void:
 	_check("then the next one", shelf.next_delivery([no_plate, first, second]).get("order") == second)
 	_check("nothing matches -> {}", shelf.next_delivery([no_plate]).is_empty())
 
+	# Plate table slots: put on a chosen cell, take that one back.
+	var pass_table := DishShelf.new(5)
+	pass_table.add(plate_a, 3)
+	_check("plate on chosen slot", pass_table.plate_at(3) == plate_a and pass_table.plate_at(0) == null)
+	_check("slot taken", not pass_table.add(plate_b, 3))
+	pass_table.remove(plate_a)
+	_check("slot freed", pass_table.plate_at(3) == null and pass_table.plates.is_empty())
+
 	# Tables.
 	var tables := DiningTables.new()
-	tables.setup(CustomerManager.layout_seats(3, Vector2(200, 400), 228))
-	_check("layout spreads seats", tables.seat_positions[0].x == 200.0 and tables.seat_positions[2].x == 400.0)
+	tables.setup(3)
 	tables.take(tables.free_seat())
 	_check("taken seat skipped", tables.free_seat() == 1)
 	tables.make_dirty(0)
@@ -46,7 +53,6 @@ func _ready() -> void:
 	tables.take(1)
 	tables.release(1)
 	_check("left without eating -> free", tables.states[1] == DiningTables.State.FREE)
-	tables.free()
 	for order in [first, second, no_plate]:
 		order.free()
 	# The restaurant has no camera; nothing (e.g. the cutscene camera) may

@@ -38,11 +38,12 @@ BẾN
   Hải sản thừa trả về kho; rau mua chợ thừa thì bỏ.
 
 PHỤC VỤ
-  A / D: Rin đi (cả lúc chưa mở quán). Phiếu order hiện ở trên cùng.
-  Đi vào khu BẾP bên trái (khi đang bán):
-    1-9 (hoặc click): nấu món số đó trên bảng menu trong bếp.   Viền xanh trên phiếu = món đã có trên kệ.
-    Đứng trước đĩa trên kệ (mũi tên xanh chỉ đĩa): E cầm ra.   E ở sọt rác (góc trái): vứt món đang cầm.
-  Minigame nấu hiện nhỏ phía trên bếp, quán vẫn chạy.
+  WASD: Rin đi. E: tác động vào ô Rin đang quay mặt vào (ô có viền trắng + phím E).
+  Hàng món ở trên cùng, phiếu order ngay dưới (viền xanh = món đã có trên bàn kê).
+  Đứng gần xe đẩy (khi đang bán): bấm 1-9 (hoặc click món) -> Rin tự ra sau bếp nấu.
+    Minigame hiện nhỏ trên mặt đường, quán vẫn chạy. Nấu xong món nằm trên tay Rin.
+  Bàn kê món (dọc cạnh xe đẩy): E đặt món xuống ô đó / cầm món ở ô đó lên.
+  Thùng rác xanh (2x2) cạnh xe đẩy: E vứt món đang cầm (món không ai gọi thì xô nhấp nháy đỏ).
   E cạnh người khác: nói chuyện (dấu "!" = có chuyện mới).
 
 NẤU
@@ -50,8 +51,9 @@ NẤU
   Xào: bấm liên tục cho đầy thanh.
 
 BẢO VÀ BÀN
-  Bảo tự bưng món cho khách vào trước, rảnh thì dọn bàn bẩn.
-  E cạnh bàn: đặt món Rin đang cầm, hoặc dọn bàn bẩn.
+  Bảo tự lấy món trên bàn kê bưng cho khách gọi trước, rảnh thì dọn bàn bẩn.
+  Cầm món: bàn gọi món đó nhấp nháy xanh. Quay mặt vào bàn bấm E: đặt món, hoặc dọn bàn bẩn.
+  Khách phần lớn đi xe máy tới, đỗ sát lề.
   Khách quen (bóng thoại vàng) tới ăn món đã đặt trước.
 
 HẾT CA
@@ -59,7 +61,7 @@ HẾT CA
   Bảng tổng kết -> "Đóng" -> "Ra khơi".
 
 SỬA QUÁN (trước giờ mở / sau khi bán xong)
-  Bấm "Sửa quán": đồ sửa được có viền xanh (bàn ghế, trang trí, bếp, tủ lạnh).
+  Bấm "Sửa quán": đồ sửa được có viền xanh (bàn ghế, trang trí, bếp, thùng đá).
   Bấm vào đồ để chọn cấp, xem trước ngay. "Xác nhận" trả tiền, "Hủy" để bỏ.""",
 	"""ĐIỆN THOẠI (J)
   A / D: đổi tab.   J / Esc: đóng.   Game tạm dừng khi mở.

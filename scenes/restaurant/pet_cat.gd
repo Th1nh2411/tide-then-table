@@ -1,14 +1,14 @@
 class_name PetCat
 extends Control
 ## The restaurant cat (adopted in the "cat_arrival" cutscene; name in
-## story_flags "pet_name"). Sits by the counter, purrs, and Rin can talk to
+## story_flags "pet_name"). Sits by the food cart, purrs, and Rin can talk to
 ## it (child Talker). While it's here customers are a bit more patient
 ## ("mèo chiêu tài", CustomerManager reads is_present()).
 
 const ADOPTED_FLAG: String = "cat_adopted"
 const GONE_FLAG: String = "cat_gone"
 
-@export var sit_position: Vector2 = Vector2(122, 262)
+@export var sit_position: Vector2 = Vector2(20, 158)
 @export var fur: Color = Color(0.95, 0.6, 0.25)
 
 var _time: float = 0.0
@@ -29,8 +29,8 @@ func _ready() -> void:
 			talker.remove_from_group("talkers")
 
 
-func talk_x() -> float:
-	return sit_position.x + 24.0
+func talk_position() -> Vector2:
+	return sit_position
 
 
 func _process(delta: float) -> void:
