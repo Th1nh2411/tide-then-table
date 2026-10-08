@@ -128,7 +128,10 @@ func _start(dish: DishData, items: Array[InventoryItem], visit: Dictionary) -> v
 func _shout(dish: DishData) -> void:
 	if not _shouted.has(dish):
 		_shouted[dish] = true
-		message_requested.emit("Bảo: Hết %s rồi Rin ơi! Chạy qua tạp hoá %s mua đi!" % [dish.display_name, stall.seller_name])
+		if stall.bag.count(dish) > 0:
+			message_requested.emit("Bảo: Rau còn trong túi kìa Rin, cất vô tủ lạnh đi!")
+		else:
+			message_requested.emit("Bảo: Hết %s rồi Rin ơi! Chạy qua tạp hoá %s mua đi!" % [dish.display_name, stall.seller_name])
 
 
 func _by_level(table: Array[float]) -> float:

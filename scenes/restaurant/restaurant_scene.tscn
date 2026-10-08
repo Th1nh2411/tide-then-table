@@ -124,8 +124,9 @@ customers = NodePath("../../CustomerManager")
 kitchen = NodePath("../../KitchenStation")
 stall = NodePath("../../MarketStall")
 
-[node name="MarketStall" type="Node" parent="." node_paths=PackedStringArray("seller")]
+[node name="MarketStall" type="Node" parent="." node_paths=PackedStringArray("room", "seller")]
 script = ExtResource("46_stall")
+room = NodePath("../World/Room")
 products = Array[ExtResource("49_dishdata")]([ExtResource("48_rau"), ExtResource("50_bia")])
 seller = NodePath("../World/People/Seller")
 

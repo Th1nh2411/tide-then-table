@@ -36,7 +36,9 @@ BẾN
   Bấm vào bảng hiệu LED (viền vàng nhấp nháy): chọn món và số phần, rồi "Mở quán" ("Đóng" để làm việc khác trước).
   Rau muống, tháp bia con mèo luôn có trên menu: đứng trước quầy tạp hoá Cô Năm (bên phải)
     bấm E mở danh sách, "Mua" (hoặc 1-9): rau 1 phần, bia 1 bình 20 lít (tháp 3 lít).
-  Tháp bia không cần nấu. Hết rau / bia thì phải chạy sang mua (trước hoặc trong giờ bán).
+  Đồ mua nằm trong túi trên tay Rin: mang về E ở tủ lạnh (sát tường, trên bàn kê) để cất,
+    cất rồi Bảo mới nấu rau / Rin mới rót bia được. Tháp bia không cần nấu.
+  Hết rau / bia thì phải chạy sang mua (trước hoặc trong giờ bán).
   Hết hải sản thì khách chỉ gọi rau muống, bia. Menu dưới 3 món bị chê đơn điệu.
   Hải sản thừa trả về kho; rau thừa bỏ đi cuối ngày, bia để dành hôm sau.
 

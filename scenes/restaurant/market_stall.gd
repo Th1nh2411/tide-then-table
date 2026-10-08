@@ -2,15 +2,18 @@ class_name MarketStall
 extends Node
 ## Cô Năm's grocery next door (the "V" counter of the StreetRoom map): E in
 ## front of the counter (`reach`) opens the list of what she sells
-## (MarketPanel); each buy is `market_pack` portions of a market dish's goods
-## (a bunch of rau, a crate of 24 beers) for its `market_cost`, before opening
-## or during the shift (not after closing). Bought goods go into `stock`
-## (MarketStock on GameState.pantry, so beer keeps between days).
+## (MarketPanel); each buy is `market_pack` units of a market dish's goods (a
+## bunch of rau, a 20 L keg) for its `market_cost`, before opening or during
+## the shift (not after closing). Bought goods go into Rin's shopping `bag`;
+## he has to carry them home and E on the fridge ("F") to put them in
+## `stock` (MarketStock on GameState.pantry, so beer keeps between days) —
+## only then can Bảo cook the rau and Rin pour the beer.
 
 signal browse_requested
 signal bought(dish: DishData, cost: int)
 signal message_requested(text: String)
 
+@export var room: StreetRoom
 ## What the grocery sells: market dishes (their goods, one portion per buy).
 @export var products: Array[DishData] = []
 @export var seller_name: String = "Cô Năm"
@@ -19,7 +22,10 @@ signal message_requested(text: String)
 ## (x: ± px) and up to this far below her (y px), facing any way.
 @export var reach: Vector2 = Vector2(56, 50)
 
+## The fridge (what the kitchen uses).
 var stock := MarketStock.new(GameState.pantry)
+## Bought, still in Rin's hands.
+var bag := MarketStock.new({})
 ## Set by the restaurant: false once the day's shift is over.
 var open: bool = true
 
@@ -41,11 +47,30 @@ func interact(rin: StreetPerson) -> bool:
 	return true
 
 
-## One portion of `dish`'s produce; false if the money isn't enough.
+## One buy of `dish`'s goods into the bag; false if the money isn't enough.
 func buy(dish: DishData) -> bool:
 	if not open or not GameState.spend_money(dish.market_cost):
 		message_requested.emit("Không đủ tiền (%dk)" % dish.market_cost)
 		return false
-	stock.add(dish, dish.market_pack)
+	bag.add(dish, dish.market_pack)
 	bought.emit(dish, dish.market_cost)
 	return true
+
+
+## E on the fridge with a full bag would put it away.
+func can_store_at(cell: Vector2i) -> bool:
+	return bag.total() > 0 and room.grid.kind(cell) == "F"
+
+
+## E on `cell`: the fridge with a full bag -> put the goods away.
+func store_at(cell: Vector2i) -> bool:
+	if not can_store_at(cell):
+		return false
+	store_all()
+	message_requested.emit("Đã cất đồ tạp hoá vào tủ lạnh")
+	return true
+
+
+## Bag -> fridge (also at closing, so nothing is lost in Rin's hands).
+func store_all() -> void:
+	bag.move_into(stock, products)

@@ -88,7 +88,8 @@ func _refresh() -> void:
 	_money_label.text = "Tiền: %dk" % GameState.money
 	for row in _rows:
 		var dish: DishData = row["dish"]
-		(row["have"] as Label).text = "có %d %s" % [stall.stock.count(dish), dish.unit_name]
+		var in_bag := stall.bag.count(dish)
+		(row["have"] as Label).text = "tủ %d%s" % [stall.stock.count(dish), (" +%d túi" % in_bag) if in_bag > 0 else ""]
 		(row["buy"] as Button).disabled = GameState.money < dish.market_cost
 
 

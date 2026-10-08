@@ -114,6 +114,10 @@ func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
 	var both: Array[DishData] = [rau, beer]
 	_check("closing wastes rau only", stock.discard_perishable(both) == 1 and stock.count(rau) == 0)
 	_check("beer keeps overnight", MarketStock.new(pantry).count(beer) == 2)
+	var bag := MarketStock.new({})
+	bag.add(rau, 3)
+	var fridge := MarketStock.new({})
+	_check("bag -> fridge", bag.move_into(fridge, both) == 3 and fridge.count(rau) == 3 and bag.total() == 0)
 
 	# Variety.
 	var table: Array[float] = [0.8, 0.8, 0.9, 1.0]

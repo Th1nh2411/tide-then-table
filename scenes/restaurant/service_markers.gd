@@ -6,7 +6,8 @@ extends Node2D
 ## plate the table that ordered it pulses green with an arrow (nobody
 ## ordered it: the bin pulses red); a small "E"
 ## key over the cell (or person) E would act on right now (Cô Năm at the
-## grocery too, also before opening).
+## grocery too, also before opening; the fridge pulses green while Rin has
+## groceries to put away).
 
 @export var room: StreetRoom
 @export var rin: RinChef
@@ -34,6 +35,11 @@ func _draw() -> void:
 	_draw_reading()
 	if rin.active and not kitchen.busy and stall.open and stall.can_reach(rin):
 		_key_icon(stall.seller.position + Vector2(0, -40))
+	if stall.bag.total() > 0:  # groceries in hand: the fridge pulses
+		var fridge := room.merged_rect("F").grow(1)
+		draw_rect(fridge, Color(good_color, 0.55 + 0.45 * sin(_time * 6.0)), false, 2.0)
+		if rin.active and stall.can_store_at(rin.front_cell()):
+			_key_over(rin.front_cell())
 	if not kitchen.is_open():
 		return
 	var pulse := 0.55 + 0.45 * sin(_time * 6.0)

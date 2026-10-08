@@ -112,7 +112,8 @@ Vietnamese, keep code comments in short English.
   `StreetRoom` (ASCII map -> `RoomGrid` with A* paths; shop front at the top,
   pavement, only the near part of the road at the bottom; Rin's kitchen =
   in the middle of the pavement: bin + food cart with Bảo's stove + plate
-  table as a bench right of it, the ice box in the back-left corner, an open
+  table as a bench right of it, the fridge against the wall above the bench (bought groceries
+  go into Rin's bag first; E on the fridge puts them away), an open
   aisle in front, then Rin's 2-cell charcoal grill "N" (under the cart's
   left end); the beer tap "U" is the keg on the cart's right end; tables on the left (columns 2 cells
   apart, nearest the stove first) =

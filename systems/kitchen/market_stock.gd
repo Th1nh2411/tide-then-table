@@ -2,9 +2,9 @@ class_name MarketStock
 extends RefCounted
 ## Grocery goods Rin has on hand, in units (a portion of water spinach, a
 ## litre of draft beer); one serving uses `DishData.portion_units`. Works on
-## a shared dictionary (dish id -> units), normally GameState.pantry so goods
-## that keep
-## (beer) are saved; perishable ones (rau) are thrown away at closing.
+## a shared dictionary (dish id -> units): the fridge works on
+## GameState.pantry so goods that keep (beer) are saved, perishable ones (rau)
+## are thrown away at closing; Rin's shopping bag is a separate stock.
 ## Pure logic, no nodes.
 
 signal changed
@@ -47,6 +47,21 @@ func take(dish: DishData) -> bool:
 	_counts[dish.id] = count(dish) - maxi(dish.portion_units, 1)
 	changed.emit()
 	return true
+
+
+## Moves everything of `dishes` into `target` (bag -> fridge). Returns how
+## many units moved.
+func move_into(target: MarketStock, dishes: Array[DishData]) -> int:
+	var moved := 0
+	for dish in dishes:
+		var n := count(dish)
+		if n > 0:
+			target.add(dish, n)
+			_counts.erase(dish.id)
+			moved += n
+	if moved > 0:
+		changed.emit()
+	return moved
 
 
 ## End of the day: goods that don't keep overnight are wasted. Returns how

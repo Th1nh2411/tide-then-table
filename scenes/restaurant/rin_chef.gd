@@ -20,6 +20,8 @@ signal interacted(cell: Vector2i)
 var active: bool = false
 ## The shop is serving (the kitchen and tables work).
 var kitchen_open: bool = false
+## Groceries in his bag, not in the fridge yet (set by the restaurant).
+var carrying_goods: bool = false
 
 var _dash_left: float = 0.0
 var _dash_cool: float = 0.0
@@ -103,6 +105,12 @@ func _draw() -> void:
 			var from := -_dash_dir * 8.0 + side + Vector2(0, -12)
 			draw_line(from, from - _dash_dir * 12.0, Color(1, 1, 1, 0.6), 1.0)
 	super()
+	if carrying_goods:  # a green plastic shopping bag in his hand
+		var side := -7.0 if facing.x >= 0 else 7.0
+		draw_rect(Rect2(side - 3, -9, 6, 7), Color(0.3, 0.7, 0.35))
+		draw_line(Vector2(side - 2, -9), Vector2(side, -12), Color(0.3, 0.7, 0.35), 1.0)
+		draw_line(Vector2(side + 2, -9), Vector2(side, -12), Color(0.3, 0.7, 0.35), 1.0)
+		draw_rect(Rect2(side - 2, -10, 4, 2), Color(0.35, 0.65, 0.25))  # greens sticking out
 
 
 func _try_move(step: Vector2) -> void:

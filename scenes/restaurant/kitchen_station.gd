@@ -133,7 +133,10 @@ func pour() -> void:
 		message_requested.emit("Chưa bàn nào gọi bia")
 		return
 	if not stall.stock.take(customer.dish):
-		message_requested.emit("Hết bia: sang tạp hoá %s mua bình mới" % stall.seller_name)
+		if stall.bag.count(customer.dish) > 0:
+			message_requested.emit("Bia còn trong túi: cất vào tủ lạnh trước")
+		else:
+			message_requested.emit("Hết bia: sang tạp hoá %s mua bình mới" % stall.seller_name)
 		return
 	rin.carried = DishShelf.Plate.new(customer.dish, [] as Array[InventoryItem], 1.0)
 

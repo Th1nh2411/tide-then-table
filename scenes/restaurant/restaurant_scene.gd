@@ -173,6 +173,7 @@ func _process(delta: float) -> void:
 	_rin.kitchen_open = _shift_running or _closing
 	_board.clickable = not _shift_running and not _shift_over and not _closing and _rin.active
 	_chef.serving = _rin.kitchen_open
+	_rin.carrying_goods = _stall.bag.total() > 0
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
 		if _time_left <= 0.0:
@@ -210,6 +211,7 @@ func _end_shift(reason: String) -> void:
 	var leftover := _plan.total_portions()
 	_plan.clear(GameState.storage)
 	_stall.open = false
+	_stall.store_all()  # whatever is still in Rin's bag
 	_market_panel.close_panel()
 	var wasted_produce := _stall.stock.discard_perishable(_stall.products)
 	# Uncooked regular orders go back to storage.
@@ -235,7 +237,7 @@ func _end_shift(reason: String) -> void:
 
 ## E: the kitchen / tables first, else talk to whoever stands right there.
 func _on_rin_interacted(cell: Vector2i) -> void:
-	if _stall.interact(_rin) or _kitchen.interact(cell):
+	if _stall.interact(_rin) or _stall.store_at(cell) or _kitchen.interact(cell):
 		return
 	var spot := _room.grid.to_world(cell)
 	for node in get_tree().get_nodes_in_group("talkers"):

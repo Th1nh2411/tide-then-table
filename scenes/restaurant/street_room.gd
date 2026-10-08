@@ -7,7 +7,8 @@ extends Node2D
 ## pavement, the tables on the left. Kitchen: the ice box (fridge
 ## upgrade), the food cart with Bảo's stove (kitchen upgrade) and the plate
 ## table as a bench right of it (the pass: one plate per cell, `shelf` slots
-## left to right), a bin left of the cart and the draft beer keg on the
+## left to right), the fridge against the wall above the bench (bought
+## groceries are put away there, MarketStall), a bin left of the cart and the draft beer keg on the
 ## cart's right end ("U", Rin pours facing up from the aisle); in front of
 ## them an open aisle for Rin, then his 2-cell charcoal grill ("N", y-sorted
 ## like the cart) starting under the cart's left end. Tables (TABLE_SIZE cells, "T" top
@@ -31,8 +32,8 @@ const SEAT_OFFSET := Vector2i(0, -1)
 	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-	"..............................GG..GG.MM.",
-	".ho..ho..ho..ho.F.............VVVVVV....",
+	".......................F......GG..GG.MM.",
+	".ho..ho..ho..ho...............VVVVVV....",
 	".Tt..Tt..Tt..Tt.BXSXUPPPPP..............",
 	".tt..tt..tt..tt.........................",
 	"........................................",
