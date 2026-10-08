@@ -4,10 +4,9 @@ extends Node
 ## customers ride in on motorbikes (CustomerBikes; some walk in along the
 ## pavement) to free tables; after reading the menu each orders a dish that
 ## can still be served (menu portions + plates on the plate table, minus
-## orders already waiting); Rin cooks (KitchenStation) and puts plates on the
-## plate table or carries them herself; Bảo (Waiter) carries the oldest
-## order that has a plate, and cleans dirty tables when there's nothing to
-## carry. Customers eat, pay (+ tip if they didn't wait long), walk back to
+## orders already waiting); Bảo cooks (ChefBao) and Rin grills / pours
+## (KitchenStation); plates go on the plate table, and Rin — the waiter —
+## carries them out and cleans the tables. Customers eat, pay (+ tip if they didn't wait long), walk back to
 ## their bike (or off the pavement) and leave a dirty table.
 ## Upgrades: seats (tables), decor (more often + well-off customers).
 ## Regulars with a fish order (FishOrders) come early in the shift.
@@ -22,7 +21,6 @@ signal regular_served(who: String, price: int)
 @export var menu: DishCatalog
 @export var room: StreetRoom
 @export var bikes: CustomerBikes
-@export var waiter: Waiter
 ## Y-sorted layer for customer nodes (and floating money text).
 @export var people_layer: Node2D
 ## Seats upgrade: its value is the number of tables (default 4 without it).
@@ -46,7 +44,7 @@ signal regular_served(who: String, price: int)
 @export var tip_patience_threshold: float = 0.5
 ## Spawn interval multiplier by yesterday's rating (index = stars, 0 unused).
 @export var interval_scale_by_rating: Array[float] = [1.0, 1.3, 1.15, 1.0, 0.85, 0.7]
-## Chance a customer orders a side dish (rau muống) while seafood is left.
+## Chance a customer orders a side (rau muống, beer) while seafood is left.
 @export var side_order_chance: float = 0.25
 ## Patience multiplier while the restaurant cat is around ("mèo chiêu tài").
 @export var cat_patience_scale: float = 1.1
@@ -80,11 +78,6 @@ func _ready() -> void:
 	room.shelf = shelf
 	refresh_upgrades()
 	bikes.parked.connect(_on_bike_parked)
-	waiter.picked_up.connect(func(customer: Customer, plate: DishShelf.Plate) -> void:
-		shelf.remove(plate)
-		waiting.erase(customer))
-	waiter.delivered.connect(_on_delivered)
-	waiter.cleaned.connect(func(seat: int) -> void: tables.clean(seat))
 	for dish in menu.dishes:
 		if dish.always_available:
 			_sides.append(dish)
@@ -143,7 +136,6 @@ func serve_at(seat: int, plate: DishShelf.Plate) -> bool:
 
 
 func _process(delta: float) -> void:
-	_assign_waiter()
 	if not _accepting:
 		return
 	_shift_time += delta
@@ -154,26 +146,6 @@ func _process(delta: float) -> void:
 		_spawn_left = _rng.randf_range(min_spawn_interval, max_spawn_interval) * _interval_scale
 		if tables.free_seat() != -1 and _anything_to_order():
 			_spawn({})
-
-
-## Bảo: carry the oldest order that has a plate, else clean a table.
-func _assign_waiter() -> void:
-	if not Waiter.is_hired() or not waiter.is_idle() or not waiter.visible:
-		return
-	var found := shelf.next_delivery(waiting)
-	if not found.is_empty():
-		waiter.deliver(found["order"], found["plate"])
-		return
-	var dirty := tables.dirty_seats()
-	if not dirty.is_empty():
-		waiter.clean(dirty[0])
-
-
-func _on_delivered(customer: Customer, plate: DishShelf.Plate) -> void:
-	if is_instance_valid(customer) and customer.state == Customer.State.WAITING:
-		_give_plate(customer, plate)
-	elif not shelf.add(plate):
-		message_requested.emit("Khách đã về, bàn kê đầy: món bị bỏ")
 
 
 func _give_plate(customer: Customer, plate: DishShelf.Plate) -> void:

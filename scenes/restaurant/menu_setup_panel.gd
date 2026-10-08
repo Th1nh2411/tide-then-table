@@ -4,7 +4,7 @@ extends PanelContainer
 ## +/- portion buttons. Seafood dishes need a free menu slot and enough
 ## ingredients in storage. Always-available dishes (rau muống) aren't planned:
 ## a note line says they're on anyway (produce from the stall next door).
-## Opened by the pinned "Chuẩn bị menu" button; "Đóng" hides it (the plan is
+## Opened by clicking the LED sign (MenuBoard); "Đóng" hides it (the plan is
 ## kept), "Mở quán" opens the shop.
 
 signal confirmed
@@ -39,8 +39,8 @@ func setup(plan: MenuPlan, menu: DishCatalog, fish_catalog: FishCatalog,
 		_fish_names[fish.id] = fish.display_name
 	for dish in menu.dishes:
 		if dish.always_available:
-			_rows_box.add_child(_label("%s · %dk: luôn có, mua rau ở sạp bên cạnh %dk/phần" % [
-				dish.display_name, dish.base_price, dish.market_cost], 0))
+			_rows_box.add_child(_label("%s · %dk: luôn có, mua ở tạp hoá bên cạnh (%s)" % [
+				dish.display_name, dish.base_price, dish.market_text()], 0))
 		else:
 			_build_row(dish)
 	_plan.changed.connect(_refresh)

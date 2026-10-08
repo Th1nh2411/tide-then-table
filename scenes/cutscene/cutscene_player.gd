@@ -169,6 +169,11 @@ func _run(command: Dictionary) -> String:
 			GameState.set_flag("pet_name", pet)
 		"set_flag":
 			GameState.set_flag(args[0])
+		"remove":
+			var gone := _actors.get(args[0]) as Node
+			if gone:
+				gone.queue_free()
+				_actors.erase(args[0])
 		"label":
 			pass
 		_:

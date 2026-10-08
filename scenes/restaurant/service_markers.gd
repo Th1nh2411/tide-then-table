@@ -5,8 +5,8 @@ extends Node2D
 ## patience bar while waiting, gold for a regular); while Rin carries a
 ## plate the table that ordered it pulses green with an arrow (nobody
 ## ordered it: the bin pulses red); a small "E"
-## key over the cell (or person) E would act on right now (the market stall
-## counter too, also before opening).
+## key over the cell (or person) E would act on right now (Cô Năm at the
+## grocery too, also before opening).
 
 @export var room: StreetRoom
 @export var rin: RinChef
@@ -32,8 +32,8 @@ func _draw() -> void:
 	for customer in customers.waiting:
 		_order_bubble(customer)
 	_draw_reading()
-	if rin.active and not kitchen.busy and stall.open and stall.is_stall(rin.front_cell()):
-		_key_over(rin.front_cell())
+	if rin.active and not kitchen.busy and stall.open and stall.can_reach(rin):
+		_key_icon(stall.seller.position + Vector2(0, -40))
 	if not kitchen.is_open():
 		return
 	var pulse := 0.55 + 0.45 * sin(_time * 6.0)
@@ -50,9 +50,9 @@ func _draw() -> void:
 		_key_over(rin.front_cell())
 
 
-## White outline + "E" key over the cell E acts on.
+## White outline + "E" key over the cell E acts on (the whole grill for it).
 func _key_over(cell: Vector2i) -> void:
-	var rect := room.grid.cell_rect(cell)
+	var rect := room.merged_rect("N") if room.grid.kind(cell) == "N" else room.grid.cell_rect(cell)
 	draw_rect(rect, Color(1, 1, 1, 0.8), false, 1.0)
 	_key_icon(rect.position + Vector2(rect.size.x * 0.5, -6))
 
@@ -96,6 +96,8 @@ func _can_act(cell: Vector2i) -> bool:
 		return (rin.carried != null) != (customers.shelf.plate_at(slot) != null)
 	if room.grid.kind(cell) == "B":
 		return rin.carried != null
+	if kitchen.can_act(cell):  # grill / beer tap with an order waiting
+		return true
 	var seat := room.table_index(cell)
 	if seat < 0:
 		return false

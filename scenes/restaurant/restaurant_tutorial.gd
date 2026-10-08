@@ -1,7 +1,7 @@
 class_name RestaurantTutorial
 extends Node
 ## Day-1 tips in the restaurant, advancing with what the player does:
-## shop open -> walked to the food cart -> first dish cooked -> first dirty
+## shop open -> walked to the kitchen -> first plate ready -> first dirty
 ## table -> evening after closing. Does nothing on later days (the
 ## full controls live in the Hướng dẫn screen).
 
@@ -24,14 +24,14 @@ func _ready() -> void:
 ## Arrived at the restaurant (menu not prepared yet).
 func on_restaurant_ready() -> void:
 	if _step == Step.WAIT_OPEN:
-		tip_requested.emit("Bấm \"Chuẩn bị menu\" để chọn món bán hôm nay, xong bấm \"Mở quán\".")
+		tip_requested.emit("Bấm vào bảng hiệu LED để chọn món bán hôm nay, xong bấm \"Mở quán\".")
 
 
 ## The shop just opened.
 func on_shop_opened() -> void:
 	if _step == Step.WAIT_OPEN:
 		_step = Step.GO_KITCHEN
-		tip_requested.emit("Khách sẽ gọi món (phiếu hiện trên cùng). WASD đi tới xe đẩy bên trái để nấu.")
+		tip_requested.emit("Khách gọi món. Bảo tự nấu, để lên bàn kê; Rin bưng ra bàn.")
 
 
 ## The summary was closed: the evening is free.
@@ -46,11 +46,11 @@ func _process(_delta: float) -> void:
 		Step.GO_KITCHEN:
 			if kitchen.is_rin_near():
 				_step = Step.COOK
-				tip_requested.emit("Ở gần xe đẩy, bấm số (hoặc click) món trên hàng món trên cùng để nấu.")
+				tip_requested.emit("Món nướng: E ở lò than. Tháp bia: E ở bình bia trên xe.")
 		Step.COOK:
 			if kitchen.rin.carried or not customers.shelf.plates.is_empty():
 				_step = Step.SERVE
-				tip_requested.emit("Món xong! Mang tới bàn đang nhấp nháy xanh, quay mặt vào bàn bấm E để đặt.")
+				tip_requested.emit("Có món! E ở bàn kê để cầm, E ở bàn nhấp nháy xanh để đặt.")
 		Step.SERVE:
 			if not customers.tables.dirty_seats().is_empty():
 				_step = Step.CLEAN

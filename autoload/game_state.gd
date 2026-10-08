@@ -64,6 +64,9 @@ var map_pins: Array[Vector2] = []
 const MAX_PINS: int = 5
 ## Active fish orders from regulars (see FishOrders).
 var orders: Array = []
+## Grocery goods kept between days (dish id -> portions), e.g. beer cans.
+## Perishable goods (rau) are thrown away at closing (MarketStock).
+var pantry: Dictionary = {}
 ## History entries kept (older ones are dropped).
 const MAX_HISTORY: int = 14
 
@@ -86,6 +89,7 @@ func reset() -> void:
 	best_sizes.clear()
 	day_history.clear()
 	orders.clear()
+	pantry.clear()
 	map_pins.clear()
 	weather_id = "calm"
 	resume_at = "sea"

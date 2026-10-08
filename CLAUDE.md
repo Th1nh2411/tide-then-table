@@ -69,10 +69,12 @@ Vietnamese, keep code comments in short English.
 
 ## Map of the game
 - Autoloads: `GameState` (money, day, storage, upgrades, flags, boat_hp,
-  rating, last_catch), `DayClock` (display-only time of day: driven by
+  rating, last_catch, pantry), `DayClock` (display-only time of day: driven by
   `LampOil` at sea and by shift progress in the restaurant; `running` = night
   trip in progress), `SceneRouter` (`go_to(path, fade_color)`).
-- Flow: main menu → sea night trip (`scenes/sea/sea_scene.tscn`, autosave at
+- Flow: main menu → (New Game: `scenes/intro/intro_scene.tscn`, cutscene
+  `intro_call`: Rin, jobless in his rented room, calls Bảo to open the
+  restaurant) → sea night trip (`scenes/sea/sea_scene.tscn`, autosave at
   start) → dock (E: unload the hold and keep fishing, or go home) / rescue (broken
   hull or no oil) → rest card
   (`scenes/rest/rest_scene.tscn`, autosave #2: Continue resumes at the
@@ -109,35 +111,49 @@ Vietnamese, keep code comments in short English.
 - Restaurant (top-down 3/4 Vietnamese sidewalk, 40x23 tiles of 16 px):
   `StreetRoom` (ASCII map -> `RoomGrid` with A* paths; shop front at the top,
   pavement, only the near part of the road at the bottom; Rin's kitchen =
-  ice box + food cart with the stove + plate table set lengthwise + bin; tables =
+  in the middle of the pavement: bin + food cart with Bảo's stove + plate
+  table as a bench right of it, the ice box in the back-left corner, an open
+  aisle in front, then Rin's 2-cell charcoal grill "N" (under the cart's
+  left end); the beer tap "U" is the keg on the cart's right end; tables on the left (columns 2 cells
+  apart, nearest the stove first) =
   first N slots from the seats upgrade; draws upgrade looks, also previewed
   while renovating), `StreetBackdrop` (shop front + traffic), `StreetProps`
   (static drawings), `StreetPerson` (16x32 body, path walking) -> `RinChef`
-  (player: WASD, E on the faced cell), `Waiter` "Bảo" (A* jobs: pick the plate
-  from its plate-table slot, carry; clean), `Customer` (most come by motorbike:
+  (player = the waiter: WASD, Shift dash, E on the faced cell; carries plates,
+  cleans tables, grills, pours beer), `ChefBao` "Bảo" (the chef, behind the
+  stove from day 1: cooks every non-grilled dish by himself, oldest ticket
+  first, puts plates on the plate table; `ChefBao.cooks(dish)`), `Customer` (most come by motorbike:
   `CustomerBikes` road -> park by the curb -> walk to the table and back).
-  `MarketStall` (Cô Năm's stall next door, right: E on the "V" counter buys
-  rau muống produce into a `MarketStock`; rau muống is always on the menu,
-  leftovers wasted at closing),
-  `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (spawning, ordering, waiter
-  jobs, payment; seats/decor upgrades, rich customers, regulars), `DishShelf`
+  `MarketStall` (Cô Năm's grocery next door, right: E in front of the "V"
+  counter opens `MarketPanel`, her product list; buying puts goods into a
+  `MarketStock` over `GameState.pantry` (saved); rau muống + beer are always
+  on the menu; beer is a 20 L keg (`market_pack`, stock in litres) served as 3 L towers
+  (`portion_units`), needs no cooking (`instant_serve`) and keeps overnight (`keeps_overnight`), rau is wasted
+  at closing),
+  `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (spawning, ordering,
+  payment; seats/decor upgrades, rich customers, regulars), `DishShelf`
   (pure: plate-table slots + arrival-order matching), `DiningTables` (pure:
-  free/taken/dirty), `KitchenStation` (menu rows; 1-9 / click a chip near the
-  cart walks Rin behind the stove, then the compact `CookingOverlay` over the
-  road; the dish lands in her hands; E on the plate table / tables),
-  `ServiceHud` (menu chips + tickets over the shop front, dim away from the
-  cart), `ServiceMarkers` (bubbles, carried plate -> its table pulses, "E"
+  free/taken/dirty), `KitchenStation` (no dish buttons: E on the charcoal
+  grill "N" grills the oldest waiting grilled dish — Rin steps behind it, the
+  compact `CookingOverlay` runs over the road, the dish lands in his hands; E
+  on the beer tap "U" by the ice box pours a tower for the oldest beer order;
+  E on the plate table / tables; `menu_rows()` feeds the LED board),
+  `ServiceHud` (order tickets over the shop front), `MenuBoard` (small LED board by the curb in the middle, "E" cells,
+  y-sorted: dish pictures + servings left), `ServiceMarkers` (bubbles, carried plate -> its table pulses, "E"
   key over what E acts on — no prompt text), `RepairButton`, `RenovationMode`
   ("Sửa quán": in-place renovation of seats/decor/kitchen/ice box with
-  preview, Hủy / Xác nhận); pinned HUD buttons "Chuẩn bị menu" + "Sửa quán"
+  preview, Hủy / Xác nhận); menu planning opens by clicking the LED sign
+  (MenuBoard: pulsing gold frame + bouncing arrow while clickable, hover
+  lifts it, hand cursor); pinned HUD button "Sửa quán"
   (when not serving) and "Ra khơi" (after the summary) — no automatic scene
   changes.
 - Cutscenes (Stardew style): write a `Cutscene` .tres in `data/cutscenes/`
   (commands listed in `CutsceneScript`), add marker Node2Ds under the scene's
   `CutsceneMarkers`, play with `CutscenePlayer.play()` (sea scene plays
   `trip_end_cutscenes` after a trip; the restaurant plays
-  `after_shift_cutscenes` when the summary closes, e.g. Bảo joining after
-  day 1 — `Waiter.is_hired()`). It pauses the tree; its actors,
+  `after_shift_cutscenes` when the summary closes; the intro scene plays
+  `intro_call`). Commands include `remove <actor>`; actor kinds rin, bao,
+  cat, crate, rin_bed. It pauses the tree; its actors,
   camera, tweens and DialogueBox run PROCESS_MODE_ALWAYS.
 - The cat: `PetCat` (restaurant), flags `cat_adopted` / `cat_gone` /
   `pet_name`; use `{pet}` in dialogue/cutscene text.
@@ -150,8 +166,9 @@ Vietnamese, keep code comments in short English.
   tab (`PhoneShop`); restaurant upgrades only via "Sửa quán".
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and
   restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is
-  an IT graduate whose failed startup (with friend Bảo, now the restaurant's
-  waiter) left this app; story (PLAN.md §1): the fog hides a portal to a
+  an IT graduate (male) whose failed startup (with friend Bảo, now the
+  restaurant's chef — he cooked the best instant noodles in their dorm) left
+  this app; story (PLAN.md §1): the fog hides a portal to a
   parallel sea, cá Ông are its guardians, the Thâm Lam corporation exploits
   it. Clues appear as `[WARN]`/`[ERR]`
   log lines and glitched aberrant-fish names.

@@ -38,6 +38,7 @@ func _test_round_trip() -> void:
 	item.size = 1.25
 	GameState.map_pins.append(Vector2(120.5, 640))
 	GameState.weather_id = "rain"
+	GameState.pantry["bia_con_meo"] = 20
 	GameState.resume_at = "restaurant"
 	GameState.orders.append({"who": "Chú Ba", "fish": "cua", "min_kg": 0.5, "reward": 120, "due_day": 7})
 	GameState.add_day_record({"day": 5, "earned": 300, "market": 20, "rating": 4})
@@ -51,6 +52,7 @@ func _test_round_trip() -> void:
 	_check("story flag", GameState.has_flag("saw_glowing_fish"))
 	_check("dex counts", int(GameState.caught_species.get("cua", 0)) == 3)
 	_check("weather", GameState.weather_id == "rain")
+	_check("pantry (kept beer)", int(GameState.pantry.get("bia_con_meo", 0)) == 20)
 	_check("resume point", GameState.resume_at == "restaurant")
 	_check("map pins", GameState.map_pins.size() == 1 and GameState.map_pins[0].is_equal_approx(Vector2(120.5, 640)))
 	_check("orders", GameState.orders.size() == 1 and int(GameState.orders[0]["reward"]) == 120)

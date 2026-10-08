@@ -93,14 +93,27 @@ func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
 	_check("auto fill skips rau", auto.get_portion_count(rau) == 0)
 	_check("rau can't be planned", not MenuPlan.new(3).can_add(rau, storage))
 	_check("market price = base × cook", KitchenLogic.calc_price(rau, 1.3, [] as Array[InventoryItem]) == 39)
+	var beer := _dish("bia_con_meo")
+	_check("beer: always on, bought, no cooking", beer.always_available and beer.is_market_dish() and beer.instant_serve)
+	_check("beer can't be planned", not MenuPlan.new(3).can_add(beer, storage))
 	_check("no peanuts any more", menu.dishes.all(func(d: DishData) -> bool: return d.id != "dau_phong_rang"))
-	var stock := MarketStock.new()
+	var pantry: Dictionary = {}
+	var stock := MarketStock.new(pantry)
 	_check("stock starts empty", stock.count(rau) == 0 and not stock.take(rau))
 	stock.add(rau)
 	stock.add(rau)
 	_check("bought 2 portions", stock.count(rau) == 2 and stock.total() == 2)
 	_check("cooking takes one", stock.take(rau) and stock.count(rau) == 1)
-	_check("closing wastes the rest", stock.clear() == 1 and stock.count(rau) == 0)
+	stock.add(beer, beer.market_pack)
+	_check("a keg is 20 litres = 6 towers", stock.count(beer) == 20 and stock.portions(beer) == 6
+		and beer.market_text() == "bình 20 lít: 150k")
+	for k in 6:
+		stock.take(beer)
+	_check("6 towers leave 2 litres, not enough for a 7th", stock.count(beer) == 2 and not stock.take(beer))
+	_check("stock writes the shared pantry", int(pantry.get("bia_con_meo", 0)) == 2)
+	var both: Array[DishData] = [rau, beer]
+	_check("closing wastes rau only", stock.discard_perishable(both) == 1 and stock.count(rau) == 0)
+	_check("beer keeps overnight", MarketStock.new(pantry).count(beer) == 2)
 
 	# Variety.
 	var table: Array[float] = [0.8, 0.8, 0.9, 1.0]

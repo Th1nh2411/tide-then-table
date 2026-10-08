@@ -1,16 +1,21 @@
 class_name KitchenStation
 extends Node
-## Rin's kitchen on the street restaurant (no pop-up screens):
-##   1-9 / click a menu chip   near the cart (room.kitchen_area): Rin walks
-##                             behind the stove, faces the road, then the
-##                             compact CookingOverlay minigame starts; the
-##                             cooked dish ends up in her hands
+## Rin's side of the kitchen on the street restaurant (no pop-up screens, no
+## dish buttons). Bảo (ChefBao) cooks everything else by himself; Rin grills
+## and pours, always for the oldest ticket still missing its plate:
+##   E on the charcoal grill   the oldest waiting grilled dish: Rin steps
+##                             behind the grill, faces the road, the compact
+##                             CookingOverlay minigame starts and the dish ends
+##                             up in his hands
+##   E on the beer tap         a beer tower for the oldest table that ordered
+##                             one, straight into his hands (needs a keg from
+##                             the grocery)
 ##   E on the plate table      put the plate on that cell / pick that one up
 ##   E on the bin              throw the carried plate away
 ##   E on a table              serve the carried plate, or clean it if dirty
-## Menu rows (`trays()`): today's dishes (numbers never shift, 0 = sold out),
-## always-available dishes (count = produce bought at the stall; none left =
-## Rin must go and buy more), then regulars' reserved fish. Only while serving.
+## `menu_rows()` (for the LED board, "who" = "rin" / "bao"): today's dishes
+## (0 = sold out), always-available dishes (servings left from the grocery
+## goods), then regulars' reserved fish not cooked yet. Only while serving.
 
 signal message_requested(text: String)
 
@@ -22,11 +27,11 @@ signal message_requested(text: String)
 @export var stall: MarketStall
 @export var clean_seconds: float = 0.5
 
-## Walking to the stove, cooking or cleaning: Rin can't move.
+## Walking to the grill, grilling or cleaning: Rin can't move.
 var busy: bool = false
 
 var _plan: MenuPlan
-var _cooking_tray: Dictionary = {}
+var _cooking_visit: Dictionary = {}
 var _cooking_items: Array[InventoryItem] = []
 
 
@@ -46,79 +51,127 @@ func is_rin_near() -> bool:
 	return room.kitchen_area.has_point(rin.cell())
 
 
-## The menu chips light up and dish keys work.
-func can_cook() -> bool:
-	return is_open() and is_rin_near() and not busy and not cooking.is_running()
+## Where Rin stands to grill: behind the charcoal grill, facing the road.
+func grill_spot() -> Vector2i:
+	return room.grill_cell() + Vector2i.UP
 
 
-## Where Rin stands to cook: behind the stove, facing the road.
-func stove_spot() -> Vector2i:
-	return room.stove_cell() + Vector2i.UP
-
-
-## Menu rows: {"label", "count" (-1 = endless), "dish", "kind", "visit"?}.
-func trays() -> Array[Dictionary]:
+## Every menu row: {"label", "count", "dish", "kind", "who", "visit"?}.
+func menu_rows() -> Array[Dictionary]:
 	var rows: Array[Dictionary] = []
 	if _plan == null:
 		return rows
 	for dish in _plan.get_dishes():
-		rows.append({"label": dish.display_name, "count": _plan.get_portion_count(dish), "dish": dish, "kind": "menu"})
+		rows.append(_row(dish.display_name, _plan.get_portion_count(dish), dish, "menu"))
 	for dish in menu.dishes:
 		if dish.always_available:
-			rows.append({"label": dish.display_name, "count": stall.stock.count(dish), "dish": dish, "kind": "side"})
+			rows.append(_row(dish.display_name, stall.stock.portions(dish), dish, "side"))
 	for visit in customers.regular_visits:
 		if not visit.get("cooked", false):
-			rows.append({"label": "%s (%s)" % [visit["dish"].display_name, visit["order"]["who"]],
-				"count": 1, "dish": visit["dish"], "kind": "regular", "visit": visit})
+			var row := _row("%s (%s)" % [visit["dish"].display_name, visit["order"]["who"]], 1, visit["dish"], "regular")
+			row["visit"] = visit
+			rows.append(row)
 	return rows
 
 
-func cook(index: int) -> void:
-	var rows := trays()
-	if not can_cook() or index < 0 or index >= rows.size():
+func _row(label: String, count: int, dish: DishData, kind: String) -> Dictionary:
+	return {"label": label, "count": count, "dish": dish, "kind": kind, "who": "bao" if ChefBao.cooks(dish) else "rin"}
+
+
+## The oldest waiting customer whose grilled dish (or drink) has no plate yet;
+## null if none.
+func next_order(drinks: bool) -> Customer:
+	for customer in customers.waiting:
+		var dish := customer.dish
+		if ChefBao.cooks(dish) or dish.instant_serve != drinks:
+			continue
+		if not customer.visit.is_empty():
+			if not customer.visit.get("cooked", false):
+				return customer
+		elif _needs_more(dish):
+			return customer
+	return null
+
+
+## More customers wait for `dish` than plates exist (plate table, Rin's hands).
+func _needs_more(dish: DishData) -> bool:
+	var waiting := customers.waiting.filter(func(c: Customer) -> bool: return c.dish == dish and c.visit.is_empty()).size()
+	var plates := customers.shelf.count(dish)
+	if rin.carried and rin.carried.dish == dish and rin.carried.visit.is_empty():
+		plates += 1
+	return waiting > plates
+
+
+## E on the grill: grill the oldest waiting grilled dish.
+func grill() -> void:
+	var customer := next_order(false)
+	if customer == null:
+		message_requested.emit("Chưa bàn nào chờ món nướng")
 		return
-	if rin.carried:
-		message_requested.emit("Tay đang cầm món")
-		return
-	var tray := rows[index]
-	var dish: DishData = tray["dish"]
+	var dish := customer.dish
 	var items: Array[InventoryItem] = []
-	match tray["kind"]:
-		"menu":
-			if _plan.get_portion_count(dish) <= 0:
-				message_requested.emit("Hết %s" % dish.display_name)
-				return
-			items = _plan.take_portion(dish)
-		"side":
-			if not stall.stock.take(dish):
-				message_requested.emit("Hết nguyên liệu %s: sang sạp %s mua" % [dish.display_name, stall.seller_name])
-				return
-		"regular":
-			var visit: Dictionary = tray["visit"]
-			visit["cooked"] = true
-			items.append(visit["item"])
+	if not customer.visit.is_empty():
+		customer.visit["cooked"] = true
+		items.append(customer.visit["item"])
+	elif _plan.get_portion_count(dish) > 0:
+		items = _plan.take_portion(dish)
+	else:
+		message_requested.emit("Hết %s" % dish.display_name)
+		return
 	busy = true
-	_cooking_tray = tray
+	_cooking_visit = customer.visit
 	_cooking_items = items
-	await rin.walk_and_wait(room.grid.path(rin.cell(), stove_spot()))
+	await rin.walk_and_wait(room.grid.path(rin.cell(), grill_spot()))
 	rin.facing = Vector2i.DOWN
 	cooking.start(dish)
 
 
-func _on_cooking_finished(dish: DishData, _result: CookingGameBase.Result, multiplier: float) -> void:
-	if _cooking_tray.is_empty():
+## E on the beer tap: pour a tower for the oldest table that ordered one.
+func pour() -> void:
+	var customer := next_order(true)
+	if customer == null:
+		message_requested.emit("Chưa bàn nào gọi bia")
 		return
-	var visit: Dictionary = _cooking_tray.get("visit", {})
-	rin.carried = DishShelf.Plate.new(dish, _cooking_items, multiplier, visit)
-	_cooking_tray = {}
+	if not stall.stock.take(customer.dish):
+		message_requested.emit("Hết bia: sang tạp hoá %s mua bình mới" % stall.seller_name)
+		return
+	rin.carried = DishShelf.Plate.new(customer.dish, [] as Array[InventoryItem], 1.0)
+
+
+func _on_cooking_finished(dish: DishData, _result: CookingGameBase.Result, multiplier: float) -> void:
+	if not busy:
+		return
+	rin.carried = DishShelf.Plate.new(dish, _cooking_items, multiplier, _cooking_visit)
+	_cooking_visit = {}
 	_cooking_items = []
 	busy = false
 
 
-## E on `cell` while serving; false = nothing to do there.
-func interact(cell: Vector2i) -> bool:
+## Whether E on `cell` does something right now (for the "E" key marker).
+func can_act(cell: Vector2i) -> bool:
 	if not is_open() or busy:
 		return false
+	match room.grid.kind(cell):
+		"N":
+			return rin.carried == null and next_order(false) != null
+		"U":
+			return rin.carried == null and next_order(true) != null
+	return false
+
+
+## E on `cell` while serving; false = nothing to do there.
+func interact(cell: Vector2i) -> bool:
+	if not is_open() or busy or cooking.is_running():
+		return false
+	match room.grid.kind(cell):
+		"N", "U":
+			if rin.carried:
+				message_requested.emit("Tay đang cầm món")
+			elif room.grid.kind(cell) == "N":
+				grill()
+			else:
+				pour()
+			return true
 	var slot := room.pass_slot(cell)
 	if slot >= 0:
 		var plate := customers.shelf.plate_at(slot)
@@ -154,12 +207,3 @@ func _clean(seat: int) -> void:
 	await get_tree().create_timer(clean_seconds).timeout
 	room.dining.clean(seat)
 	busy = false
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	var key := event as InputEventKey
-	if key and key.pressed and not key.echo and can_cook() and rin.active:
-		var index := key.physical_keycode - KEY_1
-		if index >= 0 and index < mini(trays().size(), 9):
-			get_viewport().set_input_as_handled()
-			cook(index)

@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/intro/intro_scene.gd" id="1_intro"]
+[ext_resource type="Resource" path="res://data/cutscenes/intro_call.tres" id="2_call"]
+[ext_resource type="Script" path="res://scenes/cutscene/cutscene_player.gd" id="3_player"]
+
+[node name="IntroScene" type="Node2D"]
+script = ExtResource("1_intro")
+intro = ExtResource("2_call")
+
+[node name="CutsceneMarkers" type="Node2D" parent="."]
+
+[node name="room_view" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(320, 180)
+
+[node name="bed_spot" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(166, 232)
+
+[node name="bed_side" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(290, 262)
+
+[node name="window_spot" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(440, 262)
+
+[node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers")]
+script = ExtResource("3_player")
+markers = NodePath("../CutsceneMarkers")

@@ -3,7 +3,7 @@ extends Node2D
 ## A person on the street restaurant (top-down 3/4): placeholder body drawn
 ## standing on its position (feet, 16x32 like Stardew), an optional carried
 ## plate, and path following for walkers (`walk()` + `arrived`). Lives in a
-## y-sorted layer. Base of Rin (RinChef), Bảo (Waiter) and Customer.
+## y-sorted layer. Base of Rin (RinChef), Bảo (ChefBao) and Customer.
 
 signal arrived
 

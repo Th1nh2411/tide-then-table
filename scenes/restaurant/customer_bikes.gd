@@ -22,11 +22,11 @@ class Bike:
 @export var room: StreetRoom
 @export var speed: float = 90.0
 ## Parking row (pavement cells next to the curb) and slot spacing.
-@export var parking_row: int = 15
+@export var parking_row: int = 16
 @export var parking_x: Vector2i = Vector2i(11, 36)
 ## Road lanes (rows): rightward traffic keeps to the far lane (drive on the
-## right); the far lane is only half on screen.
-@export var lane_rows: Vector2i = Vector2i(21, 18)
+## right).
+@export var lane_rows: Vector2i = Vector2i(21, 19)
 @export var slot_step: int = 3
 @export var colors: Array[Color] = [Color(0.9, 0.3, 0.25), Color(0.25, 0.4, 0.9), Color(0.95, 0.95, 0.95),
 	Color(0.2, 0.2, 0.22), Color(0.95, 0.75, 0.2)]

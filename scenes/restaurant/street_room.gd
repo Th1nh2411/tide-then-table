@@ -1,17 +1,22 @@
 class_name StreetRoom
 extends Node2D
 ## The restaurant: a Vietnamese sidewalk seafood spot seen top-down (3/4),
-## 40x23 tiles of 16 px (Stardew scale), filling the 640x360 view. The shop
+## 40x23 tiles of 16 px (5 rows of shop front wall) (Stardew scale), filling the 640x360 view. The shop
 ## front is at the top, the pavement in the middle, and only the near part of
-## the road shows at the bottom. Rin's kitchen (left): the ice box (fridge
-## upgrade), the food cart with its stove (kitchen upgrade) and the plate
-## table set lengthwise (the pass: one plate per cell, `shelf` slots top to
-## bottom), and a bin for unwanted plates. Tables (TABLE_SIZE cells, "T" top
+## the road shows at the bottom. The kitchen stands in the middle of the
+## pavement, the tables on the left. Kitchen: the ice box (fridge
+## upgrade), the food cart with Bảo's stove (kitchen upgrade) and the plate
+## table as a bench right of it (the pass: one plate per cell, `shelf` slots
+## left to right), a bin left of the cart and the draft beer keg on the
+## cart's right end ("U", Rin pours facing up from the aisle); in front of
+## them an open aisle for Rin, then his 2-cell charcoal grill ("N", y-sorted
+## like the cart) starting under the cart's left end. Tables (TABLE_SIZE cells, "T" top
 ## left + "t", two stools above: the customer's seat "h" + a spare "o";
 ## seated customers face the road) come from the seats upgrade, filling the
 ## slots nearest the cart first; the decor upgrade adds string lights / plants.
-## Next door (right): Cô Năm's vegetable & meat stall ("V" counter, "G"
-## crates; MarketStall sells over the counter).
+## Next door (right): Cô Năm's grocery stall ("V" counter, "G"
+## crates; MarketStall sells over the counter). A small LED menu board stands
+## by the curb on the left ("E" cells, MenuBoard).
 ## Owns the grid (RoomGrid) and table states (DiningTables); draws cells,
 ## plates and dirty tables. StreetBackdrop draws the shop front and traffic.
 ## Map legend: see RoomGrid.
@@ -25,20 +30,20 @@ const SEAT_OFFSET := Vector2i(0, -1)
 	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 	"..............................GG..GG.MM.",
-	".......P..ho...ho...ho...ho...VVVVVV....",
-	".B.....P..Tt...Tt...Tt...Tt.............",
-	"..XSXX.P..tt...tt...tt...tt.............",
-	".F.....P................................",
-	".......P..ho...ho...ho...ho.............",
-	"..........Tt...Tt...Tt...Tt.............",
-	"..........tt...tt...tt...tt.............",
+	".ho..ho..ho..ho.F.............VVVVVV....",
+	".Tt..Tt..Tt..Tt.BXSXUPPPPP..............",
+	".tt..tt..tt..tt.........................",
+	"........................................",
+	".ho..ho..ho..ho..NN.....................",
+	".Tt..Tt..Tt..Tt.........................",
+	".tt..tt..tt..tt.........................",
 	"D......................................D",
 	"D......................................D",
 	".........Y...........................Y..",
-	"........................................",
+	"...................EEEE.................",
 	"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
-	"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
 	"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
 	"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
 	"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
@@ -48,8 +53,8 @@ const SEAT_OFFSET := Vector2i(0, -1)
 @export var cell_size: float = 16.0
 ## Y-sorted layer with the people (the cart is drawn there).
 @export var sorted_layer: Node2D
-## Rin's kitchen (wet floor): near enough to cook from here.
-@export var kitchen_area: Rect2i = Rect2i(1, 5, 7, 5)
+## The kitchen area (for "Rin is at the kitchen" checks; not drawn).
+@export var kitchen_area: Rect2i = Rect2i(15, 5, 13, 6)
 @export var stool_colors: Array[Color] = [Color(0.85, 0.2, 0.2), Color(0.2, 0.5, 0.85)]
 @export var bike_colors: Array[Color] = [Color(0.9, 0.3, 0.25), Color(0.25, 0.4, 0.9), Color(0.95, 0.95, 0.95),
 	Color(0.2, 0.2, 0.22)]
@@ -80,8 +85,10 @@ func _ready() -> void:
 		setup_tables(4)
 	# Only the cart's wheel row blocks; its worktop is drawn one row higher,
 	# so people standing behind it get their legs hidden by it.
-	_add_sorted(merged_rect("XS").end.y,
+	_add_sorted(merged_rect("XSU").end.y,
 		func(canvas: CanvasItem) -> void: StreetProps.draw_cart(canvas, grid, kitchen_level, _time))
+	_add_sorted(merged_rect("N").end.y,
+		func(canvas: CanvasItem) -> void: StreetProps.draw_grill(canvas, merged_rect("N"), _time))
 	# One per table slot of the map; slots not in use draw nothing.
 	var slots := _table_slots()
 	for i in slots.size():
@@ -105,10 +112,15 @@ func _add_sorted(base_y: float, painter: Callable) -> void:
 
 
 ## Table slots of the map ("T" cells), column by column from the kitchen:
-## the seats upgrade fills the ones nearest the cart first.
+## the seats upgrade fills the ones nearest Bảo's stove first.
 func _table_slots() -> Array[Vector2i]:
-	var slots := RoomGrid.new(map, cell_size, Vector2.ZERO).cells_of("T")
-	slots.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.x < b.x or (a.x == b.x and a.y < b.y))
+	var full := RoomGrid.new(map, cell_size, Vector2.ZERO)
+	var stove_x := full.cells_of("S")[0].x
+	var slots := full.cells_of("T")
+	slots.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		var da := absi(a.x - stove_x)
+		var db := absi(b.x - stove_x)
+		return da < db or (da == db and a.y < b.y))
 	return slots
 
 
@@ -148,6 +160,12 @@ func stove_cell() -> Vector2i:
 	return grid.cells_of("S")[0]
 
 
+## Rin's charcoal grill: its middle "N" cell (where he stands behind it).
+func grill_cell() -> Vector2i:
+	var cells := grid.cells_of("N")
+	return cells[cells.size() / 2]
+
+
 ## Bounding rect of all cells of the given kinds (the bin, the cart...).
 func merged_rect(kind_chars: String) -> Rect2:
 	var r := Rect2()
@@ -163,15 +181,15 @@ func table_rect(seat: int) -> Rect2:
 
 ## Renovation click areas.
 func tables_area() -> Rect2:
-	return Rect2(152, 76, 288, 116)
+	return Rect2(8, 92, 240, 120)
 
 
 func decor_area() -> Rect2:
-	return Rect2(160, 62, 470, 22)
+	return Rect2(8, 78, 250, 22)
 
 
 func stove_area() -> Rect2:
-	return merged_rect("XS").grow_individual(4, cell_size + 4, 4, 4)
+	return merged_rect("XSU").grow_individual(4, cell_size + 4, 4, 4)
 
 
 func fridge_area() -> Rect2:
@@ -220,14 +238,12 @@ func _draw_ground(cell: Vector2i) -> void:
 			draw_rect(Rect2(r.position + Vector2(0, r.size.y - 4), Vector2(r.size.x, 4)), Color(0.45, 0.43, 0.4))
 		"R":
 			draw_rect(r, Color(0.22, 0.22, 0.24))
-			if cell.y == 20 and cell.x % 3 != 0:  # centre line dashes
-				draw_rect(Rect2(r.position + Vector2(0, -1), Vector2(r.size.x, 2)), Color(0.9, 0.85, 0.6))
+			if cell.y == 20 and cell.x % 3 != 0:  # centre line dashes, between the lanes
+				draw_rect(Rect2(r.position + Vector2(0, 7), Vector2(r.size.x, 2)), Color(0.9, 0.85, 0.6))
 		_:
 			var ground := Color(0.58, 0.55, 0.5)
 			if (cell.x + cell.y * 3) % 7 == 0:
 				ground = ground.darkened(0.06)
-			if kitchen_area.has_point(cell):
-				ground = ground.darkened(0.12)  # wet floor around the cart
 			draw_rect(r, ground)
 			draw_rect(r, ground.darkened(0.1), false, 1.0)
 
@@ -261,12 +277,14 @@ func _draw_thing(cell: Vector2i) -> void:
 	var r := grid.cell_rect(cell)
 	var p := r.position
 	match grid.kind(cell):
-		"P":  # plate table, set lengthwise
-			var last := grid.kind(cell + Vector2i.DOWN) != "P"
-			draw_rect(Rect2(p + Vector2(2, 0), Vector2(12, 12 if last else 16)), Color(0.72, 0.52, 0.32))
-			if last:
-				draw_rect(Rect2(p + Vector2(2, 12), Vector2(12, 3)), Color(0.5, 0.35, 0.2))
-			draw_line(p + Vector2(2, 0), p + Vector2(14, 0), Color(0.6, 0.43, 0.27), 1.0)
+		"P":  # plate table, a long wooden bench next to the cart
+			var x0 := 0.0 if grid.kind(cell + Vector2i.LEFT) == "P" else 1.0
+			var x1 := 16.0 if grid.kind(cell + Vector2i.RIGHT) == "P" else 15.0
+			draw_rect(Rect2(p + Vector2(x0, 1), Vector2(x1 - x0, 11)), Color(0.72, 0.52, 0.32))
+			draw_rect(Rect2(p + Vector2(x0, 12), Vector2(x1 - x0, 3)), Color(0.5, 0.35, 0.2))
+			draw_line(p + Vector2(x0, 1), p + Vector2(x1, 1), Color(0.8, 0.6, 0.38), 1.0)
+			if x0 > 0.0 or x1 < 16.0:  # legs at the ends
+				draw_rect(Rect2(p + Vector2(2.0 if x0 > 0.0 else 12.0, 15), Vector2(2, 1)), Color(0.4, 0.28, 0.16))
 		"h", "o":
 			var color := stool_colors[(cell.x / 3 + cell.y) % stool_colors.size()]
 			draw_rect(Rect2(p + Vector2(3, 4), Vector2(10, 8)), color)
@@ -292,8 +310,8 @@ func _draw_top() -> void:
 		_top.draw_circle(c + Vector2(-5, -4), 9.0, Color(0.28, 0.55, 0.28, 0.92))
 	if decor_level >= 1:
 		var bulbs: Array[Color] = [Color(1, 0.9, 0.5), Color(1, 0.5, 0.4), Color(0.6, 0.9, 1)]
-		var from := Vector2(decor_area().position.x, 66)
-		var to := Vector2(decor_area().end.x, 66)
+		var from := Vector2(decor_area().position.x, 82)
+		var to := Vector2(decor_area().end.x, 82)
 		for i in 30:
 			var t := float(i) / 29.0
 			var at := from.lerp(to, t) + Vector2(0, sin(t * PI * 3.0) * 6.0 + 6.0)

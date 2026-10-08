@@ -6,10 +6,10 @@ extends RefCounted
 ## F fridge / ice box, T table, h chair (a customer's seat), D entrance
 ## (walkable), W building, K curb, R road, L pole, M parked bike, Z crates,
 ## o spare stool, Y tree, X food cart, t rest of a table, V market stall
-## counter, G stall crates.
+## counter, G stall crates, N charcoal grill, U beer tap, E LED menu board.
 
 ## A seat ("h") blocks walking but is a path end: its customer walks onto it.
-const SOLID := "#SPCBFTtWKRLMZoYXQhVG"
+const SOLID := "#SPCBFTtWKRLMZoYXQhVGNUE"
 
 var cell_size: float = 24.0
 var origin: Vector2 = Vector2.ZERO

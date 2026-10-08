@@ -3,6 +3,7 @@ extends Control
 
 const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.tscn"
+const INTRO_SCENE_PATH: String = "res://scenes/intro/intro_scene.tscn"
 
 @onready var _continue_button: Button = %ContinueButton
 @onready var _new_game_button: Button = %NewGameButton
@@ -48,7 +49,7 @@ func _on_new_game_pressed() -> void:
 		_status_label.text = "Chơi mới sẽ xóa tiến độ đã lưu (ngày %d)." % _saved_day()
 		return
 	GameState.reset()
-	SceneRouter.go_to(SEA_SCENE_PATH)
+	SceneRouter.go_to(INTRO_SCENE_PATH)  # Rin calls Bảo, then the first night at sea
 
 
 func _saved_day() -> int:

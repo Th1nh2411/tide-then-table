@@ -33,27 +33,30 @@ BẾN
 ĐIỂM GHÉ
   Lại gần chỗ có đèn (miếu, chòi, hải đăng, bè...) bấm E.""",
 	"""CHUẨN BỊ
-  Bấm "Chuẩn bị menu": chọn món và số phần, rồi "Mở quán" ("Đóng" để làm việc khác trước).
-  Rau muống luôn có trên menu: E ở quầy sạp Cô Năm (bên phải) mua rau, mỗi lần 1 phần.
-  Hết rau thì không nấu được, phải chạy sang mua (trước hoặc trong giờ bán).
-  Hết hải sản thì khách chỉ gọi rau muống. Menu dưới 3 món bị chê đơn điệu.
-  Hải sản thừa trả về kho; rau thừa bỏ đi cuối ngày.
+  Bấm vào bảng hiệu LED (viền vàng nhấp nháy): chọn món và số phần, rồi "Mở quán" ("Đóng" để làm việc khác trước).
+  Rau muống, tháp bia con mèo luôn có trên menu: đứng trước quầy tạp hoá Cô Năm (bên phải)
+    bấm E mở danh sách, "Mua" (hoặc 1-9): rau 1 phần, bia 1 bình 20 lít (tháp 3 lít).
+  Tháp bia không cần nấu. Hết rau / bia thì phải chạy sang mua (trước hoặc trong giờ bán).
+  Hết hải sản thì khách chỉ gọi rau muống, bia. Menu dưới 3 món bị chê đơn điệu.
+  Hải sản thừa trả về kho; rau thừa bỏ đi cuối ngày, bia để dành hôm sau.
 
 PHỤC VỤ
-  WASD: Rin đi. E: tác động vào ô Rin đang quay mặt vào (ô có viền trắng + phím E).
-  Hàng món ở trên cùng, phiếu order ngay dưới (viền xanh = món đã có trên bàn kê).
-  Đứng gần xe đẩy (khi đang bán): bấm 1-9 (hoặc click món) -> Rin tự ra sau bếp nấu.
-    Minigame hiện nhỏ trên mặt đường, quán vẫn chạy. Nấu xong món nằm trên tay Rin.
-  Bàn kê món (dọc cạnh xe đẩy): E đặt món xuống ô đó / cầm món ở ô đó lên.
-  Thùng rác xanh (2x2) cạnh xe đẩy: E vứt món đang cầm (món không ai gọi thì xô nhấp nháy đỏ).
+  WASD: Rin đi. Shift: lướt nhanh. E: tác động vào ô Rin đang quay mặt vào (ô có viền trắng + phím E).
+  Bảng LED nhỏ cạnh lề đường: hình các món hải sản hôm nay + số phần còn (X đỏ = hết).
+  Trên cùng: phiếu order, cũ nhất bên trái (viền xanh = món đã có trên bàn kê).
+  Bảo là đầu bếp: tự nấu món hấp, xào, rau muống rồi để lên bàn kê.
+  Rin là phục vụ: bưng, dọn bàn, và tự làm món nướng + tháp bia.
+  E ở lò than (dưới xe đẩy): Rin nướng món nướng của phiếu cũ nhất đang chờ
+    (minigame nhỏ trên mặt đường, quán vẫn chạy), xong món nằm trên tay.
+  E ở bình bia (đầu phải xe đẩy): rót tháp bia cho bàn gọi sớm nhất.
+  Bàn kê món (nằm ngang cạnh xe đẩy): E đặt món xuống ô đó / cầm món ở ô đó lên.
+  Thùng rác xanh cạnh xe đẩy: E vứt món đang cầm (món không ai gọi thì xô nhấp nháy đỏ).
   E cạnh người khác: nói chuyện (dấu "!" = có chuyện mới).
 
-NẤU
-  Nướng: bấm khi kim vào vùng xanh.   Hấp: giữ rồi thả đúng lúc.
-  Xào: bấm liên tục cho đầy thanh.
+NƯỚNG
+  Bấm khi kim vào vùng xanh.
 
-BẢO VÀ BÀN
-  Bảo tự lấy món trên bàn kê bưng cho khách gọi trước, rảnh thì dọn bàn bẩn.
+BÀN
   Cầm món: bàn gọi món đó nhấp nháy xanh. Quay mặt vào bàn bấm E: đặt món, hoặc dọn bàn bẩn.
   Khách phần lớn đi xe máy tới, đỗ sát lề.
   Khách quen (bóng thoại vàng) tới ăn món đã đặt trước.

@@ -1,7 +1,7 @@
 class_name CutsceneActor
 extends Node2D
 ## A character placed by a cutscene (placeholder drawing by `kind`: "rin",
-## "bao", "cat", "crate"). Walks with a small bob, faces left/right and shows emote
+## "bao", "cat", "crate", "rin_bed" = Rin lying under a blanket, phone lit). Walks with a small bob, faces left/right and shows emote
 ## bubbles (! ? ... heart note) over its head. Runs while the tree is paused.
 
 @export var kind: String = "rin"
@@ -58,6 +58,8 @@ func _draw() -> void:
 			_draw_cat()
 		"crate":
 			_draw_crate()
+		"rin_bed":
+			_draw_lying()
 	draw_set_transform(Vector2.ZERO)
 	if _emote:
 		_draw_emote()
@@ -82,6 +84,17 @@ func _draw_cat() -> void:
 	draw_circle(Vector2(7.5, -9.5), 0.8, Color(0.2, 0.9, 0.6))  # eye (a bit too bright...)
 
 
+## Rin in bed, scrolling his phone (head on the left, blanket over him).
+func _draw_lying() -> void:
+	draw_circle(Vector2(-11, -5), 4.0, Color(0.95, 0.8, 0.65))
+	draw_rect(Rect2(-14, -9, 6, 3), Color(0.15, 0.12, 0.1))  # hair
+	draw_rect(Rect2(-7, -8, 20, 7), Color(0.55, 0.6, 0.75))  # blanket
+	draw_rect(Rect2(-7, -8, 20, 2), Color(0.65, 0.7, 0.85))
+	var glow := 0.7 + 0.3 * sin(_time * 5.0)
+	draw_rect(Rect2(-8, -11, 3, 4), Color(0.6, 0.85, 1.0, glow))  # phone
+	draw_circle(Vector2(-10, -6), 6.0, Color(0.6, 0.85, 1.0, 0.12 * glow))
+
+
 func _draw_crate() -> void:
 	draw_rect(Rect2(-9, -8, 18, 8), Color(0.55, 0.4, 0.22))
 	var colors: Array[Color] = [Color(0.45, 0.6, 0.75), Color(1.0, 0.55, 0.45), Color(0.85, 0.8, 0.95)]
@@ -91,6 +104,8 @@ func _draw_crate() -> void:
 
 func _draw_emote() -> void:
 	var at := Vector2(-6, -36 if kind == "rin" or kind == "bao" else -26)
+	if kind == "rin_bed":
+		at = Vector2(-17, -24)
 	draw_rect(Rect2(at, Vector2(12, 10)), Color(1, 1, 1, 0.95))
 	draw_colored_polygon(PackedVector2Array([at + Vector2(3, 10), at + Vector2(7, 10), at + Vector2(4, 13)]),
 		Color(1, 1, 1, 0.95))

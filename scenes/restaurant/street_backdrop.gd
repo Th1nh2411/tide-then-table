@@ -1,13 +1,13 @@
 class_name StreetBackdrop
 extends Node2D
 ## Behind the street restaurant: the shop front (wall, rolling shutters,
-## Rin's sign over the kitchen, awning; on the right Cô Năm's open grocery
+## awning; on the right Cô Năm's open grocery
 ## with a green awning) over the W rows, and motorbikes passing on the road. Sits
 ## after StreetRoom and under the people; it only paints the W rows and the
 ## road lanes.
 
 @export var room: StreetRoom
-@export var lane_rows: Vector2i = Vector2i(21, 18)
+@export var lane_rows: Vector2i = Vector2i(21, 19)
 ## The awning turns green from here on (Cô Năm's shop next door).
 @export var grocery_from_x: float = 448.0
 @export var bike_colors: Array[Color] = [Color(0.9, 0.3, 0.25), Color(0.25, 0.4, 0.9), Color(0.95, 0.95, 0.95),
@@ -28,23 +28,20 @@ func _draw() -> void:
 
 
 func _draw_shop_front() -> void:
-	var bottom := room.grid.cell_rect(Vector2i(0, 3)).end.y
+	var bottom := room.merged_rect("W").end.y
 	var width := room.grid.size.x * room.cell_size
 	draw_rect(Rect2(Vector2.ZERO, Vector2(width, bottom)), Color(0.86, 0.78, 0.55))
 	for x0: float in [0.0, 208.0]:
 		draw_rect(Rect2(x0 + 8, 24, 160, bottom - 24), Color(0.32, 0.27, 0.23))
 		draw_rect(Rect2(x0 + 8, 24, 160, 5), Color(0.62, 0.62, 0.64))
 	_draw_grocery(Rect2(456, 24, 160, bottom - 24))
-	draw_rect(Rect2(8, 42, 160, 14), Color(0.8, 0.12, 0.1))
-	draw_string(ThemeDB.fallback_font, Vector2(8, 53), "HẢI SẢN TƯƠI SỐNG", HORIZONTAL_ALIGNMENT_CENTER, 160, 10,
-		Color(1, 0.9, 0.35))
 	for i in int(width / 16.0):
 		var grocery := i * 16 >= int(grocery_from_x)  # Cô Năm's green awning
 		var stripe := Color(0.25, 0.6, 0.3) if grocery else Color(0.15, 0.5, 0.75)
 		draw_rect(Rect2(i * 16, bottom - 6, 16, 7), stripe if i % 2 == 0 else Color(0.95, 0.95, 0.9))
 
 
-## The shop next door, open: lit inside, shelves of vegetables and goods.
+## Cô Năm's grocery next door, open: lit inside, shelves of goods.
 func _draw_grocery(r: Rect2) -> void:
 	draw_rect(r, Color(0.45, 0.38, 0.28))
 	var goods: Array[Color] = [Color(0.3, 0.65, 0.25), Color(0.9, 0.3, 0.2), Color(0.95, 0.75, 0.3),

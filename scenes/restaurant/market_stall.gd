@@ -1,38 +1,51 @@
 class_name MarketStall
 extends Node
-## Cô Năm's vegetable & meat stall next door (the "V" counter cells of the
-## StreetRoom map): E on the counter buys one portion of `product`'s produce
-## for its `market_cost`, before opening or during the shift (not after
-## closing). The produce goes into `stock` (MarketStock) for the kitchen.
+## Cô Năm's grocery next door (the "V" counter of the StreetRoom map): E in
+## front of the counter (`reach`) opens the list of what she sells
+## (MarketPanel); each buy is `market_pack` portions of a market dish's goods
+## (a bunch of rau, a crate of 24 beers) for its `market_cost`, before opening
+## or during the shift (not after closing). Bought goods go into `stock`
+## (MarketStock on GameState.pantry, so beer keeps between days).
 
+signal browse_requested
 signal bought(dish: DishData, cost: int)
 signal message_requested(text: String)
 
-@export var room: StreetRoom
-## What the stall sells (a market dish: its produce, one portion per buy).
-@export var product: DishData
+## What the grocery sells: market dishes (their goods, one portion per buy).
+@export var products: Array[DishData] = []
 @export var seller_name: String = "Cô Năm"
+@export var seller: Node2D
+## Where Rin can buy from, relative to Cô Năm: anywhere along the counter
+## (x: ± px) and up to this far below her (y px), facing any way.
+@export var reach: Vector2 = Vector2(56, 50)
 
-var stock := MarketStock.new()
+var stock := MarketStock.new(GameState.pantry)
 ## Set by the restaurant: false once the day's shift is over.
 var open: bool = true
 
 
-func is_stall(cell: Vector2i) -> bool:
-	return room.grid.kind(cell) == "V"
+## Rin stands in front of the counter.
+func can_reach(rin: StreetPerson) -> bool:
+	var d := rin.position - seller.position
+	return absf(d.x) <= reach.x and d.y > 0.0 and d.y <= reach.y
 
 
-## E on `cell`; false = not the stall.
-func interact(cell: Vector2i) -> bool:
-	if not is_stall(cell):
+## E by Rin; false = he isn't at the stall.
+func interact(rin: StreetPerson) -> bool:
+	if not can_reach(rin):
 		return false
-	if not open:
-		message_requested.emit("%s: Dọn hàng rồi con ơi, mai ghé nha." % seller_name)
-	elif not GameState.spend_money(product.market_cost):
-		message_requested.emit("Không đủ tiền mua %s (%dk)" % [product.display_name, product.market_cost])
+	if open:
+		browse_requested.emit()
 	else:
-		stock.add(product)
-		bought.emit(product, product.market_cost)
-		message_requested.emit("%s: Của con nè! -%dk · đủ nấu %d phần %s" % [seller_name, product.market_cost,
-			stock.count(product), product.display_name])
+		message_requested.emit("%s: Dọn hàng rồi con ơi, mai ghé nha." % seller_name)
+	return true
+
+
+## One portion of `dish`'s produce; false if the money isn't enough.
+func buy(dish: DishData) -> bool:
+	if not open or not GameState.spend_money(dish.market_cost):
+		message_requested.emit("Không đủ tiền (%dk)" % dish.market_cost)
+		return false
+	stock.add(dish, dish.market_pack)
+	bought.emit(dish, dish.market_cost)
 	return true

@@ -3,15 +3,16 @@ extends Control
 ## Flow: prepare today's menu from storage -> open at 15:00 -> serve customers
 ## until closing at 24:00 (fixed real-time shift, or the player closes early)
 ## -> leftovers go back to storage -> summary.
-## Service (Dave the Diver style): Rin walks with WASD and E acts on the cell
-## she faces; near the food cart, a menu chip / number key walks her to the
-## stove and starts the compact cooking minigame (no pop-up), the dish lands
-## in her hands; she serves it herself or leaves it on the plate table, from
-## where Bảo carries plates in order (and cleans tables).
-## Rau muống is always on the menu: its produce is bought at Cô Năm's stall
-## next door (MarketStall, E on the counter, before opening or mid-shift);
-## leftovers are thrown away at closing. Once the seafood sells out, customers
-## only order rau muống, so a poorly prepared menu earns little. A menu with
+## Service (Dave the Diver style): Bảo is the chef (ChefBao: cooks every
+## steamed / stir-fried dish by himself and puts it on the plate table); Rin
+## is the waiter: WASD (+ Shift dash), E acts on the cell he faces — carry
+## plates out, clean tables — and near the kitchen a menu chip / number key
+## on one of his rows grills a dish (charcoal grill, compact minigame, no
+## pop-up) or pours a beer tower.
+## Rau muống and beer are always on the menu: their goods are bought at Cô
+## Năm's grocery next door (E in front of the counter opens her list,
+## MarketPanel; before opening or mid-shift); leftovers are thrown away at
+## closing. Once the seafood sells out, customers only order those, so a poorly prepared menu earns little. A menu with
 ## few dishes lowers all prices.
 ## After the summary (1-5 stars) nothing moves on by itself: pinned buttons
 ## let the player buy upgrades (phone "Nâng cấp" tab) whenever the shop isn't
@@ -57,14 +58,12 @@ var _message_token: int = 0
 var _regular_visits: Array[Dictionary] = []
 var _renovate_button: Button
 var _dialogue_box: DialogueBox
-var _menu_button: Button
 var _tutorial: RestaurantTutorial
 var _sail_button: Button
+var _market_panel: MarketPanel
 
 @onready var _customers: CustomerManager = $CustomerManager
 @onready var _menu_panel: MenuSetupPanel = %MenuSetupPanel
-@onready var _top_label: Label = %TopLabel
-@onready var _storage_label: Label = %StorageLabel
 @onready var _message_label: Label = %MessageLabel
 @onready var _summary_panel: Control = %SummaryPanel
 @onready var _summary_label: Label = %SummaryLabel
@@ -72,10 +71,11 @@ var _sail_button: Button
 @onready var _close_early_button: Button = %CloseEarlyButton
 @onready var _renovation: RenovationMode = $RenovationMode
 @onready var _room: StreetRoom = $World/Room
-@onready var _waiter: Waiter = $World/People/Waiter
+@onready var _chef: ChefBao = $World/People/Bao
 @onready var _cutscene: CutscenePlayer = $CutscenePlayer
 @onready var _rin: RinChef = $World/People/Rin
 @onready var _kitchen: KitchenStation = $KitchenStation
+@onready var _board: MenuBoard = $World/People/MenuBoard
 @onready var _stall: MarketStall = $MarketStall
 
 
@@ -86,21 +86,20 @@ func _ready() -> void:
 	_customers.customer_left_angry.connect(func() -> void: _left_angry += 1)
 	_customers.message_requested.connect(_show_message)
 	_next_day_button.pressed.connect(_on_continue_pressed)
-	_menu_button = _pin_button("Chuẩn bị menu", Rect2(292, 42, 82, 18))
-	_menu_button.pressed.connect(func() -> void:
+	_board.clicked.connect(func() -> void:  # the LED sign opens menu planning
 		_menu_panel.show()
 		_menu_panel.move_to_front())
-	_renovate_button = _pin_button("Sửa quán", Rect2(378, 42, 85, 18))
+	_renovate_button = _pin_button("Sửa quán", Rect2(292, 42, 85, 18))
 	_renovate_button.pressed.connect(_open_renovation)
 	_renovation.finished.connect(_on_renovation_finished)
 	_room.kitchen_level = GameState.get_upgrade_level(_renovation.kitchen_upgrade.id)
 	_room.fridge_level = GameState.get_upgrade_level(_renovation.fridge_upgrade.id)
-	# The minigame pops over the road below the kitchen.
+	# The minigame pops over the road below the kitchen (middle of the pavement).
 	var cooking_panel := $CookingOverlay/Panel as Control
-	cooking_panel.offset_left = 8.0
-	cooking_panel.offset_right = 238.0
-	cooking_panel.offset_top = 196.0
-	cooking_panel.offset_bottom = 312.0
+	cooking_panel.offset_left = 205.0
+	cooking_panel.offset_right = 435.0
+	cooking_panel.offset_top = 212.0
+	cooking_panel.offset_bottom = 328.0
 	_sail_button = _pin_button("Ra khơi  →", Rect2(520, 318, 114, 32))
 	_sail_button.pressed.connect(_start_next_day)
 	_sail_button.hide()
@@ -115,25 +114,27 @@ func _ready() -> void:
 	_close_early_button.pressed.connect(func() -> void: _end_shift("Đóng quán sớm"))
 	_close_early_button.hide()
 
-	_waiter.visible = Waiter.is_hired()  # day 1: Rin is alone
+	_chef.message_requested.connect(_show_message.bind(2.5))
 	_regular_visits = FishOrders.reserve_for_shift(menu)
 	_kitchen.message_requested.connect(_show_message)
 	_stall.message_requested.connect(_show_message.bind(2.0))
+	_market_panel = MarketPanel.new()
+	_market_panel.stall = _stall
+	add_child(_market_panel)
+	_stall.browse_requested.connect(_market_panel.open_panel)
 	_stall.bought.connect(func(_dish: DishData, cost: int) -> void: _market_spent += cost)
-	_stall.stock.changed.connect(_refresh_storage)
 	_rin.interacted.connect(_on_rin_interacted)
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
 		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
 	_plan = MenuPlan.new(menu_slots)
-	_plan.changed.connect(_refresh_storage)
 	_kitchen.setup(_plan)
+	_chef.setup(_plan)
 	_menu_panel.setup(_plan, menu, fish_catalog, variety_multipliers)
 	_menu_panel.confirmed.connect(_open_shop)
-	_menu_panel.hide()  # opened with the pinned "Chuẩn bị menu" button
+	_menu_panel.hide()  # opened by clicking the LED sign (MenuBoard)
 	_time_left = get_shift_seconds()
-	_refresh_storage()
 
 
 func get_shift_seconds() -> float:
@@ -147,11 +148,9 @@ func _open_shop() -> void:
 	_shift_running = true
 	_close_early_button.show()
 	_renovate_button.hide()
-	_menu_button.hide()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
 	_show_message("Quán mở cửa!")
 	_tutorial.on_shop_opened()
-	_refresh_storage()
 
 
 # Debug builds: F1 during menu setup adds one of every fish to storage,
@@ -164,25 +163,27 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	for fish in fish_catalog.fish:
 		GameState.storage.append(InventoryItem.new(fish, 1.0))
-	_plan.changed.emit()  # refresh panel + storage line
+	_plan.changed.emit()  # refresh the menu panel
 
 
 func _process(delta: float) -> void:
 	# Rin walks freely whenever no panel covers the room.
 	_rin.active = not ($CookingOverlay.is_running() or _kitchen.busy or _renovation.visible
-		or _menu_panel.visible or _summary_panel.visible)
+		or _menu_panel.visible or _summary_panel.visible or _market_panel.visible)
 	_rin.kitchen_open = _shift_running or _closing
+	_board.clickable = not _shift_running and not _shift_over and not _closing and _rin.active
+	_chef.serving = _rin.kitchen_open
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
 		if _time_left <= 0.0:
 			_end_shift("Hết giờ bán!")
 		elif _plan.is_sold_out() and not _sold_out_announced:
 			_sold_out_announced = true
-			_show_message("Hết hải sản, khách chỉ còn gọi rau muống...")
+			_show_message("Hết hải sản, khách chỉ còn gọi rau muống, tháp bia...")
 	var progress := 1.0 - _time_left / get_shift_seconds()
 	DayClock.set_progress(progress, DayClock.shop_open_hour, DayClock.shop_close_hour)
-	_top_label.text = "Ngày %d   %s (đóng cửa %02d:00)   Tiền %dk (hôm nay +%dk)" % [
-		GameState.day, DayClock.get_time_text(), DayClock.shop_close_hour, GameState.money, _earned_today]
+	# No top line (clock, money) or storage line: the LED board shows the menu,
+	# money is in the summary / phone, storage in the phone (J).
 
 
 func _end_shift(reason: String) -> void:
@@ -205,10 +206,12 @@ func _end_shift(reason: String) -> void:
 		await get_tree().process_frame
 	_rin.carried = null
 	_customers.shelf.clear()  # plates left on the table are wasted
+	_chef.clear()
 	var leftover := _plan.total_portions()
 	_plan.clear(GameState.storage)
 	_stall.open = false
-	var wasted_produce := _stall.stock.clear()
+	_market_panel.close_panel()
+	var wasted_produce := _stall.stock.discard_perishable(_stall.products)
 	# Uncooked regular orders go back to storage.
 	for visit in _customers.uncooked_regular_visits():
 		FishOrders.release(visit)
@@ -232,7 +235,7 @@ func _end_shift(reason: String) -> void:
 
 ## E: the kitchen / tables first, else talk to whoever stands right there.
 func _on_rin_interacted(cell: Vector2i) -> void:
-	if _stall.interact(cell) or _kitchen.interact(cell):
+	if _stall.interact(_rin) or _kitchen.interact(cell):
 		return
 	var spot := _room.grid.to_world(cell)
 	for node in get_tree().get_nodes_in_group("talkers"):
@@ -248,26 +251,6 @@ func _on_customer_served(price: int, tip: int) -> void:
 	_served += 1
 
 
-func _refresh_storage() -> void:
-	var lines: PackedStringArray = []
-	if _shift_running:
-		var menu_parts: PackedStringArray = []
-		for dish in _plan.get_dishes():
-			var left := _plan.get_portion_count(dish)
-			menu_parts.append("%s %s" % [dish.display_name, ("còn %d" % left) if left > 0 else "(hết)"])
-		lines.append("Menu: " + " · ".join(menu_parts))
-	lines.append("Kho: " + _storage_text())
-	if _stall.stock.total() > 0:
-		lines.append("Rau mua ở sạp: đủ %d phần" % _stall.stock.total())
-	if not _regular_visits.is_empty():
-		var parts: PackedStringArray = []
-		for visit in _regular_visits:
-			var item: InventoryItem = visit["item"]
-			parts.append("%s %s cho %s" % [item.fish.display_name, item.fish.weight_text(item.size), visit["order"]["who"]])
-		lines.append("Để riêng: " + ", ".join(parts))
-	_storage_label.text = "\n".join(lines)
-
-
 func _show_message(text: String, seconds: float = message_seconds) -> void:
 	_message_token += 1
 	var token := _message_token
@@ -276,21 +259,6 @@ func _show_message(text: String, seconds: float = message_seconds) -> void:
 	await get_tree().create_timer(seconds).timeout
 	if token == _message_token:
 		_message_label.hide()
-
-
-## e.g. "Cua x2 (tươi 100), Cua x1 (tươi 65)": grouped by fish and freshness.
-func _storage_text() -> String:
-	var groups: Dictionary = {}  # "name|freshness" -> count, keeps first-seen order
-	for item: InventoryItem in GameState.storage:
-		var key := "%s|%d" % [item.fish.display_name, roundi(item.freshness)]
-		groups[key] = groups.get(key, 0) + 1
-	if groups.is_empty():
-		return "trống"
-	var parts: PackedStringArray = []
-	for key: String in groups:
-		var pieces := key.split("|")
-		parts.append("%s x%d (tươi %s)" % [pieces[0], groups[key], pieces[1]])
-	return ", ".join(parts)
 
 
 func _rating_hint(stars: int) -> String:
@@ -307,7 +275,6 @@ func _on_continue_pressed() -> void:
 	var scene := DialogueLibrary.pick(after_shift_cutscenes) as Cutscene
 	if scene:
 		await _cutscene.play(scene)
-		_waiter.visible = Waiter.is_hired()
 	_renovate_button.show()
 	_sail_button.show()
 	_tutorial.on_evening()
@@ -330,9 +297,7 @@ func _on_renovation_finished(applied: bool) -> void:
 func _set_room_ui_visible(on: bool) -> void:
 	for node: CanvasItem in [$World/People, $World/Bikes, $World/Markers, $HUD]:
 		node.visible = on
-	_waiter.visible = Waiter.is_hired()
 	_menu_panel.visible = false
-	_menu_button.visible = on and not _shift_running and not _shift_over
 	_sail_button.visible = on and _shift_over
 	_renovate_button.visible = on
 

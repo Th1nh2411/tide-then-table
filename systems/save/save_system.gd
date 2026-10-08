@@ -79,6 +79,7 @@ static func to_dict() -> Dictionary:
 		"boat_hp": GameState.boat_hp,
 		"caught_species": GameState.caught_species.duplicate(),
 		"best_sizes": GameState.best_sizes.duplicate(),
+		"pantry": GameState.pantry.duplicate(),
 		"day_history": GameState.day_history.duplicate(true),
 		"orders": GameState.orders.duplicate(true),
 		"weather_id": GameState.weather_id,
@@ -121,6 +122,12 @@ static func apply_dict(data: Dictionary) -> void:
 		for fish_id: Variant in sizes:
 			if fish_id is String and (sizes[fish_id] is int or sizes[fish_id] is float):
 				GameState.best_sizes[fish_id] = clampf(float(sizes[fish_id]), 0.0, CatchRoll.STORED_MAX)
+
+	var pantry: Variant = data.get("pantry")
+	if pantry is Dictionary:
+		for dish_id: Variant in pantry:
+			if dish_id is String and (pantry[dish_id] is int or pantry[dish_id] is float):
+				GameState.pantry[dish_id] = maxi(int(pantry[dish_id]), 0)
 
 	var history: Variant = data.get("day_history")
 	if history is Array:

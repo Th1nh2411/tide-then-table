@@ -1,22 +1,37 @@
 class_name MarketStock
 extends RefCounted
-## Produce Rin bought at the stall today (one unit = one portion of a market
-## dish, e.g. a bunch of water spinach). Lives for the restaurant day only:
-## whatever is left at closing is thrown away. Pure logic, no nodes.
+## Grocery goods Rin has on hand, in units (a portion of water spinach, a
+## litre of draft beer); one serving uses `DishData.portion_units`. Works on
+## a shared dictionary (dish id -> units), normally GameState.pantry so goods
+## that keep
+## (beer) are saved; perishable ones (rau) are thrown away at closing.
+## Pure logic, no nodes.
 
 signal changed
 
-var _counts: Dictionary[String, int] = {}  # dish id -> portions on hand
+var _counts: Dictionary  # dish id -> units on hand (shared, not copied)
 
 
+func _init(counts: Dictionary = {}) -> void:
+	_counts = counts
+
+
+## Units on hand (litres of beer, portions of rau).
 func count(dish: DishData) -> int:
-	return _counts.get(dish.id, 0)
+	var n: int = _counts.get(dish.id, 0)
+	return n
+
+
+## Servings the units on hand still make (beer: 3 litres a tower).
+func portions(dish: DishData) -> int:
+	return count(dish) / maxi(dish.portion_units, 1)
 
 
 func total() -> int:
 	var sum := 0
-	for id in _counts:
-		sum += _counts[id]
+	for id: Variant in _counts:
+		var n: int = _counts[id]
+		sum += n
 	return sum
 
 
@@ -25,18 +40,22 @@ func add(dish: DishData, amount: int = 1) -> void:
 	changed.emit()
 
 
-## Uses one portion; false if there is none.
+## Uses one serving; false if there isn't enough for it.
 func take(dish: DishData) -> bool:
-	if count(dish) <= 0:
+	if portions(dish) <= 0:
 		return false
-	_counts[dish.id] = count(dish) - 1
+	_counts[dish.id] = count(dish) - maxi(dish.portion_units, 1)
 	changed.emit()
 	return true
 
 
-## End of the day: everything left is wasted. Returns how many portions.
-func clear() -> int:
-	var wasted := total()
-	_counts.clear()
+## End of the day: goods that don't keep overnight are wasted. Returns how
+## many units were thrown away.
+func discard_perishable(dishes: Array[DishData]) -> int:
+	var wasted := 0
+	for dish in dishes:
+		if not dish.keeps_overnight and _counts.has(dish.id):
+			wasted += count(dish)
+			_counts.erase(dish.id)
 	changed.emit()
 	return wasted
