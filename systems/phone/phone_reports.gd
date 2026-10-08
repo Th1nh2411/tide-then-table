@@ -35,9 +35,7 @@ static func menu_report(menu: DishCatalog, fish_names: Dictionary) -> String:
 	for dish in menu.dishes:
 		var head := "%-22s %3dk" % [dish.display_name, dish.base_price]
 		if dish.always_available:
-			lines.append("%s  luôn có" % head)
-		elif dish.is_market_dish():
-			lines.append("%s  mua chợ %.0fk/phần" % [head, dish.market_cost])
+			lines.append("%s  luôn có%s" % [head, (" · rau %dk/phần ở sạp" % dish.market_cost) if dish.market_cost > 0 else ""])
 		else:
 			var portions := MenuPlan.max_portions(dish, GameState.storage)
 			if portions > 0:

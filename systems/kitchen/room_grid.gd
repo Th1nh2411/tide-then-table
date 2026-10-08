@@ -5,9 +5,11 @@ extends RefCounted
 ## Legend: # wall, . floor, S stove, P pass counter, C counter, B bin,
 ## F fridge / ice box, T table, h chair (a customer's seat), D entrance
 ## (walkable), W building, K curb, R road, L pole, M parked bike, Z crates,
-## o spare stool, Y tree, X food cart.
+## o spare stool, Y tree, X food cart, t rest of a table, V market stall
+## counter, G stall crates.
 
-const SOLID := "#SPCBFTWKRLMZoYXQ"
+## A seat ("h") blocks walking but is a path end: its customer walks onto it.
+const SOLID := "#SPCBFTtWKRLMZoYXQhVG"
 
 var cell_size: float = 24.0
 var origin: Vector2 = Vector2.ZERO
@@ -63,13 +65,19 @@ func cell_rect(cell: Vector2i) -> Rect2:
 	return Rect2(origin + Vector2(cell) * cell_size, Vector2.ONE * cell_size)
 
 
-## World points from `from` to `to` (both walkable), [] if unreachable.
+## World points from `from` to `to` (walkable or a seat), [] if unreachable.
 func path(from: Vector2i, to: Vector2i) -> Array[Vector2]:
 	var result: Array[Vector2] = []
-	if not is_walkable(from) or not is_walkable(to):
-		return result
+	var ends: Array[Vector2i] = [from, to]
+	for cell in ends:
+		if not is_walkable(cell) and kind(cell) != "h":
+			return result
+	for cell in ends:  # open the seats at both ends for this search only
+		_astar.set_point_solid(cell, false)
 	for cell in _astar.get_id_path(from, to):
 		result.append(to_world(cell))
+	for cell in ends:
+		_astar.set_point_solid(cell, not is_walkable(cell))
 	return result
 
 

@@ -38,6 +38,9 @@
 [ext_resource type="Script" path="res://scenes/restaurant/customer_bikes.gd" id="43_bikes"]
 [ext_resource type="Script" path="res://scenes/restaurant/rin_chef.gd" id="44_rin"]
 [ext_resource type="Script" path="res://scenes/restaurant/service_hud.gd" id="45_hud"]
+[ext_resource type="Script" path="res://scenes/restaurant/market_stall.gd" id="46_stall"]
+[ext_resource type="Script" path="res://scenes/restaurant/street_person.gd" id="47_person"]
+[ext_resource type="Resource" path="res://data/dishes/rau_muong_xao_toi.tres" id="48_rau"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -55,8 +58,9 @@ fridge_upgrade = ExtResource("11_fridgeup")
 
 [node name="World" type="Node2D" parent="."]
 
-[node name="Room" type="Node2D" parent="World"]
+[node name="Room" type="Node2D" parent="World" node_paths=PackedStringArray("sorted_layer")]
 script = ExtResource("41_room")
+sorted_layer = NodePath("../People")
 
 [node name="Backdrop" type="Node2D" parent="World" node_paths=PackedStringArray("room")]
 script = ExtResource("42_backdrop")
@@ -96,20 +100,33 @@ display_name = "Bảo"
 dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("29_dlg2"), ExtResource("30_dlg3"), ExtResource("31_dlg4")])
 idle_lines = Array[String](["Hôm nay đông khách ghê.", "Nhớ hồi tụi mình code xuyên đêm không? Giờ thì rửa chén xuyên đêm.", "Mai câu con gì to to về nha.", "Khách bàn 2 khen món mày nấu đó.", "Tao vẫn giữ con server cũ, tiếc quá không nỡ bán."])
 
-[node name="Markers" type="Node2D" parent="World" node_paths=PackedStringArray("room", "rin", "customers", "kitchen")]
+[node name="Seller" type="Node2D" parent="World/People"]
+position = Vector2(528, 78)
+script = ExtResource("47_person")
+body_color = Color(0.75, 0.35, 0.45, 1)
+apron = true
+
+[node name="Markers" type="Node2D" parent="World" node_paths=PackedStringArray("room", "rin", "customers", "kitchen", "stall")]
 script = ExtResource("40_markers")
 room = NodePath("../Room")
 rin = NodePath("../People/Rin")
 customers = NodePath("../../CustomerManager")
 kitchen = NodePath("../../KitchenStation")
+stall = NodePath("../../MarketStall")
 
-[node name="KitchenStation" type="Node" parent="." node_paths=PackedStringArray("cooking", "customers", "rin", "room")]
+[node name="MarketStall" type="Node" parent="." node_paths=PackedStringArray("room")]
+script = ExtResource("46_stall")
+room = NodePath("../World/Room")
+product = ExtResource("48_rau")
+
+[node name="KitchenStation" type="Node" parent="." node_paths=PackedStringArray("cooking", "customers", "rin", "room", "stall")]
 script = ExtResource("25_kstation")
 cooking = NodePath("../CookingOverlay")
 customers = NodePath("../CustomerManager")
 menu = ExtResource("4_menu")
 rin = NodePath("../World/People/Rin")
 room = NodePath("../World/Room")
+stall = NodePath("../MarketStall")
 
 [node name="HUD" type="Control" parent="."]
 anchors_preset = 0
@@ -164,9 +181,9 @@ horizontal_alignment = 1
 [node name="CloseEarlyButton" type="Button" parent="HUD"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 530.0
+offset_left = 378.0
 offset_top = 42.0
-offset_right = 634.0
+offset_right = 463.0
 offset_bottom = 60.0
 theme_override_font_sizes/font_size = 10
 text = "Đóng quán sớm"
@@ -174,9 +191,9 @@ text = "Đóng quán sớm"
 [node name="RepairButton" type="Button" parent="HUD"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 300.0
+offset_left = 170.0
 offset_top = 42.0
-offset_right = 410.0
+offset_right = 288.0
 offset_bottom = 60.0
 theme_override_font_sizes/font_size = 10
 text = "Sửa thuyền"
@@ -263,7 +280,7 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 9
-text = "Chọn món và số phần từ kho. Hết món thì khách chỉ gọi đậu phộng (rẻ). Menu dưới 3 món bị chê đơn điệu (giảm giá). Hải sản thừa trả kho; món phụ mua chợ, thừa thì bỏ."
+text = "Chọn món hải sản và số phần từ kho. Rau muống luôn có: mua rau ở sạp Cô Năm bên phải (E ở quầy), thừa thì bỏ cuối ngày. Menu dưới 3 món bị chê đơn điệu (giảm giá). Hải sản thừa trả kho."
 horizontal_alignment = 1
 autowrap_mode = 3
 

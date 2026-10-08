@@ -26,7 +26,7 @@ Vietnamese, keep code comments in short English.
   not long `get_node("../..")` chains.
 - Pure logic lives in `systems/` (no nodes): `GridInventory`, `KitchenLogic`,
   `MenuPlan`, `DayRating`, `SaveSystem`, `Story`, `BoatCondition`,
-  `PhoneReports`, `CatchRoll`, `FishOrders`.
+  `PhoneReports`, `CatchRoll`, `FishOrders`, `MarketStock`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
 - Vietnamese for all player-facing text. Money is shown as "70k".
 - Keep on-screen text short. How-to / control hints only show on day 1
@@ -116,6 +116,9 @@ Vietnamese, keep code comments in short English.
   (player: WASD, E on the faced cell), `Waiter` "Bảo" (A* jobs: pick the plate
   from its plate-table slot, carry; clean), `Customer` (most come by motorbike:
   `CustomerBikes` road -> park by the curb -> walk to the table and back).
+  `MarketStall` (Cô Năm's stall next door, right: E on the "V" counter buys
+  rau muống produce into a `MarketStock`; rau muống is always on the menu,
+  leftovers wasted at closing),
   `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (spawning, ordering, waiter
   jobs, payment; seats/decor upgrades, rich customers, regulars), `DishShelf`
   (pure: plate-table slots + arrival-order matching), `DiningTables` (pure:

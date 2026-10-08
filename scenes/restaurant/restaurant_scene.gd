@@ -8,8 +8,11 @@ extends Control
 ## stove and starts the compact cooking minigame (no pop-up), the dish lands
 ## in her hands; she serves it herself or leaves it on the plate table, from
 ## where Bảo carries plates in order (and cleans tables).
-## Once the menu sells out, customers can only order snacks (peanuts), so a
-## poorly prepared menu earns little. A menu with few dishes lowers all prices.
+## Rau muống is always on the menu: its produce is bought at Cô Năm's stall
+## next door (MarketStall, E on the counter, before opening or mid-shift);
+## leftovers are thrown away at closing. Once the seafood sells out, customers
+## only order rau muống, so a poorly prepared menu earns little. A menu with
+## few dishes lowers all prices.
 ## After the summary (1-5 stars) nothing moves on by itself: pinned buttons
 ## let the player buy upgrades (phone "Nâng cấp" tab) whenever the shop isn't
 ## serving, and "Ra khơi" starts the next night (storage loses freshness).
@@ -73,6 +76,7 @@ var _sail_button: Button
 @onready var _cutscene: CutscenePlayer = $CutscenePlayer
 @onready var _rin: RinChef = $World/People/Rin
 @onready var _kitchen: KitchenStation = $KitchenStation
+@onready var _stall: MarketStall = $MarketStall
 
 
 func _ready() -> void:
@@ -82,11 +86,11 @@ func _ready() -> void:
 	_customers.customer_left_angry.connect(func() -> void: _left_angry += 1)
 	_customers.message_requested.connect(_show_message)
 	_next_day_button.pressed.connect(_on_continue_pressed)
-	_menu_button = _pin_button("Chuẩn bị menu", Rect2(416, 42, 108, 18))
+	_menu_button = _pin_button("Chuẩn bị menu", Rect2(292, 42, 82, 18))
 	_menu_button.pressed.connect(func() -> void:
 		_menu_panel.show()
 		_menu_panel.move_to_front())
-	_renovate_button = _pin_button("Sửa quán", Rect2(530, 42, 104, 18))
+	_renovate_button = _pin_button("Sửa quán", Rect2(378, 42, 85, 18))
 	_renovate_button.pressed.connect(_open_renovation)
 	_renovation.finished.connect(_on_renovation_finished)
 	_room.kitchen_level = GameState.get_upgrade_level(_renovation.kitchen_upgrade.id)
@@ -114,12 +118,15 @@ func _ready() -> void:
 	_waiter.visible = Waiter.is_hired()  # day 1: Rin is alone
 	_regular_visits = FishOrders.reserve_for_shift(menu)
 	_kitchen.message_requested.connect(_show_message)
+	_stall.message_requested.connect(_show_message.bind(2.0))
+	_stall.bought.connect(func(_dish: DishData, cost: int) -> void: _market_spent += cost)
+	_stall.stock.changed.connect(_refresh_storage)
 	_rin.interacted.connect(_on_rin_interacted)
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
 		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
-	_plan = MenuPlan.new(menu_slots, GameState.money)
+	_plan = MenuPlan.new(menu_slots)
 	_plan.changed.connect(_refresh_storage)
 	_kitchen.setup(_plan)
 	_menu_panel.setup(_plan, menu, fish_catalog, variety_multipliers)
@@ -135,9 +142,6 @@ func get_shift_seconds() -> float:
 
 func _open_shop() -> void:
 	_menu_panel.hide()
-	# Market produce is paid for now; unsold portions are wasted at closing.
-	_market_spent = _plan.market_spent
-	GameState.spend_money(_market_spent)
 	_variety_count = _plan.variety_count()
 	_variety_multiplier = MenuPlan.variety_multiplier(_variety_count, variety_multipliers)
 	_shift_running = true
@@ -174,7 +178,7 @@ func _process(delta: float) -> void:
 			_end_shift("Hết giờ bán!")
 		elif _plan.is_sold_out() and not _sold_out_announced:
 			_sold_out_announced = true
-			_show_message("Menu đã hết món, khách chỉ còn gọi đậu phộng...")
+			_show_message("Hết hải sản, khách chỉ còn gọi rau muống...")
 	var progress := 1.0 - _time_left / get_shift_seconds()
 	DayClock.set_progress(progress, DayClock.shop_open_hour, DayClock.shop_close_hour)
 	_top_label.text = "Ngày %d   %s (đóng cửa %02d:00)   Tiền %dk (hôm nay +%dk)" % [
@@ -203,6 +207,8 @@ func _end_shift(reason: String) -> void:
 	_customers.shelf.clear()  # plates left on the table are wasted
 	var leftover := _plan.total_portions()
 	_plan.clear(GameState.storage)
+	_stall.open = false
+	var wasted_produce := _stall.stock.clear()
 	# Uncooked regular orders go back to storage.
 	for visit in _customers.uncooked_regular_visits():
 		FishOrders.release(visit)
@@ -216,9 +222,9 @@ func _end_shift(reason: String) -> void:
 	GameState.last_rating = stars
 	GameState.add_day_record({"day": GameState.day, "earned": _earned_today, "market": _market_spent,
 		"rating": stars, "served": _served, "left": _left_angry})
-	_summary_label.text = "%s\nĐÁNH GIÁ: %d/5 sao\nThu được: %dk   Tiền chợ: -%dk   Lãi: %dk\n%s\nKhách đã phục vụ: %d   Khách bỏ đi: %d\nPhần thừa: %d (hải sản trả về kho, rau bỏ đi)\n%s%s" % [
+	_summary_label.text = "%s\nĐÁNH GIÁ: %d/5 sao\nThu được: %dk   Tiền chợ: -%dk   Lãi: %dk\n%s\nKhách đã phục vụ: %d   Khách bỏ đi: %d\nThừa: %d phần hải sản (trả về kho), %d phần rau (bỏ đi)\n%s%s" % [
 		reason, stars, _earned_today, _market_spent, _earned_today - _market_spent, variety_text,
-		_served, _left_angry, leftover, _rating_hint(stars),
+		_served, _left_angry, leftover, wasted_produce, _rating_hint(stars),
 		("\n" + "\n".join(order_lines)) if not order_lines.is_empty() else ""]
 	_summary_panel.show()
 	_next_day_button.grab_focus()
@@ -226,7 +232,7 @@ func _end_shift(reason: String) -> void:
 
 ## E: the kitchen / tables first, else talk to whoever stands right there.
 func _on_rin_interacted(cell: Vector2i) -> void:
-	if _kitchen.interact(cell):
+	if _stall.interact(cell) or _kitchen.interact(cell):
 		return
 	var spot := _room.grid.to_world(cell)
 	for node in get_tree().get_nodes_in_group("talkers"):
@@ -251,6 +257,8 @@ func _refresh_storage() -> void:
 			menu_parts.append("%s %s" % [dish.display_name, ("còn %d" % left) if left > 0 else "(hết)"])
 		lines.append("Menu: " + " · ".join(menu_parts))
 	lines.append("Kho: " + _storage_text())
+	if _stall.stock.total() > 0:
+		lines.append("Rau mua ở sạp: đủ %d phần" % _stall.stock.total())
 	if not _regular_visits.is_empty():
 		var parts: PackedStringArray = []
 		for visit in _regular_visits:
@@ -332,11 +340,12 @@ func _set_room_ui_visible(on: bool) -> void:
 func _pin_button(text: String, rect: Rect2) -> Button:
 	var button := Button.new()
 	button.text = text
+	button.add_theme_font_size_override("font_size", 10)
+	button.focus_mode = Control.FOCUS_NONE
+	$HUD.add_child(button)
+	# Sized once in the tree: before that the minimum size uses the default font.
 	button.position = rect.position
 	button.size = rect.size
-	button.focus_mode = Control.FOCUS_NONE
-	button.add_theme_font_size_override("font_size", 10)
-	$HUD.add_child(button)
 	return button
 
 

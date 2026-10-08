@@ -12,19 +12,18 @@ enum CookType { GRILL, STEAM, STIR }
 @export var base_price: int = 50
 ## Placeholder color for the order bubble.
 @export var color: Color = Color.WHITE
-## Market dishes (no `ingredients`) are bought per portion for this price
-## instead of using storage. They don't take a menu slot.
+## Market dishes (no `ingredients`): Rin buys one portion of produce at the
+## stall next door for this price (MarketStall); unused produce is thrown
+## away at closing.
 @export var market_cost: int = 0
 
 
-## Snack that is always in stock (free, unlimited). Never shown in menu
-## planning; customers sometimes add it, and order only it once the menu is
-## sold out.
+## Always on the menu, never planned (no menu slot); customers sometimes pick
+## it, and order only it once the seafood is sold out. Cooking it still needs
+## its produce (market dishes) — Rin has to run and buy more.
 @export var always_available: bool = false
-## Served on click with no cooking minigame (pre-made).
-@export var instant_serve: bool = false
 
 
-## Cooked from bought market produce rather than the player's catch.
+## Cooked from produce bought at the stall rather than the player's catch.
 func is_market_dish() -> bool:
-	return ingredients.is_empty() and not always_available
+	return ingredients.is_empty() and market_cost > 0

@@ -34,8 +34,10 @@ BẾN
   Lại gần chỗ có đèn (miếu, chòi, hải đăng, bè...) bấm E.""",
 	"""CHUẨN BỊ
   Bấm "Chuẩn bị menu": chọn món và số phần, rồi "Mở quán" ("Đóng" để làm việc khác trước).
-  Hết món thì khách chỉ gọi đậu phộng (rẻ). Menu dưới 3 món bị chê đơn điệu.
-  Hải sản thừa trả về kho; rau mua chợ thừa thì bỏ.
+  Rau muống luôn có trên menu: E ở quầy sạp Cô Năm (bên phải) mua rau, mỗi lần 1 phần.
+  Hết rau thì không nấu được, phải chạy sang mua (trước hoặc trong giờ bán).
+  Hết hải sản thì khách chỉ gọi rau muống. Menu dưới 3 món bị chê đơn điệu.
+  Hải sản thừa trả về kho; rau thừa bỏ đi cuối ngày.
 
 PHỤC VỤ
   WASD: Rin đi. E: tác động vào ô Rin đang quay mặt vào (ô có viền trắng + phím E).

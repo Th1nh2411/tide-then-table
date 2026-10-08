@@ -87,24 +87,22 @@ func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
 	auto.auto_fill(menu.dishes, storage)
 	_check("auto fill uses stock (cua + 2 ốc)", auto.get_portion_count(cua_dish) == 1 and auto.get_portion_count(oc_dish) == 2 and storage.size() == 1)
 
-	# Market dish: costs money instead of storage, no slot, auto never buys it.
+	# Rau muống: always on the menu, never planned; produce bought at the stall.
 	var rau := _dish("rau_muong_xao_toi")
-	_check("auto fill skips market dish", auto.get_portion_count(rau) == 0)
-	var market := MenuPlan.new(0, 25)  # zero seafood slots, 25k budget
-	_check("market dish ignores slots", market.add_portion(rau, storage))
-	_check("second portion within budget", market.add_portion(rau, storage) and market.market_spent == 20)
-	_check("budget limit", not market.add_portion(rau, storage))
-	market.remove_portion(rau, storage)
-	_check("remove refunds market cost", market.market_spent == 10)
-	_check("market portion servable", market.take_portion(rau).is_empty() and market.is_sold_out())
-	market.return_portion(rau, [] as Array[InventoryItem])
-	_check("market portion returns", market.get_portion_count(rau) == 1)
+	_check("rau is an always-on market dish", rau.always_available and rau.is_market_dish())
+	_check("auto fill skips rau", auto.get_portion_count(rau) == 0)
+	_check("rau can't be planned", not MenuPlan.new(3).can_add(rau, storage))
 	_check("market price = base × cook", KitchenLogic.calc_price(rau, 1.3, [] as Array[InventoryItem]) == 39)
+	_check("no peanuts any more", menu.dishes.all(func(d: DishData) -> bool: return d.id != "dau_phong_rang"))
+	var stock := MarketStock.new()
+	_check("stock starts empty", stock.count(rau) == 0 and not stock.take(rau))
+	stock.add(rau)
+	stock.add(rau)
+	_check("bought 2 portions", stock.count(rau) == 2 and stock.total() == 2)
+	_check("cooking takes one", stock.take(rau) and stock.count(rau) == 1)
+	_check("closing wastes the rest", stock.clear() == 1 and stock.count(rau) == 0)
 
-	# Snack + variety.
-	var peanuts := _dish("dau_phong_rang")
-	_check("snack is not a market dish", not peanuts.is_market_dish())
-	_check("snack can't be planned", not MenuPlan.new(3, 999).can_add(peanuts, storage))
+	# Variety.
 	var table: Array[float] = [0.8, 0.8, 0.9, 1.0]
 	_check("variety 1 dish x0.8", MenuPlan.variety_multiplier(1, table) == 0.8)
 	_check("variety 2 dishes x0.9", MenuPlan.variety_multiplier(2, table) == 0.9)

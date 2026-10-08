@@ -8,5 +8,5 @@ id = "seats"
 display_name = "Bàn ghế"
 description = "Thêm bàn: phục vụ được nhiều khách cùng lúc."
 levels = Array[int]([150, 400])
-values = [4, 5, 6]
-value_labels = Array[String](["4 chỗ", "5 chỗ", "6 chỗ"])
+values = [4, 6, 8]
+value_labels = Array[String](["4 bàn", "6 bàn", "8 bàn"])

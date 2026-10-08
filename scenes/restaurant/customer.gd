@@ -55,7 +55,7 @@ func _ready() -> void:
 func go_to_seat(points: Array[Vector2]) -> void:
 	await walk_and_wait(points)
 	if state == State.WALKING_IN:
-		facing = Vector2i.UP
+		facing = Vector2i.DOWN  # the seat is behind the table
 		state = State.READING
 		_timer = randf_range(read_seconds.x, read_seconds.y)
 

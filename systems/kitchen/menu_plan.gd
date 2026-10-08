@@ -4,34 +4,24 @@ extends RefCounted
 ## dishes, each with a number of portions. Ingredients for every portion are
 ## taken out of storage when the portion is added, so customers only order
 ## what can really be served. Leftover portions go back to storage at closing.
-## Market dishes (DishData.is_market_dish) don't use storage or a slot; each
-## portion costs `market_cost`, limited by `budget`. Leftovers are wasted.
+## Always-available dishes (rau muống) are never planned: they're always on
+## the menu and cooked from produce bought at the stall (MarketStock).
 
 signal changed
 
 var slots: int = 3
-## Money available for market dishes (set by the caller before planning).
-var budget: int = 0
-## Total market cost of the portions currently planned. The caller charges it
-## when the shop opens.
-var market_spent: int = 0
 ## DishData -> Array of portions; each portion is an Array[InventoryItem].
 ## Insertion order = order the player added dishes.
 var _portions: Dictionary = {}
 
 
-func _init(p_slots: int = 3, p_budget: int = 0) -> void:
+func _init(p_slots: int = 3) -> void:
 	slots = p_slots
-	budget = p_budget
 
 
-## Menu slots taken by seafood dishes (market dishes are free extras).
+## Menu slots taken.
 func used_slots() -> int:
-	var used := 0
-	for dish: DishData in _portions:
-		if not dish.is_market_dish():
-			used += 1
-	return used
+	return _portions.size()
 
 
 func get_dishes() -> Array[DishData]:
@@ -56,7 +46,7 @@ func is_sold_out() -> bool:
 	return total_portions() == 0
 
 
-## Distinct dishes on the menu (snacks never count).
+## Distinct planned dishes (always-available ones never count).
 func variety_count() -> int:
 	return _portions.size()
 
@@ -69,13 +59,11 @@ static func variety_multiplier(count: int, table: Array[float]) -> float:
 	return table[clampi(count, 0, table.size() - 1)]
 
 
-## True if one more portion of `dish` can be added: enough money for a
-## market dish, or a free slot + enough stock for a seafood dish.
+## True if one more portion of `dish` can be added: a free slot + enough
+## stock. Always-available dishes are never planned.
 func can_add(dish: DishData, storage: Array) -> bool:
-	if dish.always_available:
-		return false  # snacks are never planned
-	if dish.is_market_dish():
-		return market_spent + dish.market_cost <= budget
+	if dish.always_available or dish.ingredients.is_empty():
+		return false
 	if not _portions.has(dish) and used_slots() >= slots:
 		return false
 	return KitchenLogic.can_cook(dish, storage)
@@ -94,7 +82,6 @@ func add_portion(dish: DishData, storage: Array) -> bool:
 	if not can_add(dish, storage):
 		return false
 	var items := KitchenLogic.take_ingredients(dish, storage)
-	market_spent += dish.market_cost
 	if not _portions.has(dish):
 		_portions[dish] = []
 	_portions[dish].append(items)
@@ -107,32 +94,27 @@ func remove_portion(dish: DishData, storage: Array) -> void:
 	if get_portion_count(dish) == 0:
 		return
 	storage.append_array(_portions[dish].pop_back())
-	market_spent -= dish.market_cost
 	if _portions[dish].is_empty():
 		_portions.erase(dish)
 	changed.emit()
 
 
 ## Fill free slots with the most expensive seafood dishes storage can make,
-## as many portions as possible each. Never buys market dishes (no surprise
-## spending); the player adds those by hand.
+## as many portions as possible each.
 func auto_fill(menu: Array[DishData], storage: Array) -> void:
-	var by_price := menu.filter(func(d: DishData) -> bool:
-		return not d.is_market_dish() and not d.always_available)
+	var by_price := menu.filter(func(d: DishData) -> bool: return not d.ingredients.is_empty() and not d.always_available)
 	by_price.sort_custom(func(a: DishData, b: DishData) -> bool: return a.base_price > b.base_price)
 	for dish: DishData in by_price:
 		while add_portion(dish, storage):
 			pass
 
 
-## Return every portion's ingredients to storage and cancel market purchases.
-## At closing time the market money is already spent, so leftovers are wasted.
+## Return every portion's ingredients to storage.
 func clear(storage: Array) -> void:
 	for dish: DishData in _portions:
 		for portion: Array in _portions[dish]:
 			storage.append_array(portion)
 	_portions.clear()
-	market_spent = 0
 	changed.emit()
 
 
@@ -158,7 +140,6 @@ func take_portion(dish: DishData) -> Array[InventoryItem]:
 
 
 ## A customer left without eating: the portion goes back on the menu.
-## (Market dish portions have no items, so `items` may be empty.)
 func return_portion(dish: DishData, items: Array[InventoryItem]) -> void:
 	if not _portions.has(dish):
 		_portions[dish] = []

@@ -11,6 +11,7 @@ class Bike:
 	extends RefCounted
 	var color: Color
 	var helmet: Color
+	var shirt: Color
 	var pos: Vector2
 	var parking: Vector2i
 	var rider: bool = true
@@ -31,6 +32,8 @@ class Bike:
 	Color(0.2, 0.2, 0.22), Color(0.95, 0.75, 0.2)]
 @export var helmets: Array[Color] = [Color(0.95, 0.8, 0.3), Color(0.85, 0.2, 0.2), Color(0.3, 0.6, 0.9),
 	Color(0.95, 0.95, 0.95)]
+@export var shirts: Array[Color] = [Color(0.3, 0.55, 0.4), Color(0.85, 0.85, 0.8), Color(0.55, 0.3, 0.5),
+	Color(0.25, 0.35, 0.6)]
 
 var bikes: Array[Bike] = []
 
@@ -53,6 +56,7 @@ func arrive() -> Bike:
 	bike.parking = slots.pick_random()
 	bike.color = colors.pick_random()
 	bike.helmet = helmets.pick_random()
+	bike.shirt = shirts.pick_random()
 	var from_left := randf() < 0.5
 	bike.facing = 1.0 if from_left else -1.0
 	var lane := _lane_y(from_left)
@@ -110,23 +114,10 @@ func _draw() -> void:
 
 ## Parked nose towards the road (ready to ride off), seen from above.
 func _draw_parked(bike: Bike) -> void:
-	var p := bike.pos
-	draw_rect(Rect2(p + Vector2(-3, -9), Vector2(6, 15)), bike.color)
-	draw_rect(Rect2(p + Vector2(-2, -6), Vector2(4, 6)), Color(0.15, 0.12, 0.1))  # seat
-	draw_rect(Rect2(p + Vector2(-6, 4), Vector2(12, 2)), Color(0.3, 0.3, 0.32))  # handlebar
-	draw_circle(p + Vector2(0, 7), 1.5, Color(1, 1, 0.7))  # headlight
-	draw_rect(Rect2(p + Vector2(-2, 6), Vector2(4, 3)), Color(0.1, 0.1, 0.1))  # front tyre
-	draw_rect(Rect2(p + Vector2(-2, -12), Vector2(4, 3)), Color(0.1, 0.1, 0.1))  # back tyre
+	StreetProps.draw_bike_parked(self, bike.pos, bike.color)
 
 
-## Side view while riding, with the rider.
+## Side view while riding, with the rider (pos = lane centre, wheels below).
 func _draw_riding(bike: Bike) -> void:
-	var p := bike.pos
-	var f := bike.facing
-	draw_rect(Rect2(p + Vector2(-9, -3), Vector2(18, 6)), bike.color)
-	draw_circle(p + Vector2(-7, 3), 2.5, Color(0.1, 0.1, 0.1))
-	draw_circle(p + Vector2(7, 3), 2.5, Color(0.1, 0.1, 0.1))
-	draw_circle(p + Vector2(9 * f, -1), 1.8, Color(1, 1, 0.7))  # headlight
-	if bike.rider:
-		draw_rect(Rect2(p + Vector2(-3, -10), Vector2(6, 7)), Color(0.4, 0.4, 0.5))
-		draw_circle(p + Vector2(0, -12), 3.5, bike.helmet)
+	StreetProps.draw_bike_side(self, bike.pos + Vector2(0, 8), bike.facing, bike.color, bike.rider, bike.helmet,
+		bike.shirt)

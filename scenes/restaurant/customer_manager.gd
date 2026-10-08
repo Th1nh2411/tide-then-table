@@ -18,7 +18,7 @@ signal message_requested(text: String)
 ## A regular ate their order dish.
 signal regular_served(who: String, price: int)
 
-## Full dish catalog; snacks are taken from here.
+## Full dish catalog; always-available side dishes are taken from here.
 @export var menu: DishCatalog
 @export var room: StreetRoom
 @export var bikes: CustomerBikes
@@ -46,8 +46,8 @@ signal regular_served(who: String, price: int)
 @export var tip_patience_threshold: float = 0.5
 ## Spawn interval multiplier by yesterday's rating (index = stars, 0 unused).
 @export var interval_scale_by_rating: Array[float] = [1.0, 1.3, 1.15, 1.0, 0.85, 0.7]
-## Chance a customer orders a snack while the menu still has dishes.
-@export var snack_order_chance: float = 0.15
+## Chance a customer orders a side dish (rau muống) while seafood is left.
+@export var side_order_chance: float = 0.25
 ## Patience multiplier while the restaurant cat is around ("mèo chiêu tài").
 @export var cat_patience_scale: float = 1.1
 @export var pass_capacity: int = 5
@@ -66,7 +66,7 @@ var _regulars_to_spawn: Array[Dictionary] = []
 var _shift_time: float = 0.0
 var _decor_level: int = 0
 var _plan: MenuPlan
-var _snacks: Array[DishData] = []
+var _sides: Array[DishData] = []
 var _variety_multiplier: float = 1.0
 var _interval_scale: float = 1.0
 var _accepting: bool = false
@@ -87,7 +87,7 @@ func _ready() -> void:
 	waiter.cleaned.connect(func(seat: int) -> void: tables.clean(seat))
 	for dish in menu.dishes:
 		if dish.always_available:
-			_snacks.append(dish)
+			_sides.append(dish)
 
 
 func decor_level() -> int:
@@ -230,16 +230,17 @@ func _on_ordered(customer: Customer) -> void:
 	waiting.append(customer)
 
 
-## A dish that can still be served, or a snack (sometimes by choice, always
-## once nothing else is left). Null only if there is nothing at all.
+## A seafood dish that can still be served, or a side dish (sometimes by
+## choice, always once the seafood is gone; always orderable: Rin buys its
+## produce at the stall). Null only if there is nothing at all.
 func _pick_order() -> DishData:
 	var dishes: Array[DishData] = []
 	for dish in _plan.get_dishes():
 		if _servable(dish) > 0:
 			dishes.append(dish)
-	var wants_snack := dishes.is_empty() or _rng.randf() < snack_order_chance
-	if wants_snack and not _snacks.is_empty():
-		return _snacks[_rng.randi() % _snacks.size()]
+	var wants_side := dishes.is_empty() or _rng.randf() < side_order_chance
+	if wants_side and not _sides.is_empty():
+		return _sides[_rng.randi() % _sides.size()]
 	if dishes.is_empty():
 		return null
 	return dishes[_rng.randi() % dishes.size()]
@@ -252,7 +253,7 @@ func _servable(dish: DishData) -> int:
 
 
 func _anything_to_order() -> bool:
-	return not _snacks.is_empty() or _plan.get_dishes().any(func(d: DishData) -> bool: return _servable(d) > 0)
+	return not _sides.is_empty() or _plan.get_dishes().any(func(d: DishData) -> bool: return _servable(d) > 0)
 
 
 func _on_finished_eating(customer: Customer) -> void:

@@ -14,6 +14,7 @@ RIN THE FISHER là game 2D: **ban đêm** (0:00–6:00) Rin thắp đèn câu, l
 **Nhân vật chính (bản ghép với STORY.md):** Rin tốt nghiệp IT, cùng người bạn thân **Bảo** khởi nghiệp làm app ở thành phố; startup thất bại, hai người lâu không gặp. Rin về Xóm Đèn — quê ông nội — mở quán hải sản, đêm đêm tự ra khơi lấy nguyên liệu. App điện thoại **"Rin's Catch"** (phím J) là phần còn sót lại của startup, Rin sửa lại để quản lý kho, menu, sách cá (Dex), thuyền và sổ sách; app ghi log lỗi khi gặp cá biến dị / tọa độ lạ ("có bug thì phải debug"). Ngày 1 Rin bán một mình (tự nấu, tự bưng, tự dọn); hết ca ngày 1 Bảo bất ngờ đẩy cửa bước vào (cutscene "bao_arrival") và làm **phục vụ** từ ngày 2 (tự bưng món, dọn bàn); Rin là đầu bếp, phụ bưng và dọn khi cần.
 
 **Bí ẩn (bản ghép):** vùng sương đông bắc là nơi một **cổng không gian** dẫn tới một vùng biển song song — "lớp biển bên dưới" mà ông nội Rin từng kể. Cá biến dị (cá thu phát sáng...) là sinh vật lọt qua cổng. **Cá Ông** trong tín ngưỡng ngư dân thật ra là một tộc sinh vật thông minh canh giữ thế giới bên kia (ban đầu tưởng là thù địch vì chúng đẩy thuyền ra khỏi sương). Ông nội và người gác đèn Đá Canh Đêm đã thấy dấu hiệu từ xưa (cổng mở chập chờn); gần đây cổng mở rộng vì một nhà khoa học của **tập đoàn Thâm Lam** (tên tự đặt) vô tình kích hoạt nó, và tập đoàn đang lén khai thác sinh vật bên kia làm nguyên liệu công nghệ. MVP dừng ở lúc Rin bị xoáy nước kéo qua cổng. Hướng màn sau: khám phá biển song song, hiểu ra tộc cá Ông chỉ bảo vệ quê hương, cùng họ đánh sập các cơ sở của Thâm Lam, rồi cổng đóng lại.
+
 - Nhân vật phụ dự kiến (từ STORY.md, chưa làm): chú mèo béo ở bến (thật ra là rồng từ chiều không gian kia), một nhân viên quán (nhân vật nữ chính), một người bạn đến từ thế giới bên kia.
 - Manh mối đang có trong game: log lỗi của app, nhật ký người gác đèn, chai thư (ông nội), lời ông từ ở miếu, tin đồn ông Tám, phao lạ của Thâm Lam ở cảnh kết.
 
@@ -148,15 +149,15 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 
 ### Danh sách loài ban đầu
 
-| id                 | Tên              | Hình dạng | Vùng                     | Minigame | Độ khó | Giá |
-| ------------------ | ---------------- | --------- | ------------------------ | -------- | ------ | --- |
-| `oc_huong`         | Ốc hương         | 1x1       | NEARSHORE, REEF          | HAUL (lưới) | 0.1 | 15  |
-| `tom`              | Tôm              | 1x2       | NEARSHORE                | TIMING   | 0.2    | 25  |
-| `muc`              | Mực              | 1x2       | NEARSHORE, OPEN_SEA      | TENSION  | 0.3    | 30  |
-| `ca_thu`           | Cá thu           | 1x3       | OPEN_SEA                 | TENSION  | 0.5    | 40  |
-| `cua`              | Cua              | 2x2       | REEF                     | TIMING   | 0.4    | 50  |
-| `ca_mu`            | Cá mú            | 2x3       | REEF, OPEN_SEA           | TENSION  | 0.8    | 90  |
-| `ca_thu_phat_sang` | Cá thu phát sáng | 1x3       | OPEN_SEA (rất hiếm), FOG | TENSION  | 0.9    | 200 |
+| id                 | Tên              | Hình dạng | Vùng                     | Minigame    | Độ khó | Giá |
+| ------------------ | ---------------- | --------- | ------------------------ | ----------- | ------ | --- |
+| `oc_huong`         | Ốc hương         | 1x1       | NEARSHORE, REEF          | HAUL (lưới) | 0.1    | 15  |
+| `tom`              | Tôm              | 1x2       | NEARSHORE                | TIMING      | 0.2    | 25  |
+| `muc`              | Mực              | 1x2       | NEARSHORE, OPEN_SEA      | TENSION     | 0.3    | 30  |
+| `ca_thu`           | Cá thu           | 1x3       | OPEN_SEA                 | TENSION     | 0.5    | 40  |
+| `cua`              | Cua              | 2x2       | REEF                     | TIMING      | 0.4    | 50  |
+| `ca_mu`            | Cá mú            | 2x3       | REEF, OPEN_SEA           | TENSION     | 0.8    | 90  |
+| `ca_thu_phat_sang` | Cá thu phát sáng | 1x3       | OPEN_SEA (rất hiếm), FOG | TENSION     | 0.9    | 200 |
 
 > **Đổi cơ chế ngày (sau Phase 9, thay Phase 2):** bỏ đồng hồ giới hạn. Ngày = Đêm (ra khơi, giới hạn bằng dầu đèn: 100 = ~4 phút thật, câu −2, thả lưới −1, kéo lưới −2, minigame không cháy (giờ đứng yên lúc câu), đậu ở bến không cháy, cạn ngoài khơi = cứu hộ −80k) → màn Nghỉ ngơi (giờ cập bến, mẻ cá) → Quán 15:00–24:00 (3 phút thật cố định). Bỏ phạt về trễ. Dầu tự đổ đầy miễn phí mỗi đêm; nâng cấp "Bình dầu đèn" làm bình to hơn: 100 → 140 (150k) → 190 (400k). Lưới đầy sau 90 giây ở biển. Trời đêm xanh đậm, rạng dần khi dầu dưới ~1/3. Bến có cột đèn (PointLight2D, texture gradient) sáng xuyên màu đêm.
 
@@ -167,15 +168,17 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 > **Đơn đặt cá (Dave the Diver):** mỗi sáng 70% có tin nhắn đặt cá (tối đa 2 đơn, mỗi khách 1 đơn) — loài câu đã có trong Dex (Dex trống: loài gần bờ), cỡ yêu cầu 1.0/1.2/1.4 (làm tròn ký), thưởng = giá gốc × cỡ × 2.5 (làm tròn 10k), hạn 2 đêm. Đơn hiện ở HUD biển (dưới tiền) và tab "Đơn" của điện thoại. Đầu ca bán, con nhỏ nhất đủ ký trong kho được **để riêng** và khách quen (áo xanh, bóng thoại vàng, kiên nhẫn x2) **tới quán gọi món nấu từ con cá đó** (món đầu tiên trong menu có loài đó); nấu xong trả tiền đơn × hệ số nấu (hoàn hảo x1.3). Không phục vụ thì cá trả về kho; hết ca của ngày cuối hạn mà chưa phục vụ thì khách hủy (ghi trong bảng tổng kết). Màn sáng chỉ báo "có cá rồi / chưa có cá". Lưu trong save. Logic: `FishOrders`; test: scenes/test/orders_test.tscn.
 
 > **Điểm ghé trên bản đồ (Dredge):** mỗi điểm có đèn riêng (thấy được trong đêm), tên vẽ trên map, ghé bằng E khi thuyền chậm; hộp thoại `PoiDialog` (tạm dừng game, chọn bằng phím số/click, E/Esc đi tiếp). Điểm câu tự tránh xa các điểm ghé.
+>
 > - **Miếu Cá Ông** (bờ Xóm Đèn): thắp nhang 10k → đêm đó va đá chỉ hư 50%. Lời ông từ đổi theo cốt truyện (trước điềm báo / sau điềm báo / sương mở).
 > - **Chòi ông Tám** (Gò Vỏ Ốc): vá thuyền giữa biển +25 bền / 40k (đắt hơn ở bến); hỏi chuyện = mẹo chơi + tin đồn cốt truyện theo giai đoạn.
 > - **Hải đăng Đá Canh Đêm** (sát vùng sương): đèn quét xoay; nhật ký người gác đèn, mỗi lần ghé đọc 1 trang (lưu trong story_flags); đọc được 2 trang trước điềm báo, 3 sau điềm báo, 4 khi sương mở.
 > - **Bè tôm hùm anh Năm** (rạn đá): bán hết khoang ngay ngoài biển với 50% (giá gốc × cỡ × chất lượng) để lấy chỗ.
-> Test: scenes/test/places_test.tscn (logic thuần; ghé thử cần màn biển nên kiểm bằng test tạm).
+>   Test: scenes/test/places_test.tscn (logic thuần; ghé thử cần màn biển nên kiểm bằng test tạm).
 
 > **Bản đồ trên điện thoại (tab "Bản đồ"):** màn biển chụp bố cục map (vùng nước, bờ, đảo/đá, bến, điểm ghé) vào snapshot tĩnh lúc vào biển, nên ở quán vẫn xem được. Ngoài biển hiện thêm thuyền (mũi tên theo hướng) và lưới đang thả. Vùng sương: trước điềm báo không có gì, sau điềm báo nháy "[ERR] NaN" ở góc đông bắc, khi mở thì hiện vùng sương + "???" ở xoáy nước. Click lên bản đồ để ghim/bỏ ghim (tối đa 5, lưu trong save); ghim hiện thành mũi tên "Ghim N" ở mép màn hình khi ra khơi.
 
 > **Đi đêm thêm chiều sâu (sau Phase 9):**
+>
 > - **Tầm đi theo thuyền** (`BoatData.max_depth`, `BoatRange`): thuyền thúng 0.32 (gần bờ + mép rạn), ghe chèo 0.6 (rạn đá + mép khơi), ghe máy 1.0 (cả map). Vượt vạch sóng (bọt trắng, cả trên bản đồ điện thoại) thì bị đẩy lùi 90px/s và giới hạn tốc độ 20. Chòi ông Tám, hải đăng và vùng sương cần ghe máy; bè tôm hùm thuyền thúng tới được.
 > - **Đá ngầm**: 12 viên `Rock.submerged` ở rạn đá và ngoài khơi, chỉ vẽ ở chỗ có đèn chiếu (CanvasItemMaterial LIGHT_ONLY), không có trên bản đồ.
 > - **Thời tiết** (`WeatherData` trong data/weather/, `WeatherController`): chọn ở màn sáng cho chuyến kế tiếp, hiện dự báo ở màn sáng + log điện thoại + cạnh đồng hồ ở biển; đêm 1 luôn lặng. Lặng (x3): không gì. Trăng (x2): trời sáng x1.8, mực x3. Gió (x2): trôi 22px/s hướng ngẫu nhiên, dầu x1.15. Mưa (x2): đèn x0.7, trời tối x0.8, rarity +3, +1 điểm câu/vùng, vệt mưa trên màn hình.
@@ -189,14 +192,15 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 > - **Mèo của quán**: cutscene "cat_arrival" sau khi kết thúc đêm 2 (rạng sáng ở bến): mèo mập ăn vụng cá (chỉ trong phim, không mất cá) → Rin vuốt ve → nhận nuôi, người chơi đặt tên (mặc định "Mỡ", cờ `pet_name`, `cat_adopted`). Từ đó mèo ngồi trước quầy (`PetCat`), nói chuyện được (có "!"), "mèo chiêu tài" khách kiên nhẫn x1.1; Bảo có thoại về mèo (ngày 3); mèo ấm bất thường (ngày 4), nhìn về đông bắc sau điềm báo; app báo "[WARN] cảm biến nhiệt: sinh vật trong quán 60°C". Chưa làm: mèo biến mất sau điềm báo, bóng rồng ở cảnh kết.
 > - **Nâng cấp trong điện thoại** (tab "Nâng cấp" = app "Chợ Đồ Nghề"): chỉ bán **đồ nghề đi biển** (thuyền, cần câu, đèn), mua được ở mọi nơi (J), có hiệu lực từ chuyến sau.
 > - **Sửa quán** (kiểu Dave the Diver): nút cố định "Sửa quán" khi quán không phục vụ (trước giờ mở / sau khi bán xong). Vào chế độ sửa: ẩn người và bảng; bàn ghế, trang trí, bếp, tủ lạnh có viền xanh nhấp nháy; click đồ → danh sách cấp (cấp đang có / +giá), chọn là **xem trước** ngay (số bàn, đèn lồng/tranh/hoa, bếp than → gas → bếp công nghiệp có chụp hút, tủ lạnh to dần). Thanh dưới: "Hủy" (trả về như cũ) / "Xác nhận (-Xk)" (khóa nếu thiếu tiền). Chỉ nâng lên, không hạ. Áp dụng ngay cho ca hôm nay nếu sửa trước giờ mở (`RenovationMode`).
-> Test: scenes/test/night_test.tscn.
+>   Test: scenes/test/night_test.tscn.
 
 > **Quán nâng cấp + lưu 2 lần:**
-> - **Bàn ghế** (150k/400k): 4 → 5 → 6 chỗ, bàn đặt vào các chỗ có sẵn trên vỉa hè (`StreetRoom.setup_tables`).
+>
+> - **Bàn ghế** (150k/400k): 4 → 6 → 8 bàn, bàn đặt vào các chỗ có sẵn trên vỉa hè (`StreetRoom.setup_tables`).
 > - **Đèn lồng & trang trí** (200k/500k): khách tới nhanh hơn (khoảng cách x0.85 / x0.72), khách sang 15% / 30% (áo vàng, cà vạt, trả x1.5, kiên nhẫn x0.75); cấp 1 treo đèn lồng, cấp 2 thêm tranh + chậu hoa.
 > - **Bếp** (180k/450k): minigame nấu chạy chậm x0.85 / x0.72 (dễ hoàn hảo).
-> - **Phục vụ kiểu Dave the Diver** (luật phục vụ vẫn dùng; phần bố cục/điều khiển góc ngang bên dưới đã được thay bằng quán vỉa hè ở mục kế tiếp): khách vào → ngồi đọc menu 1.5–3s → gọi món (chỉ món còn phục vụ được: phần còn lại + món trên kệ − phiếu đang chờ; hết thì gọi đậu phộng) → chờ (kiên nhẫn 45s, chỉ giảm lúc chờ) → ăn 4–6s → trả tiền + tip → bàn **bẩn**. **Bếp nằm ngay trong quán** (không có màn hình bếp riêng): Rin đi A/D vào khu bếp bên trái; **bảng menu đánh số** trên tường bếp (tên món + số phần còn lại; món hết vẫn giữ số, mờ đi; đậu phộng; khách quen viền vàng ở cuối); **bấm số hoặc click** dòng nào thì nấu món đó (không dùng E để nấu); minigame hiện thu nhỏ ở góc trên trái phía trên bếp (quán vẫn chạy, Rin đứng yên khi nấu); món lên **kệ bếp** (4 chỗ); **đứng trước đĩa** trên kệ (mũi tên xanh nhỏ chỉ đĩa, nhắc ghi bàn nào gọi) bấm E để cầm, **E ở sọt rác** vứt món đang cầm, E ở bàn đặt món. Thanh **phiếu order** ở trên cùng (viền xanh = món đã có trên kệ). **Không dùng chữ nhắc**, chỉ dấu hiệu (`ServiceMarkers`): cầm món thì bàn gọi món đó + phiếu của nó nhấp nháy viền xanh kèm mũi tên; món không ai gọi thì sọt rác viền đỏ; đứng trước đĩa thì mũi tên xanh trên đĩa và bàn của nó sáng mờ; phím "E" nhỏ hiện trên chỗ E sẽ tác động (sọt rác, bàn đúng, bàn bẩn). **Bảo** tự bưng theo thứ tự khách vào, rảnh thì dọn bàn bẩn; **E ở bàn bẩn**: Rin dọn. Đóng quán (sớm hoặc hết giờ): không nhận khách mới, khách trong quán vẫn được phục vụ và ăn xong mới về (hoặc tự bỏ về khi hết kiên nhẫn), bếp vẫn mở tới khi khách cuối rời quán; món còn trên kệ bỏ đi. (`DishShelf`, `DiningTables`, `KitchenStation`, `Waiter`, `RinWalker`, `ShelfDisplay`; test: scenes/test/restaurant_test.tscn)
-> - **Quán vỉa hè nhìn từ trên xuống (3/4)** — thay hẳn quán góc ngang: ô 16px chuẩn Stardew, 40x23 ô phủ kín màn hình (cửa sổ 1920x1080, F11 toàn màn hình). Mặt tiền nhà (cửa cuốn, biển "HẢI SẢN TƯƠI SỐNG", mái hiên sọc, xe máy dựng + két bia) ở trên, **vỉa hè rộng** ở giữa (2 hàng bàn: 6 chỗ bàn, dùng 4/5/6 theo nâng cấp Bàn ghế), mép dưới chỉ thấy **một phần đường** (làn gần + nửa làn xa, xe máy chạy qua). Bếp lộ thiên bên trái: thùng đá (nâng cấp Tủ lạnh: thùng xốp → thùng nhựa → tủ đông), **xe đẩy có bếp trên xe** (nâng cấp Bếp: lò than → bếp ga → bếp ga đôi; tủ kính + biển đỏ quay ra đường), **bàn kê món đặt dọc cạnh xe** (5 ô, mỗi ô 1 đĩa). Rin đi **WASD**, **E** vào ô đang quay mặt (viền trắng + phím E nhỏ); đứng gần xe đẩy (sàn ướt) mà bấm số / click món trên **hàng món luôn hiện trên cùng** (mờ khi xa xe) thì Rin tự ra **sau bếp, quay mặt ra đường** nấu; minigame hiện nhỏ đè lên mặt đường; món nấu xong nằm trên tay Rin → tự mang ra bàn (bàn gọi món đó nhấp nháy xanh) hoặc đặt lên bàn kê cho Bảo. Khách phần lớn **đi xe máy tới** (chạy dưới đường → đỗ sát lề, đầu xe ra đường → đi bộ vào bàn → ăn xong ra xe chạy đi), số còn lại đi bộ dọc vỉa hè. Bảo tự tìm đường (A*) lấy đúng đĩa trên bàn kê mang ra, rảnh thì dọn bàn. Trang trí: dây đèn (cấp 1), + chậu cây cạnh bàn (cấp 2). **Thùng rác 2x2** ngay bên trái xe đẩy, sát chỗ đứng nấu: E vứt món đang cầm; cầm món không ai gọi thì xô nhấp nháy đỏ (món thừa trên bàn kê bỏ đi lúc đóng quán). (`StreetRoom`, `RoomGrid`, `StreetBackdrop`, `StreetProps`, `StreetPerson`, `RinChef`, `Waiter`, `Customer`, `CustomerBikes`, `KitchenStation`, `ServiceHud`, `ServiceMarkers`)
+> - **Phục vụ kiểu Dave the Diver** (luật phục vụ vẫn dùng; phần bố cục/điều khiển góc ngang bên dưới đã được thay bằng quán vỉa hè ở mục kế tiếp): khách vào → ngồi đọc menu 1.5–3s → gọi món (chỉ món còn phục vụ được: phần còn lại + món trên kệ − phiếu đang chờ; hết thì gọi rau muống) → chờ (kiên nhẫn 45s, chỉ giảm lúc chờ) → ăn 4–6s → trả tiền + tip → bàn **bẩn**. **Bếp nằm ngay trong quán** (không có màn hình bếp riêng): Rin đi A/D vào khu bếp bên trái; **bảng menu đánh số** trên tường bếp (tên món + số phần còn lại; món hết vẫn giữ số, mờ đi; rau muống; khách quen viền vàng ở cuối); **bấm số hoặc click** dòng nào thì nấu món đó (không dùng E để nấu); minigame hiện thu nhỏ ở góc trên trái phía trên bếp (quán vẫn chạy, Rin đứng yên khi nấu); món lên **kệ bếp** (4 chỗ); **đứng trước đĩa** trên kệ (mũi tên xanh nhỏ chỉ đĩa, nhắc ghi bàn nào gọi) bấm E để cầm, **E ở sọt rác** vứt món đang cầm, E ở bàn đặt món. Thanh **phiếu order** ở trên cùng (viền xanh = món đã có trên kệ). **Không dùng chữ nhắc**, chỉ dấu hiệu (`ServiceMarkers`): cầm món thì bàn gọi món đó + phiếu của nó nhấp nháy viền xanh kèm mũi tên; món không ai gọi thì sọt rác viền đỏ; đứng trước đĩa thì mũi tên xanh trên đĩa và bàn của nó sáng mờ; phím "E" nhỏ hiện trên chỗ E sẽ tác động (sọt rác, bàn đúng, bàn bẩn). **Bảo** tự bưng theo thứ tự khách vào, rảnh thì dọn bàn bẩn; **E ở bàn bẩn**: Rin dọn. Đóng quán (sớm hoặc hết giờ): không nhận khách mới, khách trong quán vẫn được phục vụ và ăn xong mới về (hoặc tự bỏ về khi hết kiên nhẫn), bếp vẫn mở tới khi khách cuối rời quán; món còn trên kệ bỏ đi. (`DishShelf`, `DiningTables`, `KitchenStation`, `Waiter`, `RinWalker`, `ShelfDisplay`; test: scenes/test/restaurant_test.tscn)
+> - **Quán vỉa hè nhìn từ trên xuống (3/4)** — thay hẳn quán góc ngang: ô 16px chuẩn Stardew, 40x23 ô phủ kín màn hình (cửa sổ 1920x1080, F11 toàn màn hình). Mặt tiền nhà (cửa cuốn, biển "HẢI SẢN TƯƠI SỐNG", mái hiên sọc, xe máy dựng) ở trên, **vỉa hè rộng** ở giữa (bàn 2x2 ô `StreetRoom.TABLE_SIZE`, 2 ghế nhựa phía trên: ghế khách + ghế phụ, khách ngồi quay mặt ra đường; 8 chỗ bàn xếp 2 hàng x 4 cột, 4 bàn đầu là 2 cột sát xe đẩy, mỗi cấp Bàn ghế mở thêm 1 cột bên phải (4 → 6 → 8 bàn) — sau này mở rộng tiếp sang phải), mép dưới chỉ thấy **một phần đường** (làn gần + nửa làn xa, xe máy chạy qua). Bếp lộ thiên bên trái: thùng đá (nâng cấp Tủ lạnh: thùng xốp → thùng nhựa → tủ đông), **xe đẩy có bếp trên xe** (rộng 4 ô, chỉ hàng bánh xe chặn đường, mặt bàn vẽ cao thêm 1 ô và y-sort với người: Rin đứng sau xe bị xe che chân; nâng cấp Bếp: lò than → bếp ga → bếp ga đôi; tủ kính + biển đỏ quay ra đường), **bàn kê món đặt dọc cạnh xe** (5 ô, mỗi ô 1 đĩa). Rin đi **WASD**, **E** vào ô đang quay mặt (viền trắng + phím E nhỏ); đứng gần xe đẩy (sàn ướt) mà bấm số / click món trên **hàng món luôn hiện trên cùng** (mờ khi xa xe) thì Rin tự ra **sau bếp, quay mặt ra đường** nấu; minigame hiện nhỏ đè lên mặt đường; món nấu xong nằm trên tay Rin → tự mang ra bàn (bàn gọi món đó nhấp nháy xanh) hoặc đặt lên bàn kê cho Bảo. Khách phần lớn **đi xe máy tới** (chạy dưới đường → đỗ sát lề, đầu xe ra đường → đi bộ vào bàn → ăn xong ra xe chạy đi), số còn lại đi bộ dọc vỉa hè. Bảo tự tìm đường (A*) lấy đúng đĩa trên bàn kê mang ra, rảnh thì dọn bàn. Bàn khách (bàn inox có giấy, tương ớt, nước mắm; bàn y-sort với người như xe đẩy; ghế chặn người đi, A* chỉ mở ghế ở đầu đường đi cho khách ngồi/rời); xe máy cỡ thật (~32px, người lái cao như nhân vật). Trang trí: dây đèn (cấp 1), + chậu cây cạnh bàn (cấp 2). **Sạp rau thịt Cô Năm** bên phải (tiệm mở cửa, mái hiên xanh; quầy `V` + két rau `G` trên vỉa hè, `MarketStall` + `MarketStock`): rau muống luôn có trên menu, Rin đứng trước quầy bấm E mua 1 phần rau (10k, trước giờ mở hoặc giữa ca); nấu rau trừ 1 phần, hết rau thì báo "sang sạp mua"; rau thừa bỏ cuối ngày, tiền mua tính vào "Tiền chợ". Hàng nút ghim (Sửa thuyền / Chuẩn bị menu / Sửa quán) dời sang giữa mặt tiền để không che sạp. **Thùng rác 1 ô** ngay bên trái xe đẩy, sát chỗ đứng nấu: E vứt món đang cầm; cầm món không ai gọi thì xô nhấp nháy đỏ (món thừa trên bàn kê bỏ đi lúc đóng quán). (`StreetRoom`, `RoomGrid`, `StreetBackdrop`, `StreetProps`, `StreetPerson`, `RinChef`, `Waiter`, `Customer`, `CustomerBikes`, `KitchenStation`, `ServiceHud`, `ServiceMarkers`)
 > - **Lưu 2 lần**: lúc ra khơi (tiếp tục ở biển) và ở màn sáng sau chuyến câu (tiếp tục ở quán, `resume_at`). SAVE_VERSION 2.
 
 > **Tiện ích (sau Phase 9):** Esc = menu tạm dừng (Tiếp tục / Về menu — bấm 2 lần / Thoát + bảng phím) ở biển và quán. Mũi tên mép màn hình chỉ Bến, Lưới, và xoáy nước "???" kèm khoảng cách (m). Ngày 1 có gợi ý theo ngữ cảnh. "Chơi mới" khi đã có save phải bấm 2 lần.
@@ -221,18 +225,17 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 
 `id`, `display_name`, `ingredients: Dictionary` (fish_id → số lượng), `cook_type: enum { GRILL, STEAM, STIR }`, `base_price: int`.
 
-| Món                    | Nguyên liệu | Kiểu nấu | Giá |
-| ---------------------- | ----------- | -------- | --- |
-| Ốc hương nướng mỡ hành | 3 ốc hương  | GRILL    | 70  |
-| Mực hấp gừng           | 1 mực       | STEAM    | 60  |
-| Cá thu nướng           | 1 cá thu    | GRILL    | 80  |
-| Tôm rang muối          | 2 tôm       | STIR     | 75  |
-| Cua rang me            | 1 cua       | STIR     | 110 |
-| Cá mú hấp xì dầu       | 1 cá mú     | STEAM    | 150 |
-| Rau muống xào tỏi      | Mua chợ 10k/phần (món phụ, không chiếm slot, thừa bỏ đi) | STIR | 30 |
-| Đậu phộng rang         | Luôn có, miễn phí, phục vụ ngay (không minigame) | — | 15 |
+| Món                    | Nguyên liệu                                              | Kiểu nấu | Giá |
+| ---------------------- | -------------------------------------------------------- | -------- | --- |
+| Ốc hương nướng mỡ hành | 3 ốc hương                                               | GRILL    | 70  |
+| Mực hấp gừng           | 1 mực                                                    | STEAM    | 60  |
+| Cá thu nướng           | 1 cá thu                                                 | GRILL    | 80  |
+| Tôm rang muối          | 2 tôm                                                    | STIR     | 75  |
+| Cua rang me            | 1 cua                                                    | STIR     | 110 |
+| Cá mú hấp xì dầu       | 1 cá mú                                                  | STEAM    | 150 |
+| Rau muống xào tỏi      | Luôn có trên menu; rau mua ở sạp Cô Năm 10k/phần, thừa bỏ đi cuối ngày | STIR     | 30  |
 
-> **Menu & phạt (thêm sau Phase 6):** trước ca chọn tối đa 3 món hải sản + món phụ. ~15% khách gọi đậu phộng; menu hết món thì khách chỉ gọi đậu phộng (chuẩn bị kém = thu ít). Menu ít món bị chê đơn điệu: giá mọi món x0.8 (0–1 món), x0.9 (2 món), x1.0 (3+ món). Có nút "Đóng quán sớm".
+> **Menu & phạt (thêm sau Phase 6):** trước ca chọn tối đa 3 món hải sản; rau muống luôn có (không chiếm slot). ~25% khách gọi rau muống; hết hải sản thì khách chỉ gọi rau muống (chuẩn bị kém = thu ít). (Đậu phộng rang đã bỏ.) Menu ít món bị chê đơn điệu: giá mọi món x0.8 (0–1 món), x0.9 (2 món), x1.0 (3+ món). Có nút "Đóng quán sớm".
 
 ### UpgradeData (Resource)
 
@@ -365,15 +368,15 @@ Lặn biển, thế giới song song, dị biến cơ thể, dụng cụ kết h
 
 ## 9. Tiến độ
 
-| Phase                    | Trạng thái | Ghi chú |
-| ------------------------ | ---------- | ------- |
-| 0 — Khởi tạo             | ✅         | Godot 4.7.2; autoload GameState/DayClock/SceneRouter, main menu, sea scene trống |
-| 1 — Lái thuyền           | ✅         | Map 1920x1280, 3 BoatData, spin drift, phím debug 1/2/3 đổi thuyền |
-| 2 — Thời gian & về bến   | ✅ (đã thay) | Trễ tính theo phút (pro-rata); màn quán tạm có nút "Ngày mới (tạm)" — thay ở Phase 6/7 |
-| 3 — Điểm câu             | ✅         | 7 loài + fish_catalog.tres; 4 spot/zone, 2–4 lượt, mỗi lượt +20 phút game; minigame tạm là thông báo |
-| 4 — Minigame câu         | ✅         | TIMING + TENSION; cần câu tạm = +15% vùng xanh/cấp (đổi sang UpgradeData ở Phase 7); test: scenes/test/fishing_minigame_test.tscn |
-| 5 — Khoang xếp hình      | ✅         | GridInventory thuần + HoldUI kéo-thả, khay "Cá mới" + ô "Bỏ"; overflow = pause; test: scenes/test/grid_inventory_test.tscn |
-| 6 — Quán ăn              | ✅         | + Chuẩn bị menu kiểu Dave the Diver (MenuPlan, 3 món, phần lấy từ kho, thừa trả kho, bán hết thì đóng sớm); tip 20% nếu kiên nhẫn > 50%; đơn vị "k"; F1 debug thêm cá; test: scenes/test/cooking_test.tscn |
-| 7 — Vòng ngày & nâng cấp | ✅         | Sao = tỉ lệ khách được phục vụ (−1 nếu menu đơn điệu), ảnh hưởng tần suất khách hôm sau; 3 UpgradeData (thuyền 300/800, cần 120/350, tủ lạnh 150/400); tủ lạnh mua tối nay có tác dụng ngay đêm nay |
-| 8 — Lưu game             | ✅         | SaveSystem (static) → user://save.json, ghi file tạm rồi đổi tên; autosave lúc 6:00 mỗi ngày; field thiếu/sai kiểu → mặc định, cá lạ bị bỏ qua; test: scenes/test/save_test.tscn |
-| 9 — Cảnh kết             | ✅         | Điềm báo (cá thu phát sáng / ngày 7) → hôm sau mở FOG góc đông bắc (3 điểm cá biến dị + xoáy nước); xoáy → fade trắng → thoại Rin → "Còn tiếp..." → menu; F2 debug mở sương |
+| Phase                    | Trạng thái   | Ghi chú                                                                                                                                                                                                    |
+| ------------------------ | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0 — Khởi tạo             | ✅           | Godot 4.7.2; autoload GameState/DayClock/SceneRouter, main menu, sea scene trống                                                                                                                           |
+| 1 — Lái thuyền           | ✅           | Map 1920x1280, 3 BoatData, spin drift, phím debug 1/2/3 đổi thuyền                                                                                                                                         |
+| 2 — Thời gian & về bến   | ✅ (đã thay) | Trễ tính theo phút (pro-rata); màn quán tạm có nút "Ngày mới (tạm)" — thay ở Phase 6/7                                                                                                                     |
+| 3 — Điểm câu             | ✅           | 7 loài + fish_catalog.tres; 4 spot/zone, 2–4 lượt, mỗi lượt +20 phút game; minigame tạm là thông báo                                                                                                       |
+| 4 — Minigame câu         | ✅           | TIMING + TENSION; cần câu tạm = +15% vùng xanh/cấp (đổi sang UpgradeData ở Phase 7); test: scenes/test/fishing_minigame_test.tscn                                                                          |
+| 5 — Khoang xếp hình      | ✅           | GridInventory thuần + HoldUI kéo-thả, khay "Cá mới" + ô "Bỏ"; overflow = pause; test: scenes/test/grid_inventory_test.tscn                                                                                 |
+| 6 — Quán ăn              | ✅           | + Chuẩn bị menu kiểu Dave the Diver (MenuPlan, 3 món, phần lấy từ kho, thừa trả kho, bán hết thì đóng sớm); tip 20% nếu kiên nhẫn > 50%; đơn vị "k"; F1 debug thêm cá; test: scenes/test/cooking_test.tscn |
+| 7 — Vòng ngày & nâng cấp | ✅           | Sao = tỉ lệ khách được phục vụ (−1 nếu menu đơn điệu), ảnh hưởng tần suất khách hôm sau; 3 UpgradeData (thuyền 300/800, cần 120/350, tủ lạnh 150/400); tủ lạnh mua tối nay có tác dụng ngay đêm nay        |
+| 8 — Lưu game             | ✅           | SaveSystem (static) → user://save.json, ghi file tạm rồi đổi tên; autosave lúc 6:00 mỗi ngày; field thiếu/sai kiểu → mặc định, cá lạ bị bỏ qua; test: scenes/test/save_test.tscn                           |
+| 9 — Cảnh kết             | ✅           | Điềm báo (cá thu phát sáng / ngày 7) → hôm sau mở FOG góc đông bắc (3 điểm cá biến dị + xoáy nước); xoáy → fade trắng → thoại Rin → "Còn tiếp..." → menu; F2 debug mở sương                                |

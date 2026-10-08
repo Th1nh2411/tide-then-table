@@ -9,7 +9,8 @@ extends Node
 ##   E on the bin              throw the carried plate away
 ##   E on a table              serve the carried plate, or clean it if dirty
 ## Menu rows (`trays()`): today's dishes (numbers never shift, 0 = sold out),
-## snacks (endless, instant), then regulars' reserved fish. Only while serving.
+## always-available dishes (count = produce bought at the stall; none left =
+## Rin must go and buy more), then regulars' reserved fish. Only while serving.
 
 signal message_requested(text: String)
 
@@ -18,6 +19,7 @@ signal message_requested(text: String)
 @export var menu: DishCatalog
 @export var rin: RinChef
 @export var room: StreetRoom
+@export var stall: MarketStall
 @export var clean_seconds: float = 0.5
 
 ## Walking to the stove, cooking or cleaning: Rin can't move.
@@ -63,7 +65,7 @@ func trays() -> Array[Dictionary]:
 		rows.append({"label": dish.display_name, "count": _plan.get_portion_count(dish), "dish": dish, "kind": "menu"})
 	for dish in menu.dishes:
 		if dish.always_available:
-			rows.append({"label": dish.display_name, "count": -1, "dish": dish, "kind": "snack"})
+			rows.append({"label": dish.display_name, "count": stall.stock.count(dish), "dish": dish, "kind": "side"})
 	for visit in customers.regular_visits:
 		if not visit.get("cooked", false):
 			rows.append({"label": "%s (%s)" % [visit["dish"].display_name, visit["order"]["who"]],
@@ -87,13 +89,14 @@ func cook(index: int) -> void:
 				message_requested.emit("Hết %s" % dish.display_name)
 				return
 			items = _plan.take_portion(dish)
+		"side":
+			if not stall.stock.take(dish):
+				message_requested.emit("Hết nguyên liệu %s: sang sạp %s mua" % [dish.display_name, stall.seller_name])
+				return
 		"regular":
 			var visit: Dictionary = tray["visit"]
 			visit["cooked"] = true
 			items.append(visit["item"])
-	if dish.instant_serve:
-		rin.carried = DishShelf.Plate.new(dish, items, 1.0)
-		return
 	busy = true
 	_cooking_tray = tray
 	_cooking_items = items
