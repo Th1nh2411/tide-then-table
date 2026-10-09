@@ -98,10 +98,10 @@ func next_order(drinks: bool) -> TableOrder:
 	return null
 
 
-## More lines wait for `dish` than plates exist (plate table, Rin's hands).
+## More lines wait for `dish` than plates exist (plate table, staff and Rin's hands).
 func _needs_more(dish: DishData) -> bool:
 	var waiting := customers.waiting.filter(func(o: TableOrder) -> bool: return o.dish == dish and o.visit.is_empty()).size()
-	var plates := customers.shelf.count(dish)
+	var plates := customers.plates_ready(dish)
 	if rin.carried and rin.carried.dish == dish and rin.carried.visit.is_empty():
 		plates += 1
 	return waiting > plates

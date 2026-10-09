@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="StaffCatalog" format=3]
+
+[ext_resource type="Script" path="res://data/resources/staff_catalog.gd" id="1_cat"]
+[ext_resource type="Script" path="res://data/resources/staff_data.gd" id="1_data"]
+[ext_resource type="Resource" path="res://data/staff/vy.tres" id="2_vy"]
+[ext_resource type="Resource" path="res://data/staff/ti.tres" id="3_ti"]
+[ext_resource type="Resource" path="res://data/staff/co_sau.tres" id="4_co_sau"]
+[ext_resource type="Resource" path="res://data/staff/lam.tres" id="5_lam"]
+[ext_resource type="Resource" path="res://data/staff/hung.tres" id="6_hung"]
+[ext_resource type="Resource" path="res://data/staff/ngan.tres" id="7_ngan"]
+[ext_resource type="Resource" path="res://data/staff/phat.tres" id="8_phat"]
+[ext_resource type="Resource" path="res://data/staff/quan.tres" id="9_quan"]
+[ext_resource type="Resource" path="res://data/staff/hanh.tres" id="10_hanh"]
+[ext_resource type="Resource" path="res://data/staff/khoa.tres" id="11_khoa"]
+
+[resource]
+script = ExtResource("1_cat")
+staff = Array[ExtResource("1_data")]([ExtResource("2_vy"), ExtResource("3_ti"), ExtResource("4_co_sau"), ExtResource("5_lam"), ExtResource("6_hung"), ExtResource("7_ngan"), ExtResource("8_phat"), ExtResource("9_quan"), ExtResource("10_hanh"), ExtResource("11_khoa")])

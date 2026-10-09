@@ -45,6 +45,10 @@ signal regular_served(who: String, price: int)
 var tuning: ServiceTuning
 ## The plate table (cooked dishes waiting to be carried out).
 var shelf: DishShelf
+## Plates staff are carrying out (StaffCrew), so the kitchen doesn't cook twice.
+var in_hands: Array[DishShelf.Plate] = []
+## Extra tip share from the staff working today.
+var tip_bonus: float = 0.0
 ## Ordered dishes still to bring, in order of ordering.
 var waiting: Array[TableOrder] = []
 ## Regular visits for today: [{"order", "item", "dish", "cooked"?}].
@@ -137,6 +141,12 @@ func serve_at(seat: int, plate: DishShelf.Plate) -> bool:
 			tables.put_plate(seat, plate)
 			return true
 	return false
+
+
+## Free plates of `dish` on the way (plate table + staff hands).
+func plates_ready(dish: DishData) -> int:
+	return shelf.count(dish) + in_hands.filter(func(p: DishShelf.Plate) -> bool:
+		return p.dish == dish and p.visit.is_empty()).size()
 
 
 ## Party leaders with lines still waiting, oldest line first.
@@ -244,7 +254,7 @@ func _pay(customer: Customer, tip_ok: bool) -> void:
 			regular_served.emit(customer.regular_name, TableBill.plate_price(plate, 1.0, 1.0))
 	var tip := 0
 	if tip_ok and customer.regular_name.is_empty():
-		tip = TableBill.tip(price, customer.patience, tuning.tip_patience_threshold, tuning.tip_ratio)
+		tip = TableBill.tip(price, customer.patience, tuning.tip_patience_threshold, tuning.tip_ratio + tip_bonus)
 	GameState.add_money(price + tip)
 	FloatingText.spawn(people_layer, customer.position, "+%dk" % (price + tip) + (" (tip)" if tip > 0 else ""))
 	tables.make_dirty(customer.seat)

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StaffData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/staff_data.gd" id="1_staff"]
+
+[resource]
+script = ExtResource("1_staff")
+id = "lam"
+display_name = "Lâm"
+tier = 1
+wage = 90
+walk_speed = 75.0
+clean_seconds = 0.7
+tip_bonus = 0.0
+body_color = Color(0.45, 0.55, 0.4, 1)
+pitch = "Em mới làm lần đầu... em sẽ cố."
+arrives_on_day = 0

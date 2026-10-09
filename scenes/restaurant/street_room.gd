@@ -142,6 +142,19 @@ func setup_tables(count: int) -> void:
 	dining.setup(tables.size())
 
 
+## Where to stand to reach table `seat` (a free cell next to one of its
+## cells, nearest to `near`); (-1, -1) if none.
+func table_stand_cell(seat: int, near: Vector2i) -> Vector2i:
+	var best := Vector2i(-1, -1)
+	var top_left: Vector2i = tables[seat]["table"]
+	for x in TABLE_SIZE.x:
+		for y in TABLE_SIZE.y:
+			var stand := grid.stand_cell(top_left + Vector2i(x, y), near)
+			if stand.x >= 0 and (best.x < 0 or (stand - near).length_squared() < (best - near).length_squared()):
+				best = stand
+	return best
+
+
 ## Seat of the table covering `cell` (any of its cells or its chair), -1 if none.
 func table_index(cell: Vector2i) -> int:
 	for i in tables.size():

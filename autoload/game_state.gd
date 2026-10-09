@@ -67,6 +67,8 @@ var orders: Array = []
 ## Grocery goods kept between days (dish id -> portions), e.g. beer cans.
 ## Perishable goods (rau) are thrown away at closing (MarketStock).
 var pantry: Dictionary = {}
+## Restaurant staff (StaffRoster): {"hired", "candidates", "seen": [ids], "ad_day"}.
+var staff: Dictionary = {}
 ## History entries kept (older ones are dropped).
 const MAX_HISTORY: int = 14
 
@@ -90,6 +92,7 @@ func reset() -> void:
 	day_history.clear()
 	orders.clear()
 	pantry.clear()
+	staff.clear()
 	map_pins.clear()
 	weather_id = "calm"
 	resume_at = "sea"

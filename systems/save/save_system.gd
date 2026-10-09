@@ -80,6 +80,7 @@ static func to_dict() -> Dictionary:
 		"caught_species": GameState.caught_species.duplicate(),
 		"best_sizes": GameState.best_sizes.duplicate(),
 		"pantry": GameState.pantry.duplicate(),
+		"staff": GameState.staff.duplicate(true),
 		"day_history": GameState.day_history.duplicate(true),
 		"orders": GameState.orders.duplicate(true),
 		"weather_id": GameState.weather_id,
@@ -128,6 +129,16 @@ static func apply_dict(data: Dictionary) -> void:
 		for dish_id: Variant in pantry:
 			if dish_id is String and (pantry[dish_id] is int or pantry[dish_id] is float):
 				GameState.pantry[dish_id] = maxi(int(pantry[dish_id]), 0)
+
+	var staff: Variant = data.get("staff")
+	if staff is Dictionary:
+		for key: String in ["hired", "candidates", "seen"]:
+			var ids: Variant = staff.get(key)
+			if ids is Array:
+				GameState.staff[key] = ids.filter(func(id: Variant) -> bool: return id is String)
+		var ad_day: Variant = staff.get("ad_day")
+		if ad_day is int or ad_day is float:
+			GameState.staff["ad_day"] = int(ad_day)
 
 	var history: Variant = data.get("day_history")
 	if history is Array:

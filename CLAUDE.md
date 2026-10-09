@@ -27,7 +27,7 @@ Vietnamese, keep code comments in short English.
 - Pure logic lives in `systems/` (no nodes): `GridInventory`, `KitchenLogic`,
   `MenuPlan`, `DayRating`, `SaveSystem`, `Story`, `BoatCondition`,
   `PhoneReports`, `CatchRoll`, `FishOrders`, `MarketStock`, `OrderPicker`,
-  `TableBill`.
+  `TableBill`, `StaffRoster`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
 - Vietnamese for all player-facing text. Money is shown as "70k".
 - Keep on-screen text short. How-to / control hints only show on day 1
@@ -70,7 +70,7 @@ Vietnamese, keep code comments in short English.
 
 ## Map of the game
 - Autoloads: `GameState` (money, day, storage, upgrades, flags, boat_hp,
-  rating, last_catch, pantry), `DayClock` (display-only time of day: driven by
+  rating, last_catch, pantry, staff), `DayClock` (display-only time of day: driven by
   `LampOil` at sea and by shift progress in the restaurant; `running` = night
   trip in progress), `SceneRouter` (`go_to(path, fade_color)`).
 - Flow: main menu → (New Game: `scenes/intro/intro_scene.tscn`, cutscene
@@ -137,6 +137,10 @@ Vietnamese, keep code comments in short English.
   `market_pack`, stock in litres) or 10 at once, served as 3 L towers
   (`portion_units`), needs no cooking (`instant_serve`) and keeps overnight (`keeps_overnight`), rau is wasted
   at closing),
+  `StaffCrew` + `StaffWorker` + `StaffPanel` + `StaffRoster` (from day 3:
+  hired helpers carry plates and clean tables; job ads by tier bring better
+  applicants; wages at closing; `GameState.staff`, data in `data/staff/`; Vy,
+  the heroine, applies on day 3),
   `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (spawning, ordering,
   payment; seats/decor upgrades, rich customers, regulars; balance numbers in
   `ServiceTuning` `data/restaurant/service_tuning.tres`; helpers

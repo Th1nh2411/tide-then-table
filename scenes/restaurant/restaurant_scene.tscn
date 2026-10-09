@@ -5,6 +5,8 @@
 [ext_resource type="Resource" path="res://data/dishes/menu.tres" id="4_menu"]
 [ext_resource type="Script" path="res://data/resources/service_tuning.gd" id="41_tuningscript"]
 [ext_resource type="Resource" path="res://data/restaurant/service_day1.tres" id="41_stage"]
+[ext_resource type="Resource" path="res://data/staff/staff_catalog.tres" id="47_staff"]
+[ext_resource type="Resource" path="res://data/dialogues/bao_vy.tres" id="48_dlgvy"]
 [ext_resource type="Resource" path="res://data/dialogues/bao_beer.tres" id="46_dlgbeer"]
 [ext_resource type="Resource" path="res://data/restaurant/service_day2.tres" id="42_stage"]
 [ext_resource type="Resource" path="res://data/restaurant/service_day3.tres" id="43_stage"]
@@ -63,6 +65,7 @@ after_shift_cutscenes = Array[ExtResource("39_cutdata")]([])
 menu = ExtResource("4_menu")
 fish_catalog = ExtResource("6_fish")
 fridge_upgrade = ExtResource("11_fridgeup")
+staff_catalog = ExtResource("47_staff")
 
 [node name="World" type="Node2D" parent="."]
 
@@ -108,7 +111,7 @@ kitchen_upgrade = ExtResource("19_kitchenup")
 [node name="Talker" type="Node" parent="World/People/Bao"]
 script = ExtResource("27_talker")
 display_name = "Bảo"
-dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("29_dlg2"), ExtResource("30_dlg3"), ExtResource("31_dlg4"), ExtResource("46_dlgbeer")])
+dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("29_dlg2"), ExtResource("30_dlg3"), ExtResource("31_dlg4"), ExtResource("46_dlgbeer"), ExtResource("48_dlgvy")])
 idle_lines = Array[String](["Hôm nay đông khách ghê.", "Nhớ hồi tụi mình code xuyên đêm không? Giờ thì đứng bếp xuyên đêm.", "Mai câu con gì to to về nha.", "Khách bàn 2 khen món tao nấu đó. Mày bưng lẹ lên!", "Nướng khét là tao trừ lương à nha.", "Tao vẫn giữ con server cũ, tiếc quá không nỡ bán."])
 
 [node name="MenuBoard" type="Node2D" parent="World/People" node_paths=PackedStringArray("room", "kitchen")]

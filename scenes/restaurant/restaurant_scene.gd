@@ -17,6 +17,8 @@ extends Control
 ## After the summary (1-5 stars) nothing moves on by itself: pinned buttons
 ## let the player buy upgrades (phone "Nâng cấp" tab) whenever the shop isn't
 ## serving, and "Ra khơi" starts the next night (storage loses freshness).
+## Staff (from day 3, StaffCrew + StaffPanel, pinned "Nhân viên"): hired
+## helpers carry plates out and clean tables; wages are paid at closing.
 ## Regulars with a fish order: their fish is set aside before menu planning
 ## and they come in during the shift (CustomerManager); unserved fish go back
 ## to storage and overdue orders are cancelled at closing.
@@ -37,6 +39,8 @@ const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 @export var fridge_upgrade: UpgradeData
 ## Cutscenes that can play after the summary (first eligible one, once).
 @export var after_shift_cutscenes: Array[Cutscene] = []
+## Everyone who could be hired, and the job ads.
+@export var staff_catalog: StaffCatalog
 ## How close Rin must be to someone to talk (px).
 @export var talk_reach: float = 22.0
 
@@ -61,6 +65,9 @@ var _dialogue_box: DialogueBox
 var _tutorial: RestaurantTutorial
 var _sail_button: Button
 var _market_panel: MarketPanel
+var _crew: StaffCrew
+var _staff_panel: StaffPanel
+var _staff_button: Button
 
 @onready var _customers: CustomerManager = $CustomerManager
 @onready var _menu_panel: MenuSetupPanel = %MenuSetupPanel
@@ -123,6 +130,18 @@ func _ready() -> void:
 	add_child(_market_panel)
 	_stall.browse_requested.connect(_market_panel.open_panel)
 	_stall.bought.connect(func(_dish: DishData, cost: int) -> void: _market_spent += cost)
+	_crew = StaffCrew.new()
+	_crew.catalog = staff_catalog
+	_crew.room = _room
+	_crew.customers = _customers
+	_crew.people_layer = $World/People
+	_crew.message_requested.connect(_show_message.bind(3.0))
+	add_child(_crew)
+	_staff_panel = StaffPanel.new()
+	_staff_panel.crew = _crew
+	add_child(_staff_panel)
+	_staff_button = _pin_button("Nhân viên", Rect2(381, 42, 70, 18))
+	_staff_button.pressed.connect(_staff_panel.open_panel)
 	_rin.interacted.connect(_on_rin_interacted)
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
@@ -148,6 +167,8 @@ func _open_shop() -> void:
 	_shift_running = true
 	_close_early_button.show()
 	_renovate_button.hide()
+	_staff_panel.close_panel()
+	_crew.start_shift()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
 	_show_message("Quán mở cửa!")
 	_tutorial.on_shop_opened()
@@ -175,10 +196,12 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	# Rin walks freely whenever no panel covers the room.
 	_rin.active = not ($CookingOverlay.is_running() or _kitchen.busy or _renovation.visible
-		or _menu_panel.visible or _summary_panel.visible or _market_panel.visible)
+		or _menu_panel.visible or _summary_panel.visible or _market_panel.visible or _staff_panel.visible)
 	_rin.kitchen_open = _shift_running or _closing
 	_board.clickable = not _shift_running and not _shift_over and not _closing and _rin.active
 	_chef.serving = _rin.kitchen_open
+	_crew.serving = _rin.kitchen_open
+	_staff_button.visible = _renovate_button.visible and _crew.is_unlocked()
 	_rin.carrying_goods = _stall.bag.total() > 0
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
@@ -224,6 +247,7 @@ func _end_shift(reason: String) -> void:
 	for visit in _customers.uncooked_regular_visits():
 		FishOrders.release(visit)
 	var order_lines := FishOrders.expire_after_shift(fish_catalog)
+	var wages := _crew.pay_wages()
 	_shift_over = true
 	var monotonous := _variety_multiplier < 1.0
 	var variety_text := "Menu %d món" % _variety_count
@@ -232,9 +256,10 @@ func _end_shift(reason: String) -> void:
 	var stars := DayRating.stars(_served, _left_angry, monotonous)
 	GameState.last_rating = stars
 	GameState.add_day_record({"day": GameState.day, "earned": _earned_today, "market": _market_spent,
-		"rating": stars, "served": _served, "left": _left_angry})
-	_summary_label.text = "%s\nĐÁNH GIÁ: %d/5 sao\nThu được: %dk   Tiền chợ: -%dk   Lãi: %dk\n%s\nKhách đã phục vụ: %d   Khách bỏ đi: %d\nThừa: %d phần hải sản (trả về kho), %d phần rau (bỏ đi)\n%s%s" % [
-		reason, stars, _earned_today, _market_spent, _earned_today - _market_spent, variety_text,
+		"rating": stars, "served": _served, "left": _left_angry, "wages": wages})
+	var costs := "Tiền chợ: -%dk" % _market_spent + ("   Lương: -%dk" % wages if wages > 0 else "")
+	_summary_label.text = "%s\nĐÁNH GIÁ: %d/5 sao\nThu được: %dk   %s   Lãi: %dk\n%s\nKhách đã phục vụ: %d   Khách bỏ đi: %d\nThừa: %d phần hải sản (trả về kho), %d phần rau (bỏ đi)\n%s%s" % [
+		reason, stars, _earned_today, costs, _earned_today - _market_spent - wages, variety_text,
 		_served, _left_angry, leftover, wasted_produce, _rating_hint(stars),
 		("\n" + "\n".join(order_lines)) if not order_lines.is_empty() else ""]
 	_summary_panel.show()
