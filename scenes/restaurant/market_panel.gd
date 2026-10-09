@@ -26,8 +26,9 @@ func _ready() -> void:
 	box.add_child(_label("Tạp hoá %s" % stall.seller_name))
 	_money_label = _label("")
 	box.add_child(_money_label)
-	for i in stall.products.size():
-		box.add_child(_build_row(i, stall.products[i]))
+	for dish in stall.products:
+		if dish.unlock_day <= GameState.day:
+			box.add_child(_build_row(_rows.size(), dish))
 	var close := _button("Đóng (E)")
 	close.pressed.connect(close_panel)
 	box.add_child(close)

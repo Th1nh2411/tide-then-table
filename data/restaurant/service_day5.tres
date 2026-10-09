@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ServiceTuning" format=3]
+
+[ext_resource type="Script" path="res://data/resources/service_tuning.gd" id="1_tuning"]
+
+[resource]
+script = ExtResource("1_tuning")
+from_day = 5

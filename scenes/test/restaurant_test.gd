@@ -53,6 +53,7 @@ func _ready() -> void:
 	tables.take(1)
 	tables.release(1)
 	_check("left without eating -> free", tables.states[1] == DiningTables.State.FREE)
+	_test_picker_and_bill()
 	# The restaurant has no camera; nothing (e.g. the cutscene camera) may
 	# become current by itself, or the view shifts to the top-left corner.
 	var room: Node = load("res://scenes/restaurant/restaurant_scene.tscn").instantiate()
@@ -61,6 +62,50 @@ func _ready() -> void:
 	_check("restaurant view not moved by a camera", get_viewport().get_camera_2d() == null)
 	room.queue_free()
 	print("Restaurant: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
+
+
+func _test_picker_and_bill() -> void:
+	var seafood: DishData
+	var side: DishData
+	for dish in menu.dishes:
+		if dish.always_available and side == null:
+			side = dish
+		elif not dish.is_market_dish() and seafood == null:
+			seafood = dish
+	var plan := MenuPlan.new(3)
+	plan._portions[seafood] = [[] as Array[InventoryItem], [] as Array[InventoryItem]]
+	var shelf := DishShelf.new(3)
+	var picker := OrderPicker.new(shelf, [side] as Array[DishData])
+	picker.plan = plan
+	var waiting: Array = [_order(seafood, {})]
+	_check("servable = portions - waiting lines", picker.servable(seafood, waiting) == 1)
+	shelf.add(DishShelf.Plate.new(seafood))
+	_check("plates on the pass count too", picker.servable(seafood, waiting) == 2)
+	_check("no side chance -> seafood", picker.pick(0.0, waiting) == seafood)
+	_check("side chance 1 -> side", picker.pick(1.0, waiting) == side)
+	waiting.append_array([_order(seafood, {}), _order(seafood, {})])
+	_check("seafood all promised -> side", picker.pick(0.0, waiting) == side)
+	_check("order size: 1 guest, no extra", picker.first_order_size(1, 0.0, 3) == 1)
+	_check("order size: 2 guests + extra, capped", picker.first_order_size(2, 1.0, 2) == 2)
+	var plate := DishShelf.Plate.new(side, [] as Array[InventoryItem], 1.0)
+	var regular := DishShelf.Plate.new(seafood, [] as Array[InventoryItem], 1.5, {"order": {"reward": 100}})
+	var plates: Array[DishShelf.Plate] = [plate, regular]
+	_check("bill: market dish × variety × rich, regular by reward", TableBill.total(plates, 1.0, 1.0)
+		== side.base_price + 150 and TableBill.plate_price(plate, 0.5, 2.0) == side.base_price)
+	var stages: Array[ServiceTuning] = []
+	for day: int in [1, 2, 5]:
+		var stage := ServiceTuning.new()
+		stage.from_day = day
+		stages.append(stage)
+	_check("stage by day", CustomerManager.stage_for(stages, 1) == stages[0]
+		and CustomerManager.stage_for(stages, 4) == stages[1] and CustomerManager.stage_for(stages, 9) == stages[2])
+	var shipped: Array[ServiceTuning] = []
+	for day: int in [1, 2, 3, 5]:
+		shipped.append(load("res://data/restaurant/service_day%d.tres" % day))
+	var day1 := CustomerManager.stage_for(shipped, 1)
+	_check("day 1 is simple: one guest, one dish, no extra round", day1.pair_chance == 0.0
+		and day1.extra_dish_chance == 0.0 and day1.max_more_rounds == 0)
+	_check("tip only above the threshold", TableBill.tip(100, 0.6, 0.5, 0.2) == 20 and TableBill.tip(100, 0.4, 0.5, 0.2) == 0)
 
 
 func _order(dish: DishData, visit: Dictionary) -> TableOrder:

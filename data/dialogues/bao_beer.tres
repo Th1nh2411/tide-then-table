@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Dialogue" format=3]
+
+[ext_resource type="Script" path="res://data/resources/dialogue.gd" id="1_dlg"]
+
+[resource]
+script = ExtResource("1_dlg")
+id = "bao_beer"
+min_day = 2
+once = true
+priority = 20
+script_text = "Bảo: Hôm qua có mấy ông hỏi bia hoài. Quán nhậu mà không có bia thì ai ngồi lâu?
+Rin: Thì nhập. Cô Năm có bán bia hơi đó.
+Bảo: Ừ, qua tạp hoá mua về cất tủ lạnh. Khách gọi tháp thì mày rót ở vòi đầu xe đẩy.
+Bảo: Rót từ từ thôi nha, tràn là mất bia đó."

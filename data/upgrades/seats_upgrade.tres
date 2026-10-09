@@ -7,6 +7,6 @@ script = ExtResource("1_upgrade")
 id = "seats"
 display_name = "Bàn ghế"
 description = "Thêm bàn: phục vụ được nhiều khách cùng lúc."
-levels = Array[int]([150, 400])
+levels = Array[int]([450, 1200])
 values = [4, 6, 8]
 value_labels = Array[String](["4 bàn", "6 bàn", "8 bàn"])

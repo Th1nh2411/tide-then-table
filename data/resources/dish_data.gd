@@ -36,8 +36,15 @@ enum CookType { GRILL, STEAM, STIR }
 ## it, and order only it once the seafood is sold out. Cooking it still needs
 ## its goods (market dishes) — Rin has to run and buy more.
 @export var always_available: bool = false
+## First day it's sold (beer comes on day 2, so day 1 stays simple).
+@export var unlock_day: int = 1
 ## A drink: no cooking, Rin pours it at the tap (BeerPourGame).
 @export var instant_serve: bool = false
+
+
+## Always on today's menu (always available and already unlocked).
+func on_menu_today() -> bool:
+	return always_available and GameState.day >= unlock_day
 
 
 ## Made from goods bought at the grocery rather than the player's catch.

@@ -69,7 +69,7 @@ func menu_rows() -> Array[Dictionary]:
 	for dish in _plan.get_dishes():
 		rows.append(_row(dish.display_name, _plan.get_portion_count(dish), dish, "menu"))
 	for dish in menu.dishes:
-		if dish.always_available:
+		if dish.on_menu_today():
 			rows.append(_row(dish.display_name, stall.stock.portions(dish), dish, "side"))
 	for visit in customers.regular_visits:
 		if not visit.get("cooked", false):

@@ -34,7 +34,7 @@ BẾN
   Lại gần chỗ có đèn (miếu, chòi, hải đăng, bè...) bấm E.""",
 	"""CHUẨN BỊ
   Bấm vào bảng hiệu LED (viền vàng nhấp nháy): chọn món và số phần, rồi "Mở quán" ("Đóng" để làm việc khác trước).
-  Rau muống, tháp bia con mèo luôn có trên menu: đứng trước quầy tạp hoá Cô Năm (bên phải)
+  Rau muống, tháp bia con mèo (từ ngày 2) luôn có trên menu: đứng trước quầy tạp hoá Cô Năm (bên phải)
     bấm E mở danh sách. Mua lẻ (nút trái / phím 1-9) hoặc mua sỉ rẻ hơn (nút xanh /
     Shift + số): rau 1 phần 10k / 10 phần 80k, bia 1 tháp 25k / 10 tháp 200k.
     Rau thừa bỏ cuối ngày nên đừng mua sỉ quá tay; bia để được.

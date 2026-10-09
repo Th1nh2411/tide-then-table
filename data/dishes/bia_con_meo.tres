@@ -19,4 +19,5 @@ bulk_cost = 200
 bulk_label = "10 tháp"
 keeps_overnight = true
 always_available = true
+unlock_day = 2
 instant_serve = true

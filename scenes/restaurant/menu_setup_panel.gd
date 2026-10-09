@@ -39,6 +39,8 @@ func setup(plan: MenuPlan, menu: DishCatalog, fish_catalog: FishCatalog,
 		_fish_names[fish.id] = fish.display_name
 	for dish in menu.dishes:
 		if dish.always_available:
+			if not dish.on_menu_today():
+				continue
 			_rows_box.add_child(_label("%s · %dk: luôn có, mua ở tạp hoá bên cạnh (%s)" % [
 				dish.display_name, dish.base_price, dish.market_text()], 0))
 		else:

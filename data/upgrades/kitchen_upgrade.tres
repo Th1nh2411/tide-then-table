@@ -7,6 +7,6 @@ script = ExtResource("1_upgrade")
 id = "kitchen"
 display_name = "Bếp"
 description = "Bếp tốt lửa đều: nấu chậm lại, dễ hoàn hảo hơn."
-levels = Array[int]([180, 450])
+levels = Array[int]([550, 1350])
 values = [1.0, 0.85, 0.72]
 value_labels = Array[String](["Bếp than", "Bếp gas (chậm 15%)", "Bếp công nghiệp (chậm 28%)"])

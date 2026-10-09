@@ -3,6 +3,12 @@
 [ext_resource type="Script" path="res://scenes/restaurant/restaurant_scene.gd" id="1_rest"]
 [ext_resource type="Script" path="res://scenes/restaurant/customer_manager.gd" id="2_mgr"]
 [ext_resource type="Resource" path="res://data/dishes/menu.tres" id="4_menu"]
+[ext_resource type="Script" path="res://data/resources/service_tuning.gd" id="41_tuningscript"]
+[ext_resource type="Resource" path="res://data/restaurant/service_day1.tres" id="41_stage"]
+[ext_resource type="Resource" path="res://data/dialogues/bao_beer.tres" id="46_dlgbeer"]
+[ext_resource type="Resource" path="res://data/restaurant/service_day2.tres" id="42_stage"]
+[ext_resource type="Resource" path="res://data/restaurant/service_day3.tres" id="43_stage"]
+[ext_resource type="Resource" path="res://data/restaurant/service_day5.tres" id="45_stage"]
 [ext_resource type="PackedScene" path="res://scenes/restaurant/cooking/cooking_overlay.tscn" id="5_cooking"]
 [ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="6_fish"]
 [ext_resource type="Script" path="res://scenes/restaurant/menu_setup_panel.gd" id="7_menupanel"]
@@ -102,7 +108,7 @@ kitchen_upgrade = ExtResource("19_kitchenup")
 [node name="Talker" type="Node" parent="World/People/Bao"]
 script = ExtResource("27_talker")
 display_name = "Bảo"
-dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("29_dlg2"), ExtResource("30_dlg3"), ExtResource("31_dlg4")])
+dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("29_dlg2"), ExtResource("30_dlg3"), ExtResource("31_dlg4"), ExtResource("46_dlgbeer")])
 idle_lines = Array[String](["Hôm nay đông khách ghê.", "Nhớ hồi tụi mình code xuyên đêm không? Giờ thì đứng bếp xuyên đêm.", "Mai câu con gì to to về nha.", "Khách bàn 2 khen món tao nấu đó. Mày bưng lẹ lên!", "Nướng khét là tao trừ lương à nha.", "Tao vẫn giữ con server cũ, tiếc quá không nỡ bán."])
 
 [node name="MenuBoard" type="Node2D" parent="World/People" node_paths=PackedStringArray("room", "kitchen")]
@@ -301,6 +307,7 @@ bikes = NodePath("../World/Bikes")
 people_layer = NodePath("../World/People")
 seats_upgrade = ExtResource("17_seatsup")
 decor_upgrade = ExtResource("18_decorup")
+stages = Array[ExtResource("41_tuningscript")]([ExtResource("41_stage"), ExtResource("42_stage"), ExtResource("43_stage"), ExtResource("45_stage")])
 
 [node name="CookingOverlay" parent="." instance=ExtResource("5_cooking")]
 kitchen_upgrade = ExtResource("19_kitchenup")
