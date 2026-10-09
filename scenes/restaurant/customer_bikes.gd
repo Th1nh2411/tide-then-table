@@ -19,6 +19,7 @@ class Bike:
 	## A second guest on the back (party of two).
 	var passenger: bool = false
 	var passenger_shirt: Color
+	var passenger_helmet: Color
 	var leaving: bool = false
 	var facing: float = 1.0
 	var waypoints: Array[Vector2] = []
@@ -63,6 +64,7 @@ func arrive(passenger: bool = false) -> Bike:
 	bike.shirt = shirts.pick_random()
 	bike.passenger = passenger
 	bike.passenger_shirt = shirts.pick_random()
+	bike.passenger_helmet = helmets[(helmets.find(bike.helmet) + 1) % helmets.size()]  # not the driver's
 	var from_left := randf() < 0.5
 	bike.facing = 1.0 if from_left else -1.0
 	var lane := _lane_y(from_left)
@@ -125,7 +127,5 @@ func _draw_parked(bike: Bike) -> void:
 
 ## Side view while riding, with the rider (pos = lane centre, wheels below).
 func _draw_riding(bike: Bike) -> void:
-	var at := bike.pos + Vector2(0, 8)
-	if bike.rider and bike.passenger:  # behind the driver, drawn first
-		StreetProps.draw_rider(self, at + Vector2(-8 * bike.facing, 1), bike.facing, helmets[0], bike.passenger_shirt)
-	StreetProps.draw_bike_side(self, at, bike.facing, bike.color, bike.rider, bike.helmet, bike.shirt)
+	StreetProps.draw_bike_side(self, bike.pos + Vector2(0, 8), bike.facing, bike.color, bike.rider, bike.helmet,
+		bike.shirt, bike.passenger_shirt if bike.passenger else Color.TRANSPARENT, bike.passenger_helmet)

@@ -82,8 +82,10 @@ static func draw_plant(canvas: CanvasItem, at: Vector2) -> void:
 
 ## Motorbike riding along the road, side view, ~32 px long (people are 16x32).
 ## `p` = road contact point under the middle; `facing` 1 = right, -1 = left.
+## A second rider on the back when `passenger_shirt` isn't transparent.
 static func draw_bike_side(canvas: CanvasItem, p: Vector2, facing: float, color: Color,
-		rider: bool = false, helmet: Color = Color.WHITE, shirt: Color = Color.GRAY) -> void:
+		rider: bool = false, helmet: Color = Color.WHITE, shirt: Color = Color.GRAY,
+		passenger_shirt: Color = Color.TRANSPARENT, passenger_helmet: Color = Color.WHITE) -> void:
 	var tyre := Color(0.1, 0.1, 0.1)
 	canvas.draw_rect(_flip(p, facing, -13, -8, 25, 5), Color(0.3, 0.3, 0.32))  # frame
 	canvas.draw_rect(_flip(p, facing, -14, -13, 16, 6), color)  # rear body
@@ -95,6 +97,8 @@ static func draw_bike_side(canvas: CanvasItem, p: Vector2, facing: float, color:
 	canvas.draw_circle(p + Vector2(-10 * facing, -4), 1.5, Color(0.6, 0.6, 0.62))
 	canvas.draw_circle(p + Vector2(10 * facing, -4), 1.5, Color(0.6, 0.6, 0.62))
 	canvas.draw_circle(p + Vector2(12 * facing, -14), 1.8, Color(1, 1, 0.7))  # headlight
+	if rider and passenger_shirt.a > 0.0:  # on the back seat, behind the driver
+		draw_rider(canvas, p + Vector2(-9 * facing, -1), facing, passenger_helmet, passenger_shirt)
 	if rider:
 		draw_rider(canvas, p, facing, helmet, shirt)
 		canvas.draw_line(p + Vector2(1 * facing, -26), p + Vector2(8 * facing, -21), shirt.darkened(0.2), 2.0)  # arm

@@ -10,4 +10,6 @@ cook_type = 2
 base_price = 30
 color = Color(0.35, 0.7, 0.3, 1)
 market_cost = 10
+bulk_packs = 10
+bulk_cost = 80
 always_available = true

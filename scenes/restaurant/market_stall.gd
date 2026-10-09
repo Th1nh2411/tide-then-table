@@ -3,7 +3,8 @@ extends Node
 ## Cô Năm's grocery next door (the "V" counter of the StreetRoom map): E in
 ## front of the counter (`reach`) opens the list of what she sells
 ## (MarketPanel); each buy is `market_pack` units of a market dish's goods (a
-## bunch of rau, a 20 L keg) for its `market_cost`, before opening or during
+## bunch of rau, a tower's 3 L of beer) for its `market_cost`, or the
+## cheaper bulk buy (`bulk_packs` at once for `bulk_cost`), before opening or during
 ## the shift (not after closing). Bought goods go into Rin's shopping `bag`;
 ## he has to carry them home and E on the fridge ("F") to put them in
 ## `stock` (MarketStock on GameState.pantry, so beer keeps between days) —
@@ -48,12 +49,15 @@ func interact(rin: StreetPerson) -> bool:
 
 
 ## One buy of `dish`'s goods into the bag; false if the money isn't enough.
-func buy(dish: DishData) -> bool:
-	if not open or not GameState.spend_money(dish.market_cost):
-		message_requested.emit("Không đủ tiền (%dk)" % dish.market_cost)
+## `bulk`: the cheaper bulk buy (DishData.bulk_packs packs at once).
+func buy(dish: DishData, bulk: bool = false) -> bool:
+	bulk = bulk and dish.has_bulk()
+	var cost := dish.buy_cost(bulk)
+	if not open or not GameState.spend_money(cost):
+		message_requested.emit("Không đủ tiền (%dk)" % cost)
 		return false
-	bag.add(dish, dish.market_pack)
-	bought.emit(dish, dish.market_cost)
+	bag.add(dish, dish.buy_units(bulk))
+	bought.emit(dish, cost)
 	return true
 
 

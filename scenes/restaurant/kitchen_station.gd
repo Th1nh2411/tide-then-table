@@ -8,7 +8,7 @@ extends Node
 ##                             CookingOverlay minigame starts and the dish ends
 ##                             up in his hands
 ##   E on the beer tap         a beer tower for the oldest table that ordered
-##                             one (needs a keg from the grocery): the pour
+##                             one (needs beer from the grocery): the pour
 ##                             minigame (BeerPourGame) runs in the same
 ##                             overlay, the tower ends up in his hands;
 ##                             spilling wastes `spill_litres`

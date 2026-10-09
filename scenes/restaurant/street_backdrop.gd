@@ -65,5 +65,7 @@ func _draw_traffic() -> void:
 		if not forward:
 			x = width - 80.0 - x
 		var y := (lanes.x if forward else lanes.y) + 8.0 - (i / 2) * 6.0
+		var back := shirt_colors[(i + 1) % shirt_colors.size()] if i % 3 == 1 else Color.TRANSPARENT  # some carry two
 		StreetProps.draw_bike_side(self, Vector2(x, y), 1.0 if forward else -1.0, bike_colors[i % bike_colors.size()],
-			true, Color(0.9, 0.75, 0.3) if forward else Color(0.85, 0.2, 0.2), shirt_colors[i % shirt_colors.size()])
+			true, Color(0.9, 0.75, 0.3) if forward else Color(0.85, 0.2, 0.2), shirt_colors[i % shirt_colors.size()],
+			back, Color(0.95, 0.95, 0.95))

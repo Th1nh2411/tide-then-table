@@ -155,7 +155,7 @@ func _open_shop() -> void:
 
 # Debug builds, so the restaurant can be tested with F6 without a sea trip:
 # F1 during menu setup adds one of every fish to storage; F2 (any time) puts
-# one keg of every drink the grocery sells straight into the fridge.
+# a bulk buy of every drink the grocery sells straight into the fridge.
 func _unhandled_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
 	if not OS.is_debug_build() or key == null or not key.pressed or key.echo:
@@ -167,8 +167,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif key.physical_keycode == KEY_F2:
 		for dish in _stall.products:
 			if dish.instant_serve:
-				_stall.stock.add(dish, dish.market_pack)
-				_show_message("[debug] +%d %s %s vào tủ lạnh" % [dish.market_pack, dish.unit_name, dish.display_name])
+				_stall.stock.add(dish, dish.buy_units(dish.has_bulk()))
+				_show_message("[debug] +%d %s %s vào tủ lạnh" % [dish.buy_units(dish.has_bulk()), dish.unit_name,
+					dish.display_name])
 
 
 func _process(delta: float) -> void:

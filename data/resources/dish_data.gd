@@ -14,15 +14,20 @@ enum CookType { GRILL, STEAM, STIR }
 @export var color: Color = Color.WHITE
 ## Market dishes (no `ingredients`): price of one buy at Cô Năm's grocery
 ## next door (MarketStall), which gives `market_pack` units (a bunch of rau =
-## 1 portion; a keg of draft beer = 20 litres).
+## 1 portion; a tower's worth of draft beer = 3 litres).
 @export var market_cost: int = 0
 @export var market_pack: int = 1
 ## Units one serving uses (a beer tower = 3 litres).
 @export var portion_units: int = 1
 ## Unit word for stock lines ("phần", "lít") and the name of one buy
-## ("bình 20 lít"; empty = sold per portion).
+## ("1 tháp"; empty = "1 <unit_name>").
 @export var unit_name: String = "phần"
 @export var pack_label: String = ""
+## Bulk buy, cheaper: `bulk_packs` packs at once for `bulk_cost` (0 = none),
+## named `bulk_label` ("10 tháp"; empty = "<n> <unit_name>").
+@export var bulk_packs: int = 0
+@export var bulk_cost: int = 0
+@export var bulk_label: String = ""
 ## Bought goods that keep between days (beer); others are wasted at closing.
 @export var keeps_overnight: bool = false
 
@@ -40,8 +45,27 @@ func is_market_dish() -> bool:
 	return ingredients.is_empty() and market_cost > 0
 
 
-## Grocery price text: "10k/phần" or "bình 20 lít: 150k".
+func has_bulk() -> bool:
+	return bulk_packs > 1 and bulk_cost > 0
+
+
+func buy_cost(bulk: bool) -> int:
+	return bulk_cost if bulk else market_cost
+
+
+## Units one buy gives.
+func buy_units(bulk: bool) -> int:
+	return market_pack * (bulk_packs if bulk else 1)
+
+
+## One buy with its price: "1 phần 10k", "10 tháp 200k".
+func buy_text(bulk: bool) -> String:
+	var label := pack_label if pack_label else "1 %s" % unit_name
+	if bulk:
+		label = bulk_label if bulk_label else "%d %s" % [buy_units(true), unit_name]
+	return "%s %dk" % [label, buy_cost(bulk)]
+
+
+## Grocery price text: "1 phần 10k · 10 phần 80k".
 func market_text() -> String:
-	if pack_label:
-		return "%s: %dk" % [pack_label, market_cost]
-	return "%dk/%s" % [market_cost, unit_name]
+	return buy_text(false) + ((" · " + buy_text(true)) if has_bulk() else "")

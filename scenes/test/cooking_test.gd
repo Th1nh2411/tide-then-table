@@ -113,12 +113,16 @@ func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
 	stock.add(rau)
 	_check("bought 2 portions", stock.count(rau) == 2 and stock.total() == 2)
 	_check("cooking takes one", stock.take(rau) and stock.count(rau) == 1)
-	stock.add(beer, beer.market_pack)
-	_check("a keg is 20 litres = 6 towers", stock.count(beer) == 20 and stock.portions(beer) == 6
-		and beer.market_text() == "bình 20 lít: 150k")
-	for k in 6:
+	_check("bulk is cheaper per unit", rau.has_bulk() and beer.has_bulk()
+		and rau.buy_cost(true) * rau.buy_units(false) < rau.buy_cost(false) * rau.buy_units(true)
+		and beer.buy_cost(true) * beer.buy_units(false) < beer.buy_cost(false) * beer.buy_units(true))
+	_check("price texts", rau.market_text() == "1 phần 10k · 10 phần 80k" and beer.buy_text(true) == "10 tháp 200k")
+	stock.add(beer, beer.buy_units(true))
+	_check("bulk beer = 30 litres = 10 towers", stock.count(beer) == 30 and stock.portions(beer) == 10)
+	for k in 10:
 		stock.take(beer)
-	_check("6 towers leave 2 litres, not enough for a 7th", stock.count(beer) == 2 and not stock.take(beer))
+	stock.add(beer, 2)
+	_check("2 litres left: not enough for a tower", stock.count(beer) == 2 and not stock.take(beer))
 	_check("stock writes the shared pantry", int(pantry.get("bia_con_meo", 0)) == 2)
 	var both: Array[DishData] = [rau, beer]
 	_check("closing wastes rau only", stock.discard_perishable(both) == 1 and stock.count(rau) == 0)
