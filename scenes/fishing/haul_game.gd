@@ -40,7 +40,7 @@ func setup(p_fish: FishData, p_zone_scale: float) -> void:
 
 
 func get_hint() -> String:
-	return "Giữ Space / chuột trái để kéo lưới. Dây chuyển đỏ (vướng đá) thì NHẢ ra!"
+	return "Giữ Space: kéo · dây đỏ: NHẢ"
 
 
 func get_status_text() -> String:

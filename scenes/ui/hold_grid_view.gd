@@ -87,6 +87,11 @@ func is_selling() -> bool:
 	return sell_price.is_valid()
 
 
+## Centre of the discard / "Bán" zone on screen (Guide points at it).
+func zone_center() -> Vector2:
+	return get_global_rect().position + _trash_rect().get_center()
+
+
 func _process(_delta: float) -> void:
 	if _dragged and Input.is_action_just_pressed("rotate_item"):
 		_dragged.rotated = not _dragged.rotated

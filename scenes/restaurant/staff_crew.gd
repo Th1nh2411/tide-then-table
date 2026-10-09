@@ -30,8 +30,7 @@ func _ready() -> void:
 	roster = StaffRoster.new(catalog, GameState.staff)
 	roster.changed.connect(_sync_workers)
 	if is_unlocked():
-		for person in roster.arrivals(GameState.day):
-			message_requested.emit("%s tới xin việc! (nút \"Nhân viên\")" % person.display_name)
+		roster.arrivals(GameState.day)  # Vy: her arrival cutscene tells the story
 	_sync_workers()
 
 

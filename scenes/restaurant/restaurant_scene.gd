@@ -39,6 +39,9 @@ const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 @export var fridge_upgrade: UpgradeData
 ## Cutscenes that can play after the summary (first eligible one, once).
 @export var after_shift_cutscenes: Array[Cutscene] = []
+## Cutscenes that can play on arriving, before the menu is planned (opening
+## day, beer, Vy...): highest priority eligible one, once.
+@export var arrival_cutscenes: Array[Cutscene] = []
 ## Everyone who could be hired, and the job ads.
 @export var staff_catalog: StaffCatalog
 ## How close Rin must be to someone to talk (px).
@@ -62,7 +65,7 @@ var _message_token: int = 0
 var _regular_visits: Array[Dictionary] = []
 var _renovate_button: Button
 var _dialogue_box: DialogueBox
-var _tutorial: RestaurantTutorial
+var _guide: RestaurantGuide
 var _sail_button: Button
 var _market_panel: MarketPanel
 var _crew: StaffCrew
@@ -110,12 +113,6 @@ func _ready() -> void:
 	_sail_button = _pin_button("Ra khơi  →", Rect2(520, 318, 114, 32))
 	_sail_button.pressed.connect(_start_next_day)
 	_sail_button.hide()
-	_tutorial = RestaurantTutorial.new()
-	_tutorial.customers = _customers
-	_tutorial.kitchen = _kitchen
-	add_child(_tutorial)
-	_tutorial.tip_requested.connect(func(text: String) -> void: _show_message(text, _tutorial.tip_seconds))
-	_tutorial.on_restaurant_ready.call_deferred()
 	(%RepairButton as RepairButton).repaired.connect(func(spent: int, fully: bool) -> void:
 		_show_message("Đã sửa thuyền: -%dk%s" % [spent, "" if fully else " (chưa đủ tiền sửa hết)"]))
 	_close_early_button.pressed.connect(func() -> void: _end_shift("Đóng quán sớm"))
@@ -154,6 +151,45 @@ func _ready() -> void:
 	_menu_panel.confirmed.connect(_open_shop)
 	_menu_panel.hide()  # opened by clicking the LED sign (MenuBoard)
 	_time_left = get_shift_seconds()
+	_add_guide()
+	_play_arrival_cutscene.call_deferred()
+
+
+## First-time pointers (RestaurantGuide).
+func _add_guide() -> void:
+	_guide = RestaurantGuide.new()
+	_guide.room = _room
+	_guide.rin = _rin
+	_guide.customers = _customers
+	_guide.kitchen = _kitchen
+	_guide.stall = _stall
+	_guide.board = _board
+	_guide.menu_panel = _menu_panel
+	_guide.market_panel = _market_panel
+	_guide.staff_panel = _staff_panel
+	_guide.renovation = _renovation
+	_guide.open_button = _menu_panel.get_open_button()
+	_guide.staff_button = _staff_button
+	_guide.renovate_button = _renovate_button
+	_guide.sail_button = _sail_button
+	_guide.serving = func() -> bool: return _shift_running or _closing
+	_guide.shift_over = func() -> bool: return _shift_over
+	add_child(_guide)
+
+
+## Opening day / beer / Vy...: one story scene on arrival (once each). The
+## Vy scene can hire her on the spot (flag "vy_hire_now").
+func _play_arrival_cutscene() -> void:
+	await get_tree().process_frame  # let the router's fade-in start first
+	var scene := DialogueLibrary.pick(arrival_cutscenes) as Cutscene
+	if scene == null:
+		return
+	await _cutscene.play(scene)
+	if GameState.story_flags.has("vy_hire_now"):
+		GameState.story_flags.erase("vy_hire_now")
+		var vy := staff_catalog.find("vy")
+		if vy and _crew.roster.hire(vy):
+			_show_message("Vy vào làm từ hôm nay!", 2.5)
 
 
 func _menu_slots() -> int:
@@ -176,7 +212,6 @@ func _open_shop() -> void:
 	_crew.start_shift()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
 	_show_message("Quán mở cửa!")
-	_tutorial.on_shop_opened()
 
 
 # Debug builds, so the restaurant can be tested with F6 without a sea trip:
@@ -315,7 +350,6 @@ func _on_continue_pressed() -> void:
 		await _cutscene.play(scene)
 	_renovate_button.show()
 	_sail_button.show()
-	_tutorial.on_evening()
 
 
 ## "Sửa quán": hide people and panels, let RenovationMode take over.

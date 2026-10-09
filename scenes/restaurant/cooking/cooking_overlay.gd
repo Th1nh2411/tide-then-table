@@ -56,7 +56,7 @@ func start(dish: DishData) -> void:
 	_game_holder.add_child(_game)
 	_title_label.text = ("Rót: %s" if dish.instant_serve else "Nấu: %s") % dish.display_name
 	_hint_label.text = _game.get_hint()
-	_hint_label.visible = GameState.is_first_day()
+	_hint_label.visible = Guide.once("game_" + str(_game.get_script().get_global_name()))  # first time each
 	_result_label.text = ""
 	show()
 

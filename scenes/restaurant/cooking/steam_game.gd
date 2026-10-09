@@ -19,7 +19,7 @@ func setup(p_dish: DishData) -> void:
 
 
 func get_hint() -> String:
-	return "Giữ Space / chuột trái để hấp, thả ra khi thanh vào vùng xanh"
+	return "Giữ Space: hấp · thả ở vùng xanh"
 
 
 func get_status_text() -> String:

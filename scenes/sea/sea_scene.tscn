@@ -1,5 +1,6 @@
 [gd_scene format=3]
 
+[ext_resource type="Resource" path="res://data/cutscenes/fog_omen.tres" id="60_cutomen"]
 [ext_resource type="Script" path="res://scenes/sea/sea_scene.gd" id="1_sea"]
 [ext_resource type="Script" path="res://data/resources/boat_data.gd" id="2_boatdata"]
 [ext_resource type="Resource" path="res://data/boats/thuyen_thung.tres" id="3_thung"]
@@ -28,7 +29,6 @@
 [ext_resource type="Script" path="res://scenes/sea/whirlpool.gd" id="26_whirl"]
 [ext_resource type="Script" path="res://scenes/sea/hull_controller.gd" id="27_hull"]
 [ext_resource type="Script" path="res://scenes/sea/offscreen_markers.gd" id="28_markers"]
-[ext_resource type="Script" path="res://scenes/sea/tutorial_hints.gd" id="29_tutorial"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="30_pause"]
 [ext_resource type="Script" path="res://scenes/sea/lamp_oil.gd" id="31_oil"]
 [ext_resource type="Resource" path="res://data/upgrades/lamp_upgrade.tres" id="32_lampup"]
@@ -69,7 +69,7 @@ size = Vector2(70, 90)
 script = ExtResource("1_sea")
 boat_upgrade = ExtResource("23_boatup")
 fish_catalog = ExtResource("17_catalog")
-trip_end_cutscenes = Array[ExtResource("47_cutdata")]([ExtResource("46_cat")])
+trip_end_cutscenes = Array[ExtResource("47_cutdata")]([ExtResource("46_cat"), ExtResource("60_cutomen")])
 debug_boats = Array[ExtResource("2_boatdata")]([ExtResource("3_thung"), ExtResource("4_cheo"), ExtResource("5_may")])
 
 [node name="Zones" type="Node2D" parent="."]
@@ -490,13 +490,6 @@ dock = NodePath("../../Dock")
 fog_area = NodePath("../../FogArea")
 boat = NodePath("../../Boat")
 
-[node name="TutorialHints" type="Node" parent="." node_paths=PackedStringArray("hud", "fishing", "nets", "oil")]
-script = ExtResource("29_tutorial")
-hud = NodePath("../SeaHud")
-fishing = NodePath("../FishingController")
-nets = NodePath("../NetController")
-oil = NodePath("../LampOil")
-
 [node name="PauseMenu" parent="." instance=ExtResource("30_pause")]
 
 [node name="HoldManager" type="Node" parent="." node_paths=PackedStringArray("boat", "fishing", "nets", "hold_ui", "hud")]
@@ -554,6 +547,9 @@ position = Vector2(995, 1176)
 
 [node name="rin_pet" type="Marker2D" parent="CutsceneMarkers"]
 position = Vector2(1006, 1178)
+
+[node name="fog_view" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(1600, 320)
 
 [node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers", "day_tint", "hidden_nodes")]
 script = ExtResource("45_cutscene")

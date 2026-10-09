@@ -30,7 +30,7 @@ func setup(p_dish: DishData) -> void:
 
 
 func get_hint() -> String:
-	return "Space / chuột trái khi kim vào vùng xanh (chín tới) — 2 mặt"
+	return "Space khi kim vào vùng xanh · 2 mặt"
 
 
 func get_status_text() -> String:

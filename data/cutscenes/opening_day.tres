@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="Cutscene" format=3]
+
+[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="1_cut"]
+
+[resource]
+script = ExtResource("1_cut")
+id = "opening_day"
+min_day = 1
+priority = 30
+script_text = "# Ngày đầu mở quán: Bảo dựng xe đẩy, Cô Năm tạp hoá bên cạnh sang chào.
+camera kitchen_view 0 1.6
+fade_in 0.8
+spawn Bao bao bao_stove 1.4
+spawn Rin rin rin_spot 1.4
+speak Bảo \"Xe đẩy, lò than, bình gas... đủ hết. Chiều nay khai trương!\"
+speak Rin \"Mày đứng bếp, tao chạy bàn với nướng. Như đã chốt.\"
+emote Bao note 1.0
+speak Bảo \"Món hấp, món xào để tao. Khách gọi món nướng thì mày ra lò than.\"
+spawn Nam co_nam nam_shop 1.4
+move_to Nam nam_visit 1.6
+face Rin right
+speak \"Cô Năm\" \"Hàng xóm mới hả? Cô bán tạp hoá bên này nè.\"
+speak \"Cô Năm\" \"Rau muống, đồ khô có hết. Thiếu gì qua cô, mua về nhớ bỏ tủ lạnh nghen.\"
+speak Rin \"Dạ, con cảm ơn cô Năm!\"
+move_to Nam nam_shop 1.4
+remove Nam
+camera board_view 1.0 1.6
+speak Bảo \"Bảng LED trước quán đó. Bấm vô chọn món bán hôm nay rồi mở quán.\"
+camera room_view 0.8 1"

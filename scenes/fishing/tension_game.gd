@@ -93,7 +93,7 @@ func setup(p_fish: FishData, p_zone_scale: float) -> void:
 
 
 func get_hint() -> String:
-	return "Giữ Space / chuột trái để kéo kim lên, giữ kim trong vùng xanh. Vùng xanh chớp cam = cá sắp lao!"
+	return "Giữ Space: kim lên · giữ trong vùng xanh · chớp cam: cá sắp lao"
 
 
 func get_status_text() -> String:

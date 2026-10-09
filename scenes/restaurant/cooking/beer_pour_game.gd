@@ -42,7 +42,7 @@ func setup(p_dish: DishData) -> void:
 
 
 func get_hint() -> String:
-	return "Giữ Space / chuột trái để rót, nhả từng nhịp cho ít bọt, nhả hẳn khi bọt chạm vạch xanh"
+	return "Giữ Space: rót · nhả từng nhịp: ít bọt · chạm vạch xanh: nhả"
 
 
 func get_status_text() -> String:

@@ -22,7 +22,7 @@ func setup(p_dish: DishData) -> void:
 
 
 func get_hint() -> String:
-	return "Bấm Space / chuột trái liên tục để đảo cho đầy thanh"
+	return "Bấm Space liên tục: đảo cho đầy"
 
 
 func get_status_text() -> String:

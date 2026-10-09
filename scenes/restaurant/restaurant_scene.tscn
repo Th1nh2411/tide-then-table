@@ -6,8 +6,9 @@
 [ext_resource type="Script" path="res://data/resources/service_tuning.gd" id="41_tuningscript"]
 [ext_resource type="Resource" path="res://data/restaurant/service_day1.tres" id="41_stage"]
 [ext_resource type="Resource" path="res://data/staff/staff_catalog.tres" id="47_staff"]
-[ext_resource type="Resource" path="res://data/dialogues/bao_vy.tres" id="48_dlgvy"]
-[ext_resource type="Resource" path="res://data/dialogues/bao_beer.tres" id="46_dlgbeer"]
+[ext_resource type="Resource" path="res://data/cutscenes/opening_day.tres" id="50_cutopen"]
+[ext_resource type="Resource" path="res://data/cutscenes/beer_day.tres" id="51_cutbeer"]
+[ext_resource type="Resource" path="res://data/cutscenes/vy_arrives.tres" id="52_cutvy"]
 [ext_resource type="Resource" path="res://data/restaurant/service_day2.tres" id="42_stage"]
 [ext_resource type="Resource" path="res://data/restaurant/service_day3.tres" id="43_stage"]
 [ext_resource type="Resource" path="res://data/restaurant/service_day5.tres" id="45_stage"]
@@ -62,6 +63,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_rest")
 after_shift_cutscenes = Array[ExtResource("39_cutdata")]([])
+arrival_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("50_cutopen"), ExtResource("51_cutbeer"), ExtResource("52_cutvy")])
 menu = ExtResource("4_menu")
 fish_catalog = ExtResource("6_fish")
 fridge_upgrade = ExtResource("11_fridgeup")
@@ -111,7 +113,7 @@ kitchen_upgrade = ExtResource("19_kitchenup")
 [node name="Talker" type="Node" parent="World/People/Bao"]
 script = ExtResource("27_talker")
 display_name = "Bảo"
-dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("29_dlg2"), ExtResource("30_dlg3"), ExtResource("31_dlg4"), ExtResource("46_dlgbeer"), ExtResource("48_dlgvy")])
+dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("29_dlg2"), ExtResource("30_dlg3"), ExtResource("31_dlg4")])
 idle_lines = Array[String](["Hôm nay đông khách ghê.", "Nhớ hồi tụi mình code xuyên đêm không? Giờ thì đứng bếp xuyên đêm.", "Mai câu con gì to to về nha.", "Khách bàn 2 khen món tao nấu đó. Mày bưng lẹ lên!", "Nướng khét là tao trừ lương à nha.", "Tao vẫn giữ con server cũ, tiếc quá không nỡ bán."])
 
 [node name="MenuBoard" type="Node2D" parent="World/People" node_paths=PackedStringArray("room", "kitchen")]
@@ -330,6 +332,33 @@ position = Vector2(-12, 216)
 
 [node name="bao_stop" type="Marker2D" parent="CutsceneMarkers"]
 position = Vector2(344, 136)
+
+[node name="kitchen_view" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(340, 140)
+
+[node name="bao_stove" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(376, 104)
+
+[node name="nam_shop" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(528, 94)
+
+[node name="nam_visit" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(440, 134)
+
+[node name="nam_counter" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(504, 124)
+
+[node name="guest_seat" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(216, 104)
+
+[node name="vy_start" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(-12, 136)
+
+[node name="vy_stop" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(268, 138)
+
+[node name="board_view" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(330, 230)
 
 [node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers", "hidden_nodes")]
 script = ExtResource("37_cutscene")

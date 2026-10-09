@@ -79,7 +79,8 @@ func _start_stage(game: MinigameBase) -> void:
 	_game.completed.connect(_on_game_completed)
 	_game_holder.add_child(_game)
 	_hint_label.text = _game.get_hint()
-	_hint_label.visible = GameState.is_first_day()  # how-to lives in Hướng dẫn after day 1
+	# First time with each game only; the how-to lives in Hướng dẫn.
+	_hint_label.visible = Guide.once("game_" + str(_game.get_script().get_global_name()))
 
 
 func _create_fight() -> MinigameBase:

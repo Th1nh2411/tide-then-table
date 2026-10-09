@@ -73,6 +73,22 @@ func open_overflow(items: Array[InventoryItem]) -> void:
 	show()
 
 
+func is_selling() -> bool:
+	return visible and _view.is_selling()
+
+
+func has_pending() -> bool:
+	return visible and _view.pending != null
+
+
+func sold_count() -> int:
+	return _sold_count
+
+
+func grid_view() -> HoldGridView:
+	return _view
+
+
 ## Pause and let the player sell fish to `buyer`; `price_of` = what one fish
 ## fetches (InventoryItem -> int).
 func open_sell(buyer: String, price_of: Callable) -> void:
@@ -169,5 +185,5 @@ func _refresh_texts() -> void:
 		_hint_label.text = "Khoang đầy!%s" % waiting
 		_close_button.text = "Bỏ cá mới & đóng"
 	else:
-		_hint_label.text = "Kéo-thả để xếp · R: xoay · thả vào \"Bỏ\" để vứt" if GameState.is_first_day() else ""
+		_hint_label.text = ""  # SeaGuide points at things the first time
 		_close_button.text = "Đóng"

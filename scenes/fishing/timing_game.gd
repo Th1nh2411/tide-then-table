@@ -40,7 +40,7 @@ func setup(p_fish: FishData, p_zone_scale: float) -> void:
 
 
 func get_hint() -> String:
-	return "Space / chuột trái khi kim nằm trong vùng xanh"
+	return "Space khi kim vào vùng xanh"
 
 
 func get_status_text() -> String:

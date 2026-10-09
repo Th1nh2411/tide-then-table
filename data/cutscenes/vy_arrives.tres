@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="Cutscene" format=3]
+
+[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="1_cut"]
+
+[resource]
+script = ExtResource("1_cut")
+id = "vy_arrives"
+min_day = 3
+priority = 25
+script_text = "# Ngày 3: Vy, sinh viên năm cuối ở xóm trên, xin làm thêm buổi tối.
+camera kitchen_view 0 1.6
+fade_in 0.6
+spawn Bao bao bao_stove 1.4
+spawn Rin rin rin_spot 1.4
+spawn Vy vy vy_start 1.4
+move_to Vy vy_stop 2.4
+face Rin left
+speak Vy \"Dạ... anh là chủ quán hả? Em là Vy, sinh viên năm cuối, nhà ở xóm trên.\"
+speak Vy \"Em xin làm thêm buổi tối được không anh? Em chạy bàn quen rồi, bưng món với dọn bàn nhanh lắm.\"
+emote Rin ? 1.0
+speak Bảo \"Mày chạy muốn rớt dép mỗi tối còn suy nghĩ gì nữa.\"
+speak Vy \"Lương... hai trăm một ca là được rồi ạ.\"
+choice \"Nhận Vy làm luôn\" hire \"Để anh tính đã\" later
+label hire
+speak Rin \"Ok, tối nay làm luôn nha Vy.\"
+emote Vy heart 1.2
+speak Vy \"Dạ! Em cảm ơn anh!\"
+set_flag vy_hire_now
+goto end
+label later
+speak Rin \"Để anh tính chút, khi nào cần anh gọi em nha.\"
+speak Vy \"Dạ. Anh bấm nút Nhân viên là thấy tên em.\"
+label end
+speak Bảo \"Thiếu người nữa thì đăng tin tuyển dụng. Tốn chút tiền mà có người xịn.\"
+camera room_view 0.8 1"

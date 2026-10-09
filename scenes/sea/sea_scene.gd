@@ -65,6 +65,7 @@ func _ready() -> void:
 	_oil.oil_low.connect(_hud.flash_message.bind("Dầu đèn còn 1/4, trời sắp rạng. Về bến thôi!", 2.5))
 	_oil.oil_empty.connect(_on_oil_empty)
 	DayClock.start_night()
+	_add_guide()
 	# Deferred: FogArea decides the fog zone's visibility in its own _ready.
 	_capture_map.call_deferred()
 	_show_orders()
@@ -78,6 +79,20 @@ func _ready() -> void:
 	# Autosave at the start of every night (hold is empty, storage is settled).
 	# Headless test runs pass `-- --no-autosave` so they never touch the real save.
 	SaveSystem.autosave("sea")
+
+
+## First-time pointers (SeaGuide).
+func _add_guide() -> void:
+	var guide: SeaGuide = SeaGuide.new()
+	guide.boat = _boat
+	guide.spawner = _fishing.spawner
+	guide.fishing = _fishing
+	guide.nets = _nets
+	guide.hold_manager = _hold_manager
+	guide.oil = _oil
+	guide.dock = _dock
+	guide.raft = get_node_or_null("Places/LobsterRaft") as Node2D
+	add_child(guide)
 
 
 func _capture_map() -> void:

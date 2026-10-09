@@ -43,7 +43,7 @@ func setup(p_fish: FishData, p_zone_scale: float) -> void:
 
 
 func get_hint() -> String:
-	return "Chờ phao CHÌM HẲN rồi bấm Space / chuột trái để giật cần. Phao nhấp nhẹ là cá đang rỉa, đừng giật!"
+	return "Phao CHÌM HẲN mới giật (Space) · nhấp nhẹ: chờ"
 
 
 func get_status_text() -> String:

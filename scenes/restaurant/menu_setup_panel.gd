@@ -29,6 +29,11 @@ var _rows: Dictionary = {}
 @onready var _open_button: Button = %OpenButton
 
 
+## The "Mở quán" button (RestaurantGuide points at it).
+func get_open_button() -> Button:
+	return _open_button
+
+
 func setup(plan: MenuPlan, menu: DishCatalog, fish_catalog: FishCatalog,
 		variety_table: Array[float]) -> void:
 	$Margin/VBox/HintLabel.visible = GameState.is_first_day()

@@ -1,7 +1,8 @@
 class_name CutsceneActor
 extends Node2D
 ## A character placed by a cutscene (placeholder drawing by `kind`: "rin",
-## "bao", "cat", "crate", "rin_bed" = Rin lying under a blanket, phone lit). Walks with a small bob, faces left/right and shows emote
+## "bao", "vy", "co_nam" (the grocer), "guest" (a customer), "cat", "crate",
+## "rin_bed" = Rin lying under a blanket, phone lit). Walks with a small bob, faces left/right and shows emote
 ## bubbles (! ? ... heart note) over its head. Runs while the tree is paused.
 
 @export var kind: String = "rin"
@@ -54,6 +55,12 @@ func _draw() -> void:
 			_draw_person(Color(0.2, 0.45, 0.8))
 		"bao":
 			_draw_person(Color(0.85, 0.5, 0.2))
+		"vy":
+			_draw_person(Color(0.9, 0.45, 0.55), Color(0.12, 0.1, 0.1))
+		"co_nam":
+			_draw_person(Color(0.35, 0.6, 0.4), Color(0.55, 0.55, 0.55))
+		"guest":
+			_draw_person(Color(0.5, 0.5, 0.6))
 		"cat":
 			_draw_cat()
 		"crate":
@@ -65,11 +72,16 @@ func _draw() -> void:
 		_draw_emote()
 
 
-func _draw_person(shirt: Color) -> void:
+## `long_hair`: transparent = short hair; else hair down the back (women).
+func _draw_person(shirt: Color, long_hair: Color = Color.TRANSPARENT) -> void:
+	if long_hair.a > 0.0:
+		draw_rect(Rect2(-5, -21, 6, 11), long_hair)
 	draw_rect(Rect2(-4, -14, 8, 10), shirt)
 	draw_rect(Rect2(-3, -4, 2, 4), Color(0.25, 0.2, 0.15))
 	draw_rect(Rect2(1, -4, 2, 4), Color(0.25, 0.2, 0.15))
 	draw_circle(Vector2(0, -18), 4.0, Color(0.95, 0.8, 0.65))
+	if long_hair.a > 0.0:
+		draw_rect(Rect2(-4, -23, 8, 3), long_hair)
 	draw_circle(Vector2(2, -19), 0.8, Color.BLACK)
 
 
@@ -103,7 +115,7 @@ func _draw_crate() -> void:
 
 
 func _draw_emote() -> void:
-	var at := Vector2(-6, -36 if kind == "rin" or kind == "bao" else -26)
+	var at := Vector2(-6, -26 if kind in ["cat", "crate"] else -36)
 	if kind == "rin_bed":
 		at = Vector2(-17, -24)
 	draw_rect(Rect2(at, Vector2(12, 10)), Color(1, 1, 1, 0.95))
