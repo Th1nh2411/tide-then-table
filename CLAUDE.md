@@ -182,7 +182,7 @@ Vietnamese, keep code comments in short English.
   co_nam, guest, cat, crate, rin_bed, glow. dialogue_test checks every marker
   a cutscene uses exists in its scene. It pauses the tree; its actors,
   camera, tweens and DialogueBox run PROCESS_MODE_ALWAYS.
-- The cat: `PetCat` (restaurant), flags `cat_adopted` / `cat_gone` /
+- The cat: `PetCat` (restaurant: on top of the fridge), rides at the stern at sea (`Boat._draw_cat`), flags `cat_adopted` / `cat_gone` /
   `pet_name`; use `{pet}` in dialogue/cutscene text.
 - Dialogue: write a `Dialogue` .tres in `data/dialogues/` ("Name: line" per
   line; min_day / requires_flag / once / sets_flag / priority) and add it to

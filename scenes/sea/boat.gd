@@ -39,6 +39,9 @@ var speed_multiplier: float = 1.0
 var tow_multiplier: float = 1.0
 ## Extra angular velocity from spin drift, in degrees/second.
 var _spin: float = 0.0
+var _cat_time: float = 0.0
+## The restaurant cat rides along at the stern once adopted.
+@onready var _has_cat: bool = PetCat.is_present()
 
 @onready var camera: Camera2D = $Camera2D
 @onready var _collision: CollisionShape2D = $CollisionShape2D
@@ -128,3 +131,23 @@ func _draw() -> void:
 	draw_colored_polygon(hull, boat_data.color)
 	# Bow marker so the heading is readable on round hulls.
 	draw_circle(Vector2(half.x * 0.5, 0), 1.5, Color.WHITE)
+	if _has_cat:
+		_draw_cat(Vector2(-half.x * 0.55, 0))
+
+
+## The cat curled up at the stern (seen from above), eyes glowing a little
+## (over-bright so they show through the night tint).
+func _draw_cat(at: Vector2) -> void:
+	var fur := Color(0.95, 0.6, 0.25)
+	draw_circle(at, 3.2, fur)
+	draw_circle(at + Vector2(2.6, 0), 2.0, fur)  # head toward the bow
+	draw_line(at + Vector2(-3, 0), at + Vector2(-5, 2.0 * sin(_cat_time * 2.0)), fur, 1.2)  # tail
+	var glow := 0.5 + 0.5 * sin(_cat_time * 0.7)
+	draw_circle(at + Vector2(3.4, -0.8), 0.6, Color(0.6, 3.0, 2.0, 0.5 + 0.5 * glow))
+	draw_circle(at + Vector2(3.4, 0.8), 0.6, Color(0.6, 3.0, 2.0, 0.5 + 0.5 * glow))
+
+
+func _process(delta: float) -> void:
+	if _has_cat:
+		_cat_time += delta
+		queue_redraw()

@@ -8,7 +8,8 @@ extends Control
 const ADOPTED_FLAG: String = "cat_adopted"
 const GONE_FLAG: String = "cat_gone"
 
-@export var sit_position: Vector2 = Vector2(372, 94)
+## On top of the fridge (above the plate bench): free and easy to see.
+@export var sit_position: Vector2 = Vector2(298, 86)
 @export var fur: Color = Color(0.95, 0.6, 0.25)
 
 var _time: float = 0.0
