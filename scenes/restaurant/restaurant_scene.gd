@@ -287,7 +287,6 @@ func _end_shift(reason: String) -> void:
 	_stall.open = false
 	_stall.store_all()  # whatever is still in Rin's bag
 	_market_panel.close_panel()
-	var wasted_produce := _stall.stock.discard_perishable(_stall.products)
 	# Uncooked regular orders go back to storage.
 	for visit in _customers.uncooked_regular_visits():
 		FishOrders.release(visit)
@@ -295,18 +294,28 @@ func _end_shift(reason: String) -> void:
 	var wages := _crew.pay_wages()
 	_shift_over = true
 	var monotonous := _variety_multiplier < 1.0
-	var variety_text := "Menu %d món" % _variety_count
-	if monotonous:
-		variety_text += " — đơn điệu, giá x%.1f" % _variety_multiplier
 	var stars := DayRating.stars(_served, _left_angry, monotonous)
 	GameState.last_rating = stars
 	GameState.add_day_record({"day": GameState.day, "earned": _earned_today, "market": _market_spent,
 		"rating": stars, "served": _served, "left": _left_angry, "wages": wages})
-	var costs := "Tiền chợ: -%dk" % _market_spent + ("   Lương: -%dk" % wages if wages > 0 else "")
-	_summary_label.text = "%s\nĐÁNH GIÁ: %d/5 sao\nThu được: %dk   %s   Lãi: %dk\n%s\nKhách đã phục vụ: %d   Khách bỏ đi: %d\nThừa: %d phần hải sản (trả về kho), %d phần rau (bỏ đi)\n%s%s" % [
-		reason, stars, _earned_today, costs, _earned_today - _market_spent - wages, variety_text,
-		_served, _left_angry, leftover, wasted_produce, _rating_hint(stars),
-		("\n" + "\n".join(order_lines)) if not order_lines.is_empty() else ""]
+	# Short on purpose: the details are in the phone ("Sổ sách").
+	var lines: PackedStringArray = [
+		"%s  ·  %d/5 sao" % [reason, stars],
+		"Thu %dk  ·  Chi %dk  ·  Lãi %dk" % [_earned_today, _market_spent + wages,
+			_earned_today - _market_spent - wages],
+		"Phục vụ %d bàn  ·  Bỏ đi %d" % [_served, _left_angry],
+	]
+	var notes: PackedStringArray = []
+	if monotonous:
+		notes.append("menu đơn điệu x%.1f" % _variety_multiplier)
+	if leftover > 0:
+		notes.append("%d phần hải sản về kho" % leftover)
+	if not notes.is_empty():
+		lines.append(" · ".join(notes))
+	if not _rating_hint(stars).is_empty():
+		lines.append(_rating_hint(stars))
+	lines.append_array(order_lines)
+	_summary_label.text = "\n".join(lines)
 	_summary_panel.show()
 	_next_day_button.grab_focus()
 
@@ -341,9 +350,9 @@ func _show_message(text: String, seconds: float = message_seconds) -> void:
 
 func _rating_hint(stars: int) -> String:
 	if stars >= 4:
-		return "Khách khen nức nở, mai sẽ đông khách hơn!"
+		return "Mai đông khách hơn!"
 	if stars <= 2:
-		return "Khách chê, mai sẽ vắng hơn..."
+		return "Mai vắng khách hơn..."
 	return ""
 
 

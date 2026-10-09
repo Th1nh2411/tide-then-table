@@ -106,7 +106,9 @@ func _refresh() -> void:
 	for row in _rows:
 		var dish: DishData = row["dish"]
 		var in_bag := stall.bag.count(dish)
-		(row["have"] as Label).text = "tủ %d %s%s" % [stall.stock.count(dish), dish.unit_name,
+		var fresh := stall.stock.freshness(dish)
+		(row["have"] as Label).text = "tủ %d %s%s%s" % [stall.stock.count(dish), dish.unit_name,
+			(" · tươi %d" % roundi(fresh)) if fresh < MarketStock.FULL_FRESHNESS and stall.stock.count(dish) > 0 else "",
 			(" +%d túi" % in_bag) if in_bag > 0 else ""]
 		(row["buy"] as Button).disabled = GameState.money < dish.buy_cost(false)
 		if row.has("bulk"):

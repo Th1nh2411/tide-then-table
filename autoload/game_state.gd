@@ -126,6 +126,8 @@ func advance_day(freshness_loss: float) -> int:
 			kept.append(item)
 	last_spoiled_count = storage.size() - kept.size()
 	storage = kept
+	# Fresh grocery goods (rau) age like the fish; beer keeps.
+	last_spoiled_count += MarketStock.age(pantry, freshness_loss)
 	day += 1
 	return last_spoiled_count
 

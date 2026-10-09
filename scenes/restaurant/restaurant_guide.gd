@@ -24,6 +24,11 @@ var serving: Callable
 var shift_over: Callable
 
 
+func _ready() -> void:
+	blocked = func() -> bool: return kitchen.busy
+	super()
+
+
 func _add_rules() -> void:
 	add("menu_board", "Bấm bảng: chọn món", func() -> bool: return board.clickable,
 		func() -> Vector2: return _rect_top(room.merged_rect("E").grow_individual(0, 40, 0, 0)),

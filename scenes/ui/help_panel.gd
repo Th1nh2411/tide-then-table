@@ -39,12 +39,13 @@ BẾN
   Rau muống, tháp bia con mèo (từ ngày 2) luôn có trên menu: đứng trước quầy tạp hoá Cô Năm (bên phải)
     bấm E mở danh sách. Mua lẻ (nút trái / phím 1-9) hoặc mua sỉ rẻ hơn (nút xanh /
     Shift + số): rau 1 phần 10k / 10 phần 80k, bia 1 tháp 25k / 10 tháp 200k.
-    Rau thừa bỏ cuối ngày nên đừng mua sỉ quá tay; bia để được.
+    Rau héo dần qua từng đêm nên đừng mua sỉ quá tay; bia để được.
   Đồ mua nằm trong túi trên tay Rin: mang về E ở tủ lạnh (sát tường, trên bàn kê) để cất,
     cất rồi Bảo mới nấu rau / Rin mới rót bia được. Tháp bia không cần nấu, chỉ cần rót.
   Hết rau / bia thì phải chạy sang mua (trước hoặc trong giờ bán).
   Hết hải sản thì khách chỉ gọi rau muống, bia. Menu dưới 3 món bị chê đơn điệu; nâng Bếp thì menu được 4, rồi 5 món (thêm món, giá cao hơn).
-  Hải sản thừa trả về kho; rau thừa bỏ đi cuối ngày, bia để dành hôm sau.
+  Hải sản thừa trả về kho. Rau để qua ngày được nhưng héo dần như cá (tủ lạnh
+    tốt thì lâu hơn), rau héo bán rẻ hơn, hết hạn thì bỏ. Bia để bao lâu cũng được.
 
 PHỤC VỤ
   WASD: Rin đi. Shift: lướt nhanh. E: tác động vào ô Rin đang quay mặt vào (ô có viền trắng + phím E).

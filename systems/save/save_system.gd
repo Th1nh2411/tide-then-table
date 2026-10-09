@@ -127,8 +127,17 @@ static func apply_dict(data: Dictionary) -> void:
 	var pantry: Variant = data.get("pantry")
 	if pantry is Dictionary:
 		for dish_id: Variant in pantry:
-			if dish_id is String and (pantry[dish_id] is int or pantry[dish_id] is float):
-				GameState.pantry[dish_id] = maxi(int(pantry[dish_id]), 0)
+			var entry: Variant = pantry[dish_id]
+			if not dish_id is String:
+				continue
+			if entry is int or entry is float:  # goods that keep (beer)
+				GameState.pantry[dish_id] = maxi(int(entry), 0)
+			elif entry is Array:  # fresh goods: [{"units", "fresh"}]
+				var batches: Array = []
+				for batch: Variant in entry:
+					if batch is Dictionary and _is_number(batch.get("units")) and _is_number(batch.get("fresh")):
+						batches.append({"units": maxi(int(batch["units"]), 0), "fresh": float(batch["fresh"])})
+				GameState.pantry[dish_id] = batches
 
 	var staff: Variant = data.get("staff")
 	if staff is Dictionary:

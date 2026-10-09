@@ -28,7 +28,8 @@ enum CookType { GRILL, STEAM, STIR }
 @export var bulk_packs: int = 0
 @export var bulk_cost: int = 0
 @export var bulk_label: String = ""
-## Bought goods that keep between days (beer); others are wasted at closing.
+## Bought goods that never spoil (beer). Others (rau) lose freshness every
+## night like the fish and are thrown away at 0 (MarketStock.age).
 @export var keeps_overnight: bool = false
 
 

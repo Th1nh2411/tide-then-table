@@ -7,7 +7,8 @@ extends StreetPerson
 ## reserved fish), cooks for a while (faster and better with the kitchen
 ## upgrade) and puts the plate on the plate table, waiting if it's full.
 ## Out of rau: he shouts for Rin to go to the grocery. Rin can talk to him
-## (child Talker; "!" when there's news).
+## (child Talker; "!" when there's news). Rau from older batches sells for
+## less (KitchenLogic.freshness_multiplier on its freshness).
 
 signal message_requested(text: String)
 
@@ -29,6 +30,7 @@ var _left: float = 0.0
 var _total: float = 1.0
 var _items: Array[InventoryItem] = []
 var _visit: Dictionary = {}
+var _freshness_scale: float = 1.0  # grocery goods: older rau sells for less
 var _done: DishShelf.Plate  # cooked, waiting for room on the plate table
 var _shouted: Dictionary = {}  # dish -> true: already asked Rin to buy it
 
@@ -76,7 +78,7 @@ func _process(delta: float) -> void:
 	if cooking_dish:
 		_left -= delta
 		if _left <= 0.0:
-			_done = DishShelf.Plate.new(cooking_dish, _items, _by_level(quality_by_level), _visit)
+			_done = DishShelf.Plate.new(cooking_dish, _items, _by_level(quality_by_level) * _freshness_scale, _visit)
 			cooking_dish = null
 		return
 	_start_next()
@@ -88,6 +90,7 @@ func _start_next() -> void:
 		if not cooks(dish):
 			continue
 		var items: Array[InventoryItem] = []
+		_freshness_scale = 1.0
 		if not order.visit.is_empty():
 			if order.visit.get("cooked", false):
 				continue
@@ -100,6 +103,7 @@ func _start_next() -> void:
 				_shout(dish)
 				continue
 			_shouted.erase(dish)
+			_freshness_scale = KitchenLogic.freshness_multiplier(stall.stock.last_freshness)
 		elif _plan.get_portion_count(dish) > 0:
 			items = _plan.take_portion(dish)
 		else:

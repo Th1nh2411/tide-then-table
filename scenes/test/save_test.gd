@@ -39,6 +39,7 @@ func _test_round_trip() -> void:
 	GameState.map_pins.append(Vector2(120.5, 640))
 	GameState.weather_id = "rain"
 	GameState.pantry["bia_con_meo"] = 20
+	GameState.pantry["rau_muong_xao_toi"] = [{"units": 4, "fresh": 65.0}]
 	GameState.staff = {"hired": ["vy"], "candidates": ["ti"], "seen": ["vy", "ti"], "ad_day": 4}
 	GameState.resume_at = "restaurant"
 	GameState.orders.append({"who": "Chú Ba", "fish": "cua", "min_kg": 0.5, "reward": 120, "due_day": 7})
@@ -54,6 +55,9 @@ func _test_round_trip() -> void:
 	_check("dex counts", int(GameState.caught_species.get("cua", 0)) == 3)
 	_check("weather", GameState.weather_id == "rain")
 	_check("pantry (kept beer)", int(GameState.pantry.get("bia_con_meo", 0)) == 20)
+	var rau: Array = GameState.pantry.get("rau_muong_xao_toi", [])
+	_check("pantry (rau batch with freshness)", rau.size() == 1 and int(rau[0]["units"]) == 4
+		and is_equal_approx(float(rau[0]["fresh"]), 65.0))
 	_check("staff (hired, applicants, ad day)", GameState.staff.get("hired") == ["vy"]
 		and GameState.staff.get("candidates") == ["ti"] and int(GameState.staff.get("ad_day", 0)) == 4)
 	_check("resume point", GameState.resume_at == "restaurant")

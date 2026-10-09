@@ -125,12 +125,24 @@ func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
 	_check("2 litres left: not enough for a tower", stock.count(beer) == 2 and not stock.take(beer))
 	_check("stock writes the shared pantry", int(pantry.get("bia_con_meo", 0)) == 2)
 	var both: Array[DishData] = [rau, beer]
-	_check("closing wastes rau only", stock.discard_perishable(both) == 1 and stock.count(rau) == 0)
+	_check("rau is a fresh batch at 100", stock.freshness(rau) == 100.0)
+	_check("a night: rau ages, beer doesn't", MarketStock.age(pantry, 35.0) == 0
+		and is_equal_approx(stock.freshness(rau), 65.0) and stock.count(beer) == 2)
+	stock.add(rau, 2)
+	_check("new rau sorts after the old batch", stock.take(rau) and is_equal_approx(stock.last_freshness, 65.0)
+		and stock.freshness(rau) == 100.0 and stock.count(rau) == 2)
+	_check("rau 2 nights old sells for less", KitchenLogic.freshness_multiplier(30.0) < 1.0)
+	_check("spoils after enough nights", MarketStock.age(pantry, 60.0) == 0 and MarketStock.age(pantry, 50.0) == 2
+		and stock.count(rau) == 0)
 	_check("beer keeps overnight", MarketStock.new(pantry).count(beer) == 2)
+	var old_save := {"rau_muong_xao_toi": 3}
+	_check("old saves: a rau count becomes a fresh batch", MarketStock.new(old_save).count(rau) == 3
+		and MarketStock.new(old_save).take(rau))
 	var bag := MarketStock.new({})
 	bag.add(rau, 3)
 	var fridge := MarketStock.new({})
-	_check("bag -> fridge", bag.move_into(fridge, both) == 3 and fridge.count(rau) == 3 and bag.total() == 0)
+	_check("bag -> fridge", bag.move_into(fridge, both) == 3 and fridge.count(rau) == 3 and bag.total() == 0
+		and fridge.freshness(rau) == 100.0)
 
 	# Variety.
 	var table: Array[float] = [0.8, 0.8, 0.9, 1.0]

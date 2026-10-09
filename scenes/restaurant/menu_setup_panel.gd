@@ -1,9 +1,9 @@
 class_name MenuSetupPanel
 extends PanelContainer
-## Pre-shift menu builder (Dave the Diver style). One row per dish with
-## +/- portion buttons. Seafood dishes need a free menu slot and enough
-## ingredients in storage. Always-available dishes (rau muống) aren't planned:
-## a note line says they're on anyway (produce from the stall next door).
+## Pre-shift menu builder (Dave the Diver style), kept short: a one-line
+## title (slots, portions, variety penalty), one row per seafood dish that can
+## be made or has portions (+/- buttons; the rest are hidden), one line for
+## the always-available dishes (goods from the grocery next door).
 ## Opened by clicking the LED sign (MenuBoard); "Đóng" hides it (the plan is
 ## kept), "Mở quán" opens the shop.
 
@@ -12,15 +12,13 @@ signal closed
 
 @export var font_size: int = 10
 @export var swatch_size: Vector2 = Vector2(10, 10)
-## Dims rows that can't be added and have no portions.
-@export var unavailable_alpha: float = 0.45
 
 var _plan: MenuPlan
 var _menu: DishCatalog
-var _fish_names: Dictionary = {}  # fish_id -> display name
 var _variety_table: Array[float] = []
 ## DishData -> { "row", "stock", "count", "plus", "minus" }
 var _rows: Dictionary = {}
+var _empty_label: Label
 
 @onready var _title_label: Label = %MenuTitleLabel
 @onready var _rows_box: VBoxContainer = %RowsBox
@@ -34,26 +32,37 @@ func get_open_button() -> Button:
 	return _open_button
 
 
-func setup(plan: MenuPlan, menu: DishCatalog, fish_catalog: FishCatalog,
+func setup(plan: MenuPlan, menu: DishCatalog, _fish_catalog: FishCatalog,
 		variety_table: Array[float]) -> void:
-	$Margin/VBox/HintLabel.visible = GameState.is_first_day()
+	$Margin/VBox/HintLabel.visible = false  # first-time pointers teach it (RestaurantGuide)
+	var background := StyleBoxFlat.new()
+	background.bg_color = Color(0.08, 0.09, 0.12, 0.97)
+	background.border_color = Color(1.0, 0.85, 0.3, 0.5)
+	background.set_border_width_all(1)
+	add_theme_stylebox_override("panel", background)
+	self_modulate = Color.WHITE
 	_plan = plan
 	_menu = menu
 	_variety_table = variety_table
-	for fish in fish_catalog.fish:
-		_fish_names[fish.id] = fish.display_name
+	var always: PackedStringArray = []
 	for dish in menu.dishes:
 		if dish.always_available:
-			if not dish.on_menu_today():
-				continue
-			_rows_box.add_child(_label("%s · %dk: luôn có, mua ở tạp hoá bên cạnh (%s)" % [
-				dish.display_name, dish.base_price, dish.market_text()], 0))
+			if dish.on_menu_today():
+				always.append(dish.display_name)
 		else:
 			_build_row(dish)
+	_empty_label = _label("Kho chưa có hải sản: ra khơi câu cá đã.", 0)
+	_rows_box.add_child(_empty_label)
+	if not always.is_empty():
+		var note := _label("Luôn có: %s (mua ở tạp hoá)" % ", ".join(always), 0)
+		note.modulate = Color(0.75, 0.75, 0.8)
+		_rows_box.add_child(note)
 	_plan.changed.connect(_refresh)
 	_auto_button.pressed.connect(func() -> void: _plan.auto_fill(_menu.dishes, GameState.storage))
 	_clear_button.pressed.connect(func() -> void: _plan.clear(GameState.storage))
 	_open_button.pressed.connect(func() -> void: confirmed.emit())
+	_auto_button.text = "Tự chọn"
+	_clear_button.text = "Xóa"
 	var close_button := Button.new()
 	close_button.text = "Đóng"
 	close_button.pressed.connect(func() -> void:
@@ -74,9 +83,9 @@ func _build_row(dish: DishData) -> void:
 	swatch.color = dish.color
 	row.add_child(swatch)
 
-	var name_label := _label("%s · %dk" % [dish.display_name, dish.base_price], 150)
+	var name_label := _label("%s %dk" % [dish.display_name, dish.base_price], 140)
 	row.add_child(name_label)
-	var stock_label := _label("", 140)
+	var stock_label := _label("", 90)
 	row.add_child(stock_label)
 
 	var minus := _button("−")
@@ -94,11 +103,12 @@ func _build_row(dish: DishData) -> void:
 
 
 func _refresh() -> void:
-	_title_label.text = "Chuẩn bị menu   (%d/%d món hải sản · %d phần)" % [
+	_title_label.text = "Menu hôm nay · %d/%d món · %d phần" % [
 		_plan.used_slots(), _plan.slots, _plan.total_portions()]
 	var variety := MenuPlan.variety_multiplier(_plan.variety_count(), _variety_table)
-	if variety < 1.0:
-		_title_label.text += "\nMenu đơn điệu: giá mọi món x%.1f (thêm món để hết phạt)" % variety
+	if variety != 1.0:
+		_title_label.text += " · %s x%s" % ["đơn điệu" if variety < 1.0 else "đa dạng", str(snappedf(variety, 0.01))]
+	var shown := 0
 	var counts := KitchenLogic.count_by_fish(GameState.storage)
 	for dish: DishData in _rows:
 		var widgets: Dictionary = _rows[dish]
@@ -108,22 +118,23 @@ func _refresh() -> void:
 		widgets.plus.disabled = not can_add
 		widgets.minus.disabled = portions == 0
 		widgets.stock.text = _stock_text(dish, counts)
-		widgets.row.modulate.a = 1.0 if can_add or portions > 0 else unavailable_alpha
+		widgets.row.visible = can_add or portions > 0
+		shown += 1 if widgets.row.visible else 0
+	_empty_label.visible = shown == 0
 	_clear_button.disabled = _plan.total_portions() == 0
 	# Auto only plans seafood, so it's useless when no seafood dish can be added.
 	_auto_button.disabled = _menu.dishes.all(func(d: DishData) -> bool:
 		return not _plan.can_add(d, GameState.storage))
-	_open_button.text = "Mở quán" if _plan.total_portions() > 0 else "Mở quán (chưa có hải sản)"
+	_open_button.text = "Mở quán"
 	if OS.is_debug_build() and GameState.storage.is_empty() and _plan.total_portions() == 0:
-		_title_label.text += "\n[debug] Kho trống — F1: thêm cá mẫu, F2: thêm bia"
+		_empty_label.text = "Kho trống. [debug] F1: cá mẫu · F2: bia"
 
 
-## e.g. "Ốc hương 3/phần · kho 5".
+## e.g. "kho 5 (3/phần)": fish in storage, fish per portion.
 func _stock_text(dish: DishData, counts: Dictionary) -> String:
 	var parts: PackedStringArray = []
 	for fish_id in dish.ingredients:
-		parts.append("%s %d/phần · kho %d" % [
-			_fish_names.get(fish_id, fish_id), dish.ingredients[fish_id], counts.get(fish_id, 0)])
+		parts.append("kho %d (%d/phần)" % [counts.get(fish_id, 0), dish.ingredients[fish_id]])
 	return ", ".join(parts)
 
 

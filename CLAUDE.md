@@ -138,8 +138,10 @@ Vietnamese, keep code comments in short English.
   on the menu; each buy is one pack or a cheaper bulk buy (`bulk_packs`,
   `bulk_cost`; Shift + number); beer is bought by the tower (3 L,
   `market_pack`, stock in litres) or 10 at once, served as 3 L towers
-  (`portion_units`), needs no cooking (`instant_serve`) and keeps overnight (`keeps_overnight`), rau is wasted
-  at closing),
+  (`portion_units`), needs no cooking (`instant_serve`) and never spoils (`keeps_overnight`); rau
+  is kept in freshness batches that age every night like the fish
+  (`MarketStock.age` in `GameState.advance_day`), oldest cooked first,
+  older = cheaper, thrown away at 0),
   `StaffCrew` + `StaffWorker` + `StaffRoster` (from day 3: hired helpers
   carry plates and clean tables; hiring / job ads live in the phone tab
   "Nhân viên" (`PhoneStaff`, `GameState.staff_changed` tells the crew); wages

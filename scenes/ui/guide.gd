@@ -27,6 +27,8 @@ class Rule:
 @export var font_size: int = 9
 
 var rules: Array[Rule] = []
+## () -> bool: a minigame / panel covers the screen: hide, wait.
+var blocked: Callable
 
 var _current: Rule
 var _shown: float = 0.0
@@ -87,6 +89,11 @@ func add(id: String, text: String, active: Callable, target: Callable, done: Cal
 
 func _process(delta: float) -> void:
 	_time += delta
+	if _current and _current.done.is_valid() and _current.done.call():
+		_finish(true)
+	if blocked.is_valid() and blocked.call():
+		_canvas.visible = false
+		return
 	var paused := get_tree().paused
 	if _current:
 		_shown += delta

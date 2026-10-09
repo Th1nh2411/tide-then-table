@@ -21,6 +21,7 @@ var _catches: int = 0
 
 
 func _ready() -> void:
+	blocked = fishing.is_fishing
 	super()
 	fishing.fish_caught.connect(_on_caught)
 	nets.fish_caught.connect(_on_caught)
