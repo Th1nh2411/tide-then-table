@@ -53,8 +53,6 @@ func _ready() -> void:
 	tables.take(1)
 	tables.release(1)
 	_check("left without eating -> free", tables.states[1] == DiningTables.State.FREE)
-	for order in [first, second, no_plate]:
-		order.free()
 	# The restaurant has no camera; nothing (e.g. the cutscene camera) may
 	# become current by itself, or the view shifts to the top-left corner.
 	var room: Node = load("res://scenes/restaurant/restaurant_scene.tscn").instantiate()
@@ -65,11 +63,8 @@ func _ready() -> void:
 	print("Restaurant: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
 
 
-func _order(dish: DishData, visit: Dictionary) -> Customer:
-	var customer := Customer.new()
-	customer.dish = dish
-	customer.visit = visit
-	return customer
+func _order(dish: DishData, visit: Dictionary) -> TableOrder:
+	return TableOrder.new(dish, visit)
 
 
 func _check(label: String, ok: bool) -> void:

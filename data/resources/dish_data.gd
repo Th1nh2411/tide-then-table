@@ -31,7 +31,7 @@ enum CookType { GRILL, STEAM, STIR }
 ## it, and order only it once the seafood is sold out. Cooking it still needs
 ## its goods (market dishes) — Rin has to run and buy more.
 @export var always_available: bool = false
-## Handed over at once, no cooking minigame (drinks).
+## A drink: no cooking, Rin pours it at the tap (BeerPourGame).
 @export var instant_serve: bool = false
 
 

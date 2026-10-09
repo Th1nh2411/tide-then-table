@@ -1,6 +1,6 @@
 class_name DiningTables
 extends RefCounted
-## Table states (one seat per table): FREE -> TAKEN (a customer sits) ->
+## Table states (one party per table): FREE -> TAKEN (a party sits) ->
 ## DIRTY (they ate and left) -> FREE once cleaned (by Bảo or Rin). A customer
 ## who leaves without eating leaves the table FREE. Also the plate being
 ## eaten from at each table. Pure logic; StreetRoom draws the tables.
@@ -8,7 +8,7 @@ extends RefCounted
 enum State { FREE, TAKEN, DIRTY }
 
 var states: Array[State] = []
-## A plate being eaten from, per table (null if none).
+## The last plate brought, per table (null if none).
 var plates: Array[DishShelf.Plate] = []
 
 

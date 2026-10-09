@@ -1,13 +1,17 @@
 class_name CustomerManager
 extends Node
 ## Runs the street restaurant during a shift (Dave the Diver style service):
-## customers ride in on motorbikes (CustomerBikes; some walk in along the
-## pavement) to free tables; after reading the menu each orders a dish that
-## can still be served (menu portions + plates on the plate table, minus
-## orders already waiting); Bảo cooks (ChefBao) and Rin grills / pours
-## (KitchenStation); plates go on the plate table, and Rin — the waiter —
-## carries them out and cleans the tables. Customers eat, pay (+ tip if they didn't wait long), walk back to
-## their bike (or off the pavement) and leave a dirty table.
+## parties of 1-2 ride in on motorbikes (CustomerBikes, the second guest on
+## the back; some walk in along the pavement) to free tables; after reading
+## the menu the party orders one dish per guest, sometimes one more
+## (TableOrder lines: dishes that can still be served = menu portions +
+## plates on the plate table, minus lines already waiting); Bảo cooks
+## (ChefBao) and Rin grills / pours (KitchenStation); plates go on the plate
+## table, and Rin — the waiter — carries them out and cleans the tables.
+## They eat plate by plate as they come; with everything eaten they may
+## order another round (often beer), else pay for all of it at once (+ tip
+## if they kept their patience), walk back to their bike (or off the
+## pavement) and leave a dirty table.
 ## Upgrades: seats (tables), decor (more often + well-off customers).
 ## Regulars with a fish order (FishOrders) come early in the shift.
 
@@ -44,22 +48,32 @@ signal regular_served(who: String, price: int)
 @export var tip_patience_threshold: float = 0.5
 ## Spawn interval multiplier by yesterday's rating (index = stars, 0 unused).
 @export var interval_scale_by_rating: Array[float] = [1.0, 1.3, 1.15, 1.0, 0.85, 0.7]
-## Chance a customer orders a side (rau muống, beer) while seafood is left.
+## Chance a line is a side (rau muống, beer) while seafood is left; extra
+## rounds pick a side more often.
 @export var side_order_chance: float = 0.25
+@export var round_side_chance: float = 0.6
+## Chance a party is two guests (regulars come alone).
+@export var pair_chance: float = 0.45
+## Chance of one more dish than guests in the first order (max 3 lines).
+@export var extra_dish_chance: float = 0.35
+@export var max_lines: int = 3
+## Chance to order another round once everything is eaten, and how many.
+@export var more_round_chance: float = 0.35
+@export var max_more_rounds: int = 1
 ## Patience multiplier while the restaurant cat is around ("mèo chiêu tài").
 @export var cat_patience_scale: float = 1.1
 @export var pass_capacity: int = 5
 
 ## The plate table (cooked dishes waiting to be carried out).
 var shelf: DishShelf
-## Customers who ordered and wait for food, in order of ordering.
-var waiting: Array[Customer] = []
+## Ordered dishes still to bring, in order of ordering.
+var waiting: Array[TableOrder] = []
 ## Regular visits for today: [{"order", "item", "dish", "cooked"?}].
 var regular_visits: Array[Dictionary] = []
 ## Table states (StreetRoom.dining).
 var tables: DiningTables
 
-var _customers: Array[Customer] = []
+var _customers: Array[Customer] = []  # party leaders
 var _regulars_to_spawn: Array[Dictionary] = []
 var _shift_time: float = 0.0
 var _decor_level: int = 0
@@ -127,12 +141,22 @@ func uncooked_regular_visits() -> Array[Dictionary]:
 
 ## A plate Rin carried to `seat`: serve it if that table ordered this dish.
 func serve_at(seat: int, plate: DishShelf.Plate) -> bool:
-	for customer in waiting:
-		if customer.seat == seat and customer.dish == plate.dish and customer.visit == plate.visit:
-			waiting.erase(customer)
-			_give_plate(customer, plate)
+	for order in waiting:
+		if order.seat == seat and order.dish == plate.dish and order.visit == plate.visit:
+			waiting.erase(order)
+			order.party.serve(order, plate)
+			tables.put_plate(seat, plate)
 			return true
 	return false
+
+
+## Party leaders with lines still waiting, oldest line first.
+func waiting_parties() -> Array[Customer]:
+	var result: Array[Customer] = []
+	for order in waiting:
+		if order.party not in result:
+			result.append(order.party)
+	return result
 
 
 func _process(delta: float) -> void:
@@ -148,11 +172,6 @@ func _process(delta: float) -> void:
 			_spawn({})
 
 
-func _give_plate(customer: Customer, plate: DishShelf.Plate) -> void:
-	customer.serve(plate)
-	tables.put_plate(customer.seat, plate)
-
-
 ## `visit` = a regular's visit, or {} for a walk-in customer.
 func _spawn(visit: Dictionary) -> void:
 	var free := tables.free_seats()
@@ -162,9 +181,13 @@ func _spawn(visit: Dictionary) -> void:
 		customer.rich = _rng.randf() < _by_decor(rich_chance_by_decor)
 		if customer.rich:
 			customer.patience_seconds *= rich_patience_scale
+		if _rng.randf() < pair_chance:
+			customer.companion = Customer.new()
+			customer.companion.leader = customer
+			customer.companion.seat = customer.seat
+		customer.more_rounds = max_more_rounds
 	else:
 		customer.visit = visit
-		customer.dish = visit["dish"]
 		customer.regular_name = visit["order"]["who"]
 		customer.patience_seconds *= regular_patience_scale
 		message_requested.emit("%s tới ăn món đã đặt!" % customer.regular_name)
@@ -176,15 +199,21 @@ func _spawn(visit: Dictionary) -> void:
 	tables.take(customer.seat)
 	_customers.append(customer)
 	if _rng.randf() >= walk_in_chance:
-		customer.bike = bikes.arrive()
+		customer.bike = bikes.arrive(customer.companion != null)
 	if customer.bike == null:
 		_walk_in(customer, _entrance())
 
 
 func _walk_in(customer: Customer, from: Vector2i) -> void:
+	var table: Dictionary = room.tables[customer.seat]
 	customer.position = room.grid.to_world(from)
 	people_layer.add_child(customer)
-	customer.go_to_seat(room.grid.path(from, room.tables[customer.seat]["chair"]))
+	customer.go_to_seat(room.grid.path(from, table["chair"]))
+	if customer.companion:
+		var guest := customer.companion
+		guest.position = customer.position + Vector2(-6, 2)
+		people_layer.add_child(guest)
+		guest.go_to_seat(room.grid.path(from, table["spare"]))
 
 
 func _on_bike_parked(bike: CustomerBikes.Bike) -> void:
@@ -194,23 +223,34 @@ func _on_bike_parked(bike: CustomerBikes.Bike) -> void:
 
 
 func _on_ordered(customer: Customer) -> void:
-	if customer.dish == null:
-		customer.dish = _pick_order()
-	if customer.dish == null:
-		_send_away(customer, false)
+	if not customer.visit.is_empty():
+		_add_line(customer, customer.visit["dish"], customer.visit)
 		return
-	waiting.append(customer)
+	var guests := 2 if customer.companion else 1
+	var lines := mini(guests + (1 if _rng.randf() < extra_dish_chance else 0), max_lines)
+	for i in lines:
+		var dish := _pick_order(side_order_chance)
+		if dish:
+			_add_line(customer, dish)
+	if customer.orders.is_empty():
+		_send_away(customer, false)
+
+
+func _add_line(customer: Customer, dish: DishData, visit: Dictionary = {}) -> void:
+	var order := TableOrder.new(dish, visit, customer)
+	customer.add_order(order)
+	waiting.append(order)
 
 
 ## A seafood dish that can still be served, or a side dish (sometimes by
 ## choice, always once the seafood is gone; always orderable: Rin buys its
 ## produce at the stall). Null only if there is nothing at all.
-func _pick_order() -> DishData:
+func _pick_order(side_chance: float) -> DishData:
 	var dishes: Array[DishData] = []
 	for dish in _plan.get_dishes():
 		if _servable(dish) > 0:
 			dishes.append(dish)
-	var wants_side := dishes.is_empty() or _rng.randf() < side_order_chance
+	var wants_side := dishes.is_empty() or _rng.randf() < side_chance
 	if wants_side and not _sides.is_empty():
 		return _sides[_rng.randi() % _sides.size()]
 	if dishes.is_empty():
@@ -220,7 +260,7 @@ func _pick_order() -> DishData:
 
 ## Portions not yet promised to a waiting customer.
 func _servable(dish: DishData) -> int:
-	var promised := waiting.filter(func(c: Customer) -> bool: return c.dish == dish and c.visit.is_empty()).size()
+	var promised := waiting.filter(func(o: TableOrder) -> bool: return o.dish == dish and o.visit.is_empty()).size()
 	return _plan.get_portion_count(dish) + shelf.count(dish) - promised
 
 
@@ -229,45 +269,75 @@ func _anything_to_order() -> bool:
 
 
 func _on_finished_eating(customer: Customer) -> void:
-	if customer.state != Customer.State.EATING:
+	if customer.state != Customer.State.DINING:
 		return
-	var plate := customer.plate
+	if customer.more_rounds > 0 and _accepting and _rng.randf() < more_round_chance:
+		customer.more_rounds -= 1
+		var dish := _pick_order(round_side_chance)
+		if dish:
+			_add_line(customer, dish)
+			_float_text(customer.position, "Thêm món!")
+			return
+	_pay(customer, true)
+	_leave(customer)
+
+
+## Pays for every plate eaten (tip only if `tip_ok` and still patient);
+## leaves the table dirty, or free if nothing was eaten.
+func _pay(customer: Customer, tip_ok: bool) -> void:
+	if customer.eaten.is_empty():
+		tables.release(customer.seat)
+		return
 	var price := 0
-	var tip := 0
-	if customer.regular_name:
-		price = roundi(int(customer.visit["order"]["reward"]) * plate.cook_multiplier)
-		FishOrders.complete(customer.visit["order"])
-		regular_served.emit(customer.regular_name, price)
-	else:
-		price = roundi(KitchenLogic.calc_price(plate.dish, plate.cook_multiplier, plate.ingredients)
-			* _variety_multiplier * (rich_price_scale if customer.rich else 1.0))
-		tip = roundi(price * tip_ratio) if customer.patience > tip_patience_threshold else 0
+	for plate in customer.eaten:
+		if not plate.visit.is_empty():
+			var reward := roundi(int(plate.visit["order"]["reward"]) * plate.cook_multiplier)
+			FishOrders.complete(plate.visit["order"])
+			regular_served.emit(customer.regular_name, reward)
+			price += reward
+		else:
+			price += roundi(KitchenLogic.calc_price(plate.dish, plate.cook_multiplier, plate.ingredients)
+				* _variety_multiplier * (rich_price_scale if customer.rich else 1.0))
+	var tip := roundi(price * tip_ratio) if tip_ok and customer.patience > tip_patience_threshold \
+		and customer.regular_name.is_empty() else 0
 	GameState.add_money(price + tip)
 	_float_text(customer.position, "+%dk" % (price + tip) + (" (tip)" if tip > 0 else ""))
 	tables.make_dirty(customer.seat)
-	_leave(customer)
 	customer_served.emit(price, tip)
 
 
-## Leaves without eating: the order is dropped, the table stays clean.
+## Leaves before everything came: lines still waiting are dropped; what was
+## eaten is paid for (no tip).
 func _send_away(customer: Customer, angry: bool) -> void:
 	if customer.state == Customer.State.LEAVING:
 		return
-	waiting.erase(customer)
-	tables.release(customer.seat)
+	for order in customer.orders:
+		waiting.erase(order)
+	customer.orders.clear()
+	customer.eaten.append_array(customer.queued)
+	if customer.plate:
+		customer.eaten.append(customer.plate)
 	if angry:
 		_float_text(customer.position, "Bỏ đi!")
 		customer_left_angry.emit()
+	_pay(customer, false)
 	_leave(customer)
 
 
 ## Walks back to the bike (which rides off) or off the pavement.
 func _leave(customer: Customer) -> void:
 	var exit := customer.bike.parking if customer.bike else _entrance()
+	var guest := customer.companion
+	if guest:
+		guest.leave(room.grid.path(room.grid.to_cell(guest.position), exit))
 	await customer.leave(room.grid.path(room.grid.to_cell(customer.position), exit))
+	while guest and guest.is_walking():
+		await get_tree().process_frame
 	_customers.erase(customer)
 	if customer.bike:
 		bikes.depart(customer.bike)
+	if guest:
+		guest.queue_free()
 	customer.queue_free()
 
 

@@ -1,8 +1,9 @@
 class_name ServiceMarkers
 extends Node2D
 ## Visual cues over the street restaurant (no prompt text), drawn above
-## everyone: customers' bubbles ("..." while reading, the ordered dish +
-## patience bar while waiting, gold for a regular); while Rin carries a
+## everyone: customers' bubbles over the party leader ("..." while reading,
+## then a dot per dish still coming + table number + patience bar, gold for
+## a regular); while Rin carries a
 ## plate the table that ordered it pulses green with an arrow (nobody
 ## ordered it: the bin pulses red); a small "E"
 ## key over the cell (or person) E would act on right now (Cô Năm at the
@@ -30,8 +31,8 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	for customer in customers.waiting:
-		_order_bubble(customer)
+	for party in customers.waiting_parties():
+		_order_bubble(party)
 	_draw_reading()
 	if rin.active and not kitchen.busy and stall.open and stall.can_reach(rin):
 		_key_icon(stall.seller.position + Vector2(0, -40))
@@ -56,10 +57,12 @@ func _draw() -> void:
 		_key_over(rin.front_cell())
 
 
-## White outline + "E" key over the cell E acts on (the whole grill for it).
+## "E" key over the cell E acts on, with a white outline (the whole grill
+## for it) — no outline on customer tables, just the key.
 func _key_over(cell: Vector2i) -> void:
 	var rect := room.merged_rect("N") if room.grid.kind(cell) == "N" else room.grid.cell_rect(cell)
-	draw_rect(rect, Color(1, 1, 1, 0.8), false, 1.0)
+	if room.table_index(cell) < 0:
+		draw_rect(rect, Color(1, 1, 1, 0.8), false, 1.0)
 	_key_icon(rect.position + Vector2(rect.size.x * 0.5, -6))
 
 
@@ -77,21 +80,24 @@ func _draw_reading() -> void:
 
 func _order_bubble(customer: Customer) -> void:
 	var at := customer.position + Vector2(0, -42)
-	_bubble(at, Color(1.0, 0.88, 0.5, 0.95) if customer.regular_name else Color(1, 1, 1, 0.95))
-	draw_circle(at + Vector2(-4, 0), 4.0, customer.dish.color)
-	draw_string(ThemeDB.fallback_font, at + Vector2(1, 3), str(customer.seat + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 7,
-		Color(0.2, 0.15, 0.1))
-	draw_rect(Rect2(at + Vector2(-10, 9), Vector2(20, 2)), Color(0, 0, 0, 0.4))
-	draw_rect(Rect2(at + Vector2(-10, 9), Vector2(20 * customer.patience, 2)),
+	var n := customer.orders.size()
+	var half := 6.0 + n * 4.5
+	_bubble(at, Color(1.0, 0.88, 0.5, 0.95) if customer.regular_name else Color(1, 1, 1, 0.95), half)
+	for k in n:
+		draw_circle(at + Vector2(-half + 6 + k * 9, 0), 3.5, customer.orders[k].dish.color)
+	draw_string(ThemeDB.fallback_font, at + Vector2(half - 7, 3), str(customer.seat + 1), HORIZONTAL_ALIGNMENT_LEFT,
+		-1, 7, Color(0.2, 0.15, 0.1))
+	draw_rect(Rect2(at + Vector2(-half + 1, 9), Vector2(half * 2 - 2, 2)), Color(0, 0, 0, 0.4))
+	draw_rect(Rect2(at + Vector2(-half + 1, 9), Vector2((half * 2 - 2) * customer.patience, 2)),
 		Color(1, 0.3, 0.3).lerp(Color(0.3, 0.9, 0.4), customer.patience))
 
 
 ## Tables whose waiting order this plate can go to, oldest first.
 func _seats_for(plate: DishShelf.Plate) -> Array[int]:
 	var result: Array[int] = []
-	for customer in customers.waiting:
-		if customer.dish == plate.dish and customer.visit == plate.visit:
-			result.append(customer.seat)
+	for order in customers.waiting:
+		if order.dish == plate.dish and order.visit == plate.visit and order.seat not in result:
+			result.append(order.seat)
 	return result
 
 
@@ -112,8 +118,8 @@ func _can_act(cell: Vector2i) -> bool:
 	return room.dining.states[seat] == DiningTables.State.DIRTY
 
 
-func _bubble(at: Vector2, color: Color) -> void:
-	draw_rect(Rect2(at - Vector2(11, 7), Vector2(22, 15)), color)
+func _bubble(at: Vector2, color: Color, half_width: float = 11.0) -> void:
+	draw_rect(Rect2(at - Vector2(half_width, 7), Vector2(half_width * 2, 15)), color)
 	draw_colored_polygon(PackedVector2Array([at + Vector2(-3, 8), at + Vector2(3, 8), at + Vector2(0, 12)]), color)
 
 

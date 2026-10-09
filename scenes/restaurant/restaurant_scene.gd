@@ -153,17 +153,22 @@ func _open_shop() -> void:
 	_tutorial.on_shop_opened()
 
 
-# Debug builds: F1 during menu setup adds one of every fish to storage,
-# so the restaurant can be tested with F6 without a sea trip.
+# Debug builds, so the restaurant can be tested with F6 without a sea trip:
+# F1 during menu setup adds one of every fish to storage; F2 (any time) puts
+# one keg of every drink the grocery sells straight into the fridge.
 func _unhandled_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
-	if not OS.is_debug_build() or key == null or not key.pressed or key.physical_keycode != KEY_F1:
+	if not OS.is_debug_build() or key == null or not key.pressed or key.echo:
 		return
-	if not _menu_panel.visible:
-		return
-	for fish in fish_catalog.fish:
-		GameState.storage.append(InventoryItem.new(fish, 1.0))
-	_plan.changed.emit()  # refresh the menu panel
+	if key.physical_keycode == KEY_F1 and _menu_panel.visible:
+		for fish in fish_catalog.fish:
+			GameState.storage.append(InventoryItem.new(fish, 1.0))
+		_plan.changed.emit()  # refresh the menu panel
+	elif key.physical_keycode == KEY_F2:
+		for dish in _stall.products:
+			if dish.instant_serve:
+				_stall.stock.add(dish, dish.market_pack)
+				_show_message("[debug] +%d %s %s vào tủ lạnh" % [dish.market_pack, dish.unit_name, dish.display_name])
 
 
 func _process(delta: float) -> void:

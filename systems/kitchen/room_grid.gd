@@ -70,7 +70,7 @@ func path(from: Vector2i, to: Vector2i) -> Array[Vector2]:
 	var result: Array[Vector2] = []
 	var ends: Array[Vector2i] = [from, to]
 	for cell in ends:
-		if not is_walkable(cell) and kind(cell) != "h":
+		if not is_walkable(cell) and kind(cell) not in ["h", "o"]:
 			return result
 	for cell in ends:  # open the seats at both ends for this search only
 		_astar.set_point_solid(cell, false)

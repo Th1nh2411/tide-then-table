@@ -37,7 +37,7 @@ BẾN
   Rau muống, tháp bia con mèo luôn có trên menu: đứng trước quầy tạp hoá Cô Năm (bên phải)
     bấm E mở danh sách, "Mua" (hoặc 1-9): rau 1 phần, bia 1 bình 20 lít (tháp 3 lít).
   Đồ mua nằm trong túi trên tay Rin: mang về E ở tủ lạnh (sát tường, trên bàn kê) để cất,
-    cất rồi Bảo mới nấu rau / Rin mới rót bia được. Tháp bia không cần nấu.
+    cất rồi Bảo mới nấu rau / Rin mới rót bia được. Tháp bia không cần nấu, chỉ cần rót.
   Hết rau / bia thì phải chạy sang mua (trước hoặc trong giờ bán).
   Hết hải sản thì khách chỉ gọi rau muống, bia. Menu dưới 3 món bị chê đơn điệu.
   Hải sản thừa trả về kho; rau thừa bỏ đi cuối ngày, bia để dành hôm sau.
@@ -50,7 +50,9 @@ PHỤC VỤ
   Rin là phục vụ: bưng, dọn bàn, và tự làm món nướng + tháp bia.
   E ở lò than (dưới xe đẩy): Rin nướng món nướng của phiếu cũ nhất đang chờ
     (minigame nhỏ trên mặt đường, quán vẫn chạy), xong món nằm trên tay.
-  E ở bình bia (đầu phải xe đẩy): rót tháp bia cho bàn gọi sớm nhất.
+  E ở bình bia (đầu phải xe đẩy): rót tháp bia cho bàn gọi sớm nhất. Giữ Space /
+    chuột trái để rót, nhả từng nhịp ngắn cho bọt xẹp, nhả hẳn khi mép bọt vào vạch
+    xanh (ít bọt = tip thêm). Rót tràn mất 1 lít bia.
   Bàn kê món (nằm ngang cạnh xe đẩy): E đặt món xuống ô đó / cầm món ở ô đó lên.
   Thùng rác xanh cạnh xe đẩy: E vứt món đang cầm (món không ai gọi thì xô nhấp nháy đỏ).
   E cạnh người khác: nói chuyện (dấu "!" = có chuyện mới).
@@ -60,7 +62,9 @@ NƯỚNG
 
 BÀN
   Cầm món: bàn gọi món đó nhấp nháy xanh. Quay mặt vào bàn bấm E: đặt món, hoặc dọn bàn bẩn.
-  Khách phần lớn đi xe máy tới, đỗ sát lề.
+  Khách phần lớn đi xe máy tới, đỗ sát lề. Mỗi bàn 1-2 khách, gọi 1-3 món
+    (bong bóng / phiếu có 1 chấm mỗi món còn chờ); món nào ra trước ăn trước,
+    ăn hết có khi gọi thêm (hay là bia). Ăn xong hết mới trả tiền cả bàn.
   Khách quen (bóng thoại vàng) tới ăn món đã đặt trước.
 
 HẾT CA

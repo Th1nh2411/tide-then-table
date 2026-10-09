@@ -96,13 +96,18 @@ static func draw_bike_side(canvas: CanvasItem, p: Vector2, facing: float, color:
 	canvas.draw_circle(p + Vector2(10 * facing, -4), 1.5, Color(0.6, 0.6, 0.62))
 	canvas.draw_circle(p + Vector2(12 * facing, -14), 1.8, Color(1, 1, 0.7))  # headlight
 	if rider:
-		canvas.draw_rect(_flip(p, facing, -4, -17, 8, 5), Color(0.25, 0.25, 0.35))  # thighs
-		canvas.draw_rect(_flip(p, facing, 2, -14, 3, 8), Color(0.25, 0.25, 0.35))  # shin
-		canvas.draw_rect(_flip(p, facing, -6, -29, 9, 13), shirt)
+		draw_rider(canvas, p, facing, helmet, shirt)
 		canvas.draw_line(p + Vector2(1 * facing, -26), p + Vector2(8 * facing, -21), shirt.darkened(0.2), 2.0)  # arm
-		canvas.draw_circle(p + Vector2(-1 * facing, -33), 5.5, Color(0.95, 0.8, 0.65))
-		canvas.draw_circle(p + Vector2(-1.5 * facing, -35), 5.5, helmet)
-		canvas.draw_rect(_flip(p, facing, 2, -34, 3, 2), Color(0.2, 0.2, 0.25, 0.8))  # visor
+
+
+## Someone sitting on a motorbike (side view; the driver adds the arm).
+static func draw_rider(canvas: CanvasItem, p: Vector2, facing: float, helmet: Color, shirt: Color) -> void:
+	canvas.draw_rect(_flip(p, facing, -4, -17, 8, 5), Color(0.25, 0.25, 0.35))  # thighs
+	canvas.draw_rect(_flip(p, facing, 2, -14, 3, 8), Color(0.25, 0.25, 0.35))  # shin
+	canvas.draw_rect(_flip(p, facing, -6, -29, 9, 13), shirt)
+	canvas.draw_circle(p + Vector2(-1 * facing, -33), 5.5, Color(0.95, 0.8, 0.65))
+	canvas.draw_circle(p + Vector2(-1.5 * facing, -35), 5.5, helmet)
+	canvas.draw_rect(_flip(p, facing, 2, -34, 3, 2), Color(0.2, 0.2, 0.25, 0.8))  # visor
 
 
 ## Motorbike parked nose down (towards the road), seen from above, ~28 px long.

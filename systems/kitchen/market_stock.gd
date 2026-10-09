@@ -49,6 +49,15 @@ func take(dish: DishData) -> bool:
 	return true
 
 
+## Wastes up to `amount` units (spilled beer). Returns how many were lost.
+func spill(dish: DishData, amount: int) -> int:
+	var lost := mini(amount, count(dish))
+	if lost > 0:
+		_counts[dish.id] = count(dish) - lost
+		changed.emit()
+	return lost
+
+
 ## Moves everything of `dishes` into `target` (bag -> fridge). Returns how
 ## many units moved.
 func move_into(target: MarketStock, dishes: Array[DishData]) -> int:

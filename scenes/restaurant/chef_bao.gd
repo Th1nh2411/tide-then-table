@@ -83,16 +83,16 @@ func _process(delta: float) -> void:
 
 
 func _start_next() -> void:
-	for customer in customers.waiting:
-		var dish := customer.dish
+	for order in customers.waiting:
+		var dish := order.dish
 		if not cooks(dish):
 			continue
 		var items: Array[InventoryItem] = []
-		if not customer.visit.is_empty():
-			if customer.visit.get("cooked", false):
+		if not order.visit.is_empty():
+			if order.visit.get("cooked", false):
 				continue
-			customer.visit["cooked"] = true
-			items.append(customer.visit["item"])
+			order.visit["cooked"] = true
+			items.append(order.visit["item"])
 		elif not _needs_more(dish):
 			continue
 		elif dish.always_available:
@@ -104,13 +104,13 @@ func _start_next() -> void:
 			items = _plan.take_portion(dish)
 		else:
 			continue
-		_start(dish, items, customer.visit)
+		_start(dish, items, order.visit)
 		return
 
 
-## More customers wait for `dish` than plates exist (plate table, Rin's hands).
+## More lines wait for `dish` than plates exist (plate table, Rin's hands).
 func _needs_more(dish: DishData) -> bool:
-	var waiting := customers.waiting.filter(func(c: Customer) -> bool: return c.dish == dish and c.visit.is_empty()).size()
+	var waiting := customers.waiting.filter(func(o: TableOrder) -> bool: return o.dish == dish and o.visit.is_empty()).size()
 	var plates := customers.shelf.count(dish)
 	if rin.carried and rin.carried.dish == dish and rin.carried.visit.is_empty():
 		plates += 1

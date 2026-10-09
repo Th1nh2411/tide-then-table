@@ -111,8 +111,8 @@ Vietnamese, keep code comments in short English.
 - Restaurant (top-down 3/4 Vietnamese sidewalk, 40x23 tiles of 16 px):
   `StreetRoom` (ASCII map -> `RoomGrid` with A* paths; shop front at the top,
   pavement, only the near part of the road at the bottom; Rin's kitchen =
-  in the middle of the pavement: bin + food cart with Bảo's stove + plate
-  table as a bench right of it, the fridge against the wall above the bench (bought groceries
+  in the middle of the pavement: plate table as a bench on the left (next
+  to the tables), then bin + food cart with Bảo's stove right of it, the fridge against the wall above the bench (bought groceries
   go into Rin's bag first; E on the fridge puts them away), an open
   aisle in front, then Rin's 2-cell charcoal grill "N" (under the cart's
   left end); the beer tap "U" is the keg on the cart's right end; tables on the left (columns 2 cells
@@ -123,7 +123,10 @@ Vietnamese, keep code comments in short English.
   (player = the waiter: WASD, Shift dash, E on the faced cell; carries plates,
   cleans tables, grills, pours beer), `ChefBao` "Bảo" (the chef, behind the
   stove from day 1: cooks every non-grilled dish by himself, oldest ticket
-  first, puts plates on the plate table; `ChefBao.cooks(dish)`), `Customer` (most come by motorbike:
+  first, puts plates on the plate table; `ChefBao.cooks(dish)`), `Customer` (a party of 1-2: the leader orders 1-3
+  `TableOrder` lines — `CustomerManager.waiting` holds lines, oldest first —
+  eats plates as they come, may order another round, pays for the table at
+  once; the second guest sits on the spare stool. Most come by motorbike:
   `CustomerBikes` road -> park by the curb -> walk to the table and back).
   `MarketStall` (Cô Năm's grocery next door, right: E in front of the "V"
   counter opens `MarketPanel`, her product list; buying puts goods into a
@@ -137,7 +140,9 @@ Vietnamese, keep code comments in short English.
   free/taken/dirty), `KitchenStation` (no dish buttons: E on the charcoal
   grill "N" grills the oldest waiting grilled dish — Rin steps behind it, the
   compact `CookingOverlay` runs over the road, the dish lands in his hands; E
-  on the beer tap "U" by the ice box pours a tower for the oldest beer order;
+  on the beer tap "U" by the ice box pours a tower for the oldest beer order
+  (`BeerPourGame` in the same overlay: hold to pour, short bursts keep the
+  foam thin, release in the band; spilling wastes a litre);
   E on the plate table / tables; `menu_rows()` feeds the LED board),
   `ServiceHud` (order tickets over the shop front), `MenuBoard` (small LED board by the curb in the middle, "E" cells,
   y-sorted: dish pictures + servings left), `ServiceMarkers` (bubbles, carried plate -> its table pulses, "E"

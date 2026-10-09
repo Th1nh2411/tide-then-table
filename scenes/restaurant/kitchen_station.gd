@@ -8,8 +8,10 @@ extends Node
 ##                             CookingOverlay minigame starts and the dish ends
 ##                             up in his hands
 ##   E on the beer tap         a beer tower for the oldest table that ordered
-##                             one, straight into his hands (needs a keg from
-##                             the grocery)
+##                             one (needs a keg from the grocery): the pour
+##                             minigame (BeerPourGame) runs in the same
+##                             overlay, the tower ends up in his hands;
+##                             spilling wastes `spill_litres`
 ##   E on the plate table      put the plate on that cell / pick that one up
 ##   E on the bin              throw the carried plate away
 ##   E on a table              serve the carried plate, or clean it if dirty
@@ -26,8 +28,10 @@ signal message_requested(text: String)
 @export var room: StreetRoom
 @export var stall: MarketStall
 @export var clean_seconds: float = 0.5
+## Beer lost each time a tower runs over.
+@export var spill_litres: int = 1
 
-## Walking to the grill, grilling or cleaning: Rin can't move.
+## Walking to the grill, grilling, pouring or cleaning: Rin can't move.
 var busy: bool = false
 
 var _plan: MenuPlan
@@ -37,6 +41,7 @@ var _cooking_items: Array[InventoryItem] = []
 
 func _ready() -> void:
 	cooking.finished.connect(_on_cooking_finished)
+	cooking.spilled.connect(_on_spilled)
 
 
 func setup(plan: MenuPlan) -> void:
@@ -78,24 +83,24 @@ func _row(label: String, count: int, dish: DishData, kind: String) -> Dictionary
 	return {"label": label, "count": count, "dish": dish, "kind": kind, "who": "bao" if ChefBao.cooks(dish) else "rin"}
 
 
-## The oldest waiting customer whose grilled dish (or drink) has no plate yet;
+## The oldest waiting line whose grilled dish (or drink) has no plate yet;
 ## null if none.
-func next_order(drinks: bool) -> Customer:
-	for customer in customers.waiting:
-		var dish := customer.dish
+func next_order(drinks: bool) -> TableOrder:
+	for order in customers.waiting:
+		var dish := order.dish
 		if ChefBao.cooks(dish) or dish.instant_serve != drinks:
 			continue
-		if not customer.visit.is_empty():
-			if not customer.visit.get("cooked", false):
-				return customer
+		if not order.visit.is_empty():
+			if not order.visit.get("cooked", false):
+				return order
 		elif _needs_more(dish):
-			return customer
+			return order
 	return null
 
 
-## More customers wait for `dish` than plates exist (plate table, Rin's hands).
+## More lines wait for `dish` than plates exist (plate table, Rin's hands).
 func _needs_more(dish: DishData) -> bool:
-	var waiting := customers.waiting.filter(func(c: Customer) -> bool: return c.dish == dish and c.visit.is_empty()).size()
+	var waiting := customers.waiting.filter(func(o: TableOrder) -> bool: return o.dish == dish and o.visit.is_empty()).size()
 	var plates := customers.shelf.count(dish)
 	if rin.carried and rin.carried.dish == dish and rin.carried.visit.is_empty():
 		plates += 1
@@ -104,22 +109,22 @@ func _needs_more(dish: DishData) -> bool:
 
 ## E on the grill: grill the oldest waiting grilled dish.
 func grill() -> void:
-	var customer := next_order(false)
-	if customer == null:
+	var order := next_order(false)
+	if order == null:
 		message_requested.emit("Chưa bàn nào chờ món nướng")
 		return
-	var dish := customer.dish
+	var dish := order.dish
 	var items: Array[InventoryItem] = []
-	if not customer.visit.is_empty():
-		customer.visit["cooked"] = true
-		items.append(customer.visit["item"])
+	if not order.visit.is_empty():
+		order.visit["cooked"] = true
+		items.append(order.visit["item"])
 	elif _plan.get_portion_count(dish) > 0:
 		items = _plan.take_portion(dish)
 	else:
 		message_requested.emit("Hết %s" % dish.display_name)
 		return
 	busy = true
-	_cooking_visit = customer.visit
+	_cooking_visit = order.visit
 	_cooking_items = items
 	await rin.walk_and_wait(room.grid.path(rin.cell(), grill_spot()))
 	rin.facing = Vector2i.DOWN
@@ -128,17 +133,26 @@ func grill() -> void:
 
 ## E on the beer tap: pour a tower for the oldest table that ordered one.
 func pour() -> void:
-	var customer := next_order(true)
-	if customer == null:
+	var order := next_order(true)
+	if order == null:
 		message_requested.emit("Chưa bàn nào gọi bia")
 		return
-	if not stall.stock.take(customer.dish):
-		if stall.bag.count(customer.dish) > 0:
+	if not stall.stock.take(order.dish):
+		if stall.bag.count(order.dish) > 0:
 			message_requested.emit("Bia còn trong túi: cất vào tủ lạnh trước")
 		else:
 			message_requested.emit("Hết bia: sang tạp hoá %s mua bình mới" % stall.seller_name)
 		return
-	rin.carried = DishShelf.Plate.new(customer.dish, [] as Array[InventoryItem], 1.0)
+	busy = true
+	_cooking_visit = {}
+	_cooking_items = []
+	cooking.start(order.dish)
+
+
+func _on_spilled(dish: DishData) -> void:
+	var lost := stall.stock.spill(dish, spill_litres)
+	if lost > 0:
+		message_requested.emit("Tràn! Mất %d %s bia" % [lost, dish.unit_name])
 
 
 func _on_cooking_finished(dish: DishData, _result: CookingGameBase.Result, multiplier: float) -> void:

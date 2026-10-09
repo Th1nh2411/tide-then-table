@@ -2,7 +2,8 @@ class_name CustomerBikes
 extends Node2D
 ## Customers' motorbikes: a bike rides in along the road, hops the curb into
 ## a free parking slot on the pavement edge (`parked`), waits there (nose to
-## the road) while its rider eats, then rides off screen. Drawn under the
+## the road) while its riders eat, then rides off screen. A party of two
+## rides with a passenger on the back. Drawn under the
 ## people (sits before them in the tree).
 
 signal parked(bike: Bike)
@@ -15,6 +16,9 @@ class Bike:
 	var pos: Vector2
 	var parking: Vector2i
 	var rider: bool = true
+	## A second guest on the back (party of two).
+	var passenger: bool = false
+	var passenger_shirt: Color
 	var leaving: bool = false
 	var facing: float = 1.0
 	var waypoints: Array[Vector2] = []
@@ -48,7 +52,7 @@ func free_slots() -> Array[Vector2i]:
 
 
 ## A new bike rides in to a free slot; null when the parking is full.
-func arrive() -> Bike:
+func arrive(passenger: bool = false) -> Bike:
 	var slots := free_slots()
 	if slots.is_empty():
 		return null
@@ -57,6 +61,8 @@ func arrive() -> Bike:
 	bike.color = colors.pick_random()
 	bike.helmet = helmets.pick_random()
 	bike.shirt = shirts.pick_random()
+	bike.passenger = passenger
+	bike.passenger_shirt = shirts.pick_random()
 	var from_left := randf() < 0.5
 	bike.facing = 1.0 if from_left else -1.0
 	var lane := _lane_y(from_left)
@@ -119,5 +125,7 @@ func _draw_parked(bike: Bike) -> void:
 
 ## Side view while riding, with the rider (pos = lane centre, wheels below).
 func _draw_riding(bike: Bike) -> void:
-	StreetProps.draw_bike_side(self, bike.pos + Vector2(0, 8), bike.facing, bike.color, bike.rider, bike.helmet,
-		bike.shirt)
+	var at := bike.pos + Vector2(0, 8)
+	if bike.rider and bike.passenger:  # behind the driver, drawn first
+		StreetProps.draw_rider(self, at + Vector2(-8 * bike.facing, 1), bike.facing, helmets[0], bike.passenger_shirt)
+	StreetProps.draw_bike_side(self, at, bike.facing, bike.color, bike.rider, bike.helmet, bike.shirt)

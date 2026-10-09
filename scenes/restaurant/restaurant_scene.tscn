@@ -92,7 +92,7 @@ script = ExtResource("44_rin")
 room = NodePath("../../Room")
 
 [node name="Bao" type="Node2D" parent="World/People" node_paths=PackedStringArray("customers", "stall", "rin")]
-position = Vector2(296, 104)
+position = Vector2(376, 104)
 script = ExtResource("22_chef")
 customers = NodePath("../../../CustomerManager")
 stall = NodePath("../../../MarketStall")

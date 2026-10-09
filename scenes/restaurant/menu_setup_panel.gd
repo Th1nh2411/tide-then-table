@@ -108,7 +108,7 @@ func _refresh() -> void:
 		return not _plan.can_add(d, GameState.storage))
 	_open_button.text = "Mở quán" if _plan.total_portions() > 0 else "Mở quán (chưa có hải sản)"
 	if OS.is_debug_build() and GameState.storage.is_empty() and _plan.total_portions() == 0:
-		_title_label.text += "\n[debug] Kho trống — F1: thêm cá mẫu"
+		_title_label.text += "\n[debug] Kho trống — F1: thêm cá mẫu, F2: thêm bia"
 
 
 ## e.g. "Ốc hương 3/phần · kho 5".

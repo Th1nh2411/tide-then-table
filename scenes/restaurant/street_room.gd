@@ -4,12 +4,12 @@ extends Node2D
 ## 40x23 tiles of 16 px (5 rows of shop front wall) (Stardew scale), filling the 640x360 view. The shop
 ## front is at the top, the pavement in the middle, and only the near part of
 ## the road shows at the bottom. The kitchen stands in the middle of the
-## pavement, the tables on the left. Kitchen: the ice box (fridge
-## upgrade), the food cart with Bảo's stove (kitchen upgrade) and the plate
-## table as a bench right of it (the pass: one plate per cell, `shelf` slots
+## pavement, the tables on the left. Kitchen: the plate table as a bench on
+## the left, next to the tables (the pass: one plate per cell, `shelf` slots
 ## left to right), the fridge against the wall above the bench (bought
-## groceries are put away there, MarketStall), a bin left of the cart and the draft beer keg on the
-## cart's right end ("U", Rin pours facing up from the aisle); in front of
+## groceries are put away there, MarketStall; ice box upgrade), then a bin
+## and the food cart with Bảo's stove (kitchen upgrade) right of the bench,
+## the draft beer keg on the cart's right end ("U", Rin pours facing up from the aisle); in front of
 ## them an open aisle for Rin, then his 2-cell charcoal grill ("N", y-sorted
 ## like the cart) starting under the cart's left end. Tables (TABLE_SIZE cells, "T" top
 ## left + "t", two stools above: the customer's seat "h" + a spare "o";
@@ -32,12 +32,12 @@ const SEAT_OFFSET := Vector2i(0, -1)
 	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 	"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-	".......................F......GG..GG.MM.",
+	"..................F...........GG..GG.MM.",
 	".ho..ho..ho..ho...............VVVVVV....",
-	".Tt..Tt..Tt..Tt.BXSXUPPPPP..............",
+	".Tt..Tt..Tt..Tt.PPPPPBXSXU..............",
 	".tt..tt..tt..tt.........................",
 	"........................................",
-	".ho..ho..ho..ho..NN.....................",
+	".ho..ho..ho..ho.......NN................",
 	".Tt..Tt..Tt..Tt.........................",
 	".tt..tt..tt..tt.........................",
 	"D......................................D",
@@ -63,7 +63,8 @@ const SEAT_OFFSET := Vector2i(0, -1)
 var grid: RoomGrid
 ## Table states (free / taken / dirty, plates being eaten).
 var dining := DiningTables.new()
-## [{"table": Vector2i, "chair": Vector2i}], one seat per table, in use only.
+## [{"table": Vector2i, "chair": Vector2i, "spare": Vector2i}] (the party's
+## first and second guest), in use only.
 var tables: Array[Dictionary] = []
 ## The pass (set by CustomerManager): slot i sits on pass_cells()[i].
 var shelf: DishShelf
@@ -136,14 +137,16 @@ func setup_tables(count: int) -> void:
 	grid = RoomGrid.new(rows, cell_size, Vector2.ZERO)
 	tables.clear()
 	for i in mini(count, slots.size()):
-		tables.append({"table": slots[i], "chair": slots[i] + SEAT_OFFSET})
+		var chair := slots[i] + SEAT_OFFSET
+		tables.append({"table": slots[i], "chair": chair, "spare": chair + Vector2i.RIGHT})
 	dining.setup(tables.size())
 
 
 ## Seat of the table covering `cell` (any of its cells or its chair), -1 if none.
 func table_index(cell: Vector2i) -> int:
 	for i in tables.size():
-		if Rect2i(tables[i]["table"], TABLE_SIZE).has_point(cell) or cell == tables[i]["chair"]:
+		if Rect2i(tables[i]["table"], TABLE_SIZE).has_point(cell) or cell == tables[i]["chair"] \
+				or cell == tables[i]["spare"]:
 			return i
 	return -1
 

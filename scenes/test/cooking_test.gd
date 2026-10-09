@@ -6,6 +6,14 @@ extends Control
 @export var menu: DishCatalog
 @export var fish_catalog: FishCatalog
 
+## Beer pour bot: `pour` decides whether the tap is open each frame.
+class PourBot:
+	extends BeerPourGame
+	var pour: Callable
+	func _pouring() -> bool:
+		return pour.call(self)
+
+
 var _failures: int = 0
 var _log: PackedStringArray = []
 
@@ -15,6 +23,7 @@ var _log: PackedStringArray = []
 
 func _ready() -> void:
 	_run_logic_tests()
+	_run_pour_bots()
 	_cooking.finished.connect(_on_cooking_finished)
 	for i in menu.dishes.size():
 		var dish := menu.dishes[i]
@@ -124,6 +133,55 @@ func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
 	_check("variety 1 dish x0.8", MenuPlan.variety_multiplier(1, table) == 0.8)
 	_check("variety 2 dishes x0.9", MenuPlan.variety_multiplier(2, table) == 0.9)
 	_check("variety 5 dishes x1.0", MenuPlan.variety_multiplier(5, table) == 1.0)
+
+
+func _run_pour_bots() -> void:
+	var beer := _dish("bia_con_meo")
+	# Perfect info, short bursts: let the head settle before it gets thick.
+	var state := {"settling": false}
+	var pulse := func(g: BeerPourGame) -> bool:
+		if state["settling"]:
+			state["settling"] = g.foam() > 0.01
+			return false
+		if g.top() >= 0.9:
+			return false
+		if g.foam() >= 0.1 and g.top() < 0.74:  # pause well below the band
+			state["settling"] = true
+			return false
+		return true
+	var r := _pour(beer, pulse)
+	_check("pour bot: short bursts = PERFECT (%s, %.1fs)" % [r[0], r[1]], r[0] == "PERFECT" and r[1] < 6.0)
+	var steady := func(g: BeerPourGame) -> bool: return g.top() < 0.9
+	r = _pour(beer, steady)
+	_check("pour bot: one long pour = OK (too much foam) (%s)" % r[0], r[0] == "OK")
+	var greedy := func(g: BeerPourGame) -> bool: return g.spills == 0
+	r = _pour(beer, greedy)
+	_check("pour bot: never letting go spills once, then runs short (%s, spills %d)" % [r[0], r[2]],
+		r[2] == 1 and r[0] == "BURNT")
+	var game := BeerPourGame.new()
+	_check("judge: thick head in band = OK", game.judge_pour(0.9, 0.25) == CookingGameBase.Result.OK)
+	_check("judge: over the rim band = OK edge", game.judge_pour(1.0, 0.0) == CookingGameBase.Result.OK)
+	game.free()
+	var fridge := MarketStock.new({"bia_con_meo": 3})
+	_check("spill wastes litres, never below 0", fridge.spill(beer, 1) == 1 and fridge.spill(beer, 5) == 2
+		and fridge.count(beer) == 0)
+
+
+## Runs a pour with `pour` deciding the tap; returns [result name, seconds, spills].
+func _pour(beer: DishData, pour: Callable) -> Array:
+	var bot := PourBot.new()
+	bot.pour = pour
+	bot.setup(beer)
+	bot._time = 1.0  # past the input delay
+	var result: Array[String] = ["NONE"]
+	bot.completed.connect(func(res: CookingGameBase.Result) -> void: result[0] = CookingGameBase.Result.keys()[res])
+	var seconds := 0.0
+	while result[0] == "NONE" and seconds < 60.0:
+		bot._update(1.0 / 60.0)
+		seconds += 1.0 / 60.0
+	var spills := bot.spills
+	bot.free()
+	return [result[0], seconds, spills]
 
 
 func _check(label: String, ok: bool) -> void:

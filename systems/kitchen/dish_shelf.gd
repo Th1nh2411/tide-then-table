@@ -86,7 +86,7 @@ func find_for(dish: DishData, visit: Dictionary) -> Plate:
 
 
 ## First waiting order (arrival order) that has a plate. `orders` items are
-## any objects with `dish` and `visit` properties (Customers). Returns
+## any objects with `dish` and `visit` properties (TableOrder lines). Returns
 ## {"order": <order>, "plate": Plate} or {}.
 func next_delivery(orders: Array) -> Dictionary:
 	for order: Object in orders:
