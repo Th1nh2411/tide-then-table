@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Dialogue" format=3]
+
+[ext_resource type="Script" path="res://data/resources/dialogue.gd" id="1_dlg"]
+
+[resource]
+script = ExtResource("1_dlg")
+id = "vy_fog"
+min_day = 5
+priority = 9
+script_text = "Vy: Hồi nhỏ ông nội em hay kể, ngoài phía đông bắc có một dải sương không bao giờ tan.
+Vy: Đêm nào trăng tối, trong sương sáng lên xanh xanh, như có ai thắp đèn dưới nước.
+Rin: Ông em có ra đó lần nào chưa?
+Vy: Ông nói ghe nào đi vô đó thì về... nhưng không ai nhớ đã thấy gì. Kỳ ha?"

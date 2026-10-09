@@ -173,9 +173,11 @@ Vietnamese, keep code comments in short English.
   `CutsceneMarkers`, play with `CutscenePlayer.play()` (sea scene plays
   `trip_end_cutscenes` after a trip; the restaurant plays
   `after_shift_cutscenes` when the summary closes; the intro scene plays
-  `intro_call`; the restaurant plays `arrival_cutscenes` before the menu:
-  `opening_day`, `beer_day` (day 2), `vy_arrives` (day 3, a choice can hire
-  her: flag `vy_hire_now`); the sea's trip-end list has `cat_arrival` and
+  `intro_call`; the restaurant plays `arrival_cutscenes` before the menu
+  (`ArrivalCutscenes`): `opening_day`, `beer_day` (day 2), `vy_arrives` (day
+  3, a choice can hire her: flag `vy_hire_now`), `nam_fog_tale` (day 5); and
+  `after_shift_cutscenes`: `regular_thanks` (after the first fish order is
+  served, flag `regular_served_once`); the sea's trip-end list has `cat_arrival` and
   `fog_omen`). Commands include `remove <actor>`; actor kinds rin, bao, vy,
   co_nam, guest, cat, crate, rin_bed, glow. dialogue_test checks every marker
   a cutscene uses exists in its scene. It pauses the tree; its actors,
@@ -193,6 +195,14 @@ Vietnamese, keep code comments in short English.
   box, the full main quest + fish orders on hover, never takes clicks;
   content from `QuestLog` (pure: Story stage + boat upgrades, FishOrders).
   The phone has no orders tab any more.
+- Restaurant helpers (keep restaurant_scene.gd an orchestrator):
+  `RestaurantEvening` (Sửa quán / Ra khơi buttons, renovation, next day),
+  `RestaurantDebug` (F1/F2), `ShiftReport` (pure: summary text),
+  `ArrivalCutscenes`, `StreetRoomPainter` (StreetRoom's drawing),
+  `PartyFactory` / `PartyOrders` / `PartyCheckout` / `PartyWalker`
+  (CustomerManager's parties). Staff can have lines (`StaffData.dialogues`,
+  `idle_lines`: StaffCrew adds a Talker; Vy has 4 by day/flag).
+- Art to replace the placeholders is listed in `ASSETS.md`.
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and
   restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is
   an IT graduate (male) whose failed startup (with friend Bảo, now the

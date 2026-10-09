@@ -144,4 +144,11 @@ func _sync_workers() -> void:
 			worker.data = person
 			_workers.append(worker)
 			worker.position = room.grid.to_world(_home(worker))
+			if not person.dialogues.is_empty() or not person.idle_lines.is_empty():
+				var talker := Talker.new()
+				talker.name = "Talker"
+				talker.display_name = person.display_name
+				talker.dialogues = person.dialogues
+				talker.idle_lines = person.idle_lines
+				worker.add_child(talker)
 			people_layer.add_child(worker)

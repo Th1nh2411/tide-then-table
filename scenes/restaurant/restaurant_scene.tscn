@@ -9,6 +9,8 @@
 [ext_resource type="Resource" path="res://data/cutscenes/opening_day.tres" id="50_cutopen"]
 [ext_resource type="Resource" path="res://data/cutscenes/beer_day.tres" id="51_cutbeer"]
 [ext_resource type="Resource" path="res://data/cutscenes/vy_arrives.tres" id="52_cutvy"]
+[ext_resource type="Resource" path="res://data/cutscenes/nam_fog_tale.tres" id="53_cutnam"]
+[ext_resource type="Resource" path="res://data/cutscenes/regular_thanks.tres" id="54_cutreg"]
 [ext_resource type="Resource" path="res://data/restaurant/service_day2.tres" id="42_stage"]
 [ext_resource type="Resource" path="res://data/restaurant/service_day3.tres" id="43_stage"]
 [ext_resource type="Resource" path="res://data/restaurant/service_day5.tres" id="45_stage"]
@@ -62,8 +64,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_rest")
-after_shift_cutscenes = Array[ExtResource("39_cutdata")]([])
-arrival_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("50_cutopen"), ExtResource("51_cutbeer"), ExtResource("52_cutvy")])
+after_shift_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("54_cutreg")])
+arrival_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("50_cutopen"), ExtResource("51_cutbeer"), ExtResource("52_cutvy"), ExtResource("53_cutnam")])
 menu = ExtResource("4_menu")
 fish_catalog = ExtResource("6_fish")
 fridge_upgrade = ExtResource("11_fridgeup")

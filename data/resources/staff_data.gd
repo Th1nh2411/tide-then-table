@@ -20,6 +20,10 @@ extends Resource
 @export var pitch: String = ""
 ## Comes asking for the job by themselves on this day (0 = only via an ad).
 @export var arrives_on_day: int = 0
+## Conversations while they work here (E next to them; "!" when new), and
+## small talk once those are used up.
+@export var dialogues: Array[Dialogue] = []
+@export_multiline var idle_lines: Array[String] = []
 
 
 ## "đi nhanh · dọn nhanh · tip +10%" from the numbers.

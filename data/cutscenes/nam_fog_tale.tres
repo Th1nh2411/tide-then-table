@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Cutscene" format=3]
+
+[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="1_cut"]
+
+[resource]
+script = ExtResource("1_cut")
+id = "nam_fog_tale"
+min_day = 5
+priority = 20
+script_text = "# Ngày 5: Cô Năm sang kể chuyện \"góc trời xanh\" ngoài đông bắc (dẫn tới điềm báo).
+camera kitchen_view 0 1.6
+fade_in 0.6
+spawn Bao bao bao_stove 1.4
+spawn Rin rin rin_spot 1.4
+spawn Nam co_nam nam_shop 1.4
+move_to Nam nam_visit 1.6
+face Rin right
+speak \"Cô Năm\" \"Rin nè, mấy đêm nay con đi câu có thấy gì lạ phía đông bắc không?\"
+speak Rin \"Dạ... sương dày lắm cô. Con chưa dám chạy vô.\"
+speak \"Cô Năm\" \"Hồi cô còn con gái, có một mùa trời ngoài đó sáng xanh cả góc. Ông bà kêu là cá Ông về.\"
+speak \"Cô Năm\" \"Rồi có mấy chiếc ghe đi vô... về thì về, mà không ai kể lại được đã thấy gì.\"
+emote Bao ... 1.0
+speak Bảo \"Cô kể làm thằng Rin nó tò mò rồi đó.\"
+speak \"Cô Năm\" \"Tò mò thì được, mà dại thì đừng. Thuyền chưa chắc thì đừng có ra xa nghe con.\"
+move_to Nam nam_shop 1.4
+remove Nam
+speak Rin \"...Thuyền chưa chắc. Chắc phải lên ghe máy mới tới được đó.\"
+camera room_view 0.8 1"

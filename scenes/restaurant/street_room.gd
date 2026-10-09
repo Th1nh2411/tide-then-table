@@ -18,8 +18,8 @@ extends Node2D
 ## Next door (right): Cô Năm's grocery stall ("V" counter, "G"
 ## crates; MarketStall sells over the counter). A small LED menu board stands
 ## by the curb on the left ("E" cells, MenuBoard).
-## Owns the grid (RoomGrid) and table states (DiningTables); draws cells,
-## plates and dirty tables. StreetBackdrop draws the shop front and traffic.
+## Owns the grid (RoomGrid) and table states (DiningTables); StreetRoomPainter
+## draws cells, plates and tables. StreetBackdrop draws the shop front and traffic.
 ## Map legend: see RoomGrid.
 
 const TABLE_SIZE := Vector2i(2, 2)
@@ -81,7 +81,7 @@ var _sorted: Array[Node2D] = []  # cart + tables, y-sorted with the people
 func _ready() -> void:
 	_top = Node2D.new()
 	_top.z_index = 15
-	_top.draw.connect(_draw_top)
+	_top.draw.connect(func() -> void: StreetRoomPainter.draw_top(_top, self, _time))
 	add_child(_top)
 	if grid == null:
 		setup_tables(4)
@@ -95,7 +95,7 @@ func _ready() -> void:
 	var slots := _table_slots()
 	for i in slots.size():
 		_add_sorted(grid.cell_rect(slots[i]).position.y + TABLE_SIZE.y * cell_size,
-			func(canvas: CanvasItem) -> void: _draw_table(canvas, i))
+			func(canvas: CanvasItem) -> void: StreetRoomPainter.draw_table(canvas, self, i))
 
 
 ## A prop drawn by its own node in the people's y-sorted layer, its origin
@@ -222,114 +222,4 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	for y in grid.size.y:
-		for x in grid.size.x:
-			_draw_ground(Vector2i(x, y))
-	for y in grid.size.y:
-		for x in grid.size.x:
-			_draw_thing(Vector2i(x, y))
-	StreetProps.draw_ice_box(self, grid.cell_rect(grid.cells_of("F")[0]), fridge_level)
-	StreetProps.draw_bin(self, merged_rect("B"))
-	if not grid.cells_of("V").is_empty():
-		var crates: Array[Rect2] = []
-		for cell in grid.cells_of("G"):
-			crates.append(grid.cell_rect(cell))
-		StreetProps.draw_stall(self, merged_rect("V"), crates)
-	if shelf:
-		var cells := pass_cells()
-		for i in mini(cells.size(), shelf.capacity):
-			if shelf.plate_at(i):
-				StreetProps.draw_plate(self, shelf.plate_at(i), grid.cell_rect(cells[i]).get_center() + Vector2(0, -2))
-	if decor_level >= 2:
-		for i in tables.size():
-			StreetProps.draw_plant(self, grid.cell_rect(tables[i]["table"]).position + Vector2(-8, 0))
-
-
-func _draw_ground(cell: Vector2i) -> void:
-	var r := grid.cell_rect(cell)
-	match grid.kind(cell):
-		"W":
-			pass  # StreetBackdrop
-		"K":
-			draw_rect(r, Color(0.7, 0.68, 0.62))
-			draw_rect(Rect2(r.position + Vector2(0, r.size.y - 4), Vector2(r.size.x, 4)), Color(0.45, 0.43, 0.4))
-		"R":
-			draw_rect(r, Color(0.22, 0.22, 0.24))
-			if cell.y == 20 and cell.x % 3 != 0:  # centre line dashes, between the lanes
-				draw_rect(Rect2(r.position + Vector2(0, 7), Vector2(r.size.x, 2)), Color(0.9, 0.85, 0.6))
-		_:
-			var ground := Color(0.58, 0.55, 0.5)
-			if (cell.x + cell.y * 3) % 7 == 0:
-				ground = ground.darkened(0.06)
-			draw_rect(r, ground)
-			draw_rect(r, ground.darkened(0.1), false, 1.0)
-
-
-## Low steel table (TABLE_SIZE cells) with its plate or leftovers (y-sorted).
-func _draw_table(canvas: CanvasItem, seat: int) -> void:
-	if seat >= tables.size():
-		return
-	var p := table_rect(seat).position
-	var s := table_rect(seat).size
-	var leg := Color(0.45, 0.47, 0.5)
-	canvas.draw_rect(Rect2(p + Vector2(3, s.y - 9), Vector2(3, 9)), leg)
-	canvas.draw_rect(Rect2(p + Vector2(s.x - 6, s.y - 9), Vector2(3, 9)), leg)
-	canvas.draw_rect(Rect2(p + Vector2(1, -2), Vector2(s.x - 2, s.y - 10)), Color(0.82, 0.84, 0.86))
-	canvas.draw_rect(Rect2(p + Vector2(1, -2), Vector2(s.x - 2, s.y - 10)), Color(0.7, 0.72, 0.75), false, 1.0)
-	canvas.draw_rect(Rect2(p + Vector2(1, s.y - 12), Vector2(s.x - 2, 4)), Color(0.6, 0.62, 0.65))
-	canvas.draw_rect(Rect2(p + Vector2(s.x - 10, 1), Vector2(6, 5)), Color(0.9, 0.85, 0.7))  # tissue box
-	canvas.draw_rect(Rect2(p + Vector2(s.x - 9, 9), Vector2(2, 5)), Color(0.85, 0.2, 0.15))  # chili sauce
-	canvas.draw_rect(Rect2(p + Vector2(s.x - 6, 9), Vector2(2, 5)), Color(0.35, 0.2, 0.1))  # fish sauce
-	var mid := p + Vector2(cell_size * 0.5 + 2, 7)  # in front of the customer's seat
-	if dining.plates[seat] and dining.states[seat] == DiningTables.State.TAKEN:
-		StreetProps.draw_plate(canvas, dining.plates[seat], mid)
-	if dining.states[seat] == DiningTables.State.DIRTY:
-		canvas.draw_circle(mid + Vector2(-1, 0), 4.0, Color(0.95, 0.95, 0.9))
-		canvas.draw_circle(mid + Vector2(4, 3), 1.5, Color(0.9, 0.5, 0.35))  # shells
-		canvas.draw_circle(mid + Vector2(-5, 4), 1.2, Color(0.9, 0.5, 0.35))
-		canvas.draw_circle(mid + Vector2(7, -1), 1.3, Color(0.9, 0.5, 0.35))
-
-
-func _draw_thing(cell: Vector2i) -> void:
-	var r := grid.cell_rect(cell)
-	var p := r.position
-	match grid.kind(cell):
-		"P":  # plate table, a long wooden bench next to the cart
-			var x0 := 0.0 if grid.kind(cell + Vector2i.LEFT) == "P" else 1.0
-			var x1 := 16.0 if grid.kind(cell + Vector2i.RIGHT) == "P" else 15.0
-			draw_rect(Rect2(p + Vector2(x0, 1), Vector2(x1 - x0, 11)), Color(0.72, 0.52, 0.32))
-			draw_rect(Rect2(p + Vector2(x0, 12), Vector2(x1 - x0, 3)), Color(0.5, 0.35, 0.2))
-			draw_line(p + Vector2(x0, 1), p + Vector2(x1, 1), Color(0.8, 0.6, 0.38), 1.0)
-			if x0 > 0.0 or x1 < 16.0:  # legs at the ends
-				draw_rect(Rect2(p + Vector2(2.0 if x0 > 0.0 else 12.0, 15), Vector2(2, 1)), Color(0.4, 0.28, 0.16))
-		"h", "o":
-			var color := stool_colors[(cell.x / 3 + cell.y) % stool_colors.size()]
-			draw_rect(Rect2(p + Vector2(3, 4), Vector2(10, 8)), color)
-			draw_rect(Rect2(p + Vector2(3, 12), Vector2(10, 3)), color.darkened(0.3))
-		"M":
-			StreetProps.draw_bike_parked(self, r.get_center() + Vector2(0, 2), bike_colors[cell.x % bike_colors.size()])
-		"Z":
-			draw_rect(Rect2(p + Vector2(1, -6), Vector2(14, 20)), Color(0.15, 0.45, 0.2))
-			for i in 3:
-				draw_line(p + Vector2(1, -2 + i * 6), p + Vector2(15, -2 + i * 6), Color(0.1, 0.3, 0.12), 1.0)
-		"Y":
-			draw_rect(Rect2(p + Vector2(6, -6), Vector2(4, 20)), Color(0.4, 0.28, 0.18))
-			draw_rect(Rect2(p + Vector2(6, 6), Vector2(4, 8)), Color(0.95, 0.95, 0.9))
-		"L":
-			draw_rect(Rect2(p + Vector2(6, -40), Vector2(4, 54)), Color(0.6, 0.6, 0.58))
-
-
-## Above the people: tree canopies, and string lights from the decor upgrade.
-func _draw_top() -> void:
-	for tree in grid.cells_of("Y"):
-		var c := grid.cell_rect(tree).get_center() + Vector2(0, -16)
-		_top.draw_circle(c, 15.0, Color(0.2, 0.45, 0.22, 0.92))
-		_top.draw_circle(c + Vector2(-5, -4), 9.0, Color(0.28, 0.55, 0.28, 0.92))
-	if decor_level >= 1:
-		var bulbs: Array[Color] = [Color(1, 0.9, 0.5), Color(1, 0.5, 0.4), Color(0.6, 0.9, 1)]
-		var from := Vector2(decor_area().position.x, 82)
-		var to := Vector2(decor_area().end.x, 82)
-		for i in 30:
-			var t := float(i) / 29.0
-			var at := from.lerp(to, t) + Vector2(0, sin(t * PI * 3.0) * 6.0 + 6.0)
-			_top.draw_circle(at, 1.6, Color(bulbs[i % 3], 0.7 + 0.3 * sin(_time * 3.0 + i)))
+	StreetRoomPainter.draw_room(self)

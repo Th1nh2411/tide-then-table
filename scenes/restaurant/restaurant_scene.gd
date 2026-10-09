@@ -1,29 +1,13 @@
 extends Control
 ## Restaurant screen: a sidewalk seafood spot seen top-down (StreetRoom).
-## Flow: prepare today's menu from storage -> open at 15:00 -> serve customers
-## until closing at 24:00 (fixed real-time shift, or the player closes early)
-## -> leftovers go back to storage -> summary.
-## Service (Dave the Diver style): Bảo is the chef (ChefBao: cooks every
-## steamed / stir-fried dish by himself and puts it on the plate table); Rin
-## is the waiter: WASD (+ Shift dash), E acts on the cell he faces — carry
-## plates out, clean tables — and near the kitchen a menu chip / number key
-## on one of his rows grills a dish (charcoal grill, compact minigame, no
-## pop-up) or pours a beer tower.
-## Rau muống and beer are always on the menu: their goods are bought at Cô
-## Năm's grocery next door (E in front of the counter opens her list,
-## MarketPanel; before opening or mid-shift); leftovers are thrown away at
-## closing. Once the seafood sells out, customers only order those, so a poorly prepared menu earns little. A menu with
-## few dishes lowers all prices.
-## After the summary (1-5 stars) nothing moves on by itself: pinned buttons
-## let the player buy upgrades (phone "Nâng cấp" tab) whenever the shop isn't
-## serving, and "Ra khơi" starts the next night (storage loses freshness).
-## Staff (from day 3, StaffCrew; hired in the phone's "Nhân viên" tab):
-## helpers carry plates out and clean tables; wages are paid at closing.
-## Regulars with a fish order: their fish is set aside before menu planning
-## and they come in during the shift (CustomerManager); unserved fish go back
-## to storage and overdue orders are cancelled at closing.
-
-const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
+## Day flow: arrival story scene (ArrivalCutscenes) -> plan the menu (click
+## the LED sign, MenuSetupPanel) -> open -> serve until the shift ends (or
+## close early; guests inside still eat) -> summary (ShiftReport) -> evening:
+## "Sửa quán" (RenovationMode) and "Ra khơi" (next night). Bảo cooks
+## (ChefBao), Rin serves / grills / pours (KitchenStation), customers come
+## and pay (CustomerManager), staff help (StaffCrew), the grocery is next door
+## (MarketStall + MarketPanel). First-time pointers: RestaurantGuide; quests:
+## QuestTracker; debug keys: RestaurantDebug.
 
 ## Real seconds for the whole shift (15:00 -> 24:00 on the displayed clock).
 @export var base_shift_seconds: float = 180.0
@@ -63,10 +47,9 @@ var _left_angry: int = 0
 var _message_token: int = 0
 ## Regulars coming today (FishOrders.reserve_for_shift).
 var _regular_visits: Array[Dictionary] = []
-var _renovate_button: Button
+var _evening: RestaurantEvening
 var _dialogue_box: DialogueBox
 var _guide: RestaurantGuide
-var _sail_button: Button
 var _market_panel: MarketPanel
 var _crew: StaffCrew
 
@@ -97,9 +80,17 @@ func _ready() -> void:
 	_board.clicked.connect(func() -> void:  # the LED sign opens menu planning
 		_menu_panel.show()
 		_menu_panel.move_to_front())
-	_renovate_button = _pin_button("Sửa quán", Rect2(292, 42, 85, 18))
-	_renovate_button.pressed.connect(_open_renovation)
-	_renovation.finished.connect(_on_renovation_finished)
+	_evening = RestaurantEvening.new()
+	_evening.hud = $HUD
+	_evening.renovation = _renovation
+	_evening.world_layers = [$World/People, $World/Bikes, $World/Markers, $HUD]
+	_evening.menu_panel = _menu_panel
+	_evening.fridge_upgrade = fridge_upgrade
+	_evening.fish_catalog = fish_catalog
+	_evening.shift_over = is_shift_over
+	_evening.message_requested.connect(_show_message)
+	_evening.renovated.connect(_on_renovated)
+	add_child(_evening)
 	_room.kitchen_level = GameState.get_upgrade_level(_renovation.kitchen_upgrade.id)
 	_room.fridge_level = GameState.get_upgrade_level(_renovation.fridge_upgrade.id)
 	# The minigame pops over the road below the kitchen (middle of the pavement).
@@ -108,9 +99,6 @@ func _ready() -> void:
 	cooking_panel.offset_right = 435.0
 	cooking_panel.offset_top = 212.0
 	cooking_panel.offset_bottom = 328.0
-	_sail_button = _pin_button("Ra khơi  →", Rect2(520, 318, 114, 32))
-	_sail_button.pressed.connect(_start_next_day)
-	_sail_button.hide()
 	(%RepairButton as RepairButton).repaired.connect(func(spent: int, fully: bool) -> void:
 		_show_message("Đã sửa thuyền: -%dk%s" % [spent, "" if fully else " (chưa đủ tiền sửa hết)"]))
 	_close_early_button.pressed.connect(func() -> void: _end_shift("Đóng quán sớm"))
@@ -136,6 +124,7 @@ func _ready() -> void:
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
+		GameState.set_flag("regular_served_once")  # the regular's tea after the shift
 		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
 	_plan = MenuPlan.new(_menu_slots())
 	_kitchen.setup(_plan)
@@ -150,6 +139,13 @@ func _ready() -> void:
 	tracker.origin = Vector2(4, 26)  # under the order tickets
 	add_child(tracker)
 	_cutscene.hidden_nodes.append(tracker)
+	var debug := RestaurantDebug.new()
+	debug.menu_panel = _menu_panel
+	debug.plan = _plan
+	debug.fish_catalog = fish_catalog
+	debug.stall = _stall
+	debug.message_requested.connect(_show_message)
+	add_child(debug)
 	_play_arrival_cutscene.call_deferred()
 
 
@@ -167,8 +163,8 @@ func _add_guide() -> void:
 	_guide.crew = _crew
 	_guide.renovation = _renovation
 	_guide.open_button = _menu_panel.get_open_button()
-	_guide.renovate_button = _renovate_button
-	_guide.sail_button = _sail_button
+	_guide.renovate_button = _evening.renovate_button
+	_guide.sail_button = _evening.sail_button
 	_guide.serving = is_serving
 	_guide.shift_over = is_shift_over
 	add_child(_guide)
@@ -182,19 +178,11 @@ func is_shift_over() -> bool:
 	return _shift_over
 
 
-## Opening day / beer / Vy...: one story scene on arrival (once each). The
-## Vy scene can hire her on the spot (flag "vy_hire_now").
 func _play_arrival_cutscene() -> void:
 	await get_tree().process_frame  # let the router's fade-in start first
-	var scene := DialogueLibrary.pick(arrival_cutscenes) as Cutscene
-	if scene == null:
-		return
-	await _cutscene.play(scene)
-	if GameState.story_flags.has("vy_hire_now"):
-		GameState.story_flags.erase("vy_hire_now")
-		var vy := staff_catalog.find("vy")
-		if vy and _crew.roster.hire(vy):
-			_show_message("Vy vào làm từ hôm nay!", 2.5)
+	var message: String = await ArrivalCutscenes.play(_cutscene, arrival_cutscenes, _crew.roster)
+	if message:
+		_show_message(message, 2.5)
 
 
 func _menu_slots() -> int:
@@ -212,29 +200,10 @@ func _open_shop() -> void:
 	_variety_multiplier = MenuPlan.variety_multiplier(_variety_count, variety_multipliers)
 	_shift_running = true
 	_close_early_button.show()
-	_renovate_button.hide()
+	_evening.renovate_button.hide()
 	_crew.start_shift()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
 	_show_message("Quán mở cửa!")
-
-
-# Debug builds, so the restaurant can be tested with F6 without a sea trip:
-# F1 during menu setup adds one of every fish to storage; F2 (any time) puts
-# a bulk buy of every drink the grocery sells straight into the fridge.
-func _unhandled_input(event: InputEvent) -> void:
-	var key := event as InputEventKey
-	if not OS.is_debug_build() or key == null or not key.pressed or key.echo:
-		return
-	if key.physical_keycode == KEY_F1 and _menu_panel.visible:
-		for fish in fish_catalog.fish:
-			GameState.storage.append(InventoryItem.new(fish, 1.0))
-		_plan.changed.emit()  # refresh the menu panel
-	elif key.physical_keycode == KEY_F2:
-		for dish in _stall.products:
-			if dish.instant_serve:
-				_stall.stock.add(dish, dish.buy_units(dish.has_bulk()))
-				_show_message("[debug] +%d %s %s vào tủ lạnh" % [dish.buy_units(dish.has_bulk()), dish.unit_name,
-					dish.display_name])
 
 
 func _process(delta: float) -> void:
@@ -293,29 +262,13 @@ func _end_shift(reason: String) -> void:
 	var order_lines := FishOrders.expire_after_shift(fish_catalog)
 	var wages := _crew.pay_wages()
 	_shift_over = true
-	var monotonous := _variety_multiplier < 1.0
-	var stars := DayRating.stars(_served, _left_angry, monotonous)
+	var stars := DayRating.stars(_served, _left_angry, _variety_multiplier < 1.0)
 	GameState.last_rating = stars
 	GameState.add_day_record({"day": GameState.day, "earned": _earned_today, "market": _market_spent,
 		"rating": stars, "served": _served, "left": _left_angry, "wages": wages})
-	# Short on purpose: the details are in the phone ("Sổ sách").
-	var lines: PackedStringArray = [
-		"%s  ·  %d/5 sao" % [reason, stars],
-		"Thu %dk  ·  Chi %dk  ·  Lãi %dk" % [_earned_today, _market_spent + wages,
-			_earned_today - _market_spent - wages],
-		"Phục vụ %d bàn  ·  Bỏ đi %d" % [_served, _left_angry],
-	]
-	var notes: PackedStringArray = []
-	if monotonous:
-		notes.append("menu đơn điệu x%.1f" % _variety_multiplier)
-	if leftover > 0:
-		notes.append("%d phần hải sản về kho" % leftover)
-	if not notes.is_empty():
-		lines.append(" · ".join(notes))
-	if not _rating_hint(stars).is_empty():
-		lines.append(_rating_hint(stars))
-	lines.append_array(order_lines)
-	_summary_label.text = "\n".join(lines)
+	_summary_label.text = ShiftReport.text({"reason": reason, "stars": stars, "earned": _earned_today,
+		"market": _market_spent, "wages": wages, "served": _served, "left": _left_angry,
+		"variety": _variety_multiplier, "leftover": leftover}, order_lines)
 	_summary_panel.show()
 	_next_day_button.grab_focus()
 
@@ -348,68 +301,19 @@ func _show_message(text: String, seconds: float = message_seconds) -> void:
 		_message_label.hide()
 
 
-func _rating_hint(stars: int) -> String:
-	if stars >= 4:
-		return "Mai đông khách hơn!"
-	if stars <= 2:
-		return "Mai vắng khách hơn..."
-	return ""
-
-
 ## Summary closed: the evening is free — upgrade, repair, then sail.
 func _on_continue_pressed() -> void:
 	_summary_panel.hide()
 	var scene := DialogueLibrary.pick(after_shift_cutscenes) as Cutscene
 	if scene:
 		await _cutscene.play(scene)
-	_renovate_button.show()
-	_sail_button.show()
+	_evening.show_evening()
 
 
-## "Sửa quán": hide people and panels, let RenovationMode take over.
-func _open_renovation() -> void:
-	_set_room_ui_visible(false)
-	_renovation.open()
-
-
-func _on_renovation_finished(applied: bool) -> void:
-	_set_room_ui_visible(true)
-	if applied:
-		_customers.refresh_upgrades()
-		_plan.slots = _menu_slots()  # a better kitchen holds more dishes
-		_show_message("Đã sửa quán!")
-
-
-## People, panels and pinned buttons (hidden while renovating).
-func _set_room_ui_visible(on: bool) -> void:
-	for node: CanvasItem in [$World/People, $World/Bikes, $World/Markers, $HUD]:
-		node.visible = on
-	_menu_panel.visible = false
-	_sail_button.visible = on and _shift_over
-	_renovate_button.visible = on
-
-
-func _pin_button(text: String, rect: Rect2) -> Button:
-	var button := Button.new()
-	button.text = text
-	button.add_theme_font_size_override("font_size", 10)
-	button.focus_mode = Control.FOCUS_NONE
-	$HUD.add_child(button)
-	# Sized once in the tree: before that the minimum size uses the default font.
-	button.position = rect.position
-	button.size = rect.size
-	return button
+func _on_renovated() -> void:
+	_customers.refresh_upgrades()
+	_plan.slots = _menu_slots()  # a better kitchen holds more dishes
 
 
 func _exit_tree() -> void:
 	Customer.patience_paused = false
-
-
-func _start_next_day() -> void:
-	var loss: float = float(GameState.get_upgrade_value(fridge_upgrade)) if fridge_upgrade else 35.0
-	GameState.advance_day(loss)
-	# Morning messages: maybe a new fish order (shown at sea and in the phone).
-	var rng := RandomNumberGenerator.new()
-	rng.randomize()
-	FishOrders.roll_new_order(rng, fish_catalog)
-	SceneRouter.go_to(SEA_SCENE_PATH)

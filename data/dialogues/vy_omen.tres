@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Dialogue" format=3]
+
+[ext_resource type="Script" path="res://data/resources/dialogue.gd" id="1_dlg"]
+
+[resource]
+script = ExtResource("1_dlg")
+id = "vy_omen"
+min_day = 1
+priority = 12
+requires_flag = "fog_omen_day"
+script_text = "Vy: Anh thấy ánh sáng ngoài sương rồi phải không? Cả xóm đồn ầm lên.
+Rin: Ừ. Mai sương mở, anh tính ra đó coi.
+Vy: Anh nhớ đem đèn dư dầu nha. Đừng ráng quá, quán còn chờ anh về."

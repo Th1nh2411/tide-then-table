@@ -115,6 +115,10 @@ func _test_picker_and_bill() -> void:
 	var day1 := CustomerManager.stage_for(shipped, 1)
 	_check("day 1 is simple: one guest, one dish, no extra round", day1.pair_chance == 0.0
 		and day1.extra_dish_chance == 0.0 and day1.max_more_rounds == 0)
+	var report := ShiftReport.text({"reason": "Hết giờ bán!", "stars": 4, "earned": 500, "market": 80, "wages": 20,
+		"served": 7, "left": 1, "variety": 0.9, "leftover": 2}, PackedStringArray(["Chú Ba: hết hạn"]))
+	_check("shift report: short lines with profit", report.contains("Lãi 400k") and report.contains("4/5 sao")
+		and report.contains("đơn điệu") and report.ends_with("Chú Ba: hết hạn") and report.count("\n") <= 6)
 	_check("tip only above the threshold", TableBill.tip(100, 0.6, 0.5, 0.2) == 20 and TableBill.tip(100, 0.4, 0.5, 0.2) == 0)
 
 

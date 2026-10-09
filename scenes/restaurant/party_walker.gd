@@ -3,11 +3,13 @@ extends RefCounted
 ## Moves a party on the street restaurant: from the parked bike (or a
 ## pavement edge "D") to the table — leader on the stool, second guest on the
 ## spare one — and back out; the bike rides off once both are back.
+## Bike parties walk in once their bike has parked.
 
 var room: StreetRoom
 var bikes: CustomerBikes
 var layer: Node2D
 var rng := RandomNumberGenerator.new()
+var _riding: Array[Customer] = []  # leaders whose bike hasn't parked yet
 
 
 func _init(p_room: StreetRoom, p_bikes: CustomerBikes, p_layer: Node2D) -> void:
@@ -15,6 +17,18 @@ func _init(p_room: StreetRoom, p_bikes: CustomerBikes, p_layer: Node2D) -> void:
 	bikes = p_bikes
 	layer = p_layer
 	rng.randomize()
+	bikes.parked.connect(_on_bike_parked)
+
+
+## Rides in on a bike (second guest on the back) unless it walks in (or no
+## bike slot is free): then it comes along the pavement right away.
+func arrive(customer: Customer, walk_in_chance: float) -> void:
+	if rng.randf() >= walk_in_chance:
+		customer.bike = bikes.arrive(customer.companion != null)
+	if customer.bike == null:
+		walk_in(customer, entrance())
+	else:
+		_riding.append(customer)
 
 
 ## Adds the party at `from` and walks them to their table.
@@ -51,3 +65,10 @@ func walk_out(customer: Customer) -> void:
 func entrance() -> Vector2i:
 	var doors := room.grid.cells_of("D")
 	return doors[rng.randi() % doors.size()]
+
+
+func _on_bike_parked(bike: CustomerBikes.Bike) -> void:
+	for customer in _riding.duplicate():
+		if customer.bike == bike:
+			_riding.erase(customer)
+			walk_in(customer, bike.parking)
