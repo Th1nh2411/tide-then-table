@@ -84,6 +84,11 @@ Vietnamese, keep code comments in short English.
   restaurant via `GameState.resume_at`; use `SaveSystem.autosave()`) → restaurant (menu planning → shift →
   summary + rating → upgrade shop) → next day (freshness loss) → sea …
   ending via fog whirlpool.
+- Sea view matches the restaurant: the boat camera zooms x2 (Rin is 16x32
+  on screen, standing in a nón lá; `Boat._draw` is 3/4: the deck turns, the
+  hull side always faces the bottom of the screen, Rin and the cat stay
+  upright). World coordinates / speeds are unchanged; art for the sea is
+  drawn at screen size and placed at scale 0.5.
 - Sea scene controllers: `FishingController` (rod spots → `FishingMinigame`:
   BiteGame then Timing/Tension; spot picks species via its featured fish +
   depth, `CatchRoll` rolls size: deeper = pricier/bigger, size scales price

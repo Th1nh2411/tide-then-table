@@ -40,6 +40,8 @@ var tow_multiplier: float = 1.0
 ## Extra angular velocity from spin drift, in degrees/second.
 var _spin: float = 0.0
 var _cat_time: float = 0.0
+## Hull side height (world px) in the 3/4 view.
+@export var hull_depth: float = 3.0
 ## The restaurant cat rides along at the stern once adopted.
 @onready var _has_cat: bool = PetCat.is_present()
 
@@ -116,38 +118,78 @@ func _move(delta: float) -> void:
 		position += collision.get_normal()
 
 
+## 3/4 view like the restaurant: the deck turns with the boat, the hull's
+## side always shows toward the bottom of the screen (local "down" follows
+## -rotation), and Rin (in a conical hat) and the cat stand upright. The sea
+## camera zooms x2, so Rin is 16x32 on screen like in the restaurant.
 func _draw() -> void:
 	if boat_data == null:
 		return
-	# Hull points toward +X (Godot's rotation 0).
+	# Deck outline; the bow points toward +X (Godot's rotation 0).
 	var half := boat_data.hull_size * 0.5
-	var hull := PackedVector2Array([
+	var deck := PackedVector2Array([
 		Vector2(half.x, 0),
 		Vector2(half.x * 0.3, -half.y),
 		Vector2(-half.x, -half.y),
 		Vector2(-half.x, half.y),
 		Vector2(half.x * 0.3, half.y),
 	])
-	draw_colored_polygon(hull, boat_data.color)
-	# Bow marker so the heading is readable on round hulls.
-	draw_circle(Vector2(half.x * 0.5, 0), 1.5, Color.WHITE)
+	var down := Vector2.DOWN.rotated(-rotation) * hull_depth
+	draw_colored_polygon(_shifted(deck, down * 1.8), Color(0, 0, 0, 0.25))  # shadow on the water
+	var side := boat_data.color.darkened(0.45)
+	for k in deck.size():
+		var a := deck[k]
+		var b := deck[(k + 1) % deck.size()]
+		draw_colored_polygon(PackedVector2Array([a, b, b + down, a + down]), side)
+	draw_colored_polygon(deck, boat_data.color)
+	draw_colored_polygon(_scaled(deck, 0.7), boat_data.color.darkened(0.2))  # inside the hull
+	# Upright figures (undo the boat's rotation around their feet).
 	if _has_cat:
-		_draw_cat(Vector2(-half.x * 0.55, 0))
+		draw_set_transform(Vector2(-half.x * 0.55, half.y * 0.2), -rotation)
+		_draw_cat()
+	draw_set_transform(Vector2(-half.x * 0.1, 0), -rotation)
+	_draw_rin()
+	draw_set_transform(Vector2.ZERO)
 
 
-## The cat curled up at the stern (seen from above), eyes glowing a little
-## (over-bright so they show through the night tint).
-func _draw_cat(at: Vector2) -> void:
+## Rin standing, 8x16 world px (16x32 on screen), in a nón lá.
+func _draw_rin() -> void:
+	draw_rect(Rect2(-2, -4, 1.5, 4), Color(0.25, 0.2, 0.15))  # legs
+	draw_rect(Rect2(0.5, -4, 1.5, 4), Color(0.25, 0.2, 0.15))
+	draw_rect(Rect2(-2.5, -9, 5, 5.5), Color(0.2, 0.45, 0.8))  # shirt
+	draw_circle(Vector2(0, -10.8), 2.2, Color(0.95, 0.8, 0.65))  # head
+	draw_colored_polygon(PackedVector2Array([Vector2(-4.5, -11.5), Vector2(4.5, -11.5), Vector2(0, -15.5)]),
+		Color(0.9, 0.8, 0.5))  # conical hat
+
+
+## The cat sitting up, eyes glowing a little (over-bright so they show
+## through the night tint).
+func _draw_cat() -> void:
 	var fur := Color(0.95, 0.6, 0.25)
-	draw_circle(at, 3.2, fur)
-	draw_circle(at + Vector2(2.6, 0), 2.0, fur)  # head toward the bow
-	draw_line(at + Vector2(-3, 0), at + Vector2(-5, 2.0 * sin(_cat_time * 2.0)), fur, 1.2)  # tail
-	var glow := 0.5 + 0.5 * sin(_cat_time * 0.7)
-	draw_circle(at + Vector2(3.4, -0.8), 0.6, Color(0.6, 3.0, 2.0, 0.5 + 0.5 * glow))
-	draw_circle(at + Vector2(3.4, 0.8), 0.6, Color(0.6, 3.0, 2.0, 0.5 + 0.5 * glow))
+	draw_circle(Vector2(0, -2.2), 2.4, fur)  # body
+	draw_circle(Vector2(0.6, -5.2), 1.7, fur)  # head
+	draw_colored_polygon(PackedVector2Array([Vector2(-0.7, -6.4), Vector2(-0.3, -8), Vector2(0.4, -6.6)]), fur)
+	draw_colored_polygon(PackedVector2Array([Vector2(1.0, -6.6), Vector2(1.7, -8), Vector2(2.1, -6.2)]), fur)
+	draw_line(Vector2(-2, -1), Vector2(-3.5, -3 + sin(_cat_time * 2.0)), fur, 1.0)  # tail
+	var glow := Color(0.6, 3.0, 2.0, 0.6 + 0.4 * sin(_cat_time * 0.7))
+	draw_circle(Vector2(0.1, -5.4), 0.4, glow)
+	draw_circle(Vector2(1.3, -5.4), 0.4, glow)
+
+
+func _shifted(points: PackedVector2Array, offset: Vector2) -> PackedVector2Array:
+	var result := PackedVector2Array()
+	for p in points:
+		result.append(p + offset)
+	return result
+
+
+func _scaled(points: PackedVector2Array, factor: float) -> PackedVector2Array:
+	var result := PackedVector2Array()
+	for p in points:
+		result.append(p * factor)
+	return result
 
 
 func _process(delta: float) -> void:
-	if _has_cat:
-		_cat_time += delta
-		queue_redraw()
+	_cat_time += delta
+	queue_redraw()  # the side face follows the rotation

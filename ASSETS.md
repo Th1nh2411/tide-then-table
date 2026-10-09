@@ -67,11 +67,16 @@ Khách quen, Ông lão (chòi), mèo.
 
 ## 3. Biển ban đêm (P2)
 
+Biển hiển thị zoom x2 cho cùng tỉ lệ với quán. Vẽ asset biển theo **cỡ trên màn hình**: 3 thuyền và Rin
+đã ghi sẵn cỡ màn hình; các dòng còn lại ghi cỡ trong thế giới game, **vẽ gấp đôi** (vd đám bọt 16x16 → vẽ
+32x32). Game đặt tỉ lệ 0.5 nên độ nét pixel khớp với quán.
+
 | Tên | Kích thước (px) | Ghi chú |
 |---|---|---|
-| Thuyền thúng | 16x16 | nhìn từ trên, xoay theo hướng lái |
-| Ghe chèo | 24x10 | |
-| Ghe máy | 30x12 | có vệt nước sau đuôi |
+| Thuyền thúng | 32x32 trên màn hình | góc 3/4 như quán: vẽ 8 hướng (hoặc 1 hướng + code xoay mặt boong); thành thuyền thấy ở phía dưới |
+| Ghe chèo | 48x20 trên màn hình | như trên |
+| Ghe máy | 60x24 trên màn hình | có vệt nước sau đuôi |
+| Rin trên thuyền | 16x32 | đội nón lá, đứng / thả câu / kéo lưới |
 | Nước biển | ô 16x16 lặp | 3 độ sâu: gần bờ / rạn đá / khơi xa |
 | Bờ, bến, nhà Xóm Đèn | theo bản đồ 1920x1280 | cầu tàu, đèn bến |
 | Đám bọt cá | 16x16, 3 khung | màu nhạt theo loài cá |

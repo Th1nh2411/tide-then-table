@@ -11,8 +11,8 @@ extends PointLight2D
 ## Energy change per second when switching on/off.
 @export var fade_speed: float = 3.0
 ## Light radius in px with a full / empty tank.
-@export var radius_full: float = 150.0
-@export var radius_empty: float = 55.0
+@export var radius_full: float = 100.0
+@export var radius_empty: float = 40.0
 ## Below this oil fraction the lamp starts to sputter.
 @export var sputter_fraction: float = 0.15
 @export var sputter_amount: float = 0.25
