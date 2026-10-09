@@ -1,7 +1,9 @@
 class_name LobsterRaft
 extends PointOfInterest
-## Anh Năm's lobster raft on the reef: buys everything in the hold right now
-## at a low "night market" price, to make room without going back to dock.
+## Anh Năm's lobster raft on the reef: buys fish from the hold right now at
+## a low "night market" price, to make room without going back to dock —
+## the whole hold at once, or picked one by one in the hold window (sell mode:
+## drag onto "Bán" / right-click).
 
 @export var hold_manager: HoldManager
 ## Fraction of base price × size × quality paid per fish.
@@ -17,13 +19,32 @@ func _interact() -> void:
 	var value := sale_value(items, sell_ratio)
 	var choice := await dialog.ask(title,
 		"Anh Năm: \"Khoang đầy hả? Để anh mua đỡ, giá chợ đêm thôi nghen.\"\n(%d con trong khoang)" % items.size(),
-		PackedStringArray(["Bán hết khoang: %dk" % value, "Thôi, để đem về quán"]))
-	if choice != 0:
+		PackedStringArray(["Chọn con để bán", "Bán hết khoang: %dk" % value, "Thôi, để đem về quán"]))
+	if choice == 0:
+		_sell_some()
+		return
+	if choice != 1:
 		return
 	for item: InventoryItem in items:
 		hold_manager.hold.remove(item)
 	GameState.add_money(value)
 	hud.flash_message("Bán %d con cho bè tôm hùm: +%dk" % [items.size(), value], 2.0)
+
+
+## Opens the hold in sell mode; tells how much it came to when closed.
+func _sell_some() -> void:
+	var ui := hold_manager.hold_ui
+	var total: Array[int] = [0, 0]  # fish, money
+	var on_sold := func(_item: InventoryItem, price: int) -> void:
+		total[0] += 1
+		total[1] += price
+	ui.sold.connect(on_sold)
+	ui.open_sell("bè tôm hùm anh Năm (giá chợ đêm)", func(item: InventoryItem) -> int:
+		return sale_value([item], sell_ratio))
+	await ui.closed
+	ui.sold.disconnect(on_sold)
+	if total[0] > 0:
+		hud.flash_message("Bán %d con cho bè tôm hùm: +%dk" % total, 2.0)
 
 
 ## What the raft pays for these items.

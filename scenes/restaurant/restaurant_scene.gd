@@ -29,11 +29,11 @@ const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 @export var base_shift_seconds: float = 180.0
 @export var menu: DishCatalog
 @export var fish_catalog: FishCatalog
-## How many different dishes the menu can hold.
-@export var menu_slots: int = 3
+## How many different dishes the menu can hold, by kitchen upgrade level.
+@export var menu_slots_by_kitchen: Array[int] = [3, 4, 5]
 ## Price multiplier by number of distinct dishes on the menu (index = count;
 ## higher counts use the last entry). Customers get bored of a tiny menu.
-@export var variety_multipliers: Array[float] = [0.8, 0.8, 0.9, 1.0]
+@export var variety_multipliers: Array[float] = [0.8, 0.8, 0.9, 1.0, 1.05, 1.1]
 @export var message_seconds: float = 1.5
 ## Fridge upgrade: its value is the freshness lost overnight.
 @export var fridge_upgrade: UpgradeData
@@ -147,13 +147,18 @@ func _ready() -> void:
 	add_child(_dialogue_box)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
 		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
-	_plan = MenuPlan.new(menu_slots)
+	_plan = MenuPlan.new(_menu_slots())
 	_kitchen.setup(_plan)
 	_chef.setup(_plan)
 	_menu_panel.setup(_plan, menu, fish_catalog, variety_multipliers)
 	_menu_panel.confirmed.connect(_open_shop)
 	_menu_panel.hide()  # opened by clicking the LED sign (MenuBoard)
 	_time_left = get_shift_seconds()
+
+
+func _menu_slots() -> int:
+	var level := GameState.get_upgrade_level(_renovation.kitchen_upgrade.id)
+	return menu_slots_by_kitchen[clampi(level, 0, menu_slots_by_kitchen.size() - 1)]
 
 
 func get_shift_seconds() -> float:
@@ -323,6 +328,7 @@ func _on_renovation_finished(applied: bool) -> void:
 	_set_room_ui_visible(true)
 	if applied:
 		_customers.refresh_upgrades()
+		_plan.slots = _menu_slots()  # a better kitchen holds more dishes
 		_show_message("Đã sửa quán!")
 
 

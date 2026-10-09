@@ -2,10 +2,14 @@ class_name HoldGridView
 extends Control
 ## Draws the hold grid, a tray for an incoming fish that didn't fit, and a
 ## discard zone. Left mouse drags items; `rotate_item` turns the dragged item.
+## Selling (`selling` true, at the lobster raft): the discard zone becomes a
+## green "Bán" zone; dropping a fish there or right-clicking it sells it
+## (`item_sold`; the caller pays).
 ## All game rules live in GridInventory; this only draws and forwards moves.
 
 signal pending_changed
 signal item_discarded(item: InventoryItem)
+signal item_sold(item: InventoryItem)
 
 @export var cell_size: int = 20
 @export var tray_cells: Vector2i = Vector2i(3, 3)
@@ -15,6 +19,10 @@ signal item_discarded(item: InventoryItem)
 @export var valid_color: Color = Color(0.4, 1.0, 0.5)
 @export var invalid_color: Color = Color(1.0, 0.35, 0.3)
 @export var trash_color: Color = Color(0.5, 0.15, 0.15)
+@export var sell_color: Color = Color(0.15, 0.45, 0.2)
+
+## Sell mode: what one fish fetches (InventoryItem -> int); empty = not selling.
+var sell_price: Callable
 
 var hold: GridInventory
 ## Incoming fish waiting in the tray (overflow mode), or null.
@@ -69,7 +77,14 @@ func get_hover_text() -> String:
 		item = pending
 	if item == null:
 		return ""
-	return "%s %s · chất lượng %.1f" % [item.fish.display_name, item.fish.weight_text(item.size), item.quality]
+	var text := "%s %s · chất lượng %.1f" % [item.fish.display_name, item.fish.weight_text(item.size), item.quality]
+	if is_selling():
+		text += " · bán %dk" % int(sell_price.call(item))
+	return text
+
+
+func is_selling() -> bool:
+	return sell_price.is_valid()
 
 
 func _process(_delta: float) -> void:
@@ -84,6 +99,14 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		_mouse = event.position
 		queue_redraw()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		_mouse = event.position
+		if is_selling() and _dragged == null and _grid_rect().has_point(_mouse):
+			var item := hold.get_item_at(_mouse_cell())
+			if item:
+				hold.remove(item)
+				item_sold.emit(item)
+		accept_event()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_mouse = event.position
 		if event.pressed:
@@ -126,7 +149,10 @@ func _end_drag() -> void:
 		if _drag_from_pending:
 			set_pending(null)
 		_dragged = null
-		item_discarded.emit(item)
+		if is_selling():
+			item_sold.emit(item)
+		else:
+			item_discarded.emit(item)
 	else:
 		cancel_drag()
 	queue_redraw()
@@ -173,8 +199,11 @@ func _draw() -> void:
 		_draw_item(pending, tray.position, 1.0)
 
 	var trash := _trash_rect()
-	draw_rect(trash, trash_color)
-	draw_string(font, trash.position + Vector2(0, trash.size.y * 0.5 + 4), "Bỏ",
+	draw_rect(trash, sell_color if is_selling() else trash_color)
+	var zone_text := "Bỏ"
+	if is_selling():
+		zone_text = "Bán %dk" % int(sell_price.call(_dragged)) if _dragged else "Bán"
+	draw_string(font, trash.position + Vector2(0, trash.size.y * 0.5 + 4), zone_text,
 		HORIZONTAL_ALIGNMENT_CENTER, trash.size.x, 12)
 
 	if _dragged:

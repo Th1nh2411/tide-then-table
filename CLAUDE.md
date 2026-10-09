@@ -100,7 +100,8 @@ Vietnamese, keep code comments in short English.
   Over-bright colors (x3-x5) are how things glow through the night tint.
 - Places (`scenes/sea/poi/`, under `Places` in the sea scene): subclasses of
   `PointOfInterest` (own lamp, E to visit, `_interact()` awaits
-  `PoiDialog.ask()`): `WhaleShrine`, `OldManHut`, `Lighthouse`, `LobsterRaft`.
+  `PoiDialog.ask()`): `WhaleShrine`, `OldManHut`, `Lighthouse`, `LobsterRaft` (buys the whole hold, or picked fish in
+  `HoldUI.open_sell` sell mode: drag onto "Bán" / right-click).
   Lines follow `Story.stage()`. `PoiDialog` sits before `PhoneApp`.
 - Phone map (`PhoneMap`, tab "Bản đồ"): static snapshot captured by the sea
   scene (`_capture_map`), live boat (group "boat") + nets; pins in
