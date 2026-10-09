@@ -2,8 +2,8 @@ class_name RestaurantGuide
 extends Guide
 ## First-time pointers in the restaurant (see Guide): the LED sign, "Mở
 ## quán", a plate to pick up, the table to bring it to, the grill, the beer
-## tap, the grocery when something runs out, the fridge, a dirty table, the
-## staff button, "Sửa quán" and "Ra khơi". Refs are set by the restaurant
+## tap, the grocery when something runs out, the fridge, a dirty table,
+## hiring in the phone, "Sửa quán" and "Ra khơi". Refs are set by the restaurant
 ## before it enters the tree.
 
 var room: StreetRoom
@@ -14,10 +14,9 @@ var stall: MarketStall
 var board: MenuBoard
 var menu_panel: MenuSetupPanel
 var market_panel: MarketPanel
-var staff_panel: StaffPanel
+var crew: StaffCrew
 var renovation: RenovationMode
 var open_button: Button
-var staff_button: Button
 var renovate_button: Button
 var sail_button: Button
 ## () -> bool: the shop is serving (open or closing with guests inside).
@@ -54,14 +53,19 @@ func _add_rules() -> void:
 	add("clean", "E: dọn bàn", func() -> bool: return not room.dining.dirty_seats().is_empty(),
 		_clean_target,
 		func() -> bool: return room.dining.dirty_seats().is_empty())
-	add("staff", "Thuê nhân viên", func() -> bool: return staff_button.visible,
-		func() -> Vector2: return Guide.control_center(staff_button),
-		func() -> bool: return staff_panel.visible)
+	add("staff", "J → Nhân viên: thuê người", _staff_active,
+		func() -> Vector2: return Guide.screen_of(rin, Vector2(0, -40)),
+		func() -> bool: return not crew.roster.hired().is_empty())
 	add("renovate", "Nâng cấp quán", func() -> bool: return shift_over.call() and renovate_button.visible,
 		func() -> Vector2: return Guide.control_center(renovate_button),
 		func() -> bool: return renovation.visible)
 	add("sail", "Xong thì ra khơi", _sail_active,
 		func() -> Vector2: return Guide.control_center(sail_button))
+
+
+func _staff_active() -> bool:
+	return crew.is_unlocked() and not serving.call() and crew.roster.hired().is_empty() \
+		and not crew.roster.candidates().is_empty()
 
 
 func _open_shop_active() -> bool:

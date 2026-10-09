@@ -8,7 +8,8 @@ extends StreetPerson
 ## coming, `finished_eating` (the manager may order one more round, or they
 ## pay and walk off). Patience only drains while lines are pending and
 ## there's nothing on the table; each plate brought cheers them up a bit.
-## Runs out = leaves angry (pays for what was eaten). The second guest
+## Runs out = leaves angry (pays for what was eaten). Patience waits while
+## a first-time pointer (RestaurantGuide) is on screen. The second guest
 ## (`leader` set) only walks, sits on the spare stool and eats along.
 ## Special kinds: a regular coming for their fish order (more patient, gold
 ## bubble) and a well-off customer (gold shirt + tie, pays more).
@@ -54,6 +55,9 @@ var companion: Customer
 var leader: Customer
 
 var _timer: float = 0.0
+
+## Set by the restaurant: a first-time pointer is on screen (patience waits).
+static var patience_paused: bool = false
 
 
 func _ready() -> void:
@@ -130,7 +134,7 @@ func _process(delta: float) -> void:
 					_next_plate()
 					if plate == null and orders.is_empty():
 						finished_eating.emit(self)
-			elif not orders.is_empty():
+			elif not orders.is_empty() and not patience_paused:
 				patience = maxf(patience - delta / patience_seconds, 0.0)
 				if patience <= 0.0:
 					patience_ran_out.emit(self)

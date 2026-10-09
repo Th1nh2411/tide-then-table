@@ -2,15 +2,18 @@ class_name PhoneApp
 extends CanvasLayer
 ## Rin's phone with "Rin's Catch", the app left over from the startup Rin
 ## and Bảo built (Rin is an IT graduate). `open_phone` (J) toggles it anywhere at sea or in the restaurant;
-## the game pauses while it's open. Tabs: storage, menu, orders, map (PhoneMap),
+## the game pauses while it's open. Tabs: storage, menu, map (PhoneMap),
 ## dex, boat, ledger, upgrades (PhoneShop, the only place to buy upgrades),
+## staff (PhoneStaff: hire / dismiss / job ads, from the staff unlock day),
 ## plus a console log where story clues appear. Content comes from PhoneReports.
 ## Put it LAST in the scene tree so it gets J/Esc before other overlays.
 
 const APP_TITLE: String = "Rin's Catch v0.3.1"
-const TAB_NAMES: Array[String] = ["Kho", "Menu", "Đơn", "Bản đồ", "Dex", "Thuyền", "Sổ sách", "Nâng cấp"]
-const MAP_TAB: int = 3
-const SHOP_TAB: int = 7
+const TAB_NAMES: Array[String] = ["Kho", "Menu", "Bản đồ", "Dex", "Thuyền", "Sổ sách", "Nâng cấp", "Nhân viên"]
+const MAP_TAB: int = 2
+const SHOP_TAB: int = 6
+## Hidden until StaffCatalog.unlock_day (fish orders live in the QuestTracker).
+const STAFF_TAB: int = 7
 
 @export var fish_catalog: FishCatalog
 @export var menu: DishCatalog
@@ -22,11 +25,13 @@ const SHOP_TAB: int = 7
 @export var font_size: int = 9
 ## For the forecast log line.
 @export var weather_catalog: WeatherCatalog
+@export var staff_catalog: StaffCatalog = preload("res://data/staff/staff_catalog.tres")
 
 var _tab: int = 0
 var _opened_pause: bool = false
 var _tab_buttons: Array[Button] = []
 var _mono: SystemFont
+var _staff: PhoneStaff
 
 @onready var _title_label: Label = %AppTitle
 @onready var _tabs_row: HBoxContainer = %TabsRow
@@ -54,6 +59,11 @@ func _ready() -> void:
 		_tabs_row.add_child(button)
 		_tab_buttons.append(button)
 	_shop.setup(upgrades)
+	_staff = PhoneStaff.new()
+	_staff.size_flags_vertical = _shop.size_flags_vertical
+	_staff.custom_minimum_size = _shop.custom_minimum_size
+	_shop.add_sibling(_staff)
+	_staff.setup(staff_catalog)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -68,16 +78,27 @@ func _unhandled_input(event: InputEvent) -> void:
 		close()
 	elif visible and event.is_action_pressed("turn_left"):
 		get_viewport().set_input_as_handled()
-		_show_tab(posmod(_tab - 1, TAB_NAMES.size()))
+		_step_tab(-1)
 	elif visible and event.is_action_pressed("turn_right"):
 		get_viewport().set_input_as_handled()
-		_show_tab(posmod(_tab + 1, TAB_NAMES.size()))
+		_step_tab(1)
+
+
+## Next / previous visible tab (A / D).
+func _step_tab(direction: int) -> void:
+	var index := _tab
+	for i in TAB_NAMES.size():
+		index = posmod(index + direction, TAB_NAMES.size())
+		if _tab_buttons[index].visible:
+			break
+	_show_tab(index)
 
 
 func open() -> void:
 	_opened_pause = not get_tree().paused
 	get_tree().paused = true
 	$Phone/Margin/VBox/Hint.visible = GameState.is_first_day()
+	_tab_buttons[STAFF_TAB].visible = GameState.day >= staff_catalog.unlock_day
 	show()
 	_show_tab(_tab)
 
@@ -97,9 +118,12 @@ func _show_tab(index: int) -> void:
 	_title_label.text = "%s   %s" % [APP_TITLE, DayClock.get_time_text()]
 	_map.visible = index == MAP_TAB
 	_shop.visible = index == SHOP_TAB
-	_scroll.visible = index != MAP_TAB and index != SHOP_TAB
+	_staff.visible = index == STAFF_TAB
+	_scroll.visible = index not in [MAP_TAB, SHOP_TAB, STAFF_TAB]
 	if index == SHOP_TAB:
 		_shop.refresh()
+	if index == STAFF_TAB:
+		_staff.refresh()
 	_content_label.text = _tab_text(index)
 	var weather: WeatherData = weather_catalog.find(GameState.weather_id) if weather_catalog else null
 	_log_label.text = "\n".join(PhoneReports.log_lines(_fridge_loss(), weather))
@@ -111,14 +135,12 @@ func _tab_text(index: int) -> String:
 			return PhoneReports.storage_report(_fridge_loss())
 		1:
 			return PhoneReports.menu_report(menu, _fish_names())
-		2:
-			return PhoneReports.orders_report(fish_catalog)
-		MAP_TAB, SHOP_TAB:
+		MAP_TAB, SHOP_TAB, STAFF_TAB:
 			return ""
-		4:
+		3:
 			# Seed changes with the day so the glitch "moves" between visits.
 			return PhoneReports.dex_report(fish_catalog, GameState.day)
-		5:
+		4:
 			var boat: BoatData = GameState.get_upgrade_value(boat_upgrade)
 			return PhoneReports.boat_report(boat, float(GameState.get_upgrade_value(lamp_upgrade)), upgrades)
 		_:

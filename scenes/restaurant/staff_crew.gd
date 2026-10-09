@@ -5,8 +5,9 @@ extends Node
 ## the plate table that a waiting table ordered and carries it out, or else
 ## cleans a dirty table, or walks back to their spot by the plate table.
 ## Rin and the staff never pick the same plate / table (claims). Wages are
-## paid at closing (`pay_wages`); tips get the staff's bonus. The panel
-## (StaffPanel) hires / dismisses and posts job ads.
+## paid at closing (`pay_wages`); tips get the staff's bonus. Hiring,
+## dismissing and job ads are in the phone ("Nhân viên" tab, PhoneStaff);
+## GameState.staff_changed brings the changes here.
 
 signal message_requested(text: String)
 
@@ -29,6 +30,7 @@ var _claimed_tables: Array[int] = []
 func _ready() -> void:
 	roster = StaffRoster.new(catalog, GameState.staff)
 	roster.changed.connect(_sync_workers)
+	GameState.staff_changed.connect(_sync_workers)
 	if is_unlocked():
 		roster.arrivals(GameState.day)  # Vy: her arrival cutscene tells the story
 	_sync_workers()

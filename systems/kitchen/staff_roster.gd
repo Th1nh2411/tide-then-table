@@ -10,13 +10,17 @@ extends RefCounted
 
 signal changed
 
+var data: Dictionary:
+	get:
+		return _data
+
 var catalog: StaffCatalog
 var _data: Dictionary
 
 
-func _init(p_catalog: StaffCatalog, data: Dictionary) -> void:
+func _init(p_catalog: StaffCatalog, p_data: Dictionary) -> void:
 	catalog = p_catalog
-	_data = data
+	_data = p_data
 	for key: String in ["hired", "candidates", "seen"]:
 		if not _data.get(key) is Array:
 			_data[key] = []
@@ -103,6 +107,8 @@ func _meet(person: StaffData) -> void:
 
 
 func _ids(key: String) -> Array:
+	if not _data.get(key) is Array:  # the dictionary was cleared (new game)
+		_data[key] = []
 	var list: Array = _data[key]
 	return list
 

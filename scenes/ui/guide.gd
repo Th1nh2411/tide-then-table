@@ -58,6 +58,11 @@ func _ready() -> void:
 	_add_rules()
 
 
+## A pointer is on screen right now.
+func is_showing() -> bool:
+	return _current != null
+
+
 ## Drop the rules (their lambdas keep scripts alive at exit otherwise).
 func _exit_tree() -> void:
 	rules.clear()

@@ -5,6 +5,8 @@ extends Node
 
 signal money_changed(new_amount: int)
 signal day_changed(new_day: int)
+## Hired staff / applicants changed (phone "Nhân viên" tab -> StaffCrew).
+signal staff_changed
 
 const STARTING_MONEY: int = 100
 const STARTING_DAY: int = 1

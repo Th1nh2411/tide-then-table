@@ -66,6 +66,7 @@ func _ready() -> void:
 	_oil.oil_empty.connect(_on_oil_empty)
 	DayClock.start_night()
 	_add_guide()
+	_add_quest_tracker()
 	# Deferred: FogArea decides the fog zone's visibility in its own _ready.
 	_capture_map.call_deferred()
 	_show_orders()
@@ -79,6 +80,14 @@ func _ready() -> void:
 	# Autosave at the start of every night (hold is empty, storage is settled).
 	# Headless test runs pass `-- --no-autosave` so they never touch the real save.
 	SaveSystem.autosave("sea")
+
+
+## Floating quest box (main story + fish orders), top-left under the money.
+func _add_quest_tracker() -> void:
+	var tracker := QuestTracker.new()
+	tracker.catalog = fish_catalog
+	add_child(tracker)
+	_cutscene.hidden_nodes.append(tracker)
 
 
 ## First-time pointers (SeaGuide).
@@ -101,15 +110,13 @@ func _capture_map() -> void:
 
 
 func _show_orders() -> void:
-	var lines: PackedStringArray = []
+	_hud.set_orders(PackedStringArray())  # the orders themselves are in the QuestTracker
 	var fresh := false
 	for order: Dictionary in GameState.orders:
-		lines.append("Đơn " + FishOrders.describe(order, fish_catalog))
 		# Arrived this morning: all its nights are still ahead.
 		fresh = fresh or int(order["due_day"]) - GameState.day + 1 == FishOrders.NIGHTS_TO_DELIVER
-	_hud.set_orders(lines)
 	if fresh:
-		_hud.flash_message("[MSG] Tin nhắn mới: có khách đặt cá (J xem)", 2.5)
+		_hud.flash_message("[MSG] Có khách đặt cá", 2.0)
 
 
 func _process(_delta: float) -> void:

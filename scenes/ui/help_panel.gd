@@ -59,10 +59,11 @@ PHỤC VỤ
     xanh (ít bọt = tip thêm). Rót tràn mất 1 lít bia.
   Bàn kê món (nằm ngang cạnh xe đẩy): E đặt món xuống ô đó / cầm món ở ô đó lên.
   Thùng rác xanh cạnh xe đẩy: E vứt món đang cầm (món không ai gọi thì xô nhấp nháy đỏ).
-  Nhân viên (từ ngày 3, nút "Nhân viên" lúc chưa mở quán): tự bưng món Bảo nấu
+  Nhân viên (từ ngày 3, điện thoại J → tab "Nhân viên"): tự bưng món Bảo nấu
     ra bàn và dọn bàn bẩn. Mỗi người kỹ năng, lương/ca riêng (trả cuối ca), tối đa 2.
     Đăng tin tuyển dụng (1 lần/ngày): tờ rơi 50k, hội nhóm 200k, trung tâm 500k:
     đăng chỗ xịn hơn thì người tới giỏi hơn (lương cũng cao hơn).
+  Nhiệm vụ: ô nhỏ góc trên trái (rê chuột vào để xem đủ nhiệm vụ chính + đơn đặt cá).
   E cạnh người khác: nói chuyện (dấu "!" = có chuyện mới).
 
 NƯỚNG

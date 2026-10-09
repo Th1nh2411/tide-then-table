@@ -17,7 +17,7 @@ extends Control
 ## After the summary (1-5 stars) nothing moves on by itself: pinned buttons
 ## let the player buy upgrades (phone "Nâng cấp" tab) whenever the shop isn't
 ## serving, and "Ra khơi" starts the next night (storage loses freshness).
-## Staff (from day 3, StaffCrew + StaffPanel, pinned "Nhân viên"): hired
+## Staff (from day 3, StaffCrew; hired in the phone's "Nhân viên" tab):
 ## helpers carry plates out and clean tables; wages are paid at closing.
 ## Regulars with a fish order: their fish is set aside before menu planning
 ## and they come in during the shift (CustomerManager); unserved fish go back
@@ -69,8 +69,6 @@ var _guide: RestaurantGuide
 var _sail_button: Button
 var _market_panel: MarketPanel
 var _crew: StaffCrew
-var _staff_panel: StaffPanel
-var _staff_button: Button
 
 @onready var _customers: CustomerManager = $CustomerManager
 @onready var _menu_panel: MenuSetupPanel = %MenuSetupPanel
@@ -134,11 +132,6 @@ func _ready() -> void:
 	_crew.people_layer = $World/People
 	_crew.message_requested.connect(_show_message.bind(3.0))
 	add_child(_crew)
-	_staff_panel = StaffPanel.new()
-	_staff_panel.crew = _crew
-	add_child(_staff_panel)
-	_staff_button = _pin_button("Nhân viên", Rect2(381, 42, 70, 18))
-	_staff_button.pressed.connect(_staff_panel.open_panel)
 	_rin.interacted.connect(_on_rin_interacted)
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
@@ -152,6 +145,11 @@ func _ready() -> void:
 	_menu_panel.hide()  # opened by clicking the LED sign (MenuBoard)
 	_time_left = get_shift_seconds()
 	_add_guide()
+	var tracker := QuestTracker.new()
+	tracker.catalog = fish_catalog
+	tracker.origin = Vector2(4, 26)  # under the order tickets
+	add_child(tracker)
+	_cutscene.hidden_nodes.append(tracker)
 	_play_arrival_cutscene.call_deferred()
 
 
@@ -166,10 +164,9 @@ func _add_guide() -> void:
 	_guide.board = _board
 	_guide.menu_panel = _menu_panel
 	_guide.market_panel = _market_panel
-	_guide.staff_panel = _staff_panel
+	_guide.crew = _crew
 	_guide.renovation = _renovation
 	_guide.open_button = _menu_panel.get_open_button()
-	_guide.staff_button = _staff_button
 	_guide.renovate_button = _renovate_button
 	_guide.sail_button = _sail_button
 	_guide.serving = is_serving
@@ -216,7 +213,6 @@ func _open_shop() -> void:
 	_shift_running = true
 	_close_early_button.show()
 	_renovate_button.hide()
-	_staff_panel.close_panel()
 	_crew.start_shift()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
 	_show_message("Quán mở cửa!")
@@ -244,12 +240,13 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	# Rin walks freely whenever no panel covers the room.
 	_rin.active = not ($CookingOverlay.is_running() or _kitchen.busy or _renovation.visible
-		or _menu_panel.visible or _summary_panel.visible or _market_panel.visible or _staff_panel.visible)
+		or _menu_panel.visible or _summary_panel.visible or _market_panel.visible)
 	_rin.kitchen_open = _shift_running or _closing
 	_board.clickable = not _shift_running and not _shift_over and not _closing and _rin.active
 	_chef.serving = _rin.kitchen_open
+	# Customers don't lose patience while a first-time pointer is teaching.
+	Customer.patience_paused = _guide != null and _guide.is_showing()
 	_crew.serving = _rin.kitchen_open
-	_staff_button.visible = _renovate_button.visible and _crew.is_unlocked()
 	_rin.carrying_goods = _stall.bag.total() > 0
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
@@ -393,6 +390,10 @@ func _pin_button(text: String, rect: Rect2) -> Button:
 	button.position = rect.position
 	button.size = rect.size
 	return button
+
+
+func _exit_tree() -> void:
+	Customer.patience_paused = false
 
 
 func _start_next_day() -> void:

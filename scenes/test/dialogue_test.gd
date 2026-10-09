@@ -43,8 +43,30 @@ func _ready() -> void:
 	_check("pet default name", CutsceneScript.pet_name() == "Mèo")
 	GameState.reset()
 	_check_cutscene_markers()
+	_check_quest_log()
 	GameState.reset()
 	print("Dialogue: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
+
+
+func _check_quest_log() -> void:
+	GameState.reset()
+	var main := QuestLog.main_quest()
+	var steps: Array = main["steps"]
+	_check("quest: day 1 = restaurant quest, nothing done", main["title"] == "Quán Rin & Bảo"
+		and not steps.any(func(s: Dictionary) -> bool: return s["done"]))
+	GameState.add_day_record({"day": 1, "earned": 100, "market": 0, "rating": 3})
+	GameState.upgrade_levels["boat"] = 1
+	steps = QuestLog.main_quest()["steps"]
+	_check("quest: first day + Ghe chèo ticked, Ghe máy not", steps[0]["done"] and steps[1]["done"] and not steps[2]["done"])
+	GameState.day = 7
+	Story.check_day()
+	_check("quest: omen -> wait for the fog", QuestLog.main_quest()["title"] == "Ánh sáng trong sương")
+	GameState.day = 8
+	_check("quest: fog open -> go in", QuestLog.main_quest()["title"] == "Vào sương mù")
+	var catalog: FishCatalog = load("res://data/fish/fish_catalog.tres")
+	GameState.orders = [{"who": "Chú Ba", "fish": "ca_mu", "min_kg": 4.0, "reward": 300, "due_day": 9}]
+	var sides := QuestLog.side_quests(catalog)
+	_check("quest: one side quest per fish order", sides.size() == 1 and sides[0].begins_with("Chú Ba"))
 
 
 ## Every marker a scene's cutscenes use (camera / spawn / move_to) exists

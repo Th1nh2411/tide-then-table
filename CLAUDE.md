@@ -27,7 +27,7 @@ Vietnamese, keep code comments in short English.
 - Pure logic lives in `systems/` (no nodes): `GridInventory`, `KitchenLogic`,
   `MenuPlan`, `DayRating`, `SaveSystem`, `Story`, `BoatCondition`,
   `PhoneReports`, `CatchRoll`, `FishOrders`, `MarketStock`, `OrderPicker`,
-  `TableBill`, `StaffRoster`.
+  `TableBill`, `StaffRoster`, `QuestLog`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
 - Vietnamese for all player-facing text. Money is shown as "70k".
 - Keep on-screen text short. How-to hints are first-time pointers (`Guide`:
@@ -140,10 +140,11 @@ Vietnamese, keep code comments in short English.
   `market_pack`, stock in litres) or 10 at once, served as 3 L towers
   (`portion_units`), needs no cooking (`instant_serve`) and keeps overnight (`keeps_overnight`), rau is wasted
   at closing),
-  `StaffCrew` + `StaffWorker` + `StaffPanel` + `StaffRoster` (from day 3:
-  hired helpers carry plates and clean tables; job ads by tier bring better
-  applicants; wages at closing; `GameState.staff`, data in `data/staff/`; Vy,
-  the heroine, applies on day 3),
+  `StaffCrew` + `StaffWorker` + `StaffRoster` (from day 3: hired helpers
+  carry plates and clean tables; hiring / job ads live in the phone tab
+  "Nhân viên" (`PhoneStaff`, `GameState.staff_changed` tells the crew); wages
+  at closing; `GameState.staff`, data in `data/staff/`; Vy, the heroine,
+  applies on day 3),
   `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (spawning, ordering,
   payment; seats/decor upgrades, rich customers, regulars; balance numbers in
   `ServiceTuning` `data/restaurant/service_tuning.tres`; helpers
@@ -186,6 +187,10 @@ Vietnamese, keep code comments in short English.
   saved); `DialogueBox` shows it (pauses). Rin talks with E next to them.
 - Sea gear upgrades (boat, rod, lamp) are bought in the phone's "Nâng cấp"
   tab (`PhoneShop`); restaurant upgrades only via "Sửa quán".
+- `QuestTracker` (sea + restaurant, top-left): faded one-line "next step"
+  box, the full main quest + fish orders on hover, never takes clicks;
+  content from `QuestLog` (pure: Story stage + boat upgrades, FishOrders).
+  The phone has no orders tab any more.
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and
   restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is
   an IT graduate (male) whose failed startup (with friend Bảo, now the

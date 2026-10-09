@@ -54,6 +54,16 @@ func _ready() -> void:
 	tables.release(1)
 	_check("left without eating -> free", tables.states[1] == DiningTables.State.FREE)
 	_test_picker_and_bill()
+	var guest := Customer.new()
+	guest.state = Customer.State.DINING
+	guest.add_order(TableOrder.new(menu.dishes[0]))
+	Customer.patience_paused = true
+	guest._process(5.0)
+	var kept := guest.patience == 1.0
+	Customer.patience_paused = false
+	guest._process(5.0)
+	_check("patience waits while a guide pointer shows", kept and guest.patience < 1.0)
+	guest.free()
 	# The restaurant has no camera; nothing (e.g. the cutscene camera) may
 	# become current by itself, or the view shifts to the top-left corner.
 	var room: Node = load("res://scenes/restaurant/restaurant_scene.tscn").instantiate()
