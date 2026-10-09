@@ -53,7 +53,7 @@ signal regular_served(who: String, price: int)
 @export var side_order_chance: float = 0.25
 @export var round_side_chance: float = 0.6
 ## Chance a party is two guests (regulars come alone).
-@export var pair_chance: float = 0.45
+@export var pair_chance: float = 0.15
 ## Chance of one more dish than guests in the first order (max 3 lines).
 @export var extra_dish_chance: float = 0.35
 @export var max_lines: int = 3
