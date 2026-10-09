@@ -549,7 +549,10 @@ position = Vector2(995, 1176)
 position = Vector2(1006, 1178)
 
 [node name="fog_view" type="Marker2D" parent="CutsceneMarkers"]
-position = Vector2(1600, 320)
+position = Vector2(1680, 260)
+
+[node name="fog_glow" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(1720, 190)
 
 [node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers", "day_tint", "hidden_nodes")]
 script = ExtResource("45_cutscene")

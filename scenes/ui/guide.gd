@@ -58,6 +58,12 @@ func _ready() -> void:
 	_add_rules()
 
 
+## Drop the rules (their lambdas keep scripts alive at exit otherwise).
+func _exit_tree() -> void:
+	rules.clear()
+	_current = null
+
+
 func _add_rules() -> void:
 	pass
 

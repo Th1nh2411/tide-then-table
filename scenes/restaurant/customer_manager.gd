@@ -137,7 +137,7 @@ func serve_at(seat: int, plate: DishShelf.Plate) -> bool:
 	for order in waiting:
 		if order.seat == seat and order.dish == plate.dish and order.visit == plate.visit:
 			waiting.erase(order)
-			order.party.serve(order, plate)
+			(order.party as Customer).serve(order, plate)
 			tables.put_plate(seat, plate)
 			return true
 	return false
@@ -153,8 +153,9 @@ func plates_ready(dish: DishData) -> int:
 func waiting_parties() -> Array[Customer]:
 	var result: Array[Customer] = []
 	for order in waiting:
-		if order.party not in result:
-			result.append(order.party)
+		var leader := order.party as Customer
+		if leader not in result:
+			result.append(leader)
 	return result
 
 

@@ -42,7 +42,43 @@ func _ready() -> void:
 	GameState.reset()
 	_check("pet default name", CutsceneScript.pet_name() == "Mèo")
 	GameState.reset()
+	_check_cutscene_markers()
+	GameState.reset()
 	print("Dialogue: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
+
+
+## Every marker a scene's cutscenes use (camera / spawn / move_to) exists
+## under that scene's CutsceneMarkers.
+func _check_cutscene_markers() -> void:
+	var scenes := {
+		"res://scenes/restaurant/restaurant_scene.tscn": ["arrival_cutscenes", "after_shift_cutscenes"],
+		"res://scenes/sea/sea_scene.tscn": ["trip_end_cutscenes"],
+		"res://scenes/intro/intro_scene.tscn": ["intro"],
+	}
+	for path: String in scenes:
+		var root: Node = load(path).instantiate()
+		var markers := root.get_node("CutsceneMarkers")
+		var cutscenes: Array = []
+		for property: String in scenes[path]:
+			var value: Variant = root.get(property)
+			if value is Array:
+				cutscenes.append_array(value)
+			elif value is Cutscene:
+				cutscenes.append(value)
+		var missing: PackedStringArray = []
+		for cutscene: Cutscene in cutscenes:
+			for command in CutsceneScript.parse(cutscene.script_text):
+				var args: PackedStringArray = command["args"]
+				var name := ""
+				match command["cmd"]:
+					"camera", "move_to":
+						name = args[0] if command["cmd"] == "camera" else args[1]
+					"spawn":
+						name = args[2]
+				if name != "" and markers.get_node_or_null(name) == null:
+					missing.append("%s:%s" % [cutscene.id, name])
+		_check("cutscene markers exist in %s %s" % [path.get_file(), missing], missing.is_empty() and not cutscenes.is_empty())
+		root.free()
 
 
 func _dialogue(id: String, min_day: int, flag: String, once: bool, priority: int) -> Dialogue:

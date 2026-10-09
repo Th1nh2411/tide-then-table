@@ -363,6 +363,6 @@ position = Vector2(330, 230)
 [node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers", "hidden_nodes")]
 script = ExtResource("37_cutscene")
 markers = NodePath("../CutsceneMarkers")
-hidden_nodes = [NodePath("../HUD"), NodePath("../World/People"), NodePath("../World/Markers"), NodePath("../World/Bikes")]
+hidden_nodes = [NodePath("../HUD"), NodePath("../World/People/Rin"), NodePath("../World/People/Bao"), NodePath("../World/People/Seller"), NodePath("../World/Markers"), NodePath("../World/Bikes")]
 
 [node name="PhoneApp" parent="." instance=ExtResource("16_phone")]

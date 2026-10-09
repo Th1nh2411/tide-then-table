@@ -8,21 +8,23 @@ extends RefCounted
 var dish: DishData
 ## The regular visit this line is for ({} for a normal dish).
 var visit: Dictionary = {}
-## The party's leader (null in pure tests).
-var party: Customer
+## The party's leader, a Customer (null in pure tests). Typed as
+## StreetPerson: Customer lists its TableOrders, and a two-way class
+## reference leaks both scripts at exit.
+var party: StreetPerson
 
 var seat: int:
 	get:
-		return party.seat if party else -1
+		return int(party.get("seat")) if party else -1
 var patience: float:
 	get:
-		return party.patience if party else 1.0
+		return float(party.get("patience")) if party else 1.0
 var regular_name: String:
 	get:
-		return party.regular_name if party else ""
+		return str(party.get("regular_name")) if party else ""
 
 
-func _init(p_dish: DishData = null, p_visit: Dictionary = {}, p_party: Customer = null) -> void:
+func _init(p_dish: DishData = null, p_visit: Dictionary = {}, p_party: StreetPerson = null) -> void:
 	dish = p_dish
 	visit = p_visit
 	party = p_party

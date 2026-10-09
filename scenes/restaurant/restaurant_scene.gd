@@ -172,9 +172,17 @@ func _add_guide() -> void:
 	_guide.staff_button = _staff_button
 	_guide.renovate_button = _renovate_button
 	_guide.sail_button = _sail_button
-	_guide.serving = func() -> bool: return _shift_running or _closing
-	_guide.shift_over = func() -> bool: return _shift_over
+	_guide.serving = is_serving
+	_guide.shift_over = is_shift_over
 	add_child(_guide)
+
+
+func is_serving() -> bool:
+	return _shift_running or _closing
+
+
+func is_shift_over() -> bool:
+	return _shift_over
 
 
 ## Opening day / beer / Vy...: one story scene on arrival (once each). The

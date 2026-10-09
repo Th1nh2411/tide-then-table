@@ -27,7 +27,7 @@ func _ready() -> void:
 
 
 func _add_rules() -> void:
-	add("steer", "WASD: lái thuyền", _at_sea,
+	add("steer", "WASD: lái thuyền", func() -> bool: return DayClock.running,
 		_boat_top,
 		func() -> bool: return absf(boat.speed) > 30.0)
 	add("fish_spot", "Dừng lại, E: câu", func() -> bool: return _near_spot() != null,
@@ -54,7 +54,7 @@ func _add_rules() -> void:
 	add("oil_low", "Dầu sắp hết: về bến", func() -> bool: return _at_sea() and oil.fraction() <= 0.3,
 		func() -> Vector2: return Guide.screen_of(dock),
 		func() -> bool: return dock.is_boat_inside())
-	add("dock", "E: dỡ cá / về ngủ", func() -> bool: return dock.is_boat_inside(),
+	add("dock", "E: dỡ cá / về ngủ", func() -> bool: return dock.is_boat_inside() and _catches > 0,
 		func() -> Vector2: return Guide.screen_of(dock, Vector2(0, -14)))
 
 

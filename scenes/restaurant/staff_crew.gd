@@ -15,7 +15,7 @@ signal message_requested(text: String)
 @export var customers: CustomerManager
 @export var people_layer: Node2D
 ## Where idle staff wait (one each).
-@export var home_cells: Array[Vector2i] = [Vector2i(14, 8), Vector2i(14, 9)]
+@export var home_cells: Array[Vector2i] = [Vector2i(15, 8), Vector2i(15, 9)]
 
 var roster: StaffRoster
 ## Set by the restaurant every frame (the kitchen is open).

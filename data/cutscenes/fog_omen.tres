@@ -18,6 +18,7 @@ move_to Rin rin_stop 1.0
 pause 0.4
 emote Rin ! 1.0
 face Rin right
+spawn Glow glow fog_glow
 narrate \"Ngoài khơi phía đông bắc, giữa màn sương, có một quầng sáng xanh nhấp nháy.\"
 camera fog_view 2.0 1.2
 pause 1.0

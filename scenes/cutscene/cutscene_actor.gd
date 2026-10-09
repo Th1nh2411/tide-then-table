@@ -2,7 +2,8 @@ class_name CutsceneActor
 extends Node2D
 ## A character placed by a cutscene (placeholder drawing by `kind`: "rin",
 ## "bao", "vy", "co_nam" (the grocer), "guest" (a customer), "cat", "crate",
-## "rin_bed" = Rin lying under a blanket, phone lit). Walks with a small bob, faces left/right and shows emote
+## "rin_bed" = Rin lying under a blanket, phone lit, "glow" = the strange
+## light in the fog, over-bright so it shows through the night tint). Walks with a small bob, faces left/right and shows emote
 ## bubbles (! ? ... heart note) over its head. Runs while the tree is paused.
 
 @export var kind: String = "rin"
@@ -67,6 +68,8 @@ func _draw() -> void:
 			_draw_crate()
 		"rin_bed":
 			_draw_lying()
+		"glow":
+			_draw_glow()
 	draw_set_transform(Vector2.ZERO)
 	if _emote:
 		_draw_emote()
@@ -105,6 +108,14 @@ func _draw_lying() -> void:
 	var glow := 0.7 + 0.3 * sin(_time * 5.0)
 	draw_rect(Rect2(-8, -11, 3, 4), Color(0.6, 0.85, 1.0, glow))  # phone
 	draw_circle(Vector2(-10, -6), 6.0, Color(0.6, 0.85, 1.0, 0.12 * glow))
+
+
+## A slow "breathing" glow (colours above 1 survive the night tint).
+func _draw_glow() -> void:
+	var breath := 0.5 + 0.5 * sin(_time * 1.6)
+	for i in 4:
+		var radius := 40.0 - i * 9.0 + breath * 6.0
+		draw_circle(Vector2.ZERO, radius, Color(0.3, 3.0, 2.6, 0.08 + 0.06 * i + 0.08 * breath))
 
 
 func _draw_crate() -> void:

@@ -30,10 +30,12 @@ Vietnamese, keep code comments in short English.
   `TableBill`, `StaffRoster`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
 - Vietnamese for all player-facing text. Money is shown as "70k".
-- Keep on-screen text short. How-to / control hints only show on day 1
-  (`GameState.is_first_day()`, `TutorialHints` at sea, `RestaurantTutorial`);
-  the full guide is the `HelpPanel` ("Hướng dẫn", from the pause menu and the
-  main menu) — add new controls there, not as permanent HUD text.
+- Keep on-screen text short. How-to hints are first-time pointers (`Guide`:
+  ring + arrow on the thing + 3-6 words, shown once per id, story flag
+  "tip_<id>"; rules in `RestaurantGuide` / `SeaGuide`; minigame hints via
+  `Guide.once()`), any day a feature first shows up. The full guide is the
+  `HelpPanel` ("Hướng dẫn", from the pause menu and the main menu) — add new
+  controls there and a Guide rule for a new feature, never permanent HUD text.
 - Place names are invented (Xóm Đèn, dải đảo Ngủ Quên, Gò Vỏ Ốc, Đá Canh
   Đêm, Miếu Cá Ông). Never use or echo real place names in game text or docs.
 
@@ -90,7 +92,7 @@ Vietnamese, keep code comments in short English.
   (collision damage, F repair at dock), `LampOil` (trip limit + displayed
   time; no burn in minigames or at the dock), `BoatLamp` (light radius from
   oil; the night tint is dark, so lamps are how the player sees), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,
-  `OffscreenMarkers` (edge arrows), `TutorialHints` (day 1), `PauseMenu` (Esc;
+  `OffscreenMarkers` (edge arrows), `SeaGuide` (first-time pointers), `PauseMenu` (Esc;
   must sit before `HoldUI` in the tree so the hold can eat Esc first).
 - Night variety: `BoatRange` (foam line from `BoatData.max_depth`, pushes
   back), submerged `Rock`s (LIGHT_ONLY material), `WeatherController` +
@@ -168,8 +170,12 @@ Vietnamese, keep code comments in short English.
   `CutsceneMarkers`, play with `CutscenePlayer.play()` (sea scene plays
   `trip_end_cutscenes` after a trip; the restaurant plays
   `after_shift_cutscenes` when the summary closes; the intro scene plays
-  `intro_call`). Commands include `remove <actor>`; actor kinds rin, bao,
-  cat, crate, rin_bed. It pauses the tree; its actors,
+  `intro_call`; the restaurant plays `arrival_cutscenes` before the menu:
+  `opening_day`, `beer_day` (day 2), `vy_arrives` (day 3, a choice can hire
+  her: flag `vy_hire_now`); the sea's trip-end list has `cat_arrival` and
+  `fog_omen`). Commands include `remove <actor>`; actor kinds rin, bao, vy,
+  co_nam, guest, cat, crate, rin_bed, glow. dialogue_test checks every marker
+  a cutscene uses exists in its scene. It pauses the tree; its actors,
   camera, tweens and DialogueBox run PROCESS_MODE_ALWAYS.
 - The cat: `PetCat` (restaurant), flags `cat_adopted` / `cat_gone` /
   `pet_name`; use `{pet}` in dialogue/cutscene text.
