@@ -7,6 +7,9 @@ extends Node2D
 ## bubbles (! ? ... heart note) over its head. Runs while the tree is paused.
 
 @export var kind: String = "rin"
+## Drawn art (Art: "characters/<kind>", "sea/rin_bed"...) size factor; the
+## placeholder ignores it.
+@export var art_scale: float = 1.0
 
 var _facing: float = 1.0
 var _walking: bool = false
@@ -50,6 +53,11 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var bob := absf(sin(_time * 10.0)) * 1.5 if _walking else 0.0
+	if _draw_art(bob):
+		draw_set_transform(Vector2.ZERO)
+		if _emote:
+			_draw_emote()
+		return
 	draw_set_transform(Vector2(0, -bob), 0.0, Vector2(_facing, 1.0))
 	match kind:
 		"rin":
@@ -73,6 +81,27 @@ func _draw() -> void:
 	draw_set_transform(Vector2.ZERO)
 	if _emote:
 		_draw_emote()
+
+
+## The kind's PNG if there is one: people use their restaurant sheet, the
+## cat its sheet, others one picture ("characters/crate", "characters/rin_bed",
+## "characters/glow").
+func _draw_art(bob: float) -> bool:
+	draw_set_transform(Vector2(0, -bob), 0.0, Vector2.ONE * art_scale)
+	var facing := Vector2i(int(_facing), 0)
+	match kind:
+		"rin", "bao", "vy", "co_nam", "guest":
+			return Art.draw_person(self, "characters/" + kind, facing, _time, _walking)
+		"cat":
+			return Art.draw_sheet(self, "characters/cat", Rect2(-8, -16, 16, 16), 4, 1 if _walking else 0,
+				_time, 6.0 if _walking else 3.0, _facing < 0.0)
+		"crate":
+			return Art.draw(self, "characters/crate", Rect2(-10, -14, 20, 14))
+		"rin_bed":
+			return Art.draw(self, "characters/rin_bed", Rect2(-16, -16, 32, 16))
+		"glow":
+			return Art.draw_sheet(self, "characters/glow", Rect2(-40, -40, 80, 80), 4, 0, _time, 3.0)
+	return false
 
 
 ## `long_hair`: transparent = short hair; else hair down the back (women).

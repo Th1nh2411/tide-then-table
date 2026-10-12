@@ -102,11 +102,13 @@ y_sort_enabled = true
 [node name="Rin" type="Node2D" parent="World/People" node_paths=PackedStringArray("room")]
 position = Vector2(312, 136)
 script = ExtResource("44_rin")
+sprite = "characters/rin"
 room = NodePath("../../Room")
 
 [node name="Bao" type="Node2D" parent="World/People" node_paths=PackedStringArray("customers", "stall", "rin")]
 position = Vector2(376, 104)
 script = ExtResource("22_chef")
+sprite = "characters/bao"
 customers = NodePath("../../../CustomerManager")
 stall = NodePath("../../../MarketStall")
 rin = NodePath("../Rin")
@@ -126,6 +128,7 @@ kitchen = NodePath("../../../KitchenStation")
 [node name="Seller" type="Node2D" parent="World/People"]
 position = Vector2(528, 94)
 script = ExtResource("47_person")
+sprite = "characters/co_nam"
 body_color = Color(0.75, 0.35, 0.45, 1)
 apron = true
 

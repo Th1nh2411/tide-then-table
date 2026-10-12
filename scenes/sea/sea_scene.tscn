@@ -559,5 +559,6 @@ script = ExtResource("45_cutscene")
 markers = NodePath("../CutsceneMarkers")
 day_tint = NodePath("../DayTint")
 hidden_nodes = [NodePath("../SeaHud"), NodePath("../MarkerLayer")]
+actor_art_scale = 0.5
 
 [node name="PhoneApp" parent="." instance=ExtResource("33_phone")]

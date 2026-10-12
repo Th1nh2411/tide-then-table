@@ -36,6 +36,10 @@ static func draw_ground(room: StreetRoom, cell: Vector2i) -> void:
 	match room.grid.kind(cell):
 		"W":
 			pass  # StreetBackdrop
+		"K" when Art.draw(room, "restaurant/curb", r):
+			pass
+		"R" when Art.draw(room, "restaurant/road_line" if cell.y == 20 and cell.x % 3 != 0 else "restaurant/road", r):
+			pass
 		"K":
 			room.draw_rect(r, Color(0.7, 0.68, 0.62))
 			room.draw_rect(Rect2(r.position + Vector2(0, r.size.y - 4), Vector2(r.size.x, 4)), Color(0.45, 0.43, 0.4))
@@ -43,12 +47,22 @@ static func draw_ground(room: StreetRoom, cell: Vector2i) -> void:
 			room.draw_rect(r, Color(0.22, 0.22, 0.24))
 			if cell.y == 20 and cell.x % 3 != 0:  # centre line dashes, between the lanes
 				room.draw_rect(Rect2(r.position + Vector2(0, 7), Vector2(r.size.x, 2)), Color(0.9, 0.85, 0.6))
+		_ when Art.draw(room, _pavement(cell), r):
+			pass
 		_:
 			var ground := Color(0.58, 0.55, 0.5)
 			if (cell.x + cell.y * 3) % 7 == 0:
 				ground = ground.darkened(0.06)
 			room.draw_rect(r, ground)
 			room.draw_rect(r, ground.darkened(0.1), false, 1.0)
+
+
+## Pavement tile, with up to 3 variants ("pavement_2" / "_3") for variety.
+static func _pavement(cell: Vector2i) -> String:
+	var variant := (cell.x * 7 + cell.y * 13) % 5
+	if variant >= 3 and Art.has("restaurant/pavement_%d" % (variant - 1)):
+		return "restaurant/pavement_%d" % (variant - 1)
+	return "restaurant/pavement"
 
 
 ## Low steel table (TABLE_SIZE cells) with its plate or leftovers (y-sorted).
@@ -58,6 +72,13 @@ static func draw_table(canvas: CanvasItem, room: StreetRoom, seat: int) -> void:
 	var dining := room.dining
 	var p := room.table_rect(seat).position
 	var s := room.table_rect(seat).size
+	var mid := p + Vector2(room.cell_size * 0.5 + 2, 7)  # in front of the customer's seat
+	if Art.draw(canvas, "restaurant/table", Rect2(p, s)):
+		if dining.plates[seat] and dining.states[seat] == DiningTables.State.TAKEN:
+			StreetProps.draw_plate(canvas, dining.plates[seat], mid)
+		if dining.states[seat] == DiningTables.State.DIRTY and not Art.draw(canvas, "restaurant/table_dirty", Rect2(p, s)):
+			canvas.draw_circle(mid, 4.0, Color(0.95, 0.95, 0.9))
+		return
 	var leg := Color(0.45, 0.47, 0.5)
 	canvas.draw_rect(Rect2(p + Vector2(3, s.y - 9), Vector2(3, 9)), leg)
 	canvas.draw_rect(Rect2(p + Vector2(s.x - 6, s.y - 9), Vector2(3, 9)), leg)
@@ -67,7 +88,6 @@ static func draw_table(canvas: CanvasItem, room: StreetRoom, seat: int) -> void:
 	canvas.draw_rect(Rect2(p + Vector2(s.x - 10, 1), Vector2(6, 5)), Color(0.9, 0.85, 0.7))  # tissue box
 	canvas.draw_rect(Rect2(p + Vector2(s.x - 9, 9), Vector2(2, 5)), Color(0.85, 0.2, 0.15))  # chili sauce
 	canvas.draw_rect(Rect2(p + Vector2(s.x - 6, 9), Vector2(2, 5)), Color(0.35, 0.2, 0.1))  # fish sauce
-	var mid := p + Vector2(room.cell_size * 0.5 + 2, 7)  # in front of the customer's seat
 	if dining.plates[seat] and dining.states[seat] == DiningTables.State.TAKEN:
 		StreetProps.draw_plate(canvas, dining.plates[seat], mid)
 	if dining.states[seat] == DiningTables.State.DIRTY:
@@ -82,6 +102,10 @@ static func draw_thing(room: StreetRoom, cell: Vector2i) -> void:
 	var r := grid.cell_rect(cell)
 	var p := r.position
 	match grid.kind(cell):
+		"P" when Art.draw(room, _bench_piece(grid, cell), r):
+			pass
+		"h", "o" when Art.draw(room, "restaurant/stool_%d" % ((cell.x / 3 + cell.y) % 2), r):
+			pass
 		"P":  # plate table, a long wooden bench next to the cart
 			var x0 := 0.0 if grid.kind(cell + Vector2i.LEFT) == "P" else 1.0
 			var x1 := 16.0 if grid.kind(cell + Vector2i.RIGHT) == "P" else 15.0
@@ -106,6 +130,15 @@ static func draw_thing(room: StreetRoom, cell: Vector2i) -> void:
 			room.draw_rect(Rect2(p + Vector2(6, 6), Vector2(4, 8)), Color(0.95, 0.95, 0.9))
 		"L":
 			room.draw_rect(Rect2(p + Vector2(6, -40), Vector2(4, 54)), Color(0.6, 0.6, 0.58))
+
+
+## The plate bench is drawn per cell: "plate_bench_left" / "_mid" /
+## "_right" pieces if they exist, else the same "plate_bench" in every cell.
+static func _bench_piece(grid: RoomGrid, cell: Vector2i) -> String:
+	var left := grid.kind(cell + Vector2i.LEFT) == "P"
+	var right := grid.kind(cell + Vector2i.RIGHT) == "P"
+	var piece := "restaurant/plate_bench_" + ("mid" if left and right else "right" if left else "left")
+	return piece if Art.has(piece) else "restaurant/plate_bench"
 
 
 ## Above the people: tree canopies, and string lights from the decor upgrade.

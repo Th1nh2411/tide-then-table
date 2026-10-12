@@ -143,6 +143,10 @@ func _by_level(table: Array[float]) -> float:
 	return table[clampi(level, 0, table.size() - 1)]
 
 
+func is_busy_pose() -> bool:
+	return cooking_dish != null
+
+
 func _draw() -> void:
 	super()
 	if cooking_dish:  # tossing the wok, steam, progress bar

@@ -226,12 +226,31 @@ func _draw_dragged() -> void:
 		_draw_item(_dragged, origin, 0.7)
 
 
+## The fish's picture over its cells (drawn unrotated, bow to the right;
+## turned 90° clockwise like InventoryItem.get_cells when rotated).
+func _draw_fish_art(item: InventoryItem, origin: Vector2, alpha: float) -> void:
+	var size := Vector2i.ZERO
+	for cell in item.fish.shape:
+		size = size.max(cell + Vector2i.ONE)
+	var art_size := Vector2(size) * cell_size
+	if item.rotated:
+		draw_set_transform(origin + Vector2(art_size.y, 0), PI / 2.0)
+	else:
+		draw_set_transform(origin)
+	Art.draw(self, "fish/" + item.fish.id, Rect2(Vector2.ZERO, art_size), false, Color(1, 1, 1, alpha))
+	draw_set_transform(Vector2.ZERO)
+
+
 func _draw_item(item: InventoryItem, origin: Vector2, alpha: float, outline: Color = Color.TRANSPARENT) -> void:
 	var color := item.fish.color
 	color.a = alpha
+	var art := Art.has("fish/" + item.fish.id)
+	if art:
+		_draw_fish_art(item, origin, alpha)
 	for cell in item.get_cells():
 		var rect := Rect2(origin + Vector2(cell * cell_size) + Vector2.ONE, Vector2.ONE * (cell_size - 2))
-		draw_rect(rect, color)
+		if not art:
+			draw_rect(rect, color)
 		if outline.a > 0.0:
 			draw_rect(rect, outline, false, 2.0)
 	# White dot marks a perfect-quality catch.

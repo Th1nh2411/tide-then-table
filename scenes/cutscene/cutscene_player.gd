@@ -14,6 +14,9 @@ signal finished
 ## Nodes hidden while a cutscene plays (HUD layers, the player character...).
 @export var hidden_nodes: Array[Node] = []
 @export var name_max_length: int = 12
+## Size of drawn art (Art) for actors: 1 = restaurant scale (people 16x32),
+## 0.5 at sea (the sea camera zooms x2).
+@export var actor_art_scale: float = 1.0
 
 var playing: bool = false
 
@@ -127,6 +130,7 @@ func _run(command: Dictionary) -> String:
 		"spawn":
 			var actor := CutsceneActor.new()
 			actor.kind = args[1]
+			actor.art_scale = actor_art_scale
 			actor.position = _marker(args[2])
 			actor.scale = Vector2.ONE * _float(args, 3, 1.0)
 			add_child(actor)

@@ -13,6 +13,9 @@ signal arrived
 @export var hat: bool = false
 @export var apron: bool = false
 @export var tie: bool = false
+## Sprite sheet under assets/sprites (e.g. "characters/rin", see Art); the
+## placeholder body is drawn while the PNG doesn't exist.
+@export var sprite: String = ""
 
 ## Plate in hands (null = none).
 var carried: DishShelf.Plate
@@ -79,6 +82,29 @@ func _draw() -> void:
 	var bob := absf(sin(_walk_time * 12.0)) * 1.5 if is_walking() else 0.0
 	draw_circle(Vector2(0, 1), 6.0, Color(0, 0, 0, 0.25))  # shadow
 	draw_set_transform(Vector2(0, -bob))
+	var drawn := Art.draw_person(self, sprite_name(), facing, _walk_time, is_walking(), is_busy_pose(),
+		Time.get_ticks_msec() * 0.001)
+	if not drawn:
+		_draw_placeholder_body()
+	if carried:
+		StreetProps.draw_plate(self, carried, Vector2(float(facing.x) * 7.0, -12 + (2.0 if facing == Vector2i.DOWN else 0.0)))
+	draw_set_transform(Vector2.ZERO)
+	if label:
+		draw_string(ThemeDB.fallback_font, Vector2(-12, -36), label, HORIZONTAL_ALIGNMENT_CENTER, 24, 7,
+			Color(1, 1, 1, 0.7))
+
+
+## Which sheet to draw (subclasses pick by who they are).
+func sprite_name() -> String:
+	return sprite
+
+
+## True while sitting / cooking: the sheet's "busy" row.
+func is_busy_pose() -> bool:
+	return false
+
+
+func _draw_placeholder_body() -> void:
 	draw_rect(Rect2(-6, -16, 12, 14), body_color)
 	if apron:
 		draw_rect(Rect2(-4, -10, 8, 8), Color(0.95, 0.9, 0.8))
@@ -91,9 +117,3 @@ func _draw() -> void:
 		var side := float(facing.x) * 2.5
 		draw_circle(Vector2(-2 + side, -21), 0.9, Color.BLACK)
 		draw_circle(Vector2(2 + side, -21), 0.9, Color.BLACK)
-	if carried:
-		StreetProps.draw_plate(self, carried, Vector2(float(facing.x) * 7.0, -12 + (2.0 if facing == Vector2i.DOWN else 0.0)))
-	draw_set_transform(Vector2.ZERO)
-	if label:
-		draw_string(ThemeDB.fallback_font, Vector2(-12, -36), label, HORIZONTAL_ALIGNMENT_CENTER, 24, 7,
-			Color(1, 1, 1, 0.7))

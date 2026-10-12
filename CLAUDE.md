@@ -11,7 +11,11 @@ Vietnamese, keep code comments in short English.
 - Godot **4.7.2**, binary: `/Applications/Godot.app/Contents/MacOS/Godot`.
 - Typed GDScript only. "Inferred from Variant" is an error here: annotate
   (`var x: float = dict.get(...)`), including in throwaway test scripts.
-- No plugins. Placeholder art only (`ColorRect`, `_draw()`); no image or
+- No plugins. Placeholder art (`ColorRect`, `_draw()`) until PNGs exist:
+  `Art` (scenes/common/art.gd) draws `assets/sprites/<name>.png` stretched
+  into the thing's in-game rect and returns false when missing, so every
+  hook is `if not Art.draw(...): <placeholder>` (sheets: `draw_frame`,
+  `draw_sheet`, `draw_person`; names listed in ASSETS.md "Tên file"). No
   audio files. Sounds are built in code: autoload `Sfx` (`Sfx.play("catch")`,
   `Sfx.hold("sizzle", on)`, `Sfx.ambience("sea")` per scene; recipes in
   `Sfx.SOUNDS` / `LOOPS`, synth `SfxSynth`; every Button clicks; mute in the

@@ -16,6 +16,12 @@ func _ready() -> void:
 	label = data.display_name
 
 
+## Their own sheet ("characters/vy") if drawn, else the shared helper look.
+func sprite_name() -> String:
+	var own := "characters/" + data.id
+	return own if Art.has(own) else "characters/staff"
+
+
 func can_talk() -> bool:
 	return not working and carried == null
 

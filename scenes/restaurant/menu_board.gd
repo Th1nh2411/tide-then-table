@@ -75,7 +75,9 @@ func _draw() -> void:
 		draw_rect(Rect2(x, panel.end.y, 3, base.end.y - panel.end.y - 1), Color(0.3, 0.3, 0.33))
 	if _hovered:  # lifts a little under the mouse
 		draw_set_transform(-position + Vector2(0, -2))
-	draw_rect(panel.grow(2), Color(0.22, 0.22, 0.25))
+	if not Art.draw(self, "restaurant/menu_board", Rect2(panel.position - Vector2(2, 2),
+			Vector2(panel.size.x + 4, base.end.y - panel.position.y + 1))):
+		draw_rect(panel.grow(2), Color(0.22, 0.22, 0.25))
 	draw_rect(panel, Color(0.04, 0.04, 0.06))
 	if clickable:
 		var pulse := 1.0 if _hovered else 0.45 + 0.4 * sin(_time * 4.0)

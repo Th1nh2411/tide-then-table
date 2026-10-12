@@ -1,8 +1,9 @@
 # Danh sách asset cần vẽ — Rin The Fisher
 
 Hiện mọi thứ trong game là hình vẽ tạm bằng code (`_draw()`). File này liệt kê
-những gì cần vẽ để thay dần. Khi có file PNG, game sẽ dùng ảnh; thiếu ảnh nào
-thì vẫn vẽ tạm cái đó (code nạp ảnh sẽ làm sau khi bắt đầu có asset).
+những gì cần vẽ để thay dần. **Code nạp ảnh đã có** (`Art`): bỏ file PNG đúng tên
+vào `assets/sprites/` là game dùng ngay, thiếu ảnh nào thì vẫn vẽ tạm cái đó. Xem
+mục "Tên file" ở cuối.
 
 ## Quy ước chung
 
@@ -12,7 +13,8 @@ thì vẫn vẽ tạm cái đó (code nạp ảnh sẽ làm sau khi bắt đầu
 - **Định dạng:** PNG nền trong suốt, không khử răng cưa (nearest), sprite sheet theo hàng: mỗi hàng là 1
   hoạt cảnh, mỗi cột là 1 khung hình.
 - **Hướng nhìn:** quán là top-down 3/4 (thấy mặt trên + mặt trước); biển là nhìn thẳng từ trên xuống.
-- **Thư mục đề xuất:** `assets/sprites/<khu>/<tên>.png` (vd `assets/sprites/restaurant/food_cart.png`).
+- **Thư mục:** `assets/sprites/<khu>/<tên>.png` (vd `assets/sprites/restaurant/food_cart_0.png`), tên đúng
+  như bảng "Tên file" ở cuối. Ảnh luôn được kéo cho vừa khung trong game, nên vẽ 1x hay 2x đều được.
 - **Ban đêm ở biển** màn hình bị phủ màu tối: vật cần thấy rõ (đèn, bọt cá, phao) nên có phần sáng / viền sáng.
 
 Ưu tiên: **P1** = thấy nhiều nhất, làm trước; **P2** = làm sau; **P3** = trang trí, làm cuối.
@@ -45,7 +47,7 @@ Khách quen, Ông lão (chòi), mèo.
 | Mặt đường + vạch kẻ | 16x16 | đường nhựa, vạch vàng đứt |
 | Mặt tiền nhà | 640x80 (5 hàng ô) | cửa cuốn, tường, biển hiệu; vẽ thành vài mảng ghép được |
 | Mái hiên sọc | 16x8, lặp ngang | xanh / trắng |
-| Xe đẩy + bếp | 64x32 (4 ô) + mặt bàn cao thêm 16 | 3 cấp bếp: lò than / bếp gas / bếp gas đôi; tủ kính, bánh xe |
+| Xe đẩy + bếp | 64x32 (4 ô, gồm mặt bàn cao 1 ô) | 3 cấp bếp: lò than / bếp gas / bếp gas đôi; tủ kính, bánh xe |
 | Bình bia + vòi | 16x32 | đặt trên đầu phải xe đẩy |
 | Lò than nướng | 32x16 | than đỏ, vỉ, xiên nướng; khói 3 khung |
 | Bàn kê món (bàn gỗ dài) | 80x16 | 5 ô đặt đĩa |
@@ -137,3 +139,54 @@ Thêm 1 icon 16x16 mỗi loài cho Dex / thông báo (P2).
 3. Cá trong khoang + 3 thuyền.
 4. Vy, Cô Năm, mèo, xe máy.
 5. Phần còn lại của biển, UI, cảnh riêng.
+
+## Tên file (code tự nạp)
+
+Đặt trong `assets/sprites/`. Có file là game dùng, không có thì vẽ tạm. Mở editor 1 lần để Godot import
+(chưa import thì game vẫn đọc được khi chạy thử). Kích thước ghi theo 1x; vẽ 2x thì nhân đôi.
+
+**Nhân vật** (`characters/`), sprite sheet **4 cột**, mỗi khung 16x32, các hàng:
+1. đi xuống (cột 1 = đứng yên, cột 1–4 = bước đi), 2. đi lên, 3. đi sang trái (sang phải = game tự lật),
+4. (tuỳ chọn) "đang bận": khách ngồi ăn, Bảo đảo chảo — 4 khung lặp.
+→ 1 sheet đủ 4 hàng = 64x128.
+
+| File | Ai |
+|---|---|
+| `characters/rin.png`, `bao.png`, `vy.png`, `co_nam.png` | nhân vật chính (cũng dùng trong cutscene) |
+| `characters/guest.png` hoặc `guest_1.png`…`guest_4.png` | khách thường (nhiều dáng thì game chọn ngẫu nhiên) |
+| `characters/guest_rich.png`, `guest_regular.png` | khách sang, khách quen |
+| `characters/staff.png` | nhân viên thuê (riêng ai thì `characters/<id>.png`: hung, hanh, phat, ngan, co_sau, khoa, ti, lam, quan) |
+| `characters/cat.png` | mèo: 4 cột khung 16x16, hàng 1 = ngồi vẫy đuôi, hàng 2 = đi (cutscene) |
+| `characters/crate.png` (20x14), `rin_bed.png` (32x16), `glow.png` (80x80, 4 khung ngang) | đồ trong cutscene |
+
+**Quán** (`restaurant/`):
+
+| File | Cỡ (1x) | Ghi chú |
+|---|---|---|
+| `food_cart_0.png`, `_1`, `_2` (hoặc 1 file `food_cart.png`) | 64x32 | xe đẩy theo cấp bếp, gồm cả mặt bàn; bình bia vẽ riêng |
+| `beer_tap.png` | 16x32 | bình bia + vòi |
+| `grill.png` | 32x16 | lò than; nhiều khung xếp **dọc** = than chập chờn |
+| `fridge_0.png`, `_1`, `_2` | 16x32 | thùng xốp / thùng nhựa / tủ đông |
+| `bin.png` | 16x16 | |
+| `table.png`, `table_dirty.png` | 32x32 | bàn; lớp bàn bẩn vẽ đè lên |
+| `stool_0.png`, `stool_1.png` | 16x16 | ghế xanh, đỏ |
+| `plate_bench.png` (hoặc `plate_bench_left/mid/right.png`) | 16x16 mỗi ô | bàn kê món |
+| `pavement.png` (+ `pavement_2.png`, `_3`) | 16x16 | gạch vỉa hè, biến thể rải ngẫu nhiên |
+| `curb.png`, `road.png`, `road_line.png` | 16x16 | lề, đường, đường có vạch |
+| `shop_front.png` | 640x80 | cả mặt tiền (gồm tiệm Cô Năm) |
+| `menu_board.png` | 64x40 | khung + chân bảng LED; chữ và món vẽ bằng code đè lên |
+| `grocery_counter.png`, `grocery_crate.png` | 96x16, 16x16 | quầy và két Cô Năm |
+| `plant.png` | 16x16 | chậu cây |
+
+**Món** (`dishes/<id>.png`, 16x16): ca_mu_hap_xi_dau, ca_thu_nuong, cua_rang_me, bia_con_meo,
+oc_huong_nuong_mo_hanh, muc_hap_gung, rau_muong_xao_toi, tom_rang_muoi.
+
+**Cá trong khoang** (`fish/<id>.png`, mỗi ô 20x20, vẽ nằm ngang, **đầu cá quay sang phải**; game tự xoay khi
+xoay trong khoang): oc_huong 20x20, tom 40x20, muc 40x20, ca_thu 60x20, ca_thu_phat_sang 60x20, cua 40x40,
+ca_mu 60x40.
+
+**Biển** (`sea/`): `thuyen_thung.png`, `ghe_cheo.png`, `ghe_may.png` = mặt boong nhìn từ trên, **mũi thuyền
+quay sang phải** (game xoay theo hướng lái), cỡ như bảng mục 3; `rin_boat.png` 16x32 trên màn hình.
+
+Chưa nạp ảnh (vẫn vẽ bằng code): xe máy, dây đèn, cây xanh, đường phố xa, nước biển, đá, địa điểm ngoài
+biển, sương mù, UI, minigame. Cần cái nào trước thì báo để nối thêm.

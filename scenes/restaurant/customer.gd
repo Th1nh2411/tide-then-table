@@ -140,6 +140,21 @@ func _process(delta: float) -> void:
 					patience_ran_out.emit(self)
 
 
+## Guests: well-off / regular sheets, else one of a few walk-in looks
+## ("characters/guest_1".."_4" if drawn, else "characters/guest").
+func sprite_name() -> String:
+	if rich and Art.has("characters/guest_rich"):
+		return "characters/guest_rich"
+	if regular_name != "" and Art.has("characters/guest_regular"):
+		return "characters/guest_regular"
+	var look := "characters/guest_%d" % (1 + absi(get_instance_id()) % 4)
+	return look if Art.has(look) else "characters/guest"
+
+
+func is_busy_pose() -> bool:
+	return state == State.READING or state == State.DINING
+
+
 func _draw() -> void:
 	super()
 	var eater := leader if leader else self

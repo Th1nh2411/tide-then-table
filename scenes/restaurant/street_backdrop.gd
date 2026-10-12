@@ -30,6 +30,8 @@ func _draw() -> void:
 func _draw_shop_front() -> void:
 	var bottom := room.merged_rect("W").end.y
 	var width := room.grid.size.x * room.cell_size
+	if Art.draw(self, "restaurant/shop_front", Rect2(0, 0, width, bottom)):
+		return
 	draw_rect(Rect2(Vector2.ZERO, Vector2(width, bottom)), Color(0.86, 0.78, 0.55))
 	for x0: float in [0.0, 208.0]:
 		draw_rect(Rect2(x0 + 8, 24, 160, bottom - 24), Color(0.32, 0.27, 0.23))

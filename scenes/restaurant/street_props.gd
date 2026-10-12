@@ -3,7 +3,8 @@ extends RefCounted
 ## Placeholder drawings shared by the street restaurant (static helpers that
 ## draw on any CanvasItem): the food cart + stove by kitchen level, the ice
 ## box by fridge level, the bin, plates, potted plants (decor), motorbikes
-## (riding / parked) and the market stall next door.
+## (riding / parked) and the market stall next door. Each one draws its PNG
+## instead when there is one (Art, names in ASSETS.md).
 
 
 ## The cart (X cells + its stove S + the beer tap U on its right end). The
@@ -20,6 +21,10 @@ static func draw_cart(canvas: CanvasItem, grid: RoomGrid, level: int, time: floa
 	for cell in cells:
 		r = r.merge(grid.cell_rect(cell))
 	r = r.grow_individual(0, grid.cell_size, 0, 0)  # the worktop rises one row above its (solid) base
+	if Art.draw(canvas, "restaurant/food_cart_%d" % level, r) or Art.draw(canvas, "restaurant/food_cart", r):
+		for tap in grid.cells_of("U"):  # the keg stands on the worktop
+			draw_beer_tap(canvas, Vector2(grid.cell_rect(tap).position.x, r.position.y))
+		return
 	var top := r.size.y - 14.0  # worktop depth; the front face below it
 	canvas.draw_rect(Rect2(r.position + Vector2(-1, 0), Vector2(r.size.x + 2, top)), Color(0.75, 0.78, 0.8))
 	canvas.draw_rect(Rect2(r.position + Vector2(-1, 0), Vector2(r.size.x + 2, 2)), Color(0.88, 0.9, 0.92))
@@ -54,6 +59,8 @@ static func draw_cart(canvas: CanvasItem, grid: RoomGrid, level: int, time: floa
 
 ## Ice box by fridge level: 0 styrofoam box, 1 blue cooler, 2 chest freezer.
 static func draw_ice_box(canvas: CanvasItem, r: Rect2, level: int) -> void:
+	if Art.draw(canvas, "restaurant/fridge_%d" % level, Rect2(r.position.x, r.end.y - 32, 16, 32)):
+		return
 	match level:
 		0:
 			canvas.draw_rect(Rect2(r.position + Vector2(1, 2), Vector2(14, 12)), Color(0.94, 0.95, 0.96))
@@ -68,13 +75,16 @@ static func draw_ice_box(canvas: CanvasItem, r: Rect2, level: int) -> void:
 
 
 static func draw_plate(canvas: CanvasItem, plate: DishShelf.Plate, at: Vector2) -> void:
-	canvas.draw_circle(at, 5.0, Color.WHITE)
-	canvas.draw_circle(at + Vector2(0, -1), 3.2, plate.dish.color)
+	if not Art.draw(canvas, "dishes/" + plate.dish.id, Rect2(at - Vector2(8, 8), Vector2(16, 16))):
+		canvas.draw_circle(at, 5.0, Color.WHITE)
+		canvas.draw_circle(at + Vector2(0, -1), 3.2, plate.dish.color)
 	if not plate.visit.is_empty():  # a regular's order
 		canvas.draw_arc(at, 5.5, 0.0, TAU, 14, Color(1.0, 0.8, 0.3), 1.0)
 
 
 static func draw_plant(canvas: CanvasItem, at: Vector2) -> void:
+	if Art.draw(canvas, "restaurant/plant", Rect2(at + Vector2(-4, -3), Vector2(16, 16))):
+		return
 	canvas.draw_rect(Rect2(at + Vector2(1, 6), Vector2(6, 6)), Color(0.65, 0.35, 0.2))
 	canvas.draw_circle(at + Vector2(4, 3), 4.5, Color(0.25, 0.55, 0.25))
 	canvas.draw_circle(at + Vector2(2, 1), 1.5, Color(0.95, 0.4, 0.55))
@@ -137,6 +147,11 @@ static func _flip(p: Vector2, facing: float, x: float, y: float, w: float, h: fl
 ## spinach, tomatoes, beer kegs) and a green front with its name, plastic
 ## crates behind it (G cells).
 static func draw_stall(canvas: CanvasItem, counter: Rect2, crates: Array[Rect2]) -> void:
+	if Art.has("restaurant/grocery_counter"):
+		for c in crates:
+			Art.draw(canvas, "restaurant/grocery_crate", c)
+		Art.draw(canvas, "restaurant/grocery_counter", counter)
+		return
 	var crate_colors: Array[Color] = [Color(0.25, 0.45, 0.8), Color(0.3, 0.6, 0.35)]
 	var veg: Array[Color] = [Color(0.3, 0.65, 0.25), Color(0.95, 0.55, 0.15), Color(0.55, 0.3, 0.55)]
 	for i in crates.size():
@@ -170,6 +185,8 @@ static func draw_stall(canvas: CanvasItem, counter: Rect2, crates: Array[Rect2])
 ## Rin's charcoal grill (N cells): a low clay brazier with glowing coals, a
 ## wire grate with skewers and a wisp of smoke.
 static func draw_grill(canvas: CanvasItem, r: Rect2, time: float) -> void:
+	if Art.draw_sheet(canvas, "restaurant/grill", r, 1, 0, time):  # frames stacked down = flickering coals
+		return
 	canvas.draw_rect(Rect2(r.position + Vector2(2, 2), Vector2(r.size.x - 4, 9)), Color(0.55, 0.3, 0.2))
 	canvas.draw_rect(Rect2(r.position + Vector2(2, 11), Vector2(r.size.x - 4, 4)), Color(0.4, 0.22, 0.15))
 	canvas.draw_rect(Rect2(r.position + Vector2(4, 3), Vector2(r.size.x - 8, 7)), Color(0.15, 0.1, 0.08))
@@ -187,6 +204,8 @@ static func draw_grill(canvas: CanvasItem, r: Rect2, time: float) -> void:
 ## The draft beer keg with its tap, standing on the cart's worktop (`at` =
 ## top-left of its cell on the worktop row).
 static func draw_beer_tap(canvas: CanvasItem, at: Vector2) -> void:
+	if Art.draw(canvas, "restaurant/beer_tap", Rect2(at + Vector2(0, -16), Vector2(16, 32))):
+		return
 	canvas.draw_rect(Rect2(at + Vector2(3, -4), Vector2(10, 16)), Color(0.72, 0.75, 0.78))
 	canvas.draw_rect(Rect2(at + Vector2(3, 0), Vector2(10, 1)), Color(0.5, 0.52, 0.55))
 	canvas.draw_rect(Rect2(at + Vector2(3, 7), Vector2(10, 1)), Color(0.5, 0.52, 0.55))
@@ -197,6 +216,8 @@ static func draw_beer_tap(canvas: CanvasItem, at: Vector2) -> void:
 
 ## Small blue plastic bin (one cell) with a lid and a bag sticking out.
 static func draw_bin(canvas: CanvasItem, r: Rect2) -> void:
+	if Art.draw(canvas, "restaurant/bin", r):
+		return
 	var body := r.grow_individual(-3, -1, -3, -1)
 	canvas.draw_rect(Rect2(body.position + Vector2(0, 3), body.size - Vector2(0, 3)), Color(0.2, 0.4, 0.8))
 	canvas.draw_rect(Rect2(body.position + Vector2(0, body.size.y - 3), Vector2(body.size.x, 3)), Color(0.14, 0.28, 0.6))

@@ -41,6 +41,16 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var at := sit_position
+	# Sheet: 4 frames per row, row 0 = sitting (tail swishing).
+	if not Art.draw_sheet(self, "characters/cat", Rect2(at + Vector2(-8, -16), Vector2(16, 16)), 4, 0, _time, 3.0):
+		_draw_placeholder(at)
+	var talker := get_node_or_null("Talker") as Talker
+	if talker and talker.has_news():
+		draw_string(ThemeDB.fallback_font, at + Vector2(-8, -22), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 12,
+			Color(1, 0.85, 0.3))
+
+
+func _draw_placeholder(at: Vector2) -> void:
 	draw_circle(at + Vector2(0, -6), 7.0, fur)  # loaf body
 	draw_circle(at + Vector2(-6, -11), 4.0, fur)  # head, facing left
 	draw_colored_polygon(PackedVector2Array([at + Vector2(-9, -14), at + Vector2(-9, -18), at + Vector2(-6, -14)]), fur)
@@ -49,7 +59,3 @@ func _draw() -> void:
 	# Eyes half closed; a faint glow now and then (it isn't quite a cat...).
 	var glow := 0.5 + 0.5 * sin(_time * 0.7)
 	draw_line(at + Vector2(-8, -12), at + Vector2(-7, -12), Color(0.2, 0.9, 0.6, 0.4 + 0.6 * glow), 1.0)
-	var talker := get_node_or_null("Talker") as Talker
-	if talker and talker.has_news():
-		draw_string(ThemeDB.fallback_font, at + Vector2(-8, -22), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 12,
-			Color(1, 0.85, 0.3))

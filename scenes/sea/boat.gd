@@ -136,6 +136,10 @@ func _draw() -> void:
 	])
 	var down := Vector2.DOWN.rotated(-rotation) * hull_depth
 	draw_colored_polygon(_shifted(deck, down * 1.8), Color(0, 0, 0, 0.25))  # shadow on the water
+	# Art: one top view, bow to the right, turned with the boat (ASSETS.md).
+	if Art.draw(self, "sea/" + boat_data.id, Rect2(-half, boat_data.hull_size)):
+		_draw_crew(half)
+		return
 	var side := boat_data.color.darkened(0.45)
 	for k in deck.size():
 		var a := deck[k]
@@ -143,7 +147,11 @@ func _draw() -> void:
 		draw_colored_polygon(PackedVector2Array([a, b, b + down, a + down]), side)
 	draw_colored_polygon(deck, boat_data.color)
 	draw_colored_polygon(_scaled(deck, 0.7), boat_data.color.darkened(0.2))  # inside the hull
-	# Upright figures (undo the boat's rotation around their feet).
+	_draw_crew(half)
+
+
+## Upright figures (undo the boat's rotation around their feet).
+func _draw_crew(half: Vector2) -> void:
 	if _has_cat:
 		draw_set_transform(Vector2(-half.x * 0.55, half.y * 0.2), -rotation)
 		_draw_cat()
@@ -154,6 +162,8 @@ func _draw() -> void:
 
 ## Rin standing, 8x16 world px (16x32 on screen), in a nón lá.
 func _draw_rin() -> void:
+	if Art.draw(self, "sea/rin_boat", Rect2(-4, -16, 8, 16)):
+		return
 	draw_rect(Rect2(-2, -4, 1.5, 4), Color(0.25, 0.2, 0.15))  # legs
 	draw_rect(Rect2(0.5, -4, 1.5, 4), Color(0.25, 0.2, 0.15))
 	draw_rect(Rect2(-2.5, -9, 5, 5.5), Color(0.2, 0.45, 0.8))  # shirt
@@ -165,6 +175,8 @@ func _draw_rin() -> void:
 ## The cat sitting up, eyes glowing a little (over-bright so they show
 ## through the night tint).
 func _draw_cat() -> void:
+	if Art.draw_sheet(self, "characters/cat", Rect2(-4, -8, 8, 8), 4, 0, _cat_time, 3.0):
+		return
 	var fur := Color(0.95, 0.6, 0.25)
 	draw_circle(Vector2(0, -2.2), 2.4, fur)  # body
 	draw_circle(Vector2(0.6, -5.2), 1.7, fur)  # head
