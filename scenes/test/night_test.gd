@@ -38,6 +38,16 @@ func _ready() -> void:
 	_check("boat range grows", limits[0] > limits[1] and not is_finite(limits[2]))
 	range_node.free()
 
+	# Towed home broken with no money: the free patch lets the boat sail.
+	GameState.money = 0
+	BoatCondition.damage(BoatCondition.MAX_HP)
+	BoatCondition.tow_patch(20.0)
+	_check("tow patch: broke + broken boat can sail", not BoatCondition.is_broken() and GameState.boat_hp == 20.0)
+	GameState.boat_hp = 60.0
+	BoatCondition.tow_patch(20.0)
+	_check("tow patch never lowers the hull", GameState.boat_hp == 60.0)
+	GameState.reset()
+
 	# Event kinds: no duplicates, count capped.
 	var kinds := NightEvents.pick_kinds(rng, 6, [1.0, 1.0, 1.0, 1.0])
 	_check("event kinds unique", kinds.size() == 4 and kinds.duplicate().size() == 4

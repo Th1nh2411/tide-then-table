@@ -18,6 +18,12 @@ static func damage(amount: float) -> void:
 	GameState.boat_hp = clampf(GameState.boat_hp - amount, 0.0, MAX_HP)
 
 
+## The rescue crew's free patch after towing a broken boat home, so a
+## player with no money can still sail (no softlock).
+static func tow_patch(min_hp: float) -> void:
+	GameState.boat_hp = clampf(maxf(GameState.boat_hp, min_hp), 0.0, MAX_HP)
+
+
 ## Price to bring the hull back to full with this boat's repair rate.
 static func full_repair_cost(boat: BoatData) -> int:
 	return ceili((MAX_HP - GameState.boat_hp) * boat.repair_cost_per_hp)

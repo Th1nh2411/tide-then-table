@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_dlg")
 id = "vy_fog"
-min_day = 5
+min_day = 3
 priority = 9
 script_text = "Vy: Hồi nhỏ ông nội em hay kể, ngoài phía đông bắc có một dải sương không bao giờ tan.
 Vy: Đêm nào trăng tối, trong sương sáng lên xanh xanh, như có ai thắp đèn dưới nước.

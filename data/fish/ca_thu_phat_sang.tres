@@ -12,6 +12,6 @@ zones = Array[int]([2, 3])
 minigame = 0
 difficulty = 0.9
 base_price = 200
-spawn_weight = 0.03
+spawn_weight = 0.06
 is_aberrant = true
 typical_kg = 2.5

@@ -83,7 +83,9 @@ Vietnamese, keep code comments in short English.
   (`scenes/rest/rest_scene.tscn`, autosave #2: Continue resumes at the
   restaurant via `GameState.resume_at`; use `SaveSystem.autosave()`) → restaurant (menu planning → shift →
   summary + rating → upgrade shop) → next day (freshness loss) → sea …
-  ending via fog whirlpool.
+  ending via fog whirlpool (omen on day 4 or the first glowing mackerel,
+  fog opens the next day; a full run is ~5 days / ~45 min, measured by a
+  whole-game bot).
 - Sea view matches the restaurant: the boat camera zooms x2 (Rin is 16x32
   on screen, standing in a nón lá; `Boat._draw` is 3/4: the deck turns, the
   hull side always faces the bottom of the screen, Rin and the cat stay
@@ -180,7 +182,7 @@ Vietnamese, keep code comments in short English.
   `after_shift_cutscenes` when the summary closes; the intro scene plays
   `intro_call`; the restaurant plays `arrival_cutscenes` before the menu
   (`ArrivalCutscenes`): `opening_day`, `beer_day` (day 2), `vy_arrives` (day
-  3, a choice can hire her: flag `vy_hire_now`), `nam_fog_tale` (day 5); and
+  3, a choice can hire her: flag `vy_hire_now`), `nam_fog_tale` (day 4); and
   `after_shift_cutscenes`: `regular_thanks` (after the first fish order is
   served, flag `regular_served_once`); the sea's trip-end list has `cat_arrival` and
   `fog_omen`). Commands include `remove <actor>`; actor kinds rin, bao, vy,

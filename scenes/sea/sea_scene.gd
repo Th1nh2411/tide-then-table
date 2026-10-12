@@ -16,6 +16,9 @@ const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 ## Rescue tow fees (k, capped at what the player has).
 @export var rescue_fee: int = 150
 @export var oil_rescue_fee: int = 80
+## Hull the rescue crew patches a broken boat up to (free), so a player
+## with no money can still sail the next night.
+@export var tow_patch_hp: float = 20.0
 ## For order texts (fish names).
 @export var fish_catalog: FishCatalog
 ## Cutscenes that can play when a trip ends (first eligible one, once).
@@ -208,7 +211,8 @@ func _refresh_dock_prompt() -> void:
 
 
 func _on_boat_broken() -> void:
-	_rescue("Thuyền hư! Cứu hộ kéo về bến", rescue_fee)
+	BoatCondition.tow_patch(tow_patch_hp)
+	_rescue("Thuyền hư! Cứu hộ kéo về, vá tạm", rescue_fee)
 
 
 func _on_oil_empty() -> void:

@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_cut")
 id = "nam_fog_tale"
-min_day = 5
+min_day = 4
 priority = 20
-script_text = "# Ngày 5: Cô Năm sang kể chuyện \"góc trời xanh\" ngoài đông bắc (dẫn tới điềm báo).
+script_text = "# Ngày 4: Cô Năm sang kể chuyện \"góc trời xanh\" ngoài đông bắc (dẫn tới điềm báo).
 camera kitchen_view 0 1.6
 fade_in 0.6
 spawn Bao bao bao_stove 1.4

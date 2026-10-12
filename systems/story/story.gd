@@ -8,7 +8,7 @@ extends RefCounted
 ## Flag holding the day number the omen happened on.
 const OMEN_DAY_FLAG: String = "fog_omen_day"
 const ENDING_SEEN_FLAG: String = "ending_seen"
-const OMEN_DAY: int = 7
+const OMEN_DAY: int = 4
 const OMEN_FISH_ID: String = "ca_thu_phat_sang"
 
 
