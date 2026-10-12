@@ -38,6 +38,10 @@ static func menu_report(menu: DishCatalog, fish_names: Dictionary) -> String:
 			if not dish.on_menu_today():
 				continue
 			lines.append("%s  luôn có%s" % [head, (" · tạp hoá " + dish.market_text()) if dish.market_cost > 0 else ""])
+		elif not DishBook.is_known(dish):
+			continue  # unknown until its seafood is caught
+		elif not DishBook.is_cookable(dish):
+			lines.append("%s  cần Bếp cấp %d" % [head, dish.kitchen_level])
 		else:
 			var portions := MenuPlan.max_portions(dish, GameState.storage)
 			if portions > 0:

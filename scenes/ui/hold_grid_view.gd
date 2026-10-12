@@ -253,6 +253,11 @@ func _draw_item(item: InventoryItem, origin: Vector2, alpha: float, outline: Col
 			draw_rect(rect, color)
 		if outline.a > 0.0:
 			draw_rect(rect, outline, false, 2.0)
+	if item.is_new:
+		var tag := Rect2(origin + Vector2(2, cell_size - 10), Vector2(20, 8))
+		draw_rect(tag, Color(1.0, 0.85, 0.3, alpha))
+		draw_string(ThemeDB.fallback_font, tag.position + Vector2(1, 7), "NEW", HORIZONTAL_ALIGNMENT_LEFT, -1, 7,
+			Color(0.2, 0.1, 0.0, alpha))
 	# White dot marks a perfect-quality catch.
 	if item.quality >= 1.0:
 		draw_circle(origin + Vector2(5, 5), 2.0, Color(1, 1, 1, alpha))

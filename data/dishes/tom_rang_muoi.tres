@@ -8,5 +8,6 @@ id = "tom_rang_muoi"
 display_name = "Tôm rang muối"
 ingredients = Dictionary[String, int]({"tom": 2})
 cook_type = 2
-base_price = 75
+base_price = 90
 color = Color(1.0, 0.5, 0.35, 1)
+kitchen_level = 2

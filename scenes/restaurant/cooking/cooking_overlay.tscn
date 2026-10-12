@@ -38,7 +38,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 8
 text = "hint"
 horizontal_alignment = 1
-autowrap_mode = 3
 
 [node name="GameHolder" type="CenterContainer" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true

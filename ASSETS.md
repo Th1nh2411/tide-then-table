@@ -56,7 +56,7 @@ Khách quen, Ông lão (chòi), mèo.
 | Bàn ăn inox | 32x32 | có hộp giấy, chai tương ớt, nước mắm |
 | Ghế nhựa | 16x16 | xanh dương + đỏ |
 | Bàn bẩn | 32x32 lớp phủ | vỏ ốc, đĩa dơ |
-| Đĩa món ăn | 16x16 mỗi món | 8 món: ốc hương nướng, mực hấp gừng, cá thu nướng, tôm rang muối, cua rang me, cá mú hấp, rau muống xào, tháp bia |
+| Đĩa món ăn | 16x16 mỗi món | 18 món (tên ở mục "Tên file"): mỗi hải sản có món luộc, nướng, hấp hoặc xào |
 | Tháp bia (cầm tay) | 8x16 | |
 | Bảng LED menu | 64x40 | khung + chân; chữ chạy vẽ bằng code |
 | Tạp hoá Cô Năm | quầy 96x16, két hàng 16x16 | rau, cà chua, bình bia, bảng "TẠP HOÁ" |
@@ -178,8 +178,12 @@ Thêm 1 icon 16x16 mỗi loài cho Dex / thông báo (P2).
 | `grocery_counter.png`, `grocery_crate.png` | 96x16, 16x16 | quầy và két Cô Năm |
 | `plant.png` | 16x16 | chậu cây |
 
-**Món** (`dishes/<id>.png`, 16x16): ca_mu_hap_xi_dau, ca_thu_nuong, cua_rang_me, bia_con_meo,
-oc_huong_nuong_mo_hanh, muc_hap_gung, rau_muong_xao_toi, tom_rang_muoi.
+**Món** (`dishes/<id>.png`, 16x16): tom_luoc, tom_nuong, tom_rang_muoi, muc_luoc, muc_nuong, muc_hap_gung,
+oc_huong_luoc_sa, oc_huong_nuong_mo_hanh, cua_luoc, cua_hap_bia, cua_rang_me, canh_chua_ca_thu, ca_thu_nuong,
+ca_thu_sot_ca, chao_ca_mu, ca_mu_hap_xi_dau, rau_muong_xao_toi, bia_con_meo.
+
+**Hải sản trên vỉ nướng** (`grill/<fish_id>.png`, khoảng 60x32, vẽ lúc **còn sống**; game tự nhuộm vàng → cháy
+và lật): ca_thu, tom, muc, oc_huong.
 
 **Cá trong khoang** (`fish/<id>.png`, mỗi ô 20x20, vẽ nằm ngang, **đầu cá quay sang phải**; game tự xoay khi
 xoay trong khoang): oc_huong 20x20, tom 40x20, muc 40x20, ca_thu 60x20, ca_thu_phat_sang 60x20, cua 40x40,

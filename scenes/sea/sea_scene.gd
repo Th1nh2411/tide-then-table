@@ -58,6 +58,9 @@ func _ready() -> void:
 	_dock.boat_entered.connect(_on_dock_entered)
 	_hull.hull_changed.connect(_refresh_dock_prompt)
 	_hull.boat_broken.connect(_on_boat_broken)
+	var card := NewCatchCard.new()
+	add_child(card)
+	_hold_manager.new_species_caught.connect(card.show_fish)
 	var phone := $PhoneApp as PhoneApp
 	phone.repair_allowed = _hull.is_at_dock
 	phone.repair_action = _hull.repair

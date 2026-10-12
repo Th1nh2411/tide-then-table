@@ -103,9 +103,12 @@ Vietnamese, keep code comments in short English.
   drawn at screen size and placed at scale 0.5.
 - Sea scene controllers: `FishingController` (rod spots → `FishingMinigame`:
   BiteGame then Timing/Tension; spot picks species via its featured fish +
-  depth, `CatchRoll` rolls size: deeper = pricier/bigger, size scales price
+  depth (`FishPortrait` on the overlay: a shadow + "?" while waiting for the
+  bite and for species not in the Dex yet, named "???"), `CatchRoll` rolls size: deeper = pricier/bigger, size scales price
   and difficulty; records in `GameState.best_sizes`), `NetController` (Q nets → HaulGame),
-  `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab), `HullController`
+  `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab; a species caught
+  for the first time is tagged NEW and `new_species_caught` shows
+  `NewCatchCard`: shadow → slow reveal → "NEW!", name, weight), `HullController`
   (collision damage, F repair at dock), `LampOil` (trip limit + displayed
   time; no burn in minigames or at the dock), `BoatLamp` (light radius from
   oil; the night tint is dark, so lamps are how the player sees), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,
@@ -197,9 +200,10 @@ Vietnamese, keep code comments in short English.
   `trip_end_cutscenes` after a trip; the restaurant plays
   `after_shift_cutscenes` when the summary closes; the intro scene plays
   `intro_call`; the restaurant plays `arrival_cutscenes` before the menu
-  (`ArrivalCutscenes`): `opening_day`, `beer_day` (day 2), `vy_arrives` (day
+  (`ArrivalCutscenes`): `opening_day`, `vy_arrives` (day
   3, a choice can hire her: flag `vy_hire_now`), `nam_fog_tale` (day 4); and
-  `after_shift_cutscenes`: `regular_thanks` (after the first fish order is
+  `after_shift_cutscenes`: `beer_day` (after the first shift: a guest asks
+  for beer, sold from day 2), `regular_thanks` (after the first fish order is
   served, flag `regular_served_once`); the sea's trip-end list has `cat_arrival` and
   `fog_omen`). Commands include `remove <actor>`; actor kinds rin, bao, vy,
   co_nam, guest, cat, crate, rin_bed, glow. dialogue_test checks every marker
@@ -216,6 +220,14 @@ Vietnamese, keep code comments in short English.
   a `Talker` child of the character (character needs `talk_position()`, optional
   `can_talk()`). `DialogueLibrary` picks and marks seen (story_flags →
   saved); `DialogueBox` shows it (pauses). Rin talks with E next to them.
+- Dishes: each seafood has 2-3 dishes by cooking method (`DishData.cook_type`
+  BOIL / GRILL from the start, STEAM at kitchen 1, STIR at kitchen 2 =
+  `kitchen_level`). `DishBook` (pure): known = its seafood was caught once,
+  cookable = kitchen level; `MenuPlan.kitchen_level` blocks the rest (menu
+  panel shows them dimmed "cần Bếp cấp N"); regulars eat the priciest
+  cookable dish; the rest card shows "Món mới!" once per dish (flag
+  "dish_<id>"). Rin grills GRILL dishes (GrillGame + `GrillView`: the
+  seafood big on the coals, browning, flipped on each press); Bảo cooks the rest.
 - Sea gear upgrades (boat, rod, lamp) are bought in the phone's "Nâng cấp"
   tab (`PhoneShop`); restaurant upgrades only via "Sửa quán".
 - `QuestTracker` (sea + restaurant, top-left): faded one-line "next step"

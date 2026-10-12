@@ -24,10 +24,15 @@ func _ready() -> void:
 	var storage := PhoneReports.storage_report(35.0)
 	_check("storage groups fish", storage.contains("Cua") and storage.contains("x2"))
 	_check("storage warns spoiling", storage.contains("hỏng đêm nay"))
+	var caught := GameState.caught_species.duplicate()
+	GameState.caught_species["oc_huong"] = 1  # ốc known, mực never caught
 	var menu_text := PhoneReports.menu_report(menu, {"cua": "Cua", "oc_huong": "Ốc hương"})
-	_check("menu: cua cookable", menu_text.contains("nấu được 2 phần"))
+	_check("menu: cua cookable", menu_text.contains("Cua luộc") and menu_text.contains("nấu được 2 phần"))
 	_check("menu: missing ingredients", menu_text.contains("thiếu: 2 Ốc hương"))
+	_check("menu: needs a better kitchen", menu_text.contains("Cua rang me") and menu_text.contains("cần Bếp cấp 2"))
+	_check("menu: never-caught seafood hidden", not menu_text.contains("Mực"))
 	_check("menu: snack always", menu_text.contains("luôn có"))
+	GameState.caught_species = caught
 	var dex := PhoneReports.dex_report(fish_catalog, 1)
 	_check("dex counts known species", dex.contains("DEX  1/%d" % fish_catalog.fish.size()))
 	_check("dex hides unknown", dex.contains("???"))

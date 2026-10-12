@@ -2,13 +2,18 @@ class_name DishData
 extends Resource
 ## One dish on the menu. One .tres per dish lives in res://data/dishes/.
 
-enum CookType { GRILL, STEAM, STIR }
+## GRILL = Rin on the charcoal grill; the rest Bảo cooks (BOIL from the start,
+## STEAM / STIR need a better kitchen: `kitchen_level`).
+enum CookType { GRILL, STEAM, STIR, BOIL }
 
 @export var id: String = ""
 @export var display_name: String = ""
 ## fish_id -> how many of that fish the dish needs.
 @export var ingredients: Dictionary[String, int] = {}
 @export var cook_type: CookType = CookType.GRILL
+## Kitchen upgrade level needed to cook it (DishBook): 0 boiled / grilled,
+## 1 steamed, 2 stir-fried.
+@export var kitchen_level: int = 0
 @export var base_price: int = 50
 ## Placeholder color for the order bubble.
 @export var color: Color = Color.WHITE

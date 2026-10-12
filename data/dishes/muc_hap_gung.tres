@@ -8,5 +8,6 @@ id = "muc_hap_gung"
 display_name = "Mực hấp gừng"
 ingredients = Dictionary[String, int]({"muc": 1})
 cook_type = 1
-base_price = 60
+base_price = 70
 color = Color(0.9, 0.9, 0.8, 1)
+kitchen_level = 1

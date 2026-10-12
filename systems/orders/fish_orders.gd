@@ -101,12 +101,9 @@ static func expire_after_shift(catalog: FishCatalog) -> PackedStringArray:
 	return lines
 
 
-## The dish a regular eats for this fish: the first menu dish using it.
+## The dish a regular eats for this fish: the priciest the kitchen can make.
 static func dish_for(fish_id: String, dishes: DishCatalog) -> DishData:
-	for dish in dishes.dishes:
-		if dish.ingredients.has(fish_id):
-			return dish
-	return null
+	return DishBook.best_for(fish_id, dishes.dishes)
 
 
 ## "Chú Ba: Cá mú từ 4kg · 300k · còn 2 đêm"

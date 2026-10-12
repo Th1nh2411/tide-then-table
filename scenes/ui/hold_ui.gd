@@ -106,6 +106,8 @@ func open_sell(buyer: String, price_of: Callable) -> void:
 
 
 func close() -> void:
+	for item in _view.hold.items:  # seen now
+		item.is_new = false
 	_view.cancel_drag()
 	_view.sell_price = Callable()
 	_sell_all_button.hide()

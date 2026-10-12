@@ -35,12 +35,18 @@ var _bite_clean: bool = true
 @onready var _game_holder: Container = %GameHolder
 @onready var _hold_button: Button = %HoldButton
 
+var _portrait: FishPortrait
+
 
 func _ready() -> void:
 	hide()
 	# No keyboard focus: Space is `cast` and must never "click" this button.
 	_hold_button.focus_mode = Control.FOCUS_NONE
 	_hold_button.pressed.connect(hold_requested.emit)
+	_portrait = FishPortrait.new()
+	_portrait.custom_minimum_size = Vector2(96, 40)
+	_portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_title_label.add_sibling(_portrait)
 
 
 func is_running() -> bool:
@@ -60,14 +66,18 @@ func start(fish: FishData, zone_scale: float = 1.0, count: int = 1, size: float 
 	_bite_clean = true
 	_result_label.text = ""
 	_title_label.modulate = Color.WHITE
+	_portrait.fish = fish
 	if fish.minigame == FishData.Minigame.HAUL:
 		_in_bite_stage = false
-		_title_label.text = "Kéo lưới: %s" % fish.display_name
+		_title_label.text = "Kéo lưới: %s" % _species_name()
+		_show_species()
 		_start_stage(HaulGame.new())
 	else:
 		# The species stays a mystery until it's hooked.
 		_in_bite_stage = true
 		_title_label.text = "Đang câu..."
+		_portrait.silhouette = 1.0  # who's down there? a shadow until hooked
+		_portrait.mystery = true
 		_start_stage(BiteGame.new())
 	show()
 
@@ -98,7 +108,8 @@ func _on_game_completed(success: bool, perfect: bool) -> void:
 	if _in_bite_stage and success:
 		_in_bite_stage = false
 		_bite_clean = perfect
-		_title_label.text = "Dính câu: %s %s%s!" % [_fish.display_name, _fish.weight_text(_size),
+		_show_species()
+		_title_label.text = "Dính câu: %s %s%s!" % [_species_name(), _fish.weight_text(_size),
 			" (to!)" if CatchRoll.is_big(_size) else ""]
 		_title_label.modulate = aberrant_title_color if _fish.is_aberrant else Color.WHITE
 		await get_tree().create_timer(hooked_pause_seconds).timeout
@@ -125,3 +136,15 @@ func _free_game() -> void:
 	_game_holder.remove_child(_game)
 	_game.queue_free()
 	_game = null
+
+
+## Known species (in the Dex) show in colour; new ones stay a shadow with a
+## "?" — the NewCatchCard reveals them once landed.
+func _show_species() -> void:
+	var known := int(GameState.caught_species.get(_fish.id, 0)) > 0
+	_portrait.silhouette = 0.0 if known else 1.0
+	_portrait.mystery = not known
+
+
+func _species_name() -> String:
+	return _fish.display_name if int(GameState.caught_species.get(_fish.id, 0)) > 0 else "???"

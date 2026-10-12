@@ -126,6 +126,7 @@ func _ready() -> void:
 		GameState.set_flag("regular_served_once")  # the regular's tea after the shift
 		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
 	_plan = MenuPlan.new(_menu_slots())
+	_plan.kitchen_level = DishBook.kitchen_level()
 	_kitchen.setup(_plan)
 	_chef.setup(_plan)
 	_menu_panel.setup(_plan, menu, fish_catalog, variety_multipliers)

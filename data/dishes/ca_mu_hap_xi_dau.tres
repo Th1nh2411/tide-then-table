@@ -10,3 +10,4 @@ ingredients = Dictionary[String, int]({"ca_mu": 1})
 cook_type = 1
 base_price = 150
 color = Color(0.5, 0.35, 0.25, 1)
+kitchen_level = 1

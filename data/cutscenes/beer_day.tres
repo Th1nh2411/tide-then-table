@@ -5,23 +5,24 @@
 [resource]
 script = ExtResource("1_cut")
 id = "beer_day"
-min_day = 2
+min_day = 1
 priority = 30
-script_text = "# Ngày 2: khách hỏi bia, Rin sang Cô Năm lấy bia hơi.
+script_text = "# Sau ca bán đầu tiên: khách cuối hỏi bia, Cô Năm hẹn mai lấy bia hơi (bán từ ngày 2).
 camera kitchen_view 0 1.6
 fade_in 0.6
 spawn Bao bao bao_stove 1.4
 spawn Rin rin rin_spot 1.4
 spawn Guest guest guest_seat 1.4
 speak Khách \"Ông chủ ơi, quán có bia không? Ăn hải sản mà thiếu bia buồn lắm.\"
+speak Rin \"Dạ hôm nay chưa có... mai em có liền!\"
 emote Rin ... 1.0
 speak Bảo \"Thấy chưa. Quán nhậu mà không có bia thì ai ngồi lâu.\"
-speak Rin \"Cô Năm có bán bia hơi. Để tao qua lấy.\"
+speak Rin \"Cô Năm có bán bia hơi. Để tao qua hỏi.\"
 spawn Nam co_nam nam_shop 1.4
 move_to Rin nam_counter 1.4
-speak \"Cô Năm\" \"Bia hơi hả? Cô bán theo tháp, lấy mười tháp một lần thì cô bớt cho.\"
+speak \"Cô Năm\" \"Bia hơi hả? Mai con qua lấy. Cô bán theo tháp, lấy mười tháp một lần thì cô bớt cho.\"
 speak \"Cô Năm\" \"Nhớ rót từ từ, để bọt mỏng thôi. Tràn là phí bia đó con.\"
 move_to Rin rin_spot 1.4
-speak Bảo \"Vòi bia tao gắn đầu xe đẩy rồi. Khách gọi tháp thì mày rót.\"
+speak Bảo \"Tối nay tao gắn vòi bia đầu xe đẩy. Mai khách gọi tháp thì mày rót.\"
 emote Guest heart 1.0
 camera room_view 0.8 1"

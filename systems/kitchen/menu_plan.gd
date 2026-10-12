@@ -10,6 +10,8 @@ extends RefCounted
 signal changed
 
 var slots: int = 3
+## Kitchen upgrade level: dishes above it can't be planned (DishData.kitchen_level).
+var kitchen_level: int = 99
 ## DishData -> Array of portions; each portion is an Array[InventoryItem].
 ## Insertion order = order the player added dishes.
 var _portions: Dictionary = {}
@@ -62,7 +64,7 @@ static func variety_multiplier(count: int, table: Array[float]) -> float:
 ## True if one more portion of `dish` can be added: a free slot + enough
 ## stock. Always-available dishes are never planned.
 func can_add(dish: DishData, storage: Array) -> bool:
-	if dish.always_available or dish.ingredients.is_empty():
+	if dish.always_available or dish.ingredients.is_empty() or dish.kitchen_level > kitchen_level:
 		return false
 	if not _portions.has(dish) and used_slots() >= slots:
 		return false

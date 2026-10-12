@@ -11,6 +11,8 @@ var size: float = 1.0
 var freshness: float = 100.0
 ## Turned 90 degrees clockwise in the grid.
 var rotated: bool = false
+## First of its species: "NEW" tag in the hold until the hold closes (not saved).
+var is_new: bool = false
 ## Top-left cell of the item's bounding box. Only meaningful while in a grid.
 var grid_pos: Vector2i = Vector2i.ZERO
 

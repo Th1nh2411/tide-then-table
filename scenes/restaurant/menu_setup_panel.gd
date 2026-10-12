@@ -117,8 +117,11 @@ func _refresh() -> void:
 		widgets.count.text = str(portions)
 		widgets.plus.disabled = not can_add
 		widgets.minus.disabled = portions == 0
-		widgets.stock.text = _stock_text(dish, counts)
-		widgets.row.visible = can_add or portions > 0
+		# Fish in stock but the kitchen can't cook it yet: shown dimmed.
+		var locked := dish.kitchen_level > _plan.kitchen_level and MenuPlan.max_portions(dish, GameState.storage) > 0
+		widgets.stock.text = "cần Bếp cấp %d" % dish.kitchen_level if locked else _stock_text(dish, counts)
+		widgets.row.modulate.a = 0.45 if locked else 1.0
+		widgets.row.visible = can_add or portions > 0 or locked
 		shown += 1 if widgets.row.visible else 0
 	_empty_label.visible = shown == 0
 	_clear_button.disabled = _plan.total_portions() == 0

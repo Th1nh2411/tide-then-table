@@ -106,6 +106,7 @@ func _test_menu_plan(oc_dish: DishData, cua_dish: DishData) -> void:
 	_check("beer: always on, bought, no cooking", beer.always_available and beer.is_market_dish() and beer.instant_serve)
 	_check("beer can't be planned", not MenuPlan.new(3).can_add(beer, storage))
 	_check("no peanuts any more", menu.dishes.all(func(d: DishData) -> bool: return d.id != "dau_phong_rang"))
+	_test_dish_book(menu)
 	var pantry: Dictionary = {}
 	var stock := MarketStock.new(pantry)
 	_check("stock starts empty", stock.count(rau) == 0 and not stock.take(rau))
@@ -222,3 +223,33 @@ func _dish(id: String) -> DishData:
 			return d
 	push_error("Unknown dish %s" % id)
 	return null
+
+
+## Dishes unlock by catch + kitchen level (DishBook, MenuPlan.kitchen_level).
+func _test_dish_book(menu: DishCatalog) -> void:
+	var saved_caught := GameState.caught_species.duplicate()
+	var saved_flags := GameState.story_flags.duplicate()
+	var saved_levels := GameState.upgrade_levels.duplicate()
+	GameState.caught_species = {"tom": 2}
+	GameState.upgrade_levels = {}
+	var fresh := DishBook.new_dishes(menu.dishes)
+	var ids := fresh.map(func(d: DishData) -> String: return d.id)
+	_check("new dishes: boiled + grilled tôm only (%s)" % str(ids), ids.size() == 2 and "tom_luoc" in ids and "tom_nuong" in ids)
+	DishBook.mark_seen(fresh)
+	_check("seen dishes aren't new again", DishBook.new_dishes(menu.dishes).is_empty())
+	GameState.upgrade_levels = {"kitchen": 2}
+	_check("kitchen 2 unlocks tôm rang muối", DishBook.new_dishes(menu.dishes).map(
+		func(d: DishData) -> String: return d.id) == ["tom_rang_muoi"])
+	var rang: DishData = menu.dishes.filter(func(d: DishData) -> bool: return d.id == "tom_rang_muoi")[0]
+	var tom: FishData = load("res://data/fish/tom.tres")
+	var storage: Array = [InventoryItem.new(tom, 1.0), InventoryItem.new(tom, 1.0)]
+	var plan := MenuPlan.new(3)
+	plan.kitchen_level = 0
+	_check("plan blocks dishes above the kitchen level", not plan.can_add(rang, storage))
+	plan.kitchen_level = 2
+	_check("...and allows them once upgraded", plan.can_add(rang, storage))
+	_check("regular eats the priciest cookable dish", DishBook.best_for("tom", menu.dishes, 0).id == "tom_nuong"
+		and DishBook.best_for("tom", menu.dishes, 2).id == "tom_rang_muoi")
+	GameState.caught_species = saved_caught
+	GameState.story_flags = saved_flags
+	GameState.upgrade_levels = saved_levels

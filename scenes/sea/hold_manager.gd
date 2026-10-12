@@ -2,7 +2,10 @@ class_name HoldManager
 extends Node
 ## Owns the boat hold for the current sea day. Catches (rod or net) go
 ## straight into free spots; whatever doesn't fit opens the hold UI in
-## (paused) overflow mode.
+## (paused) overflow mode. A species caught for the first time is tagged NEW
+## and announced (`new_species_caught`, the sea scene shows NewCatchCard).
+
+signal new_species_caught(fish: FishData, size: float)
 
 @export var boat: Boat
 @export var fishing: FishingController
@@ -49,15 +52,19 @@ func take_all() -> Array[InventoryItem]:
 
 
 func add_catch(fish: FishData, quality: float, count: int, size: float = 1.0) -> void:
+	var is_new := int(GameState.caught_species.get(fish.id, 0)) == 0
 	GameState.record_catch(fish, count, size)  # for the phone's Dex
 	var overflow: Array[InventoryItem] = []
 	for i in count:
 		var item := InventoryItem.new(fish, quality, size)
+		item.is_new = is_new
 		if not hold.auto_place(item):
 			overflow.append(item)
 	if not overflow.is_empty():
 		hud.flash_message("Khoang đầy!")
 		hold_ui.open_overflow(overflow)
+	if is_new:  # after the overflow window, so the card shows on top of it
+		new_species_caught.emit(fish, size)
 
 
 ## Boat swapped (debug key now, upgrades later): rebuild the hold at the new

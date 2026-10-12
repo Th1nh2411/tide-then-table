@@ -22,6 +22,7 @@ signal spilled(dish: DishData)
 
 var _dish: DishData
 var _game: CookingGameBase
+var _panel_anchor: Vector2 = Vector2.ZERO  # centre-x, bottom of the panel as placed
 
 @onready var _title_label: Label = %TitleLabel
 @onready var _hint_label: Label = %HintLabel
@@ -55,12 +56,24 @@ func start(dish: DishData) -> void:
 	_game.completed.connect(_on_game_completed)
 	if dish.cook_type == DishData.CookType.GRILL and not dish.instant_serve:
 		Sfx.hold("sizzle", true)
+	var panel := $Panel as Control
+	if _panel_anchor == Vector2.ZERO:  # as the scene placed it, before any game grew it
+		_panel_anchor = Vector2(panel.position.x + panel.size.x * 0.5, panel.position.y + panel.size.y)
 	_game_holder.add_child(_game)
+	_fit_panel.call_deferred()
 	_title_label.text = ("Rót: %s" if dish.instant_serve else "Nấu: %s") % dish.display_name
 	_hint_label.text = _game.get_hint()
 	_hint_label.visible = Guide.once("game_" + str(_game.get_script().get_global_name()))  # first time each
 	_result_label.text = ""
 	show()
+
+
+## Wider games (the grill with its picture) grow the panel to both sides,
+## keeping its centre and bottom (it sits over the road, not the kitchen).
+func _fit_panel() -> void:
+	var panel := $Panel as Control
+	panel.reset_size()
+	panel.position = Vector2(_panel_anchor.x - panel.size.x * 0.5, _panel_anchor.y - panel.size.y)
 
 
 func _cooking_game(dish: DishData) -> CookingGameBase:

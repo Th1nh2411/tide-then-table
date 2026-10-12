@@ -10,3 +10,4 @@ ingredients = Dictionary[String, int]({"oc_huong": 3})
 cook_type = 0
 base_price = 70
 color = Color(0.95, 0.8, 0.45, 1)
+kitchen_level = 0
