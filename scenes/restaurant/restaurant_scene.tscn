@@ -370,5 +370,6 @@ position = Vector2(330, 230)
 script = ExtResource("37_cutscene")
 markers = NodePath("../CutsceneMarkers")
 hidden_nodes = [NodePath("../HUD"), NodePath("../World/People/Rin"), NodePath("../World/People/Bao"), NodePath("../World/People/Seller"), NodePath("../World/Markers"), NodePath("../World/Bikes")]
+hidden_groups = Array[StringName]([&"staff", &"customers"])
 
 [node name="PhoneApp" parent="." instance=ExtResource("16_phone")]

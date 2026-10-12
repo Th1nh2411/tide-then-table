@@ -7,12 +7,17 @@ extends Node2D
 ## (flags, the pet's default name, the first answer of a choice).
 ## Command list: see CutsceneScript.
 
+signal started
 signal finished
 
 @export var markers: Node2D
 @export var day_tint: DayTint
 ## Nodes hidden while a cutscene plays (HUD layers, the player character...).
+## Things drawn inside another node (Rin on the boat) listen to `started` /
+## `finished` and check `playing` instead.
 @export var hidden_nodes: Array[Node] = []
+## Groups hidden too (people added at runtime: staff, customers).
+@export var hidden_groups: Array[StringName] = []
 @export var name_max_length: int = 12
 ## Size of drawn art (Art) for actors: 1 = restaurant scale (people 16x32),
 ## 0.5 at sea (the sea camera zooms x2).
@@ -59,10 +64,14 @@ func play(cutscene: Cutscene) -> void:
 	var was_paused := get_tree().paused
 	get_tree().paused = true
 	var shown: Array[Node] = []
-	for node in hidden_nodes:
+	var to_hide: Array[Node] = hidden_nodes.duplicate()
+	for group in hidden_groups:
+		to_hide.append_array(get_tree().get_nodes_in_group(group))
+	for node in to_hide:
 		if node.get("visible"):
 			shown.append(node)
 			node.set("visible", false)
+	started.emit()
 	_previous_camera = get_viewport().get_camera_2d()
 	if _previous_camera:
 		_camera.global_position = _previous_camera.get_screen_center_position()
@@ -91,7 +100,8 @@ func play(cutscene: Cutscene) -> void:
 	_dialogue.hold_pause = false
 	_dialogue.hide()
 	for node in shown:
-		node.set("visible", true)
+		if is_instance_valid(node):
+			node.set("visible", true)
 	if _previous_camera:
 		_previous_camera.make_current()
 	else:

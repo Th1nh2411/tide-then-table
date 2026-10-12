@@ -44,6 +44,9 @@ var _cat_time: float = 0.0
 @export var hull_depth: float = 3.0
 ## The restaurant cat rides along at the stern once adopted.
 @onready var _has_cat: bool = PetCat.is_present()
+## While it plays a cutscene, Rin and the cat on board aren't drawn (the
+## cutscene has its own Rin, e.g. on the dock).
+@export var cutscene: CutscenePlayer
 
 @onready var camera: Camera2D = $Camera2D
 @onready var _collision: CollisionShape2D = $CollisionShape2D
@@ -51,6 +54,9 @@ var _cat_time: float = 0.0
 
 func _ready() -> void:
 	add_to_group("boat")  # the phone map finds the boat through this
+	if cutscene:  # the tree is paused then, so redraw by hand
+		cutscene.started.connect(queue_redraw)
+		cutscene.finished.connect(queue_redraw)
 	if boat_data:
 		apply_boat_data(boat_data)
 
@@ -152,6 +158,8 @@ func _draw() -> void:
 
 ## Upright figures (undo the boat's rotation around their feet).
 func _draw_crew(half: Vector2) -> void:
+	if cutscene and cutscene.playing:
+		return
 	if _has_cat:
 		draw_set_transform(Vector2(-half.x * 0.55, half.y * 0.2), -rotation)
 		_draw_cat()

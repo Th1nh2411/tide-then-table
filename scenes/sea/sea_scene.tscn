@@ -370,7 +370,8 @@ spot_scene = ExtResource("15_spot")
 zones_root = NodePath("../Zones")
 catalog = ExtResource("17_catalog")
 
-[node name="Boat" parent="." instance=ExtResource("9_boat")]
+[node name="Boat" parent="." node_paths=PackedStringArray("cutscene") instance=ExtResource("9_boat")]
+cutscene = NodePath("../CutscenePlayer")
 position = Vector2(1000, 1100)
 rotation = -1.5708
 

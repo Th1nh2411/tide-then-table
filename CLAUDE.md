@@ -197,7 +197,11 @@ Vietnamese, keep code comments in short English.
   served, flag `regular_served_once`); the sea's trip-end list has `cat_arrival` and
   `fog_omen`). Commands include `remove <actor>`; actor kinds rin, bao, vy,
   co_nam, guest, cat, crate, rin_bed, glow. dialogue_test checks every marker
-  a cutscene uses exists in its scene. It pauses the tree; its actors,
+  a cutscene uses exists in its scene. Anything that would double an actor
+  must hide while it plays: `hidden_nodes` (restaurant: Rin, Bảo, Cô Năm),
+  `hidden_groups` (restaurant: "staff", "customers"), and things drawn
+  inside another node check `CutscenePlayer.playing` + redraw on `started` /
+  `finished` (Rin and the cat on the boat). It pauses the tree; its actors,
   camera, tweens and DialogueBox run PROCESS_MODE_ALWAYS.
 - The cat: `PetCat` (restaurant: on top of the fridge), rides at the stern at sea (`Boat._draw_cat`), flags `cat_adopted` / `cat_gone` /
   `pet_name`; use `{pet}` in dialogue/cutscene text.

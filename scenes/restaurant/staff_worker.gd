@@ -10,6 +10,7 @@ var working: bool = false
 
 
 func _ready() -> void:
+	add_to_group("staff")  # hidden during cutscenes
 	body_color = data.body_color
 	speed = data.walk_speed
 	apron = true

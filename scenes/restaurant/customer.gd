@@ -61,6 +61,7 @@ static var patience_paused: bool = false
 
 
 func _ready() -> void:
+	add_to_group("customers")  # hidden during cutscenes
 	body_color = Color.from_hsv(randf(), 0.5, 0.85)
 	if rich:
 		body_color = Color(0.95, 0.8, 0.3)
