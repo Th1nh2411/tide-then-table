@@ -74,7 +74,8 @@ func _ready() -> void:
 	_summary_panel.hide()
 	_message_label.hide()
 	_customers.customer_served.connect(_on_customer_served)
-	_customers.customer_left_angry.connect(func() -> void: _left_angry += 1)
+	_customers.customer_left_angry.connect(_on_customer_left_angry)
+	Sfx.ambience("street")
 	_customers.message_requested.connect(_show_message)
 	_next_day_button.pressed.connect(_on_continue_pressed)
 	_board.clicked.connect(func() -> void:  # the LED sign opens menu planning
@@ -286,7 +287,13 @@ func _on_rin_interacted(cell: Vector2i) -> void:
 			return
 
 
+func _on_customer_left_angry() -> void:
+	_left_angry += 1
+	Sfx.play("grumble")
+
+
 func _on_customer_served(price: int, tip: int) -> void:
+	Sfx.play("coins")
 	_earned_today += price + tip
 	_served += 1
 

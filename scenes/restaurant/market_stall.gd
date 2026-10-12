@@ -57,6 +57,7 @@ func buy(dish: DishData, bulk: bool = false) -> bool:
 		message_requested.emit("Không đủ tiền (%dk)" % cost)
 		return false
 	bag.add(dish, dish.buy_units(bulk))
+	Sfx.play("bag")
 	bought.emit(dish, cost)
 	return true
 
@@ -71,6 +72,7 @@ func store_at(cell: Vector2i) -> bool:
 	if not can_store_at(cell):
 		return false
 	store_all()
+	Sfx.play("bag")
 	message_requested.emit("Đã cất đồ tạp hoá vào tủ lạnh")
 	return true
 

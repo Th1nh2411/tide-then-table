@@ -45,6 +45,7 @@ var _day_ended: bool = false
 
 
 func _ready() -> void:
+	Sfx.ambience("sea")
 	var camera := _boat.camera
 	camera.limit_left = 0
 	camera.limit_top = 0
@@ -160,6 +161,7 @@ func _on_whirlpool_entered(_whirlpool: Whirlpool) -> void:
 	_boat.set_physics_process(false)
 	_hud.hide_prompt()
 	GameState.set_flag(Story.ENDING_SEEN_FLAG)
+	Sfx.play("whoosh", 0.0)
 	var tween := create_tween().set_parallel()
 	tween.tween_property(_boat, "global_position", _fog.get_whirlpool_position(), whirlpool_pull_seconds)
 	tween.tween_property(_boat, "rotation", _boat.rotation + TAU * 3.0, whirlpool_pull_seconds)
@@ -179,6 +181,7 @@ func _unload_at_dock() -> void:
 	if _day_ended or count == 0:
 		return
 	GameState.unload_catch(_hold_manager.take_all())
+	Sfx.play("coins")
 	_hud.flash_message("Đã dỡ %d con vào kho. Ra khơi tiếp thôi!" % count, 2.0)
 	_refresh_dock_prompt()
 

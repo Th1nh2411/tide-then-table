@@ -101,6 +101,7 @@ func _try_drop() -> void:
 	buoy_parent.add_child(buoy)
 	_buoys.append(buoy)
 	oil.spend(oil_per_drop)
+	Sfx.play("splash")
 	hud.flash_message("Đã thả lưới, quay lại sau để kéo")
 	_emit_nets()
 

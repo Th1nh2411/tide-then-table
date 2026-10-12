@@ -19,6 +19,7 @@ const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.
 
 
 func _ready() -> void:
+	Sfx.ambience("sea")
 	var time := DayClock.format_minutes(GameState.return_minutes)
 	if GameState.was_towed:
 		_return_label.text = "Rin được cứu hộ kéo về bến lúc %s." % time

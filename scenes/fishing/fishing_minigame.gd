@@ -107,6 +107,7 @@ func _on_game_completed(success: bool, perfect: bool) -> void:
 		return
 
 	perfect = perfect and _bite_clean
+	Sfx.play("catch" if success and perfect else "ok" if success else "miss")
 	if success:
 		var amount := " %d con" % _game.catch_count if _game.catch_count > 1 else ""
 		_result_label.text = "Bắt được%s!%s" % [amount, " (hoàn hảo)" if perfect else ""]

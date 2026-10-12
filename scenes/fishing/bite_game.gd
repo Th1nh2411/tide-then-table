@@ -102,6 +102,10 @@ func _restart_sequence(extra_wait: float = 0.0) -> void:
 
 
 func _set_state(state: State, seconds: float) -> void:
+	if state == State.NIBBLE:
+		Sfx.play("nibble")
+	elif state == State.BITE:
+		Sfx.play("bite")
 	_state = state
 	_state_left = seconds
 

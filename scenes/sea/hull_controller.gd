@@ -22,6 +22,9 @@ signal hull_changed
 ## Damage multiplier for tonight (the Miếu Cá Ông blessing lowers it).
 var damage_scale: float = 1.0
 
+## Hits weaker than this (jellyfish stings each frame) make no thud.
+@export var bump_sound_damage: float = 0.5
+
 var _at_dock: bool = false
 
 
@@ -98,6 +101,8 @@ func apply_damage(amount: float) -> void:
 	if damage <= 0.0:
 		return
 	var before := GameState.boat_hp
+	if damage >= bump_sound_damage:
+		Sfx.play("bump")
 	BoatCondition.damage(damage)
 	_refresh()
 	if BoatCondition.is_broken():

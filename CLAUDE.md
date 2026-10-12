@@ -11,7 +11,12 @@ Vietnamese, keep code comments in short English.
 - Godot **4.7.2**, binary: `/Applications/Godot.app/Contents/MacOS/Godot`.
 - Typed GDScript only. "Inferred from Variant" is an error here: annotate
   (`var x: float = dict.get(...)`), including in throwaway test scripts.
-- No plugins. Placeholder art only (`ColorRect`, `_draw()`); no images/audio.
+- No plugins. Placeholder art only (`ColorRect`, `_draw()`); no image or
+  audio files. Sounds are built in code: autoload `Sfx` (`Sfx.play("catch")`,
+  `Sfx.hold("sizzle", on)`, `Sfx.ambience("sea")` per scene; recipes in
+  `Sfx.SOUNDS` / `LOOPS`, synth `SfxSynth`; every Button clicks; mute in the
+  pause menu, saved in user://settings.cfg; silent when headless). Quit via
+  `SceneRouter.quit_game()` (stops sounds first, else playbacks leak).
 - 640x360 viewport, stretch `viewport`, integer scaling; default window
   1920x1080 (x3). F11 toggles fullscreen anywhere (`SceneRouter._input`).
   Top-down art uses Stardew-scale 16 px tiles (characters 16x32).
@@ -72,7 +77,7 @@ Vietnamese, keep code comments in short English.
 
 ## Map of the game
 - Autoloads: `GameState` (money, day, storage, upgrades, flags, boat_hp,
-  rating, last_catch, pantry, staff), `DayClock` (display-only time of day: driven by
+  rating, last_catch, pantry, staff, play_seconds), `Sfx`, `DayClock` (display-only time of day: driven by
   `LampOil` at sea and by shift progress in the restaurant; `running` = night
   trip in progress), `SceneRouter` (`go_to(path, fade_color)`).
 - Flow: main menu → (New Game: `scenes/intro/intro_scene.tscn`, cutscene
@@ -85,7 +90,8 @@ Vietnamese, keep code comments in short English.
   summary + rating → upgrade shop) → next day (freshness loss) → sea …
   ending via fog whirlpool (omen on day 4 or the first glowing mackerel,
   fog opens the next day; a full run is ~5 days / ~45 min, measured by a
-  whole-game bot).
+  whole-game bot). The ending shows a run card (`EndingStats`: days +
+  minutes, fish, guests, earnings) and a thank-you for playtesters.
 - Sea view matches the restaurant: the boat camera zooms x2 (Rin is 16x32
   on screen, standing in a nón lá; `Boat._draw` is 3/4: the deck turns, the
   hull side always faces the bottom of the screen, Rin and the cat stay

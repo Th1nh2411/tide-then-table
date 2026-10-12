@@ -72,6 +72,7 @@ func show_line(speaker: String, text: String) -> void:
 	_portrait_letter.text = speaker.left(1)
 	_text_label.text = CutsceneScript.fill(text)
 	_text_label.visible_characters = 0
+	Sfx.play("blip")
 
 
 func await_advance() -> void:

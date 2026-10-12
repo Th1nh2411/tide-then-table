@@ -73,7 +73,9 @@ func judge_pour(top_level: float, foam_level: float) -> Result:
 func _update(delta: float) -> void:
 	_elapsed += delta
 	_flash = maxf(_flash - delta, 0.0)
-	if _accepts_input() and _pouring():
+	var pouring := _accepts_input() and _pouring()
+	Sfx.hold("pour", pouring)
+	if pouring:
 		_hold += delta
 		_beer += fill_rate * delta
 		_foam = minf(_foam + (foam_growth + foam_ramp * _hold) * delta, max_foam)
@@ -97,6 +99,7 @@ func _pouring() -> bool:
 
 
 func _spill() -> void:
+	Sfx.play("splash")
 	spills += 1
 	_beer = 0.0
 	_foam = 0.0

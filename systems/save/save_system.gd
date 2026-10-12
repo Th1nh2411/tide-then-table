@@ -85,6 +85,7 @@ static func to_dict() -> Dictionary:
 		"orders": GameState.orders.duplicate(true),
 		"weather_id": GameState.weather_id,
 		"resume_at": GameState.resume_at,
+		"play_seconds": GameState.play_seconds,
 		"map_pins": GameState.map_pins.map(func(pin: Vector2) -> Array: return [pin.x, pin.y]),
 	}
 
@@ -94,6 +95,9 @@ static func apply_dict(data: Dictionary) -> void:
 	GameState.money = maxi(_get_int(data, "money", GameState.money), 0)
 	GameState.day = maxi(_get_int(data, "day", GameState.day), 1)
 	GameState.last_rating = clampi(_get_int(data, "last_rating", GameState.last_rating), 1, 5)
+	var played: Variant = data.get("play_seconds")
+	if _is_number(played):
+		GameState.play_seconds = maxf(float(played), 0.0)
 	var hp: Variant = data.get("boat_hp")
 	if hp is float or hp is int:
 		GameState.boat_hp = clampf(float(hp), 0.0, BoatCondition.MAX_HP)

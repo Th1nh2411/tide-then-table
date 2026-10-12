@@ -21,7 +21,7 @@ func _ready() -> void:
 	hide()
 	_resume_button.pressed.connect(_resume)
 	_menu_button.pressed.connect(_on_menu_pressed)
-	_quit_button.pressed.connect(func() -> void: get_tree().quit())
+	_quit_button.pressed.connect(SceneRouter.quit_game)
 	_help = HelpPanel.new()
 	add_child(_help)
 	_help.closed.connect(_resume_button.grab_focus)
@@ -29,6 +29,16 @@ func _ready() -> void:
 	help_button.text = "Hướng dẫn"
 	help_button.pressed.connect(_help.open)
 	_resume_button.add_sibling(help_button)
+	var sound_button := Button.new()
+	sound_button.text = _sound_text()
+	sound_button.pressed.connect(func() -> void:
+		Sfx.set_muted(not Sfx.muted)
+		sound_button.text = _sound_text())
+	help_button.add_sibling(sound_button)
+
+
+func _sound_text() -> String:
+	return "Âm thanh: Tắt" if Sfx.muted else "Âm thanh: Bật"
 
 
 func _unhandled_input(event: InputEvent) -> void:

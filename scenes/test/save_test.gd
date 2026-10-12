@@ -42,6 +42,7 @@ func _test_round_trip() -> void:
 	GameState.pantry["rau_muong_xao_toi"] = [{"units": 4, "fresh": 65.0}]
 	GameState.staff = {"hired": ["vy"], "candidates": ["ti"], "seen": ["vy", "ti"], "ad_day": 4}
 	GameState.resume_at = "restaurant"
+	GameState.play_seconds = 1800.5
 	GameState.orders.append({"who": "Chú Ba", "fish": "cua", "min_kg": 0.5, "reward": 120, "due_day": 7})
 	GameState.add_day_record({"day": 5, "earned": 300, "market": 20, "rating": 4})
 	_check("save writes file", SaveSystem.save_game(TEST_PATH) and SaveSystem.has_save(TEST_PATH))
@@ -61,6 +62,10 @@ func _test_round_trip() -> void:
 	_check("staff (hired, applicants, ad day)", GameState.staff.get("hired") == ["vy"]
 		and GameState.staff.get("candidates") == ["ti"] and int(GameState.staff.get("ad_day", 0)) == 4)
 	_check("resume point", GameState.resume_at == "restaurant")
+	_check("play time", is_equal_approx(GameState.play_seconds, 1800.5))
+	var stats := EndingStats.lines(7)
+	_check("ending stats: 3 lines, days + minutes", stats.size() == 3 and stats[0] == "6 ngày · 30 phút")
+	_check("ending stats: catch + earnings", stats[1] == "3 con cá · 1/7 loài" and stats[2].contains("300k"))
 	_check("map pins", GameState.map_pins.size() == 1 and GameState.map_pins[0].is_equal_approx(Vector2(120.5, 640)))
 	_check("orders", GameState.orders.size() == 1 and int(GameState.orders[0]["reward"]) == 120)
 	_check("size record", is_equal_approx(GameState.best_size(_fish("cua")), 1.4))

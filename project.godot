@@ -19,6 +19,7 @@ config/features=PackedStringArray("4.7")
 GameState="*res://autoload/game_state.gd"
 DayClock="*res://autoload/day_clock.gd"
 SceneRouter="*res://autoload/scene_router.gd"
+Sfx="*res://autoload/sfx.gd"
 
 [display]
 

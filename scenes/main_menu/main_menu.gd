@@ -15,6 +15,7 @@ var _confirm_new_game: bool = false
 
 
 func _ready() -> void:
+	Sfx.ambience("sea")
 	_continue_button.pressed.connect(_on_continue_pressed)
 	_new_game_button.pressed.connect(_on_new_game_pressed)
 	_quit_button.pressed.connect(_on_quit_pressed)
@@ -62,4 +63,4 @@ func _saved_day() -> int:
 
 
 func _on_quit_pressed() -> void:
-	get_tree().quit()
+	SceneRouter.quit_game()

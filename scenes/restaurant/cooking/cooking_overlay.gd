@@ -53,6 +53,8 @@ func start(dish: DishData) -> void:
 	if kitchen_upgrade:
 		_game.time_scale = float(GameState.get_upgrade_value(kitchen_upgrade))
 	_game.completed.connect(_on_game_completed)
+	if dish.cook_type == DishData.CookType.GRILL and not dish.instant_serve:
+		Sfx.hold("sizzle", true)
 	_game_holder.add_child(_game)
 	_title_label.text = ("Rót: %s" if dish.instant_serve else "Nấu: %s") % dish.display_name
 	_hint_label.text = _game.get_hint()
@@ -94,6 +96,9 @@ func _on_game_completed(result: CookingGameBase.Result) -> void:
 		CookingGameBase.Result.BURNT: "Vơi..." if _dish.instant_serve else "Hỏng...",
 	}
 	var multiplier := get_multiplier(result)
+	Sfx.hold("sizzle", false)
+	Sfx.hold("pour", false)
+	Sfx.play({CookingGameBase.Result.PERFECT: "catch", CookingGameBase.Result.OK: "ok"}.get(result, "miss"))
 	_result_label.text = "%s  x%.1f" % [names[result], multiplier]
 	await get_tree().create_timer(result_seconds).timeout
 	_game.queue_free()

@@ -24,6 +24,22 @@ func _ready() -> void:
 	# Ignore mouse so the invisible overlay doesn't block clicks.
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_fade_rect)
+	# Closing the window goes through quit_game() too.
+	get_tree().auto_accept_quit = false
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		quit_game()
+
+
+## Quit buttons + window close: stop the sounds and give the audio server a
+## few frames to let go of them (a sound still playing at exit leaks).
+func quit_game() -> void:
+	Sfx.stop_all()
+	for i in 3:
+		await get_tree().process_frame
+	get_tree().quit()
 
 
 ## F11 toggles fullscreen anywhere in the game.

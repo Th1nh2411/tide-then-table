@@ -13,6 +13,7 @@ const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
 
 
 func _ready() -> void:
+	Sfx.ambience("")
 	await get_tree().process_frame  # let the router's fade-in start first
 	if intro:
 		await _player.play(intro)

@@ -108,6 +108,7 @@ func _process(delta: float) -> void:
 			if (rule.while_paused or not paused) and not is_seen(rule.id) and rule.active.call():
 				_current = rule
 				_shown = 0.0
+				Sfx.play("pop")
 				break
 	_canvas.visible = _current != null and (_current.while_paused or not paused)
 	_canvas.queue_redraw()

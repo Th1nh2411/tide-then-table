@@ -195,14 +195,17 @@ func interact(cell: Vector2i) -> bool:
 		if rin.carried and plate == null:
 			customers.shelf.add(rin.carried, slot)
 			rin.carried = null
+			Sfx.play("clink")
 			return true
 		if not rin.carried and plate:
 			customers.shelf.remove(plate)
 			rin.carried = plate
+			Sfx.play("clink")
 			return true
 		return false
 	if room.grid.kind(cell) == "B" and rin.carried:
 		rin.carried = null
+		Sfx.play("bag")
 		return true
 	var seat := room.table_index(cell)
 	if seat < 0:
@@ -210,6 +213,7 @@ func interact(cell: Vector2i) -> bool:
 	if rin.carried:
 		if customers.serve_at(seat, rin.carried):
 			rin.carried = null
+			Sfx.play("clink")
 		else:
 			message_requested.emit("Bàn %d không gọi món này" % (seat + 1))
 		return true

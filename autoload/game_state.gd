@@ -71,6 +71,9 @@ var orders: Array = []
 var pantry: Dictionary = {}
 ## Restaurant staff (StaffRoster): {"hired", "candidates", "seen": [ids], "ad_day"}.
 var staff: Dictionary = {}
+## Seconds spent in the game itself (not the main menu / ending), saved.
+## Shown on the ending's thank-you card.
+var play_seconds: float = 0.0
 ## History entries kept (older ones are dropped).
 const MAX_HISTORY: int = 14
 
@@ -99,6 +102,17 @@ func reset() -> void:
 	weather_id = "calm"
 	resume_at = "sea"
 	trip_notes.clear()
+	play_seconds = 0.0
+
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS  # cutscenes / phone count as play
+
+
+func _process(delta: float) -> void:
+	var scene := get_tree().current_scene
+	if scene and not scene.scene_file_path.contains("main_menu") and not scene.scene_file_path.contains("ending"):
+		play_seconds += delta / maxf(Engine.time_scale, 0.001)
 
 
 ## Called when the night trip ends: records the return and moves the catch into storage.
