@@ -6,6 +6,8 @@ extends CanvasLayer
 ## dex, boat, ledger, upgrades (PhoneShop, the only place to buy upgrades),
 ## staff (PhoneStaff: hire / dismiss / job ads, from the staff unlock day),
 ## plus a console log where story clues appear. Content comes from PhoneReports.
+## The boat tab has the repair button (at sea: only at the dock). `open_map`
+## (M) opens the big map (MapOverlay) instead of the phone.
 ## Put it LAST in the scene tree so it gets J/Esc before other overlays.
 
 const APP_TITLE: String = "Rin's Catch v0.3.1"
@@ -14,6 +16,7 @@ const MAP_TAB: int = 2
 const SHOP_TAB: int = 6
 ## Hidden until StaffCatalog.unlock_day (fish orders live in the QuestTracker).
 const STAFF_TAB: int = 7
+const BOAT_TAB: int = 4
 
 @export var fish_catalog: FishCatalog
 @export var menu: DishCatalog
@@ -32,6 +35,11 @@ var _opened_pause: bool = false
 var _tab_buttons: Array[Button] = []
 var _mono: SystemFont
 var _staff: PhoneStaff
+var _repair: RepairButton
+var _big_map: MapOverlay
+## Set by the sea scene: () -> bool (at the dock) and () -> int (repair).
+var repair_allowed: Callable
+var repair_action: Callable
 
 @onready var _title_label: Label = %AppTitle
 @onready var _tabs_row: HBoxContainer = %TabsRow
@@ -64,9 +72,39 @@ func _ready() -> void:
 	_staff.custom_minimum_size = _shop.custom_minimum_size
 	_shop.add_sibling(_staff)
 	_staff.setup(staff_catalog)
+	_repair = RepairButton.new()
+	_repair.boat_upgrade = boat_upgrade
+	_repair.focus_mode = Control.FOCUS_NONE
+	_repair.add_theme_font_size_override("font_size", font_size)
+	_repair.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	var style := StyleBoxFlat.new()  # stands out from the console text
+	style.bg_color = Color(0.25, 0.18, 0.08)
+	style.border_color = Color(1.0, 0.75, 0.3)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(3)
+	style.set_content_margin_all(4)
+	_repair.add_theme_stylebox_override("normal", style)
+	_repair.add_theme_stylebox_override("hover", style)
+	_repair.add_theme_color_override("font_color", Color(1.0, 0.85, 0.45))
+	_scroll.add_sibling(_repair)
+	_repair.repaired.connect(func(_spent: int, _fully: bool) -> void: _show_tab(_tab))
+	_big_map = MapOverlay.new()
+	add_child(_big_map)
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("open_map"):
+		get_viewport().set_input_as_handled()
+		if _big_map.visible:
+			_big_map.close()
+		elif not get_tree().paused or visible:
+			close()
+			_big_map.open()
+		return
+	if _big_map.visible and event.is_action_pressed("pause"):
+		get_viewport().set_input_as_handled()
+		_big_map.close()
+		return
 	if event.is_action_pressed("open_phone"):
 		get_viewport().set_input_as_handled()
 		if visible:
@@ -124,6 +162,10 @@ func _show_tab(index: int) -> void:
 		_shop.refresh()
 	if index == STAFF_TAB:
 		_staff.refresh()
+	_repair.allowed = repair_allowed
+	_repair.action = repair_action
+	_repair.refresh()
+	_repair.visible = _repair.visible and index == BOAT_TAB
 	_content_label.text = _tab_text(index)
 	var weather: WeatherData = weather_catalog.find(GameState.weather_id) if weather_catalog else null
 	_log_label.text = "\n".join(PhoneReports.log_lines(_fridge_loss(), weather))

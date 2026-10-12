@@ -17,6 +17,10 @@ const PIN_HIT_RADIUS_PX: float = 8.0
 @export var pin_color: Color = Color(1.0, 0.4, 0.9)
 @export var fog_color: Color = Color(0.4, 1.0, 0.9)
 @export var label_size: int = 7
+## Big map (MapOverlay): legend row + zone names.
+@export var show_legend: bool = false
+## Distance shown in "m" like the sea's edge markers.
+@export var pixels_per_meter: float = 10.0
 
 ## Layout of the sea map, filled by capture(). Empty until the first night.
 static var _snap: Dictionary = {}
@@ -30,7 +34,7 @@ static func capture(map_size: Vector2, zones_root: Node, land_root: Node, obstac
 		var zone := child as SeaZone
 		if zone:
 			zones.append({"rect": zone.get_global_rect(), "color": zone.color,
-				"fog": zone.zone == FishData.Zone.FOG})
+				"fog": zone.zone == FishData.Zone.FOG, "name": PhoneReports.ZONE_NAMES[zone.zone]})
 	var land: Array = []
 	for child in land_root.get_children():
 		var block := child as LandBlock
@@ -100,6 +104,10 @@ func _draw() -> void:
 			continue
 		var color: Color = zone["color"]
 		draw_rect(_to_map_rect(zone["rect"]), color.darkened(0.35))
+		if show_legend and zone.has("name"):
+			var r := _to_map_rect(zone["rect"])
+			draw_string(font, r.position + Vector2(4, label_size + 3), zone["name"], HORIZONTAL_ALIGNMENT_LEFT, -1,
+				label_size, Color(1, 1, 1, 0.45))
 	for rect: Rect2 in _snap["land"]:
 		draw_rect(_to_map_rect(rect), land_color)
 	for rock: Dictionary in _snap["rocks"]:
@@ -115,7 +123,26 @@ func _draw() -> void:
 		_draw_pin(font, GameState.map_pins[i], i + 1)
 	_draw_boat()
 	var hint := "Ghim %d/%d" % [GameState.map_pins.size(), GameState.MAX_PINS]
+	var boat := get_tree().get_first_node_in_group("boat") as Node2D
+	if boat:
+		var meters := roundi(boat.global_position.distance_to(_snap["dock"]) / pixels_per_meter)
+		hint += " · về bến %dm" % meters
 	draw_string(font, Vector2(4, size.y - 4), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(0.6, 0.65, 0.7))
+	if show_legend:
+		_draw_legend(font)
+
+
+## Key to the symbols, bottom right.
+func _draw_legend(font: Font) -> void:
+	var items: Array = [["Thuyền", boat_color], ["Bến", dock_color], ["Địa điểm", place_color],
+		["Lưới", net_color], ["Ghim", pin_color]]
+	var x := size.x - 4.0
+	for i in range(items.size() - 1, -1, -1):
+		var text: String = items[i][0]
+		x -= font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size).x
+		draw_string(font, Vector2(x, size.y - 4), text, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(0.75, 0.8, 0.85))
+		draw_circle(Vector2(x - 6, size.y - 4 - label_size * 0.35), 2.5, items[i][1])
+		x -= 16.0
 
 
 ## Dashed foam line: how far the current boat can go.
@@ -146,6 +173,8 @@ func _draw_boat() -> void:
 	if boat == null:
 		return
 	var at := _to_map(boat.global_position)
+	var pulse := fmod(Time.get_ticks_msec() * 0.001, 1.2) / 1.2  # "you are here" ring
+	draw_arc(at, 4.0 + pulse * 10.0, 0.0, TAU, 20, Color(boat_color, 0.8 * (1.0 - pulse)), 1.0)
 	var forward := Vector2.RIGHT.rotated(boat.global_rotation)
 	var side := forward.orthogonal()
 	draw_colored_polygon(PackedVector2Array([at + forward * 6.0, at - forward * 4.0 + side * 3.5,

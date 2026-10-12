@@ -82,6 +82,21 @@ static func draw_plate(canvas: CanvasItem, plate: DishShelf.Plate, at: Vector2) 
 		canvas.draw_arc(at, 5.5, 0.0, TAU, 14, Color(1.0, 0.8, 0.3), 1.0)
 
 
+## True for dishes Rin grills himself on the charcoal grill (not Bảo's, not beer).
+static func rin_grills(dish: DishData) -> bool:
+	return not ChefBao.cooks(dish) and not dish.instant_serve
+
+
+## Small flickering flame (`at` = its base): marks Rin's grill dishes.
+static func draw_flame(canvas: CanvasItem, at: Vector2, height: float, time: float) -> void:
+	var sway := sin(time * 9.0) * height * 0.12
+	var w := height * 0.4
+	canvas.draw_colored_polygon(PackedVector2Array([at + Vector2(-w, 0), at + Vector2(sway, -height),
+		at + Vector2(w, 0), at + Vector2(0, height * 0.18)]), Color(1.0, 0.4, 0.1))
+	canvas.draw_colored_polygon(PackedVector2Array([at + Vector2(-w * 0.5, 0), at + Vector2(sway * 0.6, -height * 0.55),
+		at + Vector2(w * 0.5, 0)]), Color(1.0, 0.85, 0.3))
+
+
 static func draw_plant(canvas: CanvasItem, at: Vector2) -> void:
 	if Art.draw(canvas, "restaurant/plant", Rect2(at + Vector2(-4, -3), Vector2(16, 16))):
 		return

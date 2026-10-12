@@ -59,18 +59,24 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _repair() -> void:
+	repair()
+
+
+## Repairs at the dock (F or the phone). Returns the money spent.
+func repair() -> int:
 	if not BoatCondition.is_damaged():
-		return
+		return 0
 	var was_broken := BoatCondition.is_broken()
 	var spent := BoatCondition.repair(boat.boat_data)
 	if spent == 0:
 		hud.flash_message("Không đủ tiền sửa thuyền")
-		return
+		return 0
 	var partial := " (chưa đủ tiền sửa hết)" if BoatCondition.is_damaged() else ""
 	hud.flash_message("Đã sửa thuyền: -%dk%s" % [spent, partial])
 	if was_broken and not BoatCondition.is_broken():
 		boat.set_physics_process(true)
 	_refresh()
+	return spent
 
 
 ## Patch at sea: +`hp` for `cost`. Returns false if the hull is fine or the

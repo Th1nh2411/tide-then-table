@@ -17,11 +17,9 @@
 [ext_resource type="PackedScene" path="res://scenes/restaurant/cooking/cooking_overlay.tscn" id="5_cooking"]
 [ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="6_fish"]
 [ext_resource type="Script" path="res://scenes/restaurant/menu_setup_panel.gd" id="7_menupanel"]
-[ext_resource type="Resource" path="res://data/upgrades/boat_upgrade.tres" id="9_boatup"]
 [ext_resource type="Resource" path="res://data/upgrades/rod_upgrade.tres" id="10_rodup"]
 [ext_resource type="Resource" path="res://data/upgrades/fridge_upgrade.tres" id="11_fridgeup"]
 [ext_resource type="Script" path="res://data/resources/upgrade_data.gd" id="12_updata"]
-[ext_resource type="Script" path="res://scenes/ui/repair_button.gd" id="13_repair"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="14_pause"]
 [ext_resource type="Resource" path="res://data/upgrades/lamp_upgrade.tres" id="15_lampup"]
 [ext_resource type="PackedScene" path="res://scenes/ui/phone_app.tscn" id="16_phone"]
@@ -187,18 +185,6 @@ offset_right = 377.0
 offset_bottom = 60.0
 theme_override_font_sizes/font_size = 10
 text = "Đóng quán sớm"
-
-[node name="RepairButton" type="Button" parent="HUD"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 170.0
-offset_top = 42.0
-offset_right = 288.0
-offset_bottom = 60.0
-theme_override_font_sizes/font_size = 10
-text = "Sửa thuyền"
-script = ExtResource("13_repair")
-boat_upgrade = ExtResource("9_boatup")
 
 [node name="RenovationMode" type="Control" parent="." node_paths=PackedStringArray("room")]
 layout_mode = 3

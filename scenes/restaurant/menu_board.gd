@@ -98,6 +98,8 @@ func _draw() -> void:
 		var alpha := 1.0 if count > 0 else 0.35
 		draw_circle(at, icon_radius, Color(1, 1, 1, alpha))
 		draw_circle(at + Vector2(0, -0.5), icon_radius * 0.65, Color(dish.color, alpha))
+		if StreetProps.rin_grills(dish):  # Rin grills this one
+			StreetProps.draw_flame(self, at + Vector2(icon_radius * 0.7, -icon_radius * 0.4), 5.0, _time)
 		if count > 0:
 			_led_text(font, at + Vector2(icon_radius + 1, 4), str(count))
 		else:  # sold out: red cross

@@ -3,8 +3,9 @@ extends Control
 ## Over the shop front (so the kitchen stays clear): the order tickets, one
 ## per table, oldest first (table, a dot per dish still to bring with a
 ## green ring when its plate is on the plate table, patience; gold border
-## for a regular). The menu is on the LED board (MenuBoard); Rin grills /
-## pours with E at the grill / beer tap.
+## for a regular; a little flame on dishes Rin grills himself). The menu
+## is on the LED board (MenuBoard); Rin grills / pours with E at the grill /
+## beer tap.
 
 @export var customers: CustomerManager
 @export var tickets_origin: Vector2 = Vector2(4, 4)
@@ -39,6 +40,8 @@ func _draw() -> void:
 		for k in lines.size():
 			var at := rect.position + Vector2(ticket_base_width + k * dot_step, 8)
 			draw_circle(at, 3.5, lines[k].dish.color)
+			if StreetProps.rin_grills(lines[k].dish):
+				StreetProps.draw_flame(self, at + Vector2(3, -2), 6.0, Time.get_ticks_msec() * 0.001)
 			if customers.shelf.find_for(lines[k].dish, lines[k].visit):
 				draw_arc(at, 4.5, 0.0, TAU, 12, Color(0.2, 0.75, 0.3), 1.5)
 		draw_rect(Rect2(rect.position + Vector2(2, ticket_height - 4), Vector2((rect.size.x - 4) * party.patience, 2)),

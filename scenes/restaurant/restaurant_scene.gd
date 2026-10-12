@@ -100,8 +100,6 @@ func _ready() -> void:
 	cooking_panel.offset_right = 435.0
 	cooking_panel.offset_top = 212.0
 	cooking_panel.offset_bottom = 328.0
-	(%RepairButton as RepairButton).repaired.connect(func(spent: int, fully: bool) -> void:
-		_show_message("Đã sửa thuyền: -%dk%s" % [spent, "" if fully else " (chưa đủ tiền sửa hết)"]))
 	_close_early_button.pressed.connect(func() -> void: _end_shift("Đóng quán sớm"))
 	_close_early_button.hide()
 

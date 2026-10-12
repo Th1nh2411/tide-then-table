@@ -8,7 +8,8 @@ extends Node2D
 ## ordered it: the bin pulses red); a small "E"
 ## key over the cell (or person) E would act on right now (Cô Năm at the
 ## grocery too, also before opening; the fridge pulses green while Rin has
-## groceries to put away).
+## groceries to put away). Rin's own grill dishes carry a little flame, and
+## the grill glows with a flame over it while one is waiting.
 
 @export var room: StreetRoom
 @export var rin: RinChef
@@ -44,6 +45,10 @@ func _draw() -> void:
 	if not kitchen.is_open():
 		return
 	var pulse := 0.55 + 0.45 * sin(_time * 6.0)
+	if kitchen.next_order(false) and not kitchen.busy:  # a grill dish is waiting for Rin
+		var grill := room.merged_rect("N").grow(1)
+		draw_rect(grill, Color(1.0, 0.55, 0.15, pulse), false, 2.0)
+		StreetProps.draw_flame(self, grill.get_center() + Vector2(0, -12 - absf(sin(_time * 5.0)) * 3.0), 9.0, _time)
 	if rin.carried:
 		var seats := _seats_for(rin.carried)
 		for k in seats.size():
@@ -84,7 +89,10 @@ func _order_bubble(customer: Customer) -> void:
 	var half := 6.0 + n * 4.5
 	_bubble(at, Color(1.0, 0.88, 0.5, 0.95) if customer.regular_name else Color(1, 1, 1, 0.95), half)
 	for k in n:
-		draw_circle(at + Vector2(-half + 6 + k * 9, 0), 3.5, customer.orders[k].dish.color)
+		var dot := at + Vector2(-half + 6 + k * 9, 0)
+		draw_circle(dot, 3.5, customer.orders[k].dish.color)
+		if StreetProps.rin_grills(customer.orders[k].dish):
+			StreetProps.draw_flame(self, dot + Vector2(3, -2), 6.0, _time)
 	draw_string(ThemeDB.fallback_font, at + Vector2(half - 7, 3), str(customer.seat + 1), HORIZONTAL_ALIGNMENT_LEFT,
 		-1, 7, Color(0.2, 0.15, 0.1))
 	draw_rect(Rect2(at + Vector2(-half + 1, 9), Vector2(half * 2 - 2, 2)), Color(0, 0, 0, 0.4))

@@ -124,7 +124,11 @@ Vietnamese, keep code comments in short English.
   Lines follow `Story.stage()`. `PoiDialog` sits before `PhoneApp`.
 - Phone map (`PhoneMap`, tab "Bản đồ"): static snapshot captured by the sea
   scene (`_capture_map`), live boat (group "boat") + nets; pins in
-  `GameState.map_pins` (saved, also edge markers at sea).
+  `GameState.map_pins` (saved, also edge markers at sea). `open_map` (M)
+  opens the big map (`MapOverlay`, owned by PhoneApp: zone names, legend,
+  distance home). Boat repair is a button in the phone's "Thuyền" tab
+  (`RepairButton`; at sea only at the dock via `HullController.repair`, or
+  F at the dock) — no repair button on the restaurant HUD.
 - Fish orders (`FishOrders`, `GameState.orders`): rolled when the next day
   starts, shown on the sea HUD + phone tab; at shift start the fish is set
   aside (`reserve_for_shift`) and the regular comes to the restaurant;
@@ -173,7 +177,9 @@ Vietnamese, keep code comments in short English.
   grill "N" grills the oldest waiting grilled dish — Rin steps behind it, the
   compact `CookingOverlay` runs over the road, the dish lands in his hands; E
   on the beer tap "U" by the ice box pours a tower for the oldest beer order
-  (`BeerPourGame` in the same overlay: hold to pour, short bursts keep the
+  (Rin's grill dishes carry a small flame on tickets, bubbles and the LED
+  board, `StreetProps.rin_grills` / `draw_flame`; the grill glows while one
+  waits) (`BeerPourGame` in the same overlay: hold to pour, short bursts keep the
   foam thin, release in the band; spilling wastes a litre);
   E on the plate table / tables; `menu_rows()` feeds the LED board),
   `ServiceHud` (order tickets over the shop front), `MenuBoard` (small LED board by the curb in the middle, "E" cells,

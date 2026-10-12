@@ -89,10 +89,10 @@ SỬA QUÁN (trước giờ mở / sau khi bán xong)
 
   Kho: cá trong kho, độ tươi, còn mấy đêm.
   Menu: món nấu được bao nhiêu phần, thiếu gì.
-  Đơn: khách quen đặt cá.
-  Bản đồ: click để ghim / bỏ ghim (ghim hiện mũi tên khi ra khơi).
+  Bản đồ (hoặc phím M = bản đồ lớn): click để ghim / bỏ ghim (ghim hiện mũi tên khi ra khơi).
   Dex: các loài đã bắt, kỷ lục cân nặng.
-  Thuyền / Sổ sách: tình trạng thuyền, lãi từng ngày.
+  Thuyền: tình trạng thuyền + nút sửa (ngoài biển chỉ sửa ở bến).
+  Sổ sách: lãi từng ngày.
   Nâng cấp: đồ nghề đi biển (thuyền, cần câu, đèn), có hiệu lực từ chuyến sau.
   (Đồ trong quán thì sửa bằng nút "Sửa quán".)""",
 	"""MẸO
