@@ -2,7 +2,8 @@ class_name SeaGuide
 extends Guide
 ## First-time pointers at sea (see Guide): steering, a fishing spot, the
 ## nets, a full net, the hold, a full hold, the lobster raft and selling
-## there, low oil and the dock. Refs are set by the sea scene.
+## there, low oil, a dented hull, repairing at the dock, unloading a nearly
+## full hold, and the dock. Refs are set by the sea scene.
 
 ## Show "fish here" when the boat is this close to a spot (px).
 @export var spot_reach: float = 90.0
@@ -16,6 +17,7 @@ var hold_manager: HoldManager
 var oil: LampOil
 var dock: Dock
 var raft: Node2D
+var hud: SeaHud
 
 var _catches: int = 0
 
@@ -34,7 +36,7 @@ func _add_rules() -> void:
 	add("fish_spot", "Dừng lại, E: câu", func() -> bool: return _near_spot() != null,
 		_spot_target,
 		func() -> bool: return fishing.is_fishing())
-	add("net", "Q: thả lưới ốc", func() -> bool: return _catches >= 1 and nets.nets_available() > 0,
+	add("net", "Q: thả lưới (tôm, cua, ốc)", _net_tip_due,
 		_boat_top,
 		func() -> bool: return nets.nets_out() > 0)
 	add("haul", "E: kéo lưới", func() -> bool: return _full_buoy() != null,
@@ -55,6 +57,15 @@ func _add_rules() -> void:
 	add("oil_low", "Dầu sắp hết: về bến", func() -> bool: return _at_sea() and oil.fraction() <= 0.3,
 		func() -> Vector2: return Guide.screen_of(dock),
 		func() -> bool: return dock.is_boat_inside())
+	add("hull", "Thuyền móp: về bến sửa", func() -> bool: return _at_sea() and BoatCondition.is_damaged(),
+		hud.hull_target,
+		func() -> bool: return dock.is_boat_inside())
+	add("repair", "F: sửa thuyền", func() -> bool: return dock.is_boat_inside() and BoatCondition.is_damaged(),
+		_boat_top,
+		func() -> bool: return not BoatCondition.is_damaged())
+	add("unload", "Về bến dỡ bớt cá", _hold_nearly_full,
+		func() -> Vector2: return Guide.screen_of(dock),
+		func() -> bool: return dock.is_boat_inside())
 	add("dock", "E: dỡ cá / về ngủ", func() -> bool: return dock.is_boat_inside() and _catches > 0,
 		func() -> Vector2: return Guide.screen_of(dock, Vector2(0, -14)))
 	add("wave", "C khi câu: chậm lại", func() -> bool: return WaveMark.has_power() and DayClock.running,
@@ -64,6 +75,15 @@ func _add_rules() -> void:
 
 func _at_sea() -> bool:
 	return DayClock.running and not dock.is_boat_inside()
+
+
+## Nets are taught on the first night: shrimp and crab only come from them.
+func _net_tip_due() -> bool:
+	return Guide.is_seen("steer") and _at_sea() and nets.nets_available() > 0 and nets.can_drop_here()
+
+
+func _hold_nearly_full() -> bool:
+	return _at_sea() and hold_manager.hold.fill_fraction() >= hold_manager.almost_full_fraction
 
 
 func _boat_top() -> Vector2:

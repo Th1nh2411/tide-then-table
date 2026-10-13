@@ -69,7 +69,7 @@ func add_catch(fish: FishData, quality: float, count: int, size: float = 1.0) ->
 		hold_ui.open_overflow(overflow)
 	elif not _almost_full_said and hold.fill_fraction() >= almost_full_fraction:
 		_almost_full_said = true
-		hud.flash_message("Khoang gần đầy rồi... thêm vài con là phải về dỡ.", 2.5)
+		hud.flash_message("Khoang gần đầy rồi... về bến dỡ bớt cá rồi ra câu tiếp.", 3.0)
 	if is_new:  # after the overflow window, so the card shows on top of it
 		new_species_caught.emit(fish, size)
 

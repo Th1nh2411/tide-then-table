@@ -12,12 +12,22 @@ var silhouette: float = 0.0
 var mystery: bool = false
 ## White glow while revealing (0..1).
 var flash: float = 0.0
+## Drawn standing up, head to the top (being reeled in); the "?" stays upright.
+var vertical: bool = false
+
+var _jolt: float = 0.0
 
 var _time: float = 0.0
 
 
+## A quick shake (the fish tugs on the line).
+func jolt() -> void:
+	_jolt = 1.0
+
+
 func _process(delta: float) -> void:
 	_time += delta
+	_jolt = maxf(_jolt - delta * 6.0, 0.0)
 	if is_visible_in_tree():
 		queue_redraw()
 
@@ -25,17 +35,23 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	if fish == null:
 		return
-	var rect := Rect2(Vector2.ZERO, size).grow(-2)
+	var rect := Rect2(Vector2(sin(_time * 70.0) * 3.0 * _jolt, -4.0 * _jolt), size).grow(-2)
+	var short_side := minf(rect.size.x, rect.size.y)
 	if flash > 0.0:
-		draw_circle(rect.get_center(), rect.size.y * (0.4 + flash * 0.4), Color(1, 1, 1, flash * 0.4))
+		draw_circle(rect.get_center(), short_side * (0.4 + flash * 0.4), Color(1, 1, 1, flash * 0.4))
 	var color := fish.color.lerp(shadow_color, silhouette)
-	if not _draw_art(rect, color):
-		draw_shape(self, fish.id, rect, color, Color(color.darkened(0.3), 1.0))
+	var body := rect
+	if vertical:  # rotate a quarter turn: the head (left) points up
+		draw_set_transform(rect.get_center(), PI * 0.5)
+		body = Rect2(-Vector2(rect.size.y, rect.size.x) * 0.5, Vector2(rect.size.y, rect.size.x))
+	if not _draw_art(body, color):
+		draw_shape(self, fish.id, body, color, Color(color.darkened(0.3), 1.0))
+	draw_set_transform(Vector2.ZERO)
 	if fish.is_aberrant and silhouette < 0.5:  # it glows a little
-		draw_circle(rect.get_center(), rect.size.y * 0.45, Color(0.5, 1.0, 0.9, 0.12 + 0.08 * sin(_time * 3.0)))
+		draw_circle(rect.get_center(), short_side * 0.45, Color(0.5, 1.0, 0.9, 0.12 + 0.08 * sin(_time * 3.0)))
 	if mystery:
 		var font := ThemeDB.fallback_font
-		var font_size := int(rect.size.y * 0.55)
+		var font_size := int(short_side * 0.55)
 		var text_size := font.get_string_size("?", HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
 		var at := rect.get_center() + Vector2(-text_size.x * 0.5, font_size * 0.35)
 		var bob := sin(_time * 3.0) * 1.5

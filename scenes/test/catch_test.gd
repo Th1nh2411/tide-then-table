@@ -19,8 +19,30 @@ func _ready() -> void:
 	_test_spot()
 	_test_size()
 	_test_weight_and_price()
+	_test_nets()
 	GameState.reset()
 	print("CatchRoll: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
+
+
+## Nets: shrimp near shore, crab on the reef, snails in both; rods never
+## bring up shrimp or crab.
+func _test_nets() -> void:
+	var counts := {0: {}, 1: {}}
+	for zone: int in counts:
+		for i in SAMPLES:
+			var fish := fish_catalog.pick_random(zone as FishData.Zone, _rng, FishData.CatchMethod.NET)
+			counts[zone][fish.id] = int(counts[zone].get(fish.id, 0)) + 1
+	_check("net near shore: mostly shrimp, some snails", int(counts[0].get("tom", 0)) > SAMPLES / 2
+		and int(counts[0].get("oc_huong", 0)) > 0 and not counts[0].has("cua"))
+	_check("net on the reef: mostly crab, some snails", int(counts[1].get("cua", 0)) > SAMPLES / 2
+		and int(counts[1].get("oc_huong", 0)) > 0 and not counts[1].has("tom"))
+	var rod_ids: Array[String] = []
+	for zone in [0, 1, 2]:
+		for fish in fish_catalog.get_fish_for_zone(zone as FishData.Zone, FishData.CatchMethod.ROD):
+			rod_ids.append(fish.id)
+	_check("rods: no shrimp / crab, reef has mackerel", not rod_ids.has("tom") and not rod_ids.has("cua")
+		and fish_catalog.get_fish_for_zone(FishData.Zone.REEF, FishData.CatchMethod.ROD).any(
+			func(f: FishData) -> bool: return f.id == "ca_thu"))
 
 
 func _test_depth() -> void:

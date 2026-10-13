@@ -14,6 +14,8 @@ signal haul_requested(buoy: NetBuoy)
 
 ## Set by NetController before the buoy enters the tree.
 var fish: FishData
+## Sea zone it was dropped in (FishData.Zone): decides what the net brings up.
+var zone: int = 0
 ## Seconds of soaking for a full net.
 var full_seconds: float = 90.0
 

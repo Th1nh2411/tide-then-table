@@ -17,18 +17,25 @@ const TEXTS: Array[String] = [
 CÂU CÁ
   Dừng thuyền ở đám bọt, bấm E để câu.
   Chờ phao CHÌM HẲN rồi bấm Space / chuột trái (phao nhấp là cá đang rỉa).
-  Cá kéo dây: giữ Space để kim nằm trong vùng xanh (vùng chớp cam = cá sắp lao).
-  Cá bấm nhịp: bấm khi kim đi qua vùng xanh.
+  Cá dính câu thì giật dây theo nhịp: mỗi cú giật là một nốt rơi xuống làn A S D F,
+    bấm đúng phím khi nốt chạm vạch, nốt dài thì giữ phím. Trúng: thanh Kéo đầy dần,
+    trượt hay bấm nhầm: Dây mòn. Cá càng khó càng nhiều làn, nhiều nốt.
 
-LƯỚI ỐC
-  Q: thả lưới ở vùng nước nông. Để một lúc, quay lại phao bấm E để kéo.
+LƯỚI (tôm, cua, ốc)
+  Q: thả lưới khi thuyền đứng yên. Để một lúc, quay lại phao bấm E để kéo.
+  Gần bờ lưới ra nhiều tôm, vùng đá ra nhiều cua; ốc hương thì chỗ nào cũng có.
 
 KHOANG
   Tab: mở khoang. Kéo-thả để xếp, R: xoay, thả vào "Bỏ" để vứt.
 
 BẾN
   Nút "Dỡ cá vào kho" (E): khoang trống lại, đêm vẫn tiếp tục.
-  Nút "Về nhà ngủ": hết đêm.   F: sửa thuyền.
+  Nút "Về nhà ngủ": hết đêm.
+  Khoang gần đầy: về bến dỡ bớt rồi ra câu tiếp.
+
+THUYỀN
+  Va đá / sứa làm thuyền móp (ô "Thân thuyền"), móp nhiều thì chạy chậm, về 0 là phải gọi kéo về.
+  Sửa ở bến: F, hoặc tab "Thuyền" trong điện thoại (J). Ngoài khơi: nhờ ông Tám vá (đắt hơn).
 
 ĐIỂM GHÉ
   Lại gần chỗ có đèn (miếu, chòi, hải đăng, bè...) bấm E.

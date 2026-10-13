@@ -114,6 +114,11 @@ func show_tip(text: String) -> void:
 	_tip_label.show()
 
 
+## Screen point of the hull readout (first-time pointer).
+func hull_target() -> Vector2:
+	return Guide.control_center(_hull_label)
+
+
 func set_hull(hp: float, critical: bool) -> void:
 	_hull_label.text = "Thân thuyền %d%%" % roundi(hp)
 	_hull_label.modulate = late_color if critical else Color.WHITE

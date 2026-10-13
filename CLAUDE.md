@@ -124,14 +124,16 @@ Vietnamese, keep code comments in short English.
   upright). World coordinates / speeds are unchanged; art for the sea is
   drawn at screen size and placed at scale 0.5.
 - Sea scene controllers: `FishingController` (rod spots → `FishingMinigame`:
-  BiteGame then Timing/Tension; spot picks species via its featured fish +
-  depth (`FishPortrait` on the overlay: a shadow + "?" while waiting for the
+  BiteGame then `RhythmGame` (piano tiles: each tug is a note in lanes
+  A S D F, tune from `RhythmChart` by difficulty / size / rod, hits fill
+  "Kéo", misses wear "Dây"; tuned with a timing-error player sim); spot picks species via its featured fish +
+  depth (`FishPortrait` right of the minigame, standing up (`vertical`): a shadow + "?" while waiting for the
   bite and for species not in the Dex yet, named "???"), `CatchRoll` rolls size: deeper = pricier/bigger, size scales price
-  and difficulty; records in `GameState.best_sizes`), `NetController` (Q nets → HaulGame),
+  and difficulty; records in `GameState.best_sizes`), `NetController` (Q nets → HaulGame; nets bring shrimp / crab / snails, each rolled from the zone with its own size: near shore mostly shrimp, reef mostly crab — rods catch fish and squid only),
   `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab; a species caught
   for the first time is tagged NEW and `new_species_caught` shows
   `NewCatchCard`: shadow → slow reveal → "NEW!", name, weight), `HullController`
-  (collision damage, F repair at dock), `LampOil` (trip limit + displayed
+  (collision damage, F repair at dock; the first hit of a trip makes Rin say how to repair, SeaGuide points at the hull readout, then "F: sửa thuyền" at the dock; a nearly full hold → Rin + pointer "Về bến dỡ bớt cá"), `LampOil` (trip limit + displayed
   time; no burn in minigames or at the dock), `BoatLamp` (light radius from
   oil; the night tint is dark, so lamps are how the player sees), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,
   `OffscreenMarkers` (edge arrows), `SeaGuide` (first-time pointers), `PauseMenu` (Esc;

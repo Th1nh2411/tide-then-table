@@ -26,6 +26,7 @@ var damage_scale: float = 1.0
 @export var bump_sound_damage: float = 0.5
 
 var _at_dock: bool = false
+var _hit_said: bool = false
 
 
 func _ready() -> void:
@@ -114,7 +115,13 @@ func apply_damage(amount: float) -> void:
 	if BoatCondition.is_broken():
 		boat_broken.emit()
 	elif GameState.boat_hp < warn_below_hp and before >= warn_below_hp:
-		hud.flash_message("Thuyền thủng nặng rồi... phải về bến sửa thôi.", 2.0)
+		hud.flash_message("Thuyền thủng nặng rồi... về bến bấm F sửa thôi.", 2.5)
+	elif damage >= bump_sound_damage and not _hit_said:
+		_hit_said = true  # once a trip; the first time also says how
+		if Guide.once("hull_hit"):
+			hud.flash_message("Ui, va trúng rồi! Thuyền móp thì chạy chậm... về bến bấm F (hoặc điện thoại) để sửa.", 3.5)
+		else:
+			hud.flash_message("Ui, va trúng rồi... lát về bến nhớ sửa.", 2.0)
 
 
 func _refresh() -> void:

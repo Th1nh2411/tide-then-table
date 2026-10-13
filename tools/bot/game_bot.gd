@@ -83,9 +83,9 @@ func _report_end(what: String) -> void:
 
 func _print_day() -> void:
 	var d := _day_line
-	print("DAY %d | thuyền%d cần%d đèn%d bếp%d bàn%d | cá %d (dỡ %d, sáng %d) | biển ~%.1f ph | phục vụ %d bỏ %d | ca %+dk | mua %s | tiền %dk | stage %d | staff %s | tổng ~%.0f ph" % [
+	print("DAY %d | thuyền%d cần%d đèn%d bếp%d bàn%d | cá %d (lưới %d, dỡ %d, sáng %d) | biển ~%.1f ph | phục vụ %d bỏ %d | ca %+dk | mua %s | tiền %dk | stage %d | staff %s | tổng ~%.0f ph" % [
 		d["day"], _lvl("boat"), _lvl("rod"), _lvl("lamp"), _lvl("kitchen"), _lvl("seats"),
-		d.get("fish", 0), d.get("docks", 0), d.get("glow", 0), float(d.get("sea_s", 0.0)) / 60.0,
+		d.get("fish", 0), d.get("net", 0), d.get("docks", 0), d.get("glow", 0), float(d.get("sea_s", 0.0)) / 60.0,
 		d.get("served", 0), d.get("angry", 0), d.get("shift_money", 0), str(d.get("bought", [])),
 		GameState.money, Story.stage(), str(GameState.staff.get("hired", [])), _human_seconds / 60.0])
 
@@ -129,6 +129,21 @@ func _sea_night() -> bool:
 		if spot and spot.global_position.y >= limit:
 			spots.append(spot)
 	var hold_cells := boat.boat_data.hold_size.x * boat.boat_data.hold_size.y
+	# Nets first (shrimp near shore, crab on the reef), hauled before going home.
+	var nets := sea.get_node("NetController") as NetController
+	for zone in [FishData.Zone.NEARSHORE, FishData.Zone.REEF]:
+		for spot in spots:
+			if is_instance_valid(spot) and spot.zone == zone and nets.nets_available() > 0:
+				var t := pos.distance_to(spot.global_position) / speed
+				oil.spend(t * burn)
+				sea_s += t + 4.0
+				pos = spot.global_position + Vector2(0, 45)
+				boat.global_position = pos
+				boat.speed = 0.0
+				await _wait(0.2)
+				nets.call("_try_drop")
+				break
+	var net_reserve := 6.0 * nets.nets_out()
 	while true:
 		var best: FishingSpot = null
 		var best_t := INF
@@ -137,7 +152,7 @@ func _sea_night() -> bool:
 				continue
 			var t := pos.distance_to(spot.global_position) / speed
 			var home := spot.global_position.distance_to(dock) / speed
-			if (t + home) * burn + 2.0 * spot.casts_left + 4.0 < oil.amount and t < best_t:
+			if (t + home) * burn + 2.0 * spot.casts_left + 4.0 + net_reserve < oil.amount and t < best_t:
 				best_t = t
 				best = spot
 		if best == null:
@@ -175,6 +190,33 @@ func _sea_night() -> bool:
 				fish += after - before
 				if hold_manager.hold.items[-1].fish.id == Story.OMEN_FISH_ID:
 					glow += 1
+	for buoy in nets.buoy_parent.get_children():
+		if not buoy is NetBuoy:
+			continue
+		var t := pos.distance_to(buoy.global_position) / speed
+		oil.spend(t * burn)
+		sea_s += t + MINIGAME_SECONDS
+		pos = buoy.global_position
+		boat.global_position = pos
+		boat.speed = 0.0
+		buoy.set("_soak_seconds", (buoy as NetBuoy).full_seconds)  # the night went by
+		var before := hold_manager.hold.items.size()
+		(buoy as NetBuoy).haul_requested.emit(buoy)
+		await _wait(0.3)
+		while fishing.minigame.is_running():
+			var game: MinigameBase = fishing.minigame.get("_game")
+			if game:
+				game._finish(_rng.randf() < SKILL, _rng.randf() < 0.3)
+			await _wait(0.2)
+		await _wait(0.2)
+		if get_tree().paused:
+			var hold_ui := sea.get_node("HoldUI") as HoldUI
+			if hold_ui.visible:
+				hold_ui.close()
+			await _through_cutscene("sea pause d%d" % GameState.day)
+		var got := hold_manager.hold.items.size() - before
+		fish += maxi(got, 0)
+		_day_line["net"] = int(_day_line.get("net", 0)) + maxi(got, 0)
 	sea_s += pos.distance_to(dock) / speed
 	_human_seconds += sea_s + 15.0
 	_day_line.merge({"fish": fish, "docks": docks, "sea_s": sea_s, "glow": glow}, true)

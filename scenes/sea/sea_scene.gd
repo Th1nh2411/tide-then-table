@@ -124,6 +124,7 @@ func _add_guide() -> void:
 	guide.oil = _oil
 	guide.dock = _dock
 	guide.raft = get_node_or_null("Places/LobsterRaft") as Node2D
+	guide.hud = _hud
 	add_child(guide)
 
 

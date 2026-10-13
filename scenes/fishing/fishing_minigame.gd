@@ -43,10 +43,18 @@ func _ready() -> void:
 	# No keyboard focus: Space is `cast` and must never "click" this button.
 	_hold_button.focus_mode = Control.FOCUS_NONE
 	_hold_button.pressed.connect(hold_requested.emit)
+	# The fish on the line sits right of the minigame, big.
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 10)
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_game_holder.add_sibling(row)
+	_game_holder.reparent(row)
 	_portrait = FishPortrait.new()
-	_portrait.custom_minimum_size = Vector2(96, 40)
-	_portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_title_label.add_sibling(_portrait)
+	_portrait.custom_minimum_size = Vector2(56, 120)
+	_portrait.vertical = true
+	_portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(_portrait)
 
 
 func is_running() -> bool:
@@ -97,9 +105,9 @@ func _start_stage(game: MinigameBase) -> void:
 
 
 func _create_fight() -> MinigameBase:
-	if _fish.minigame == FishData.Minigame.TENSION:
-		return TensionGame.new()
-	return TimingGame.new()
+	var game := RhythmGame.new()
+	game.tugged.connect(_portrait.jolt)
+	return game
 
 
 func _process(_delta: float) -> void:

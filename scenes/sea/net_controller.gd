@@ -1,10 +1,12 @@
 class_name NetController
 extends Node
-## Nets for shellfish (catch_method = NET). Press `drop_net` while slow in a
-## zone where such species live to drop a net (a buoy appears). The longer it
-## soaks (real seconds at sea), the more it holds. Come back, press `interact` and
-## win the HAUL minigame to bring the catch aboard. Nets left at sea when the
-## day ends lose their catch.
+## Nets for shrimp, crab and snails (catch_method = NET). Press `drop_net`
+## while slow in a zone where such species live to drop a net (a buoy
+## appears). The longer it soaks (real seconds at sea), the more it holds.
+## Come back, press `interact` and win the HAUL minigame to bring the catch
+## aboard: each animal is rolled from the zone (near shore mostly shrimp, on
+## the reef mostly crab, snails in both) with its own size. Nets left at sea
+## when the day ends lose their catch.
 
 signal fish_caught(fish: FishData, quality: float, count: int, size: float)
 signal nets_changed(available: int, total: int)
@@ -33,12 +35,16 @@ signal nets_changed(available: int, total: int)
 @export var oil_per_haul: float = 2.0
 ## Fewer snags per "net" upgrade level (same idea as the rod bonus).
 @export var net_bonus_per_level: float = 0.15
+## "Depth" used for sizes, by zone (NEARSHORE, REEF, ...): reef crabs run bigger.
+@export var depth_by_zone: Array[float] = [0.1, 0.5, 0.8, 1.0]
 
 var _buoys: Array[NetBuoy] = []
 ## Buoy whose haul prompt is showing; its text is refreshed as the net fills.
 var _prompt_buoy: NetBuoy
 ## True while the shared minigame overlay is running one of OUR hauls.
 var _active: bool = false
+## What the net being hauled holds: [[FishData, size], ...].
+var _haul: Array[Array] = []
 var _rng := RandomNumberGenerator.new()
 
 
@@ -46,6 +52,12 @@ func _ready() -> void:
 	_rng.randomize()
 	minigame.finished.connect(_on_minigame_finished)
 	_emit_nets.call_deferred()
+
+
+## Nets work here (a zone with net species).
+func can_drop_here() -> bool:
+	var sea_zone := SeaZone.find_at(zones_root, boat.global_position)
+	return sea_zone != null and not catalog.get_fish_for_zone(sea_zone.zone, FishData.CatchMethod.NET).is_empty()
 
 
 func nets_out() -> int:
@@ -84,7 +96,7 @@ func _try_drop() -> void:
 	if sea_zone:
 		fish = catalog.pick_random(sea_zone.zone, _rng, FishData.CatchMethod.NET)
 	if fish == null:
-		hud.flash_message("Chỗ này không có ốc, thả lưới chỉ phí công.")
+		hud.flash_message("Nước sâu quá, thả lưới ở đây không ăn thua.")
 		return
 	var drop_pos := boat.global_position - Vector2.RIGHT.rotated(boat.rotation) * drop_offset
 	for other in _buoys:
@@ -95,6 +107,7 @@ func _try_drop() -> void:
 	var buoy: NetBuoy = buoy_scene.instantiate()
 	buoy.global_position = drop_pos
 	buoy.fish = fish
+	buoy.zone = sea_zone.zone
 	buoy.full_seconds = seconds_to_full
 	buoy.haulable_changed.connect(_on_buoy_haulable_changed)
 	buoy.haul_requested.connect(_on_haul_requested)
@@ -125,8 +138,9 @@ func _show_haul_prompt(buoy: NetBuoy) -> void:
 func _on_haul_requested(buoy: NetBuoy) -> void:
 	if minigame.is_running():
 		return
-	var fish := buoy.fish
 	var count := expected_catch(buoy)
+	_haul = _roll_haul(buoy.zone, count)
+	var fish := _main_species(_haul) if not _haul.is_empty() else buoy.fish
 	# The net comes back aboard whatever happens next.
 	_buoys.erase(buoy)
 	buoy.queue_free()
@@ -134,7 +148,7 @@ func _on_haul_requested(buoy: NetBuoy) -> void:
 	hud.hide_prompt()
 	_emit_nets()
 	if count <= 0:
-		hud.flash_message("Lưới chưa dính con ốc nào...")
+		hud.flash_message("Lưới chưa dính con nào...")
 		return
 	_active = true
 	boat.speed = 0.0
@@ -151,9 +165,46 @@ func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: 
 	if DayClock.running:
 		boat.set_physics_process(true)
 	if caught:
-		hud.flash_message("Được %d %s%s!" % [count, fish.display_name, ", ngon lành" if quality >= 1.0 else ""])
-		# Shellfish in a net are all average size.
-		fish_caught.emit(fish, quality, count, 1.0)
+		hud.flash_message("Được %s%s!" % [_haul_text(_haul), ", ngon lành" if quality >= 1.0 else ""])
+		for entry: Array in _haul:
+			fish_caught.emit(entry[0], quality, 1, entry[1])
+	_haul.clear()
+
+
+## `count` animals from a net in `zone`: [[FishData, size], ...].
+func _roll_haul(zone: int, count: int) -> Array[Array]:
+	var depth: float = depth_by_zone[clampi(zone, 0, depth_by_zone.size() - 1)]
+	var haul: Array[Array] = []
+	for i in count:
+		var fish := catalog.pick_random(zone as FishData.Zone, _rng, FishData.CatchMethod.NET)
+		if fish:
+			var size := CatchRoll.snap_size(CatchRoll.roll_size(_rng, depth, false), fish.typical_kg)
+			haul.append([fish, size])
+	return haul
+
+
+## The species most of the haul is (shown on the haul minigame).
+func _main_species(haul: Array[Array]) -> FishData:
+	var counts: Dictionary = {}
+	var best: FishData = haul[0][0]
+	for entry: Array in haul:
+		var fish: FishData = entry[0]
+		counts[fish] = int(counts.get(fish, 0)) + 1
+		if counts[fish] > int(counts.get(best, 0)):
+			best = fish
+	return best
+
+
+## "5 Tôm, 2 Ốc hương"
+func _haul_text(haul: Array[Array]) -> String:
+	var counts: Dictionary = {}
+	for entry: Array in haul:
+		var fish: FishData = entry[0]
+		counts[fish] = int(counts.get(fish, 0)) + 1
+	var parts := PackedStringArray()
+	for fish: FishData in counts:
+		parts.append("%d %s" % [counts[fish], fish.display_name])
+	return ", ".join(parts)
 
 
 func _emit_nets() -> void:

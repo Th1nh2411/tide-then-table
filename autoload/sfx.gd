@@ -27,6 +27,7 @@ const SOUNDS := {
 	"flip": [{"w": "noise", "lp": 0.6, "d": 0.08, "v": 0.2}, {"w": "noise", "lp": 0.85, "d": 0.25, "v": 0.08}],
 	"bag": [{"w": "noise", "lp": 0.7, "d": 0.12, "v": 0.18}],
 	"whoosh": [{"w": "noise", "lp": 0.12, "d": 1.6, "v": 0.6, "a": 0.7}],
+	"pluck": [{"w": "tri", "f": [440, 440], "d": 0.2, "v": 0.22}],
 }
 const LOOPS := {
 	"heartbeat": [{"w": "sine", "f": [70, 45], "d": 0.14, "v": 0.6}, {"at": 0.22, "w": "sine", "f": [60, 40], "d": 0.16, "v": 0.45},
@@ -86,6 +87,18 @@ func play(sound: String, jitter: float = 0.05) -> void:
 	_next = (_next + 1) % _pool.size()
 	player.stream = _streams[sound]
 	player.pitch_scale = 1.0 + randf_range(-jitter, jitter)
+	player.play()
+
+
+## One-shot at an exact pitch, `semitones` above / below the recipe (the
+## fishing rhythm game plays a little tune this way).
+func play_note(sound: String, semitones: float) -> void:
+	if silent or not _streams.has(sound):
+		return
+	var player := _pool[_next]
+	_next = (_next + 1) % _pool.size()
+	player.stream = _streams[sound]
+	player.pitch_scale = pow(2.0, semitones / 12.0)
 	player.play()
 
 
