@@ -29,7 +29,16 @@ func pick(side_chance: float, waiting: Array) -> DishData:
 		return sides[rng.randi() % sides.size()]
 	if dishes.is_empty():
 		return null
-	return dishes[rng.randi() % dishes.size()]
+	# Today's trending dish (DailyTrend) is picked more often.
+	var total := 0.0
+	for dish in dishes:
+		total += DailyTrend.pick_weight(dish)
+	var roll := rng.randf() * total
+	for dish in dishes:
+		roll -= DailyTrend.pick_weight(dish)
+		if roll <= 0.0:
+			return dish
+	return dishes[-1]
 
 
 ## Portions of `dish` not yet promised to a waiting line.

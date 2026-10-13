@@ -164,7 +164,7 @@ func _process(delta: float) -> void:
 func _spawn(visit: Dictionary) -> void:
 	var customer := _factory.create(visit, tables.free_seats())
 	if not visit.is_empty():
-		message_requested.emit("%s tới ăn món đặt rồi kìa!" % customer.regular_name)
+		message_requested.emit("NEO: %s đã tới nhận món đặt." % customer.regular_name)
 	customer.ordered.connect(_on_ordered)
 	customer.patience_ran_out.connect(_send_away.bind(true))
 	customer.finished_eating.connect(_on_finished_eating)

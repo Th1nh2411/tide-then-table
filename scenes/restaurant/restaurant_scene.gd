@@ -73,6 +73,7 @@ var _closer: ShiftCloser
 
 
 func _ready() -> void:
+	DailyTrend.ensure(null, menu)  # before the menu panel shows the HOT dish
 	_summary_panel.hide()
 	_message_label.hide()
 	Sfx.ambience("street")
@@ -194,6 +195,10 @@ func is_shift_over() -> bool:
 func _play_arrival_cutscene() -> void:
 	await get_tree().process_frame  # let the router's fade-in start first
 	var message: String = await ArrivalCutscenes.play(_cutscene, arrival_cutscenes, _crew.roster)
+	DailyTrend.ensure(null, menu)  # a save resumed here may have none yet
+	var trend := DailyTrend.announcement(menu)
+	if trend != "":
+		_show_message(trend, 4.0)
 	if message:
 		_show_message(message, 2.5)
 
@@ -232,13 +237,15 @@ func _process(delta: float) -> void:
 	if _customers.is_rush() != _rush_shown:
 		_rush_shown = _customers.is_rush()
 		if _rush_shown:
-			_show_message("Khách tới dồn dập quá... (C: Nhịp Sóng)" if Guide.once("rush") else "Khách tới dồn dập quá!", 2.5)
+			_show_message("Khách tới dồn dập quá!", 2.0)
+			if Guide.once("rush"):
+				_show_message("NEO: Lượng khách tăng đột biến. Gợi ý: phím C, Nhịp Sóng.", 3.5)
 			Sfx.play("pop")
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
 		if not _late_said and _time_left <= get_shift_seconds() * late_fraction:
 			_late_said = true
-			_show_message("Sắp tới giờ dọn hàng rồi, ráng thêm chút!", 2.5)
+			_show_message("NEO: Còn ít phút nữa là tới giờ đóng quán.", 3.0)
 		if _time_left <= 0.0:
 			_end_shift("Hết giờ bán!")
 		elif _plan.is_sold_out() and not _sold_out_announced:

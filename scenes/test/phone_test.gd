@@ -29,7 +29,7 @@ func _ready() -> void:
 	var menu_text := PhoneReports.menu_report(menu, {"cua": "Cua", "oc_huong": "Ốc hương"})
 	_check("menu: cua cookable", menu_text.contains("Cua luộc") and menu_text.contains("nấu được 2 phần"))
 	_check("menu: missing ingredients", menu_text.contains("thiếu: 2 Ốc hương"))
-	_check("menu: needs a better kitchen", menu_text.contains("Cua rang me") and menu_text.contains("cần Bếp cấp 2"))
+	_check("menu: dishes the kitchen can't cook stay hidden", not menu_text.contains("Cua rang me"))
 	_check("menu: never-caught seafood hidden", not menu_text.contains("Mực"))
 	_check("menu: snack always", menu_text.contains("luôn có"))
 	GameState.caught_species = caught

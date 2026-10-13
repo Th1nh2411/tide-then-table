@@ -38,10 +38,8 @@ static func menu_report(menu: DishCatalog, fish_names: Dictionary) -> String:
 			if not dish.on_menu_today():
 				continue
 			lines.append("%s  luôn có%s" % [head, (" · tạp hoá " + dish.market_text()) if dish.market_cost > 0 else ""])
-		elif not DishBook.is_known(dish):
-			continue  # unknown until its seafood is caught
 		elif not DishBook.is_cookable(dish):
-			lines.append("%s  cần Bếp cấp %d" % [head, dish.kitchen_level])
+			continue  # unknown until its seafood is caught and the kitchen can cook it
 		else:
 			var portions := MenuPlan.max_portions(dish, GameState.storage)
 			if portions > 0:
@@ -76,7 +74,7 @@ static func dex_report(catalog: FishCatalog, glitch_seed: int) -> String:
 			lines.append("    kỷ lục: %s" % fish.weight_text(GameState.best_size(fish)))
 		if fish.is_aberrant:
 			lines.append("    [WARN] species_id \"%s\" không có trong database" % fish.id)
-	lines.insert(0, "DEX  %d/%d loài\n" % [known, catalog.fish.size()])
+	lines.insert(0, "DEX  %d/%d loài\n%s\n" % [known, catalog.fish.size(), CollectionRewards.next_milestone_text()])
 	return "\n".join(lines)
 
 

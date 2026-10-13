@@ -99,6 +99,8 @@ SỬA QUÁN (trước giờ mở / sau khi bán xong)
   Bản đồ (hoặc phím M = bản đồ lớn): click để ghim / bỏ ghim (ghim hiện mũi tên khi ra khơi).
   Dex: các loài đã bắt, kỷ lục cân nặng.
   Thuyền: tình trạng thuyền + nút sửa (ngoài biển chỉ sửa ở bến).
+  NEO, trợ lí trong app (góc dưới trái): nhắc dầu đèn, khoang, sửa thuyền, đơn đặt cá,
+    báo món đang hot hôm nay (bán giá x1.5) và thưởng sưu tầm (loài mới, mốc Dex, kỷ lục).
   Sổ sách: lãi từng ngày.
   Nâng cấp: đồ nghề đi biển (thuyền, cần câu, đèn), có hiệu lực từ chuyến sau.
   (Đồ trong quán thì sửa bằng nút "Sửa quán".)""",

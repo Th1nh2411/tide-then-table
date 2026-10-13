@@ -83,8 +83,8 @@ func _ready() -> void:
 	_fishing.fish_caught.connect(_on_fish_caught)
 	_fog.whirlpool_entered.connect(_on_whirlpool_entered)
 	_oil.oil_changed.connect(_hud.set_oil)
-	_oil.oil_low.connect(_hud.flash_message.bind("Dầu đèn còn 1/4, trời sắp rạng. Về bến thôi!", 2.5))
-	_oil.oil_critical.connect(_hud.flash_message.bind("Đèn leo lét rồi... phải về bến ngay!", 2.5))
+	_oil.oil_low.connect(_hud.flash_message.bind("NEO: Dầu đèn còn 25%, trời sắp rạng. Tôi đề nghị anh quay về bến.", 3.0))
+	_oil.oil_critical.connect(_hud.flash_message.bind("NEO: Cảnh báo: dầu còn 10%. Đèn tắt là phải gọi cứu hộ đó anh Rin.", 3.0))
 	_oil.oil_empty.connect(_on_oil_empty)
 	DayClock.start_night()
 	_add_guide()
@@ -95,6 +95,13 @@ func _ready() -> void:
 	if GameState.last_spoiled_count > 0:
 		_hud.flash_message("Hư mất %d con trong kho rồi, tiếc ghê..." % GameState.last_spoiled_count, 2.5)
 		GameState.last_spoiled_count = 0
+	if not GameState.has_flag("neo_hello"):
+		GameState.set_flag("neo_hello")
+		_hud.flash_message("NEO: Chào anh Rin. Rin's Catch đã khởi động lại. Tôi sẽ nhắc anh dầu đèn, khoang cá và đơn hàng.", 4.0)
+	DailyTrend.ensure()
+	var trend := DailyTrend.announcement()
+	if trend != "":
+		_hud.flash_message(trend, 4.0)
 	if Story.check_day():
 		_hud.flash_message("Biển lặng lạ thường... phía đông bắc sương dày lên.", 3.0)
 	elif Story.is_fog_open():
@@ -140,7 +147,7 @@ func _show_orders() -> void:
 		# Arrived this morning: all its nights are still ahead.
 		fresh = fresh or int(order["due_day"]) - GameState.day + 1 == FishOrders.NIGHTS_TO_DELIVER
 	if fresh:
-		_hud.flash_message("[MSG] Có khách đặt cá", 2.0)
+		_hud.flash_message("NEO: Anh có đơn đặt cá mới, tôi ghim ở góc trái.", 3.0)
 
 
 func _process(_delta: float) -> void:

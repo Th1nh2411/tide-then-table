@@ -42,8 +42,12 @@ Vietnamese, keep code comments in short English.
 - Notices are speech, not system text: `SeaHud.flash_message` / the
   restaurant's `_show_message` show a `SpeechLine` bubble over the speaker,
   Rin talking to himself by default ("Sóng to quá... phải nâng cấp thuyền"),
-  "Bảo: ..." / "Cô Năm: ..." over them, "[...]" from the app; one bubble per
-  speaker, a speaker's next line waits until the current one had 1 s. Write
+  "Bảo: ..." / "Cô Năm: ..." over them; "NEO: ..." / "[...]" is NEO, the AI
+  assistant in Rin's Catch (JARVIS-like, says "tôi" / "anh Rin"; bottom-left
+  with its `NeoAvatar` hologram, "[WARN]"/"[ERR]" in red): system reminders
+  (oil, hold, repairs, orders, rush, closing time, today's dish, rewards) are
+  NEO's, Rin keeps the emotional ones (catches, spills, "sóng to quá"). One bubble per
+  speaker, a speaker's next line waits for the current one (1-2.5 s). Write
   new ones in Rin's voice (first person, short); situational ones say it
   once per trip / shift (oil 25% / 10%, hold 80%, first guest lost, 15% of
   the shift left), never a permanent HUD warning.
@@ -271,11 +275,19 @@ Vietnamese, keep code comments in short English.
   a `Talker` child of the character (character needs `talk_position()`, optional
   `can_talk()`). `DialogueLibrary` picks and marks seen (story_flags →
   saved); `DialogueBox` shows it (pauses). Rin talks with E next to them.
+- Today's dish (`DailyTrend`, Dave-style): rolled when the night starts
+  among dishes Rin can really serve (caught + cookable; first night:
+  near-shore seafood), sells x1.5 and is ordered x3 as often (TableBill,
+  OrderPicker), NEO announces it at sea and in the restaurant, red ring on
+  the LED board, "HOT" in the menu panel; story flags trend_dish / trend_day.
+  Collection rewards (`CollectionRewards`): new species, Dex milestones (3, 6
+  species, flag "dex_reward_<n>"), big size records pay money, NEO says it;
+  aberrant fish never count; the phone Dex shows the next milestone.
 - Dishes: each seafood has 2-3 dishes by cooking method (`DishData.cook_type`
   BOIL / GRILL from the start, STEAM at kitchen 1, STIR at kitchen 2 =
   `kitchen_level`). `DishBook` (pure): known = its seafood was caught once,
   cookable = kitchen level; `MenuPlan.kitchen_level` blocks the rest (menu
-  panel shows them dimmed "cần Bếp cấp N"); regulars eat the priciest
+  panel and phone hide dishes the kitchen can't cook yet); regulars eat the priciest
   cookable dish; the rest card shows "Món mới!" once per dish (flag
   "dish_<id>"). Rin grills GRILL dishes (GrillGame + `GrillView`: the
   seafood big on the coals, browning, flipped on each press); Bảo cooks the rest.

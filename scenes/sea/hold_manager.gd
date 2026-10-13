@@ -57,7 +57,10 @@ func take_all() -> Array[InventoryItem]:
 
 func add_catch(fish: FishData, quality: float, count: int, size: float = 1.0) -> void:
 	var is_new := int(GameState.caught_species.get(fish.id, 0)) == 0
+	var previous_best := GameState.best_size(fish)
 	GameState.record_catch(fish, count, size)  # for the phone's Dex
+	for line in CollectionRewards.claim(fish, size, is_new, previous_best):
+		hud.flash_message(line, 3.5)
 	var overflow: Array[InventoryItem] = []
 	for i in count:
 		var item := InventoryItem.new(fish, quality, size)
@@ -69,7 +72,7 @@ func add_catch(fish: FishData, quality: float, count: int, size: float = 1.0) ->
 		hold_ui.open_overflow(overflow)
 	elif not _almost_full_said and hold.fill_fraction() >= almost_full_fraction:
 		_almost_full_said = true
-		hud.flash_message("Khoang gần đầy rồi... về bến dỡ bớt cá rồi ra câu tiếp.", 3.0)
+		hud.flash_message("NEO: Khoang đã đầy 80%. Anh có thể về bến dỡ bớt rồi ra câu tiếp.", 3.5)
 	if is_new:  # after the overflow window, so the card shows on top of it
 		new_species_caught.emit(fish, size)
 

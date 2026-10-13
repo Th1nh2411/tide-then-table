@@ -13,6 +13,7 @@ func _ready() -> void:
 	add_child(layer)
 	var speech := SpeechLine.new()
 	speech.min_seconds = 0.3
+	speech.max_wait = 0.3
 	speech.clock = func() -> float: return _time
 	_speech = speech
 	layer.add_child(speech)
@@ -20,7 +21,7 @@ func _ready() -> void:
 	speech.say("Bảo: Hết rau rồi Rin ơi!", 2.0)
 	speech.say("[MSG] Có khách đặt cá", 2.0)
 	_check("each speaker keeps their own bubble", speech.current("Rin") == "Khoang gần đầy rồi."
-		and speech.current("Bảo") == "Hết rau rồi Rin ơi!" and speech.current("Rin's Catch") == "[MSG] Có khách đặt cá")
+		and speech.current("Bảo") == "Hết rau rồi Rin ơi!" and speech.current("NEO") == "Có khách đặt cá")
 	speech.say("Được con Mực.", 2.0)
 	_check("same speaker's next line waits", speech.current("Rin") == "Khoang gần đầy rồi.")
 	await _wait(0.4)
