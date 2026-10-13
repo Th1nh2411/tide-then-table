@@ -209,7 +209,7 @@ Vietnamese, keep code comments in short English.
   `after_shift_cutscenes` when the summary closes; the intro scene plays
   `intro_call`; the restaurant plays `arrival_cutscenes` before the menu
   (`ArrivalCutscenes`): `opening_day`, `wave_awaken` (day 3), `vy_arrives` (day
-  3, a choice can hire her: flag `vy_hire_now`), `nam_fog_tale` (day 4); and
+  4, a choice can hire her: flag `vy_hire_now`); and
   `after_shift_cutscenes`: `beer_day` (after the first shift: a guest asks
   for beer, sold from day 2), `nam_fog_tale` (after day 3), `regular_thanks` (after the first fish order is
   served, flag `regular_served_once`); the sea's trip-end list has `wave_faint` (night 3), `cat_arrival`
@@ -245,7 +245,10 @@ Vietnamese, keep code comments in short English.
 - The cat: `PetCat` (restaurant: on top of the fridge), rides at the stern at sea (`Boat._draw_cat`), flags `cat_adopted` / `cat_gone` /
   `pet_name`; use `{pet}` in dialogue/cutscene text.
 - Dialogue: write a `Dialogue` .tres in `data/dialogues/` ("Name: line" per
-  line; min_day / requires_flag / once / sets_flag / priority) and add it to
+  line, "Name (mood): line" picks a portrait mood; `DialogueBox` is Nine Sols
+  style: `DialoguePortrait` bust in a bottom corner — Rin left, others right —
+  art `portraits/<slug>[_<mood>]`, placeholder drawn otherwise — and a bubble
+  with a tail; no speaker = narration box; min_day / requires_flag / once / sets_flag / priority) and add it to
   a `Talker` child of the character (character needs `talk_position()`, optional
   `can_talk()`). `DialogueLibrary` picks and marks seen (story_flags →
   saved); `DialogueBox` shows it (pauses). Rin talks with E next to them.

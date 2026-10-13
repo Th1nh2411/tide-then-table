@@ -46,7 +46,6 @@ var _variety_multiplier: float = 1.0
 var _sold_out_announced: bool = false
 var _served: int = 0
 var _left_angry: int = 0
-var _message_token: int = 0
 ## Regulars coming today (FishOrders.reserve_for_shift).
 var _regular_visits: Array[Dictionary] = []
 var _evening: RestaurantEvening
@@ -126,7 +125,6 @@ func _ready() -> void:
 	_rin.interacted.connect(_on_rin_interacted)
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
-	_message_label.hide()
 	_speech = SpeechLine.new()
 	_speech.anchors = {"Rin": _head_of.bind(_rin), "Bảo": _head_of.bind(_chef),
 		_stall.seller_name: _head_of.bind(_stall.seller)}

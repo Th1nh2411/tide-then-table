@@ -35,8 +35,11 @@ Kích thước 16x32. Hướng: xuống / lên / trái (phải = lật trái). �
 | Nhân viên thuê (9 người) | đi bộ, cầm đĩa, dọn bàn | có thể dùng 2–3 dáng người + đổi màu |
 | Mèo (Mỡ) | ngồi, đi, nằm ngủ, vẫy đuôi | mèo mập màu cam, ~16x16 |
 
-**Chân dung hộp thoại (P2):** 48x48, mỗi người 2 nét mặt (bình thường / ngạc nhiên): Rin, Bảo, Vy, Cô Năm,
-Khách quen, Ông lão (chòi), mèo.
+**Chân dung hộp thoại (P2, kiểu Nine Sols):** bán thân lớn (đầu + vai), vuông 64x64 (game phóng lên 136x136,
+hoặc vẽ 128x128 cho chi tiết), **quay mặt sang phải** (người đứng bên phải màn hình được lật tự động), vai chạm
+mép dưới. File `portraits/<id>.png`, nét mặt thêm `portraits/<id>_<nét>.png` (trong thoại ghi `Rin (vui): ...`;
+thiếu file nét mặt thì dùng ảnh thường). id = tên không dấu: `rin`, `bao`, `vy`, `co_nam`, `ong_tam`,
+`khach_quen`, `cat` (mèo). Nét gợi ý: `vui`, `lo`, `ngac_nhien`, `buon`.
 
 ## 2. Quán vỉa hè (P1)
 
