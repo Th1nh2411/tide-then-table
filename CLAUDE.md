@@ -16,7 +16,8 @@ Vietnamese, keep code comments in short English.
   into the thing's in-game rect and returns false when missing, so every
   hook is `if not Art.draw(...): <placeholder>` (palette "Xóm Đèn": 37 colours
   from Apollo + 4 in assets/palette/, F7 in debug builds shows the game in it
-  (`PalettePreview`), `tools/pixelize.py` cleans AI drafts into sprites;
+  (`PalettePreview`), `tools/pixelize.py` cleans AI drafts into sprites; PixelLab MCP is set up for
+  this project, the next steps are in ART_PLAN.md;
   sheets: `draw_frame`,
   `draw_sheet`, `draw_person`; names listed in ASSETS.md "Tên file"). No
   audio files. Sounds are built in code: autoload `Sfx` (`Sfx.play("catch")`,
