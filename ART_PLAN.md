@@ -10,9 +10,22 @@ bảng màu, giới hạn màu) và `CLAUDE.md` (cách game nạp art: `Art`, F7
   `curl` tải về.
 - Bảng màu "Xóm Đèn" 37 màu: `assets/palette/xom_den.hex` (mỗi dòng RRGGBB). Ảnh mẫu màu: `xom_den.png`.
 - Game tự dùng PNG nào có trong `assets/sprites/` (thiếu thì vẽ hình tạm). F7 (bản debug) xem cả game bằng bảng màu.
-- Chưa có asset thật nào.
+- Bước 1 + 2 xong (2026-10-13), **chờ duyệt**: `characters/rin.png`, `portraits/rin.png`, `fish/muc.png`.
+  Ảnh chụp trong game: `build/shots/` (không commit).
+- Gói trial: tối đa **1 job cùng lúc** (animate từng hướng một: `directions=["south"]`, rồi north, west với
+  cùng `animation_group_id`). Đã dùng 26/40 lượt.
+- Bài học bước 2:
+  - `create_image_pro` ở đúng cỡ game (64x64, 40x20) đẹp hơn hẳn pixflux + thu nhỏ; cỡ ≤ 42 px cho 64 ứng viên.
+    Tốn 10 lượt mỗi lần → dùng cho chân dung + hải sản, chọn nhiều thứ trong một lần nếu được.
+  - `create_image_pixflux` cho con mực kém (2 lần, hình lạ) → bỏ cho hải sản.
+  - `create_character` size 48 → người cao ~53 px, thu về 32 px thì mờ chi tiết mặt nhưng vẫn đọc được (nón lá,
+    áo xanh). Muốn nét hơn: thử `size` ~30 để khỏi thu nhỏ.
+  - Ứng viên mực khác màu (#39 xanh, #63 trắng phát sáng) có thể dùng cho cá dị biến.
 
 ## Bước 1 — `tools/pixellab_import.py`
+
+Đã có. `character <zip> <tên> [--walk walk] [--busy <anim>]` (zip tải từ `get_character` → "download"),
+`image <png> <loại/tên> --size WxH [--max-colors N] [--center]` (ảnh đã đúng cỡ thì giữ 1:1, chỉ ép màu).
 
 Chuyển file PixelLab tải về thành đúng file game cần:
 
