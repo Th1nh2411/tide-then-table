@@ -68,10 +68,9 @@ size = Vector2(70, 90)
 
 [node name="SeaScene" type="Node2D"]
 script = ExtResource("1_sea")
-faint_cutscene = ExtResource("93_faint")
 boat_upgrade = ExtResource("23_boatup")
 fish_catalog = ExtResource("17_catalog")
-trip_end_cutscenes = Array[ExtResource("47_cutdata")]([ExtResource("46_cat"), ExtResource("60_cutomen")])
+trip_end_cutscenes = Array[ExtResource("47_cutdata")]([ExtResource("93_faint"), ExtResource("46_cat"), ExtResource("60_cutomen")])
 debug_boats = Array[ExtResource("2_boatdata")]([ExtResource("3_thung"), ExtResource("4_cheo"), ExtResource("5_may")])
 
 [node name="Zones" type="Node2D" parent="."]

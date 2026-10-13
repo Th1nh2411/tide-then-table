@@ -28,7 +28,7 @@ func _interact() -> void:
 	for item: InventoryItem in items:
 		hold_manager.hold.remove(item)
 	GameState.add_money(value)
-	hud.flash_message("Bán %d con cho bè tôm hùm: +%dk" % [items.size(), value], 2.0)
+	hud.flash_message("Bán cho anh Năm %d con, được %dk." % [items.size(), value], 2.0)
 
 
 ## Opens the hold in sell mode; tells how much it came to when closed.
@@ -44,7 +44,7 @@ func _sell_some() -> void:
 	await ui.closed
 	ui.sold.disconnect(on_sold)
 	if total[0] > 0:
-		hud.flash_message("Bán %d con cho bè tôm hùm: +%dk" % total, 2.0)
+		hud.flash_message("Bán cho anh Năm %d con, được %dk." % total, 2.0)
 
 
 ## What the raft pays for these items.

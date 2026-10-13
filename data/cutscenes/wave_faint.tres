@@ -5,19 +5,30 @@
 [resource]
 script = ExtResource("1_cut")
 id = "wave_faint"
-min_day = 1
+min_day = 3
 priority = 60
-script_text = "# Cá thu phát sáng cắn tay Rin ngay lúc câu: Rin thấy quầng sáng rồi ngất trên ghe; ông Tám tìm thấy.
+script_text = "# Cuối đêm câu thứ 3: Rin còn trên ghe vừa cập bến, một con cá thu phát sáng lượn sát mạn ghe, Rin ráng câu thêm, nó ngoạm tay rồi lặn mất; Rin ngất trên ghe, Bảo tìm thấy.
+tint dawn
 camera @boat 0 2.5
+fade_in 1.0
 spawn Rin rin @boat
-emote Rin ! 0.8
+speak Rin \"Xong một đêm. Cột ghe lại rồi về ngủ thôi...\"
+spawn Glow glow @boat+22,8 0.15
+pause 0.6
+emote Rin ! 1.0
+face Rin right
+narrate \"Dưới mặt nước sát mạn ghe, một con cá lượn chầm chậm. Cả thân nó sáng xanh.\"
+speak Rin \"Cá gì mà... phát sáng? Chưa thấy loài này bao giờ.\"
+speak Rin \"Ráng thêm một cần nữa thôi.\"
+narrate \"Rin thả lưỡi câu ngay trước mũi con cá. Nó đớp liền.\"
 sfx bite
-narrate \"Con cá thu phát sáng giãy mạnh, ngoạm trúng bàn tay Rin.\"
+narrate \"Con cá giật mạnh, vọt lên khỏi mặt nước, ngoạm trúng bàn tay Rin rồi lặn mất.\"
 speak Rin \"Á!\"
-spawn Spark glow @boat 0.12
-narrate \"Vết cắn sáng xanh, lan dần lên cánh tay. Tai ù đi, mặt biển chòng chành.\"
+remove Glow
+spawn Spark glow @boat+3,-8 0.12
+narrate \"Vết cắn sáng xanh, lan dần lên cánh tay. Tai ù đi, chiếc ghe chòng chành.\"
 slow 0.35 1.0
-narrate \"Phía đông bắc, giữa màn sương, có một quầng sáng xanh nhấp nháy... như đang thở.\"
+narrate \"Trước khi mắt nhắm lại, Rin thấy phía đông bắc, rất xa, một đốm sáng xanh nhấp nháy.\"
 speak Rin \"Cái gì... vậy...\"
 remove Rin
 remove Spark
@@ -25,6 +36,7 @@ spawn Lying rin_faint @boat
 fade_out 1.5
 slow 1 0
 narrate \"...\"
-narrate \"Gần sáng, ông Tám chèo ra thăm lưới thì thấy chiếc ghe trôi lững lờ, Rin nằm bất tỉnh trong đó.\"
-narrate \"Ông kéo ghe về bến, nhắn Bảo ra đưa Rin về nhà.\"
+narrate \"Rạng sáng, Bảo ra bến tìm thì thấy Rin nằm bất tỉnh trong ghe, bàn tay còn hơi sáng.\"
+narrate \"Bảo cõng Rin về nhà.\"
+set_flag wave_bitten
 set_flag wave_fainted"

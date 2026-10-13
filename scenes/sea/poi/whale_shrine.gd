@@ -28,11 +28,11 @@ func _interact() -> void:
 	if choice != 0:
 		return
 	if not GameState.spend_money(incense_cost):
-		hud.flash_message("Không đủ tiền mua nhang")
+		hud.flash_message("Không đủ tiền mua nhang...")
 		return
 	_blessed = true
 	hull.damage_scale = blessed_damage_scale
-	hud.flash_message("Đã thắp nhang. Đêm nay va đá chỉ hư một nửa.", 2.0)
+	hud.flash_message("Thắp nhang xong. Đêm nay va đá chắc cũng đỡ.", 2.0)
 
 
 func _draw() -> void:

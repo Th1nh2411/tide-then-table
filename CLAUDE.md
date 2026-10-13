@@ -39,6 +39,11 @@ Vietnamese, keep code comments in short English.
   `TableBill`, `StaffRoster`, `QuestLog`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
 - Vietnamese for all player-facing text. Money is shown as "70k".
+- Notices are speech, not system text: `SeaHud.flash_message` / the
+  restaurant's `_show_message` show a `SpeechLine` bubble over the speaker,
+  Rin talking to himself by default ("Sóng to quá... phải nâng cấp thuyền"),
+  "Bảo: ..." / "Cô Năm: ..." over them, "[...]" from the app. Write new ones
+  in Rin's voice (first person, short).
 - Keep on-screen text short. How-to hints are first-time pointers (`Guide`:
   ring + arrow on the thing + 3-6 words, shown once per id, story flag
   "tip_<id>"; rules in `RestaurantGuide` / `SeaGuide`; minigame hints via
@@ -52,6 +57,9 @@ Vietnamese, keep code comments in short English.
 - Run everything: `tools/run_tests.sh` (imports, runs `scenes/test/*_test.tscn`,
   smoke-runs main scenes, exit code ≠ 0 on FAIL/script errors).
 - Test scenes print `PASS ...` / `FAIL ...` lines; the runner counts them.
+- Debug keys (debug builds): sea 1-3 boat, F2 open the fog; restaurant F1
+  fish, F2 beer; both F3 play this scene's cutscenes one by one, F4 toggle
+  Nhịp Sóng (`CutsceneDebug`).
 - Ad-hoc headless checks: write `scenes/test/_tmp_*.gd/.tscn`, run with
   `--headless --path . --fixed-fps 60 --quit-after N res://... -- --no-autosave`,
   then delete them. Always pass `-- --no-autosave` when a run can reach the sea
@@ -170,7 +178,7 @@ Vietnamese, keep code comments in short English.
   carry plates and clean tables; hiring / job ads live in the phone tab
   "Nhân viên" (`PhoneStaff`, `GameState.staff_changed` tells the crew); wages
   at closing; `GameState.staff`, data in `data/staff/`; Vy, the heroine,
-  applies on day 3),
+  applies on day 4),
   `MenuSetupPanel` + `MenuPlan`, `CustomerManager` (spawning, ordering,
   payment; seats/decor upgrades, rich customers, regulars; balance numbers in
   `ServiceTuning` `data/restaurant/service_tuning.tres`; helpers
@@ -200,12 +208,12 @@ Vietnamese, keep code comments in short English.
   `trip_end_cutscenes` after a trip; the restaurant plays
   `after_shift_cutscenes` when the summary closes; the intro scene plays
   `intro_call`; the restaurant plays `arrival_cutscenes` before the menu
-  (`ArrivalCutscenes`): `opening_day`, `wave_awaken`, `vy_arrives` (day
+  (`ArrivalCutscenes`): `opening_day`, `wave_awaken` (day 3), `vy_arrives` (day
   3, a choice can hire her: flag `vy_hire_now`), `nam_fog_tale` (day 4); and
   `after_shift_cutscenes`: `beer_day` (after the first shift: a guest asks
   for beer, sold from day 2), `nam_fog_tale` (after day 3), `regular_thanks` (after the first fish order is
-  served, flag `regular_served_once`); the sea's trip-end list has `cat_arrival` and
-  `fog_omen`). Commands include `remove <actor>`; actor kinds rin, bao, vy,
+  served, flag `regular_served_once`); the sea's trip-end list has `wave_faint` (night 3), `cat_arrival`
+  (night 2) and `fog_omen` (night 4)). Commands include `remove <actor>`; actor kinds rin, bao, vy,
   co_nam, guest, cat, crate, rin_bed, glow. dialogue_test checks every marker
   a cutscene uses exists in its scene. Effects (`CutsceneEffects`): `rain
   on|off`, `slow <factor> <s>` (0.02 = frozen rain, teal tint, heartbeat),
@@ -217,11 +225,12 @@ Vietnamese, keep code comments in short English.
   `finished` (Rin and the cat on the boat). It pauses the tree; its actors,
   camera, tweens and DialogueBox run PROCESS_MODE_ALWAYS.
 - Nhịp Sóng (Rin's power, `WaveMark` pure + `WavePower` node in both
-  scenes, key C). How he gets it: the first glowing mackerel bites him and
-  he passes out on the boat at once (sea scene `_pass_out`, cutscene
-  `wave_faint`, which also counts as the omen; Ông Tám tows him home) — or,
-  with no bite by day 4, `fog_omen` on the dock: the glow touches his hand
-  and he passes out there (Bảo finds him). Both set "wave_fainted"; the
+  scenes, key C). How he gets it: trip-end cutscene `wave_faint` (end of
+  night 3, Rin still on his boat by the dock, markers "@boat+x,y"): a glowing
+  mackerel by the hull, Rin tries one more cast, it bites his hand and swims off (story only: never in the hold /
+  Dex, no omen), he passes out, Bảo finds him. The real glowing mackerel far
+  out stays rare / hard and still triggers the omen. `fog_omen` (night 4)
+  makes the mark glow (its touch-and-faint branch is only a fallback). Both set "wave_fainted"; the
   restaurant arrival cutscene `wave_awaken` (late, running in the rain
   without an umbrella, the rain freezes mid-air) sets "wave_mark".
   Slows the world (Engine.time_scale) a few real seconds: at sea only during

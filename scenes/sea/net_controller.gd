@@ -74,22 +74,22 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _try_drop() -> void:
 	if nets_available() <= 0:
-		hud.flash_message("Hết lưới! Kéo lưới cũ lên trước")
+		hud.flash_message("Hết lưới rồi, phải kéo lưới cũ lên trước.")
 		return
 	if absf(boat.speed) > max_drop_speed:
-		hud.flash_message("Dừng thuyền lại để thả lưới")
+		hud.flash_message("Phải dừng thuyền lại mới thả lưới được.")
 		return
 	var sea_zone := SeaZone.find_at(zones_root, boat.global_position)
 	var fish: FishData = null
 	if sea_zone:
 		fish = catalog.pick_random(sea_zone.zone, _rng, FishData.CatchMethod.NET)
 	if fish == null:
-		hud.flash_message("Vùng này không có ốc để thả lưới")
+		hud.flash_message("Chỗ này không có ốc, thả lưới chỉ phí công.")
 		return
 	var drop_pos := boat.global_position - Vector2.RIGHT.rotated(boat.rotation) * drop_offset
 	for other in _buoys:
 		if other.global_position.distance_to(drop_pos) < min_buoy_distance:
-			hud.flash_message("Quá gần lưới khác")
+			hud.flash_message("Sát lưới kia quá, ra chỗ khác thả.")
 			return
 
 	var buoy: NetBuoy = buoy_scene.instantiate()
@@ -102,7 +102,7 @@ func _try_drop() -> void:
 	_buoys.append(buoy)
 	oil.spend(oil_per_drop)
 	Sfx.play("splash")
-	hud.flash_message("Đã thả lưới, quay lại sau để kéo")
+	hud.flash_message("Thả lưới xong. Lát quay lại kéo.")
 	_emit_nets()
 
 
@@ -134,7 +134,7 @@ func _on_haul_requested(buoy: NetBuoy) -> void:
 	hud.hide_prompt()
 	_emit_nets()
 	if count <= 0:
-		hud.flash_message("Lưới chưa có ốc nào...")
+		hud.flash_message("Lưới chưa dính con ốc nào...")
 		return
 	_active = true
 	boat.speed = 0.0
@@ -151,7 +151,7 @@ func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: 
 	if DayClock.running:
 		boat.set_physics_process(true)
 	if caught:
-		hud.flash_message("Kéo được %d %s%s" % [count, fish.display_name, " (hoàn hảo)" if quality >= 1.0 else ""])
+		hud.flash_message("Được %d %s%s!" % [count, fish.display_name, ", ngon lành" if quality >= 1.0 else ""])
 		# Shellfish in a net are all average size.
 		fish_caught.emit(fish, quality, count, 1.0)
 

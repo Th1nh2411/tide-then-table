@@ -214,17 +214,22 @@ func _run(command: Dictionary) -> String:
 
 
 ## A marker under `markers`, or "@group": the first node in that group (the
-## boat wherever it is at sea).
+## boat wherever it is at sea), optionally shifted: "@boat+18,-6".
 func _marker(marker_name: String) -> Vector2:
 	var node: Node2D = null
+	var offset := Vector2.ZERO
 	if marker_name.begins_with("@"):
-		node = get_tree().get_first_node_in_group(marker_name.substr(1)) as Node2D
+		var parts := marker_name.substr(1).split("+")
+		node = get_tree().get_first_node_in_group(parts[0]) as Node2D
+		if parts.size() > 1:
+			var xy := parts[1].split(",")
+			offset = Vector2(float(xy[0]), float(xy[1]) if xy.size() > 1 else 0.0)
 	else:
 		node = markers.get_node_or_null(marker_name) as Node2D
 	if node == null:
 		push_warning("Cutscene marker '%s' not found" % marker_name)
 		return _camera.global_position
-	return node.global_position
+	return node.global_position + offset
 
 
 func _float(args: PackedStringArray, index: int, fallback: float) -> float:

@@ -57,7 +57,8 @@ func walk_in_due(delta: float) -> bool:
 
 ## Rush hour right now (WaveMark.has_power() only).
 func is_rush() -> bool:
-	return WaveMark.has_power() and _shift_time >= tuning.rush_from and _shift_time < tuning.rush_to
+	return WaveMark.has_power() and GameState.day >= WaveMark.RUSH_FROM_DAY \
+		and _shift_time >= tuning.rush_from and _shift_time < tuning.rush_to
 
 
 ## A new party at one of `free_seats` (`visit` = a regular's visit, or {}

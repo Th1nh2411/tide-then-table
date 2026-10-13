@@ -24,7 +24,7 @@ func _interact() -> void:
 	_busy = true
 	monitoring = false
 	boat.tow_multiplier = tow_speed_scale
-	hud.flash_message("Đang kéo ghe %s. Về bến để nhận %dk." % [owner_name, reward], 2.5)
+	hud.flash_message("Kéo ghe %s về bến là có %dk." % [owner_name, reward], 2.5)
 
 
 func _process(delta: float) -> void:

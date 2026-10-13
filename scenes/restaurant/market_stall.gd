@@ -54,7 +54,7 @@ func buy(dish: DishData, bulk: bool = false) -> bool:
 	bulk = bulk and dish.has_bulk()
 	var cost := dish.buy_cost(bulk)
 	if not open or not GameState.spend_money(cost):
-		message_requested.emit("Không đủ tiền (%dk)" % cost)
+		message_requested.emit("Không đủ tiền... cần %dk." % cost)
 		return false
 	bag.add(dish, dish.buy_units(bulk))
 	Sfx.play("bag")
@@ -73,7 +73,7 @@ func store_at(cell: Vector2i) -> bool:
 		return false
 	store_all()
 	Sfx.play("bag")
-	message_requested.emit("Đã cất đồ tạp hoá vào tủ lạnh")
+	message_requested.emit("Cất vô tủ lạnh xong.")
 	return true
 
 

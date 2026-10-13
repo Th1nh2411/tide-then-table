@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_cut")
 id = "vy_arrives"
-min_day = 3
+min_day = 4
 priority = 25
-script_text = "# Ngày 3: Vy, sinh viên năm cuối ở xóm trên, xin làm thêm buổi tối.
+script_text = "# Ngày 4: Vy, sinh viên năm cuối ở xóm trên, xin làm thêm buổi tối.
 camera kitchen_view 0 1.6
 fade_in 0.6
 spawn Bao bao bao_stove 1.4

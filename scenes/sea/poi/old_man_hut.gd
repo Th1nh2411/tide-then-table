@@ -40,11 +40,11 @@ func _interact() -> void:
 	match choice:
 		0:
 			if not BoatCondition.is_damaged():
-				hud.flash_message("Thuyền còn lành, không cần vá")
+				hud.flash_message("Thuyền còn lành mà, khỏi vá.")
 			elif hull.patch(patch_hp, patch_cost):
-				hud.flash_message("Ông Tám vá thuyền: +%d bền, -%dk" % [roundi(patch_hp), patch_cost], 2.0)
+				hud.flash_message("Ông Tám: Xong rồi đó con. (+%d bền, -%dk)" % [roundi(patch_hp), patch_cost], 2.0)
 			else:
-				hud.flash_message("Không đủ tiền nhờ vá thuyền")
+				hud.flash_message("Không đủ tiền nhờ ông Tám vá...")
 		1:
 			var line := pick_rumor(Story.stage(), _rng)
 			if WaveMark.has_power() and not GameState.has_flag("tam_mark"):

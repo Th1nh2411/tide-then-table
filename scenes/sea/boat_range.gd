@@ -54,7 +54,7 @@ func _physics_process(delta: float) -> void:
 	boat.speed = clampf(boat.speed, -max_speed_in_waves, max_speed_in_waves)
 	if _message_left <= 0.0:
 		_message_left = message_cooldown
-		hud.flash_message("Sóng lớn quá, %s không ra xa hơn được. Nâng cấp thuyền để đi xa hơn." % boat.boat_data.display_name, 2.5)
+		hud.flash_message("Sóng to quá... %s chỉ ra tới đây thôi. Phải nâng cấp thuyền mới đi xa hơn được." % boat.boat_data.display_name, 2.5)
 
 
 func _process(delta: float) -> void:

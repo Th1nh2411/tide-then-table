@@ -18,7 +18,8 @@ extends RefCounted
 ##   if_flag <flag> <label>            jump there if the story flag is set
 ##   rain on|off / slow <factor> <s>   rain; slow the scene (0.02 = frozen)
 ##   sfx <sound> / ambience <loop|none>
-## Markers may be "@group": the first node in that group (e.g. @boat).
+## Markers may be "@group": the first node in that group (e.g. @boat),
+## optionally shifted "@boat+18,-6".
 ##   pause <s>
 ##   name_pet <default>                ask the pet's name ({pet})
 ##   set_flag <name>

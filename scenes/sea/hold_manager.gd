@@ -61,7 +61,7 @@ func add_catch(fish: FishData, quality: float, count: int, size: float = 1.0) ->
 		if not hold.auto_place(item):
 			overflow.append(item)
 	if not overflow.is_empty():
-		hud.flash_message("Khoang đầy!")
+		hud.flash_message("Khoang đầy rồi!")
 		hold_ui.open_overflow(overflow)
 	if is_new:  # after the overflow window, so the card shows on top of it
 		new_species_caught.emit(fish, size)

@@ -111,7 +111,7 @@ func _needs_more(dish: DishData) -> bool:
 func grill() -> void:
 	var order := next_order(false)
 	if order == null:
-		message_requested.emit("Chưa bàn nào chờ món nướng")
+		message_requested.emit("Chưa có bàn nào gọi món nướng mà.")
 		return
 	var dish := order.dish
 	var items: Array[InventoryItem] = []
@@ -121,7 +121,7 @@ func grill() -> void:
 	elif _plan.get_portion_count(dish) > 0:
 		items = _plan.take_portion(dish)
 	else:
-		message_requested.emit("Hết %s" % dish.display_name)
+		message_requested.emit("Hết %s rồi..." % dish.display_name)
 		return
 	busy = true
 	_cooking_visit = order.visit
@@ -135,13 +135,13 @@ func grill() -> void:
 func pour() -> void:
 	var order := next_order(true)
 	if order == null:
-		message_requested.emit("Chưa bàn nào gọi bia")
+		message_requested.emit("Có ai gọi bia đâu.")
 		return
 	if not stall.stock.take(order.dish):
 		if stall.bag.count(order.dish) > 0:
-			message_requested.emit("Bia còn trong túi: cất vào tủ lạnh trước")
+			message_requested.emit("Bia còn trong túi, cất vô tủ lạnh trước đã.")
 		else:
-			message_requested.emit("Hết bia: sang tạp hoá %s mua bình mới" % stall.seller_name)
+			message_requested.emit("Hết bia rồi, chạy qua %s mua thêm thôi." % stall.seller_name)
 		return
 	busy = true
 	_cooking_visit = {}
@@ -152,7 +152,7 @@ func pour() -> void:
 func _on_spilled(dish: DishData) -> void:
 	var lost := stall.stock.spill(dish, spill_litres)
 	if lost > 0:
-		message_requested.emit("Tràn! Mất %d %s bia" % [lost, dish.unit_name])
+		message_requested.emit("Ối, tràn rồi! Phí mất %d %s bia." % [lost, dish.unit_name])
 
 
 func _on_cooking_finished(dish: DishData, _result: CookingGameBase.Result, multiplier: float) -> void:
@@ -183,7 +183,7 @@ func interact(cell: Vector2i) -> bool:
 	match room.grid.kind(cell):
 		"N", "U":
 			if rin.carried:
-				message_requested.emit("Tay đang cầm món")
+				message_requested.emit("Tay mình đang cầm món mà.")
 			elif room.grid.kind(cell) == "N":
 				grill()
 			else:
@@ -215,7 +215,7 @@ func interact(cell: Vector2i) -> bool:
 			rin.carried = null
 			Sfx.play("clink")
 		else:
-			message_requested.emit("Bàn %d không gọi món này" % (seat + 1))
+			message_requested.emit("Bàn %d đâu có gọi món này." % (seat + 1))
 		return true
 	if room.dining.states[seat] == DiningTables.State.DIRTY:
 		_clean(seat)

@@ -49,7 +49,7 @@ func _on_renovation_finished(applied: bool) -> void:
 	_set_room_ui_visible(true)
 	if applied:
 		renovated.emit()
-		message_requested.emit("Đã sửa quán!")
+		message_requested.emit("Quán nhìn ra dáng hơn rồi!")
 
 
 func _set_room_ui_visible(on: bool) -> void:

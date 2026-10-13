@@ -55,6 +55,7 @@ var _guide: RestaurantGuide
 var _market_panel: MarketPanel
 var _crew: StaffCrew
 var _rush_shown: bool = false
+var _speech: SpeechLine
 
 @onready var _customers: CustomerManager = $CustomerManager
 @onready var _menu_panel: MenuSetupPanel = %MenuSetupPanel
@@ -125,6 +126,16 @@ func _ready() -> void:
 	_rin.interacted.connect(_on_rin_interacted)
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
+	_message_label.hide()
+	_speech = SpeechLine.new()
+	_speech.anchors = {"Rin": _head_of.bind(_rin), "Bảo": _head_of.bind(_chef),
+		_stall.seller_name: _head_of.bind(_stall.seller)}
+	$HUD.add_child(_speech)
+	var story_debug := CutsceneDebug.new()
+	story_debug.player = _cutscene
+	story_debug.cutscenes.assign(arrival_cutscenes + after_shift_cutscenes)
+	story_debug.message_requested.connect(_show_message.bind(2.5))
+	add_child(story_debug)
 	var wave := WavePower.new()
 	wave.seconds = wave_seconds
 	wave.keep_rin_speed = true
@@ -133,7 +144,7 @@ func _ready() -> void:
 	add_child(wave)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
 		GameState.set_flag("regular_served_once")  # the regular's tea after the shift
-		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
+		_show_message("%s khen ngon, trả %dk. Vui ghê!" % [who, price], 2.5))
 	_plan = MenuPlan.new(_menu_slots())
 	_plan.kitchen_level = DishBook.kitchen_level()
 	_kitchen.setup(_plan)
@@ -212,7 +223,7 @@ func _open_shop() -> void:
 	_evening.renovate_button.hide()
 	_crew.start_shift()
 	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
-	_show_message("Quán mở cửa!")
+	_show_message("Mở quán thôi!")
 
 
 func _process(delta: float) -> void:
@@ -229,7 +240,7 @@ func _process(delta: float) -> void:
 	if _customers.is_rush() != _rush_shown:
 		_rush_shown = _customers.is_rush()
 		if _rush_shown:
-			_show_message("Giờ cao điểm! (C: Nhịp Sóng)" if Guide.once("rush") else "Giờ cao điểm!", 2.5)
+			_show_message("Khách tới dồn dập quá... (C: Nhịp Sóng)" if Guide.once("rush") else "Khách tới dồn dập quá!", 2.5)
 			Sfx.play("pop")
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
@@ -237,7 +248,7 @@ func _process(delta: float) -> void:
 			_end_shift("Hết giờ bán!")
 		elif _plan.is_sold_out() and not _sold_out_announced:
 			_sold_out_announced = true
-			_show_message("Hết hải sản, khách chỉ còn gọi rau muống, tháp bia...")
+			_show_message("Hết sạch hải sản rồi, giờ chỉ còn rau với bia thôi...")
 	var progress := 1.0 - _time_left / get_shift_seconds()
 	DayClock.set_progress(progress, DayClock.shop_open_hour, DayClock.shop_close_hour)
 	# No top line (clock, money) or storage line: the LED board shows the menu,
@@ -254,7 +265,7 @@ func _end_shift(reason: String) -> void:
 	if _customers.is_idle():
 		_show_message(reason)
 	else:
-		_show_message("%s Không nhận khách mới, phục vụ nốt khách trong quán." % reason, 3.0)
+		_show_message("%s Lo nốt mấy bàn còn lại thôi." % reason, 3.0)
 	# Everyone inside gets served and eats (or runs out of patience) first.
 	while not _customers.is_idle():
 		await get_tree().process_frame
@@ -311,14 +322,13 @@ func _on_customer_served(price: int, tip: int) -> void:
 	_served += 1
 
 
+## Said by Rin (or "Bảo: ..." / "Cô Năm: ...") in a speech bubble.
 func _show_message(text: String, seconds: float = message_seconds) -> void:
-	_message_token += 1
-	var token := _message_token
-	_message_label.text = text
-	_message_label.show()
-	await get_tree().create_timer(seconds).timeout
-	if token == _message_token:
-		_message_label.hide()
+	_speech.say(text, maxf(seconds, 1.5 + text.length() * 0.04))
+
+
+func _head_of(person: Node2D) -> Vector2:
+	return person.get_global_transform_with_canvas().origin + Vector2(0, -40)
 
 
 ## Summary closed: the evening is free — upgrade, repair, then sail.

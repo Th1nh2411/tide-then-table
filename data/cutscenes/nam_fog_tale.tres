@@ -18,6 +18,13 @@ face Rin right
 speak \"Cô Năm\" \"Rin nè, mấy đêm nay con đi câu có thấy gì lạ phía đông bắc không?\"
 speak Rin \"Dạ... sương dày lắm cô. Con chưa dám chạy vô.\"
 speak \"Cô Năm\" \"Hồi cô còn con gái, có một mùa trời ngoài đó sáng xanh cả góc. Ông bà kêu là cá Ông về.\"
+if_flag wave_mark marked
+goto tale
+label marked
+emote Rin ! 0.8
+narrate \"Nghe tới hai chữ sáng xanh, vệt sóng trên tay Rin nhói lên. Rin giấu tay ra sau lưng.\"
+speak Rin \"(Sáng xanh... giống hệt con cá đêm qua.)\"
+label tale
 speak \"Cô Năm\" \"Rồi có mấy chiếc ghe đi vô... về thì về, mà không ai kể lại được đã thấy gì.\"
 emote Bao ... 1.0
 speak Bảo \"Cô kể làm thằng Rin nó tò mò rồi đó.\"

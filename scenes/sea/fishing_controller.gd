@@ -102,14 +102,14 @@ func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: 
 
 ## e.g. "Bắt được Cá mú 3.9kg (to!) - kỷ lục mới!"
 func _catch_message(fish: FishData, quality: float) -> String:
-	var text := "Bắt được %s %s" % [fish.display_name, fish.weight_text(_size)]
+	var text := "Được con %s %s" % [fish.display_name, fish.weight_text(_size)]
 	if CatchRoll.is_big(_size):
-		text += " (to!)"
+		text += ", to ghê"
 	if quality >= 1.0:
-		text += " (hoàn hảo)"
+		text += ", ngon lành"
 	# Must be checked before the hold manager records this catch.
 	if GameState.caught_species.has(fish.id) and _size > GameState.best_size(fish):
-		text += " - kỷ lục mới!"
+		text += ". Kỷ lục luôn!"
 	return text
 
 

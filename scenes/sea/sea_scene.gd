@@ -25,8 +25,6 @@ const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 @export var trip_end_cutscenes: Array[Cutscene] = []
 ## Seconds the boat spins into the whirlpool before the white fade.
 @export var whirlpool_pull_seconds: float = 2.0
-## The glowing mackerel bites Rin and he passes out on the boat (WaveMark).
-@export var faint_cutscene: Cutscene
 
 var _day_ended: bool = false
 
@@ -63,6 +61,12 @@ func _ready() -> void:
 	var wave := WavePower.new()
 	wave.can_use = _fishing.minigame.is_running
 	add_child(wave)
+	_hud.set_speaker("Rin", _rin_head)
+	var story_debug := CutsceneDebug.new()
+	story_debug.player = _cutscene
+	story_debug.cutscenes = trip_end_cutscenes
+	story_debug.message_requested.connect(_hud.flash_message.bind(2.5))
+	add_child(story_debug)
 	var card := NewCatchCard.new()
 	add_child(card)
 	_hold_manager.new_species_caught.connect(card.show_fish)
@@ -86,12 +90,12 @@ func _ready() -> void:
 	_capture_map.call_deferred()
 	_show_orders()
 	if GameState.last_spoiled_count > 0:
-		_hud.flash_message("Qua đêm %d món trong kho đã hỏng, phải bỏ đi" % GameState.last_spoiled_count, 2.5)
+		_hud.flash_message("Hư mất %d con trong kho rồi, tiếc ghê..." % GameState.last_spoiled_count, 2.5)
 		GameState.last_spoiled_count = 0
 	if Story.check_day():
-		_hud.flash_message("Đêm nay biển lặng lạ thường... phía đông bắc sương mù dày lên.", 3.0)
+		_hud.flash_message("Biển lặng lạ thường... phía đông bắc sương dày lên.", 3.0)
 	elif Story.is_fog_open():
-		_hud.flash_message("Sương mù phủ góc đông bắc. Trong đó có ánh sáng lạ...", 3.0)
+		_hud.flash_message("Sương phủ kín góc đông bắc... trong đó có ánh sáng gì vậy?", 3.0)
 	# Autosave at the start of every night (hold is empty, storage is settled).
 	# Headless test runs pass `-- --no-autosave` so they never touch the real save.
 	SaveSystem.autosave("sea")
@@ -136,7 +140,7 @@ func _show_orders() -> void:
 
 func _process(_delta: float) -> void:
 	if _debug_label.visible:
-		_debug_label.text = "%s | tốc độ %d | [1-3] đổi thuyền [F2] mở sương [F3] cutscene mèo" % [
+		_debug_label.text = "%s | tốc độ %d | [1-3] đổi thuyền [F2] mở sương [F3] cutscene [F4] Nhịp Sóng" % [
 			_boat.boat_data.display_name, roundi(_boat.speed)]
 
 
@@ -153,20 +157,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		# Debug: pretend the omen happened yesterday and reload to open the fog.
 		GameState.set_flag(Story.OMEN_DAY_FLAG, GameState.day - 1)
 		get_tree().reload_current_scene()
-	elif key.physical_keycode == KEY_F3 and not trip_end_cutscenes.is_empty() and not _cutscene.playing:
-		# Debug: play the trip-end cutscene now (ignores its day / once conditions).
-		_cutscene.play(trip_end_cutscenes[0])
 
 
 func _on_fish_caught(fish: FishData, _quality: float, _count: int, _size: float) -> void:
-	if fish.id == Story.OMEN_FISH_ID and not GameState.has_flag(WaveMark.BITTEN_FLAG) \
-			and not GameState.has_flag(WaveMark.FAINTED_FLAG):
-		GameState.set_flag(WaveMark.BITTEN_FLAG)
-		Story.trigger_omen()
-		_pass_out.call_deferred()
-		return
 	if Story.on_fish_caught(fish):
-		_hud.flash_message("[WARN] App báo: loài này không có trong database... Ngoài khơi đông bắc có gì đó lạ.", 3.0)
+		_hud.flash_message("[WARN] species_id không có trong database. Ngoài khơi đông bắc có gì đó lạ.", 3.0)
 
 
 ## Ending: the whirlpool pulls the boat in, then everything goes white.
@@ -199,7 +194,7 @@ func _unload_at_dock() -> void:
 		return
 	GameState.unload_catch(_hold_manager.take_all())
 	Sfx.play("coins")
-	_hud.flash_message("Đã dỡ %d con vào kho. Ra khơi tiếp thôi!" % count, 2.0)
+	_hud.flash_message("Dỡ xong %d con. Ra khơi tiếp thôi!" % count, 2.0)
 	_refresh_dock_prompt()
 
 
@@ -232,11 +227,11 @@ func _refresh_dock_prompt() -> void:
 
 func _on_boat_broken() -> void:
 	BoatCondition.tow_patch(tow_patch_hp)
-	_rescue("Thuyền hư! Cứu hộ kéo về, vá tạm", rescue_fee)
+	_rescue("Thuyền hư rồi... đành gọi cứu hộ kéo về", rescue_fee)
 
 
 func _on_oil_empty() -> void:
-	_rescue("Hết dầu đèn, biển tối om! Cứu hộ kéo về bến", oil_rescue_fee)
+	_rescue("Hết dầu đèn, tối om... đành gọi cứu hộ kéo về", oil_rescue_fee)
 
 
 ## Pay the rescue boat (as much as the player has) and get towed home.
@@ -251,21 +246,7 @@ func _rescue(text: String, fee: int) -> void:
 	_end_sea_day(true)
 
 
-## Bitten by the glowing mackerel: once the catch card is closed, Rin passes
-## out on the boat (it also shows the omen), Ông Tám tows him home for free.
-func _pass_out() -> void:
-	while get_tree().paused:  # the NEW card / a full hold first
-		await get_tree().process_frame
-	if _day_ended or faint_cutscene == null:
-		return
-	_boat.set_physics_process(false)
-	GameState.set_flag(DialogueLibrary.SEEN_PREFIX + "fog_omen")  # this was the omen
-	await _cutscene.play(faint_cutscene)
-	GameState.trip_notes.append("Ông Tám kéo ghe về bến, không lấy tiền: \"Con nghỉ đi.\"")
-	_end_sea_day(true, false)
-
-
-func _end_sea_day(towed: bool, trip_end_scenes: bool = true) -> void:
+func _end_sea_day(towed: bool) -> void:
 	# Guard: docking and a rescue can both fire on the same frame.
 	if _day_ended:
 		return
@@ -276,7 +257,12 @@ func _end_sea_day(towed: bool, trip_end_scenes: bool = true) -> void:
 	_hud.hide_dock()
 	_events.on_trip_end(towed)
 	GameState.finish_sea_day(DayClock.current_minutes, towed, _hold_manager.get_items())
-	var scene := DialogueLibrary.pick(trip_end_cutscenes) as Cutscene if trip_end_scenes else null
+	var scene := DialogueLibrary.pick(trip_end_cutscenes) as Cutscene
 	if scene:
 		await _cutscene.play(scene)
 	SceneRouter.go_to(REST_SCENE_PATH)
+
+
+## Above Rin on the boat, on screen (his speech bubble).
+func _rin_head() -> Vector2:
+	return _boat.get_global_transform_with_canvas().origin + Vector2(0, -40)

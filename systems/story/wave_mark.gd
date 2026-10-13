@@ -1,8 +1,11 @@
 class_name WaveMark
 extends RefCounted
-## "Nhịp Sóng": the mark the creatures from the fog leave on Rin's hand (on
-## the omen night: bitten by the glowing mackerel while fishing, or touched
-## by the glow in the fog). With it Rin can slow the world for a moment
+## "Nhịp Sóng": the mark the creatures from the fog leave on Rin's hand.
+## End of night 3 (trip-end cutscene `wave_faint`): back at the dock, Rin
+## sees a glowing mackerel in the water, tries one more cast, it bites his
+## hand and swims off, he passes out (Bảo finds him); the restaurant's
+## `wave_awaken` (running in the rain) gives the power. Separate from the
+## real, rare glowing mackerel far out (which still brings the omen). With it Rin can slow the world for a moment
 ## (WavePower, key C) a few times a night at sea and a few times a shift in
 ## the restaurant. Once he has it, some moments get harder so it's worth
 ## using: big / aberrant fish fight harder, pricey grill dishes are trickier,
@@ -17,6 +20,11 @@ const BITTEN_FLAG := "wave_bitten"
 const FAINTED_FLAG := "wave_fainted"
 const FISH_CATALOG_PATH := "res://data/fish/fish_catalog.tres"
 
+## The night of the bite (wave_faint's min_day).
+const BITE_FROM_DAY := 3
+## The restaurant's rush hour starts from this day (day 2 stays gentle).
+const RUSH_FROM_DAY := 3
+
 const BASE_CHARGES := 2
 const MAX_CHARGES := 4
 ## One more use per this many aberrant fish caught.
@@ -27,6 +35,12 @@ const HARD_FIGHT_SCALE := 0.8
 
 static func has_power() -> bool:
 	return GameState.has_flag(FLAG)
+
+
+## Rin hasn't been bitten / marked yet.
+static func bite_due() -> bool:
+	return not has_power() and not GameState.has_flag(BITTEN_FLAG) and not GameState.has_flag(FAINTED_FLAG)
+
 
 
 ## Uses per night (sea) or per shift (restaurant).

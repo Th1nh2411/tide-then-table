@@ -36,6 +36,7 @@ var _canvas: Control
 
 func _ready() -> void:
 	layer = 15
+	add_to_group("wave_power")  # CutsceneDebug (F4) refills it
 	charges = WaveMark.max_charges()
 	_canvas = Control.new()
 	_canvas.set_anchors_preset(Control.PRESET_FULL_RECT)

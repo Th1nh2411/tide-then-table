@@ -22,9 +22,9 @@ func _ready() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
 	_check("nobody yet", roster.hired().is_empty() and roster.candidates().is_empty())
-	_check("Vy not before day 3", roster.arrivals(2).is_empty())
-	var vy := roster.arrivals(3)
-	_check("Vy comes on day 3, once", vy.size() == 1 and vy[0].id == "vy" and roster.arrivals(4).is_empty())
+	_check("Vy not before day 4", roster.arrivals(3).is_empty())
+	var vy := roster.arrivals(4)
+	_check("Vy comes on day 4, once", vy.size() == 1 and vy[0].id == "vy" and roster.arrivals(5).is_empty())
 	_check("one ad a day", roster.can_post(3))
 	var flyer := roster.post_ad(1, 3, rng)
 	_check("flyer brings tier-1 people", flyer.size() == catalog.applicants_per_ad

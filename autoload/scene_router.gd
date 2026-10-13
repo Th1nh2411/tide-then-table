@@ -61,6 +61,9 @@ func go_to(scene_path: String, fade_color: Color = Color.BLACK) -> void:
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_STOP
 
 	await _fade_to(1.0)
+	# A pause left over by the old scene (a cutscene / panel cut short) must
+	# never carry into the new one: that would freeze the game for good.
+	get_tree().paused = false
 	var error := get_tree().change_scene_to_file(scene_path)
 	if error != OK:
 		push_error("SceneRouter: failed to load %s (error %d)" % [scene_path, error])

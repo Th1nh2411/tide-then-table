@@ -48,7 +48,7 @@ func _process(delta: float) -> void:
 	if _tick <= 0.0:
 		_tick = damage_interval
 		hull.apply_damage(damage)
-		hud.flash_message("Sứa quấn chân vịt! Ra khỏi đàn sứa đi.", 1.5)
+		hud.flash_message("Sứa quấn chân vịt rồi! Phải thoát khỏi đàn sứa.", 1.5)
 
 
 func _draw() -> void:

@@ -69,10 +69,10 @@ func repair() -> int:
 	var was_broken := BoatCondition.is_broken()
 	var spent := BoatCondition.repair(boat.boat_data)
 	if spent == 0:
-		hud.flash_message("Không đủ tiền sửa thuyền")
+		hud.flash_message("Không đủ tiền sửa thuyền rồi...")
 		return 0
-	var partial := " (chưa đủ tiền sửa hết)" if BoatCondition.is_damaged() else ""
-	hud.flash_message("Đã sửa thuyền: -%dk%s" % [spent, partial])
+	var partial := " Chưa sửa hết được." if BoatCondition.is_damaged() else ""
+	hud.flash_message("Sửa thuyền hết %dk.%s" % [spent, partial])
 	if was_broken and not BoatCondition.is_broken():
 		boat.set_physics_process(true)
 	_refresh()
@@ -114,7 +114,7 @@ func apply_damage(amount: float) -> void:
 	if BoatCondition.is_broken():
 		boat_broken.emit()
 	elif GameState.boat_hp < warn_below_hp and before >= warn_below_hp:
-		hud.flash_message("Thuyền thủng nặng! Về bến sửa đi.", 2.0)
+		hud.flash_message("Thuyền thủng nặng rồi... phải về bến sửa thôi.", 2.0)
 
 
 func _refresh() -> void:

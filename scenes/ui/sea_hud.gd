@@ -21,6 +21,7 @@ var _home_button: Button
 @onready var _clock_label: Label = %ClockLabel
 @onready var _warning_label: Label = %WarningLabel
 @onready var _prompt_label: Label = %PromptLabel
+var _speech_line: SpeechLine
 @onready var _message_label: Label = %MessageLabel
 @onready var _net_label: Label = %NetLabel
 @onready var _oil_label: Label = %OilLabel
@@ -133,21 +134,27 @@ func hide_prompt() -> void:
 	_prompt_label.hide()
 
 
-## Big centered message, e.g. when the boat gets towed.
+## Said and kept until the next line (e.g. when the boat gets towed).
 func show_message(text: String) -> void:
-	_message_token += 1
-	_message_label.text = text
-	_message_label.show()
+	_speech().say(text, 0.0)
 
 
-## Centered message that hides itself after `seconds`.
+## Said by Rin (or "Name: ..." / "[app]"), gone after a reading time.
 func flash_message(text: String, seconds: float = flash_seconds) -> void:
-	show_message(text)
-	# Token check: a newer message must not be hidden by an older timer.
-	var token := _message_token
-	await get_tree().create_timer(seconds).timeout
-	if token == _message_token:
+	_speech().say(text, maxf(seconds, 1.5 + text.length() * 0.04))
+
+
+## Where Rin's speech bubble sits (the sea scene: over the boat).
+func set_speaker(speaker: String, anchor: Callable) -> void:
+	_speech().anchors[speaker] = anchor
+
+
+func _speech() -> SpeechLine:
+	if _speech_line == null:
 		_message_label.hide()
+		_speech_line = SpeechLine.new()
+		add_child(_speech_line)
+	return _speech_line
 
 
 func set_weather(weather_name: String) -> void:

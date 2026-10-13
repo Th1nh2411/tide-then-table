@@ -97,7 +97,8 @@ func _check_cutscene_markers() -> void:
 						name = args[0] if command["cmd"] == "camera" else args[1]
 					"spawn":
 						name = args[2]
-				if name != "" and markers.get_node_or_null(name) == null:
+				# "@group" markers follow a node at runtime (the boat).
+				if name != "" and not name.begins_with("@") and markers.get_node_or_null(name) == null:
 					missing.append("%s:%s" % [cutscene.id, name])
 		_check("cutscene markers exist in %s %s" % [path.get_file(), missing], missing.is_empty() and not cutscenes.is_empty())
 		root.free()

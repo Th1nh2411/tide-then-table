@@ -32,7 +32,7 @@ func _process(delta: float) -> void:
 		if is_instance_valid(boat) and boat.global_position.distance_to(global_position) < notice_distance:
 			_noticed = true
 			_target = best_spot(spawner.get_children(), min_y)
-			hud.flash_message("Đàn cá heo! Đi theo tụi nó thử xem.", 2.0)
+			hud.flash_message("Cá heo kìa! Đi theo tụi nó thử coi.", 2.0)
 		return
 	if is_instance_valid(_target) and _arrived_time < 0.0:
 		global_position = global_position.move_toward(_target.global_position, swim_speed * delta)

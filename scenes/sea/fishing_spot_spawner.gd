@@ -66,6 +66,7 @@ func spawn_spots() -> void:
 				push_warning("No free position for spot in zone %s" % sea_zone.name)
 
 
+
 func _random_point_in(rect: Rect2) -> Vector2:
 	return Vector2(
 		_rng.randf_range(rect.position.x, rect.end.x),
