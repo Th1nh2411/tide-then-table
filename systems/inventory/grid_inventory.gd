@@ -77,6 +77,11 @@ func get_item_at(cell: Vector2i) -> InventoryItem:
 	return _cells.get(cell)
 
 
+## Share of cells taken (0..1).
+func fill_fraction() -> float:
+	return float(_cells.size()) / float(maxi(size.x * size.y, 1))
+
+
 func _clear_cells(item: InventoryItem) -> void:
 	for offset in item.get_cells():
 		_cells.erase(item.grid_pos + offset)

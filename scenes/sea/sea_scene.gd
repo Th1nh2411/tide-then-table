@@ -82,6 +82,7 @@ func _ready() -> void:
 	_fog.whirlpool_entered.connect(_on_whirlpool_entered)
 	_oil.oil_changed.connect(_hud.set_oil)
 	_oil.oil_low.connect(_hud.flash_message.bind("Dầu đèn còn 1/4, trời sắp rạng. Về bến thôi!", 2.5))
+	_oil.oil_critical.connect(_hud.flash_message.bind("Đèn leo lét rồi... phải về bến ngay!", 2.5))
 	_oil.oil_empty.connect(_on_oil_empty)
 	DayClock.start_night()
 	_add_guide()

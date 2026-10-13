@@ -11,4 +11,4 @@ requires_flag = "wave_mark"
 script_text = "{pet}: ...
 Rin: Mày nhìn tay tao hoài vậy?
 {pet}: Meo. (mắt sáng xanh lên một thoáng, đúng nhịp với vệt trên tay Rin)
-Rin: ...Tao bắt đầu thấy mày không phải mèo thường rồi đó."
+Rin (ngac_nhien): ...Tao bắt đầu thấy mày không phải mèo thường rồi đó."

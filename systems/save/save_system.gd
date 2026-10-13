@@ -157,7 +157,10 @@ static func apply_dict(data: Dictionary) -> void:
 	if history is Array:
 		for entry: Variant in history:
 			if entry is Dictionary:
-				GameState.add_day_record(entry)
+				var record: Dictionary = {}
+				for key: Variant in entry:
+					record[key] = _whole(entry[key])
+				GameState.add_day_record(record)
 
 	var saved_orders: Variant = data.get("orders")
 	if saved_orders is Array:
@@ -185,11 +188,18 @@ static func apply_dict(data: Dictionary) -> void:
 	if flags is Dictionary:
 		for flag_name: Variant in flags:
 			if flag_name is String:
-				GameState.story_flags[flag_name] = flags[flag_name]
+				GameState.story_flags[flag_name] = _whole(flags[flag_name])
 
 
 static func _is_number(value: Variant) -> bool:
 	return value is int or value is float
+
+
+## JSON gives every number back as a float: 4.0 -> 4, 0.5 stays.
+static func _whole(value: Variant) -> Variant:
+	if value is float and is_equal_approx(value, roundf(value)) and absf(value) < 1e15:
+		return int(value)
+	return value
 
 
 ## JSON numbers come back as floats; accept int or float, else the fallback.

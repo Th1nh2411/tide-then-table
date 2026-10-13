@@ -12,8 +12,11 @@ signal new_species_caught(fish: FishData, size: float)
 @export var nets: NetController
 @export var hold_ui: HoldUI
 @export var hud: SeaHud
+## Rin mutters once per load when the hold gets this full.
+@export var almost_full_fraction: float = 0.8
 
 var hold: GridInventory
+var _almost_full_said: bool = false
 
 
 func _ready() -> void:
@@ -48,6 +51,7 @@ func take_all() -> Array[InventoryItem]:
 	var items := get_items()
 	for item in items:
 		hold.remove(item)
+	_almost_full_said = false
 	return items
 
 
@@ -63,6 +67,9 @@ func add_catch(fish: FishData, quality: float, count: int, size: float = 1.0) ->
 	if not overflow.is_empty():
 		hud.flash_message("Khoang đầy rồi!")
 		hold_ui.open_overflow(overflow)
+	elif not _almost_full_said and hold.fill_fraction() >= almost_full_fraction:
+		_almost_full_said = true
+		hud.flash_message("Khoang gần đầy rồi... thêm vài con là phải về dỡ.", 2.5)
 	if is_new:  # after the overflow window, so the card shows on top of it
 		new_species_caught.emit(fish, size)
 

@@ -7,7 +7,8 @@ extends Control
 ## (ChefBao), Rin serves / grills / pours (KitchenStation), customers come
 ## and pay (CustomerManager), staff help (StaffCrew), the grocery is next door
 ## (MarketStall + MarketPanel). First-time pointers: RestaurantGuide; quests:
-## QuestTracker; debug keys: RestaurantDebug.
+## QuestTracker + Nhịp Sóng + debug keys: RestaurantTools; the day's books
+## and closing: ShiftCloser.
 
 ## Real seconds for the whole shift (15:00 -> 24:00 on the displayed clock).
 @export var base_shift_seconds: float = 180.0
@@ -32,6 +33,8 @@ extends Control
 @export var wave_seconds: float = 4.0
 ## How close Rin must be to someone to talk (px).
 @export var talk_reach: float = 22.0
+## Rin notices closing time when this much of the shift is left.
+@export var late_fraction: float = 0.15
 
 var _plan: MenuPlan
 var _time_left: float = 0.0
@@ -39,13 +42,7 @@ var _shift_running: bool = false
 var _shift_over: bool = false
 ## Closed to new customers, still serving the ones inside.
 var _closing: bool = false
-var _earned_today: int = 0
-var _market_spent: int = 0
-var _variety_count: int = 0
-var _variety_multiplier: float = 1.0
 var _sold_out_announced: bool = false
-var _served: int = 0
-var _left_angry: int = 0
 ## Regulars coming today (FishOrders.reserve_for_shift).
 var _regular_visits: Array[Dictionary] = []
 var _evening: RestaurantEvening
@@ -54,7 +51,9 @@ var _guide: RestaurantGuide
 var _market_panel: MarketPanel
 var _crew: StaffCrew
 var _rush_shown: bool = false
+var _late_said: bool = false
 var _speech: SpeechLine
+var _closer: ShiftCloser
 
 @onready var _customers: CustomerManager = $CustomerManager
 @onready var _menu_panel: MenuSetupPanel = %MenuSetupPanel
@@ -76,8 +75,6 @@ var _speech: SpeechLine
 func _ready() -> void:
 	_summary_panel.hide()
 	_message_label.hide()
-	_customers.customer_served.connect(_on_customer_served)
-	_customers.customer_left_angry.connect(_on_customer_left_angry)
 	Sfx.ambience("street")
 	_customers.message_requested.connect(_show_message)
 	_next_day_button.pressed.connect(_on_continue_pressed)
@@ -114,7 +111,6 @@ func _ready() -> void:
 	_market_panel.stall = _stall
 	add_child(_market_panel)
 	_stall.browse_requested.connect(_market_panel.open_panel)
-	_stall.bought.connect(func(_dish: DishData, cost: int) -> void: _market_spent += cost)
 	_crew = StaffCrew.new()
 	_crew.catalog = staff_catalog
 	_crew.room = _room
@@ -122,6 +118,16 @@ func _ready() -> void:
 	_crew.people_layer = $World/People
 	_crew.message_requested.connect(_show_message.bind(3.0))
 	add_child(_crew)
+	_closer = ShiftCloser.new()
+	_closer.customers = _customers
+	_closer.stall = _stall
+	_closer.market_panel = _market_panel
+	_closer.crew = _crew
+	_closer.chef = _chef
+	_closer.rin = _rin
+	_closer.fish_catalog = fish_catalog
+	_closer.message_requested.connect(_show_message)
+	add_child(_closer)
 	_rin.interacted.connect(_on_rin_interacted)
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
@@ -129,17 +135,6 @@ func _ready() -> void:
 	_speech.anchors = {"Rin": _head_of.bind(_rin), "Bảo": _head_of.bind(_chef),
 		_stall.seller_name: _head_of.bind(_stall.seller)}
 	$HUD.add_child(_speech)
-	var story_debug := CutsceneDebug.new()
-	story_debug.player = _cutscene
-	story_debug.cutscenes.assign(arrival_cutscenes + after_shift_cutscenes)
-	story_debug.message_requested.connect(_show_message.bind(2.5))
-	add_child(story_debug)
-	var wave := WavePower.new()
-	wave.seconds = wave_seconds
-	wave.keep_rin_speed = true
-	wave.can_use = _wave_allowed
-	wave.ripple_origin = _rin_screen_position
-	add_child(wave)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
 		GameState.set_flag("regular_served_once")  # the regular's tea after the shift
 		_show_message("%s khen ngon, trả %dk. Vui ghê!" % [who, price], 2.5))
@@ -152,18 +147,18 @@ func _ready() -> void:
 	_menu_panel.hide()  # opened by clicking the LED sign (MenuBoard)
 	_time_left = get_shift_seconds()
 	_add_guide()
-	var tracker := QuestTracker.new()
-	tracker.catalog = fish_catalog
-	tracker.origin = Vector2(4, 26)  # under the order tickets
-	add_child(tracker)
-	_cutscene.hidden_nodes.append(tracker)
-	var debug := RestaurantDebug.new()
-	debug.menu_panel = _menu_panel
-	debug.plan = _plan
-	debug.fish_catalog = fish_catalog
-	debug.stall = _stall
-	debug.message_requested.connect(_show_message)
-	add_child(debug)
+	var tools := RestaurantTools.new()
+	tools.cutscene = _cutscene
+	tools.cutscenes.assign(arrival_cutscenes + after_shift_cutscenes)
+	tools.menu_panel = _menu_panel
+	tools.plan = _plan
+	tools.fish_catalog = fish_catalog
+	tools.stall = _stall
+	tools.wave_seconds = wave_seconds
+	tools.wave_allowed = _wave_allowed
+	tools.ripple_origin = _rin_screen_position
+	tools.message_requested.connect(_show_message)
+	add_child(tools)
 	_play_arrival_cutscene.call_deferred()
 
 
@@ -214,13 +209,12 @@ func get_shift_seconds() -> float:
 
 func _open_shop() -> void:
 	_menu_panel.hide()
-	_variety_count = _plan.variety_count()
-	_variety_multiplier = MenuPlan.variety_multiplier(_variety_count, variety_multipliers)
+	_closer.variety_multiplier = MenuPlan.variety_multiplier(_plan.variety_count(), variety_multipliers)
 	_shift_running = true
 	_close_early_button.show()
 	_evening.renovate_button.hide()
 	_crew.start_shift()
-	_customers.start_shift(_plan, _variety_multiplier, _regular_visits)
+	_customers.start_shift(_plan, _closer.variety_multiplier, _regular_visits)
 	_show_message("Mở quán thôi!")
 
 
@@ -242,6 +236,9 @@ func _process(delta: float) -> void:
 			Sfx.play("pop")
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
+		if not _late_said and _time_left <= get_shift_seconds() * late_fraction:
+			_late_said = true
+			_show_message("Sắp tới giờ dọn hàng rồi, ráng thêm chút!", 2.5)
 		if _time_left <= 0.0:
 			_end_shift("Hết giờ bán!")
 		elif _plan.is_sold_out() and not _sold_out_announced:
@@ -271,27 +268,8 @@ func _end_shift(reason: String) -> void:
 	var cooking: CookingOverlay = $CookingOverlay
 	while cooking.is_running():
 		await get_tree().process_frame
-	_rin.carried = null
-	_customers.shelf.clear()  # plates left on the table are wasted
-	_chef.clear()
-	var leftover := _plan.total_portions()
-	_plan.clear(GameState.storage)
-	_stall.open = false
-	_stall.store_all()  # whatever is still in Rin's bag
-	_market_panel.close_panel()
-	# Uncooked regular orders go back to storage.
-	for visit in _customers.uncooked_regular_visits():
-		FishOrders.release(visit)
-	var order_lines := FishOrders.expire_after_shift(fish_catalog)
-	var wages := _crew.pay_wages()
 	_shift_over = true
-	var stars := DayRating.stars(_served, _left_angry, _variety_multiplier < 1.0)
-	GameState.last_rating = stars
-	GameState.add_day_record({"day": GameState.day, "earned": _earned_today, "market": _market_spent,
-		"rating": stars, "served": _served, "left": _left_angry, "wages": wages})
-	_summary_label.text = ShiftReport.text({"reason": reason, "stars": stars, "earned": _earned_today,
-		"market": _market_spent, "wages": wages, "served": _served, "left": _left_angry,
-		"variety": _variety_multiplier, "leftover": leftover}, order_lines)
+	_summary_label.text = _closer.close(reason, _plan)
 	_summary_panel.show()
 	_next_day_button.grab_focus()
 
@@ -307,17 +285,6 @@ func _on_rin_interacted(cell: Vector2i) -> void:
 				or talker.talk_position().distance_to(_rin.position) <= talk_reach):
 			talker.talk(_dialogue_box)
 			return
-
-
-func _on_customer_left_angry() -> void:
-	_left_angry += 1
-	Sfx.play("grumble")
-
-
-func _on_customer_served(price: int, tip: int) -> void:
-	Sfx.play("coins")
-	_earned_today += price + tip
-	_served += 1
 
 
 ## Said by Rin (or "Bảo: ..." / "Cô Năm: ...") in a speech bubble.

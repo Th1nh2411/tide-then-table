@@ -9,5 +9,5 @@ min_day = 4
 requires_flag = "cat_adopted"
 priority = 3
 script_text = "Rin vuốt lưng {pet}. Lông nó ấm lạ thường, như vừa nằm phơi nắng giữa trưa.
-Rin: ...Mày bị sốt hả?
+Rin (lo): ...Mày bị sốt hả?
 {pet}: Meo."

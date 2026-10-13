@@ -10,5 +10,5 @@ priority = 10
 script_text = "Vy: Anh Rin, cái app trên điện thoại anh... anh tự viết hả?
 Rin: Ừ. Hồi còn làm startup với Bảo. Giờ dùng để quản lý quán thôi.
 Vy: Sao log của nó toàn chữ đỏ [ERR] vậy anh? Em thấy có dòng "tọa độ không tồn tại".
-Rin: ...Chắc GPS lỗi. Code hồi đó viết vội lắm.
-Vy: Hì, anh nói y chang Bảo luôn."
+Rin (boi_roi): ...Chắc GPS lỗi. Code hồi đó viết vội lắm.
+Vy (vui): Hì, anh nói y chang Bảo luôn."

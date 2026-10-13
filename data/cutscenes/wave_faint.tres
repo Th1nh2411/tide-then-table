@@ -23,13 +23,13 @@ speak Rin \"Ráng thêm một cần nữa thôi.\"
 narrate \"Rin thả lưỡi câu ngay trước mũi con cá. Nó đớp liền.\"
 sfx bite
 narrate \"Con cá giật mạnh, vọt lên khỏi mặt nước, ngoạm trúng bàn tay Rin rồi lặn mất.\"
-speak Rin \"Á!\"
+speak \"Rin (ngac_nhien)\" \"Á!\"
 remove Glow
 spawn Spark glow @boat+3,-8 0.12
 narrate \"Vết cắn sáng xanh, lan dần lên cánh tay. Tai ù đi, chiếc ghe chòng chành.\"
 slow 0.35 1.0
 narrate \"Trước khi mắt nhắm lại, Rin thấy phía đông bắc, rất xa, một đốm sáng xanh nhấp nháy.\"
-speak Rin \"Cái gì... vậy...\"
+speak \"Rin (buon)\" \"Cái gì... vậy...\"
 remove Rin
 remove Spark
 spawn Lying rin_faint @boat

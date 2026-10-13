@@ -11,7 +11,7 @@ requires_flag = "wave_fainted"
 script_text = "# Sau đêm ngất: Rin tỉnh dậy trễ, chạy ra quán dưới mưa (quên dù), mưa đứng yên giữa không trung: Rin nhận ra năng lực.
 fade_out 0
 narrate \"Rin tỉnh dậy trên giường. Ngoài cửa sổ trời xám xịt.\"
-speak Rin \"Mấy giờ rồi... Ba giờ chiều?! Trễ mở quán rồi!\"
+speak \"Rin (ngac_nhien)\" \"Mấy giờ rồi... Ba giờ chiều?! Trễ mở quán rồi!\"
 narrate \"Đầu còn ong ong. Trên mu bàn tay hằn một vệt xanh hình con sóng.\"
 camera run_view 0 1.5
 rain on
@@ -31,7 +31,7 @@ narrate \"Rin đưa tay chạm vào một giọt nước. Nó vỡ ra thật ch�
 speak Rin \"Là cái vết này. Đêm qua... con cá đó... ánh sáng đó...\"
 slow 1 0.8
 narrate \"Ào! Tiếng mưa đổ ập xuống trở lại.\"
-speak Bảo \"Rin! Mày đứng giữa mưa ngẩn ra cái gì vậy? Vô lẹ!\"
+speak \"Bảo (lo)\" \"Rin! Mày đứng giữa mưa ngẩn ra cái gì vậy? Vô lẹ!\"
 move_to Rin rin_spot 1.4
 speak Rin \"(Mọi thứ chậm lại... Nếu gọi được nó lúc quán đông thì sao?)\"
 set_flag wave_mark

@@ -12,7 +12,7 @@ camera kitchen_view 0 1.6
 fade_in 0.8
 spawn Bao bao bao_stove 1.4
 spawn Rin rin rin_spot 1.4
-speak Bảo \"Xe đẩy, lò than, bình gas... đủ hết. Chiều nay khai trương!\"
+speak \"Bảo (vui)\" \"Xe đẩy, lò than, bình gas... đủ hết. Chiều nay khai trương!\"
 speak Rin \"Mày đứng bếp, tao chạy bàn với nướng. Như đã chốt.\"
 emote Bao note 1.0
 speak Bảo \"Món hấp, món xào để tao. Khách gọi món nướng thì mày ra lò than.\"

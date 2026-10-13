@@ -42,8 +42,11 @@ Vietnamese, keep code comments in short English.
 - Notices are speech, not system text: `SeaHud.flash_message` / the
   restaurant's `_show_message` show a `SpeechLine` bubble over the speaker,
   Rin talking to himself by default ("Sóng to quá... phải nâng cấp thuyền"),
-  "Bảo: ..." / "Cô Năm: ..." over them, "[...]" from the app. Write new ones
-  in Rin's voice (first person, short).
+  "Bảo: ..." / "Cô Năm: ..." over them, "[...]" from the app; one bubble per
+  speaker, a speaker's next line waits until the current one had 1 s. Write
+  new ones in Rin's voice (first person, short); situational ones say it
+  once per trip / shift (oil 25% / 10%, hold 80%, first guest lost, 15% of
+  the shift left), never a permanent HUD warning.
 - Keep on-screen text short. How-to hints are first-time pointers (`Guide`:
   ring + arrow on the thing + 3-6 words, shown once per id, story flag
   "tip_<id>"; rules in `RestaurantGuide` / `SeaGuide`; minigame hints via
@@ -57,6 +60,15 @@ Vietnamese, keep code comments in short English.
 - Run everything: `tools/run_tests.sh` (imports, runs `scenes/test/*_test.tscn`,
   smoke-runs main scenes, exit code ≠ 0 on FAIL/script errors).
 - Test scenes print `PASS ...` / `FAIL ...` lines; the runner counts them.
+- Whole game: `tools/run_bot.sh` (`tools/bot/game_bot.gd`: New Game → ending
+  through the real scenes, prints a line per day + minutes of human play,
+  exit ≠ 0 on STUCK / SAVE MISMATCH / no ending; `POLICY=balanced` for the
+  other upgrade order). Run it after changing pacing, the day flow or saves;
+  it reads scene internals (`_closer`, `_menu_panel`...), keep it in sync.
+- Playtest builds: `tools/export.sh` (runs the tests, then the presets in
+  `export_presets.cfg` → `build/mac/RinTheFisher.zip`, `build/windows/
+  RinTheFisher.exe`; needs export templates for this exact Godot version).
+  Hand out `PLAYTEST.md` with it.
 - Debug keys (debug builds): sea 1-3 boat, F2 open the fog; restaurant F1
   fish, F2 beer; both F3 play this scene's cutscenes one by one, F4 toggle
   Nhịp Sóng (`CutsceneDebug`).
@@ -204,7 +216,10 @@ Vietnamese, keep code comments in short English.
   changes.
 - Cutscenes (Stardew style): write a `Cutscene` .tres in `data/cutscenes/`
   (commands listed in `CutsceneScript`), add marker Node2Ds under the scene's
-  `CutsceneMarkers`, play with `CutscenePlayer.play()` (sea scene plays
+  `CutsceneMarkers` (`CutsceneCamera` resolves them and moves the camera;
+  `CutsceneNamePrompt` is the cat's name box; `emote <actor> !|?|...|heart|note`
+  gives that speaker's next line a portrait mood), play with
+  `CutscenePlayer.play()` (sea scene plays
   `trip_end_cutscenes` after a trip; the restaurant plays
   `after_shift_cutscenes` when the summary closes; the intro scene plays
   `intro_call`; the restaurant plays `arrival_cutscenes` before the menu
@@ -268,7 +283,10 @@ Vietnamese, keep code comments in short English.
   The phone has no orders tab any more.
 - Restaurant helpers (keep restaurant_scene.gd an orchestrator):
   `RestaurantEvening` (Sửa quán / Ra khơi buttons, renovation, next day),
-  `RestaurantDebug` (F1/F2), `ShiftReport` (pure: summary text),
+  `RestaurantTools` (WavePower, QuestTracker, RestaurantDebug F1/F2,
+  CutsceneDebug F3/F4), `ShiftCloser` (the shift's money / guests / market
+  counters and closing: clears the kitchen, wages, rating, day record,
+  summary), `ShiftReport` (pure: summary text),
   `ArrivalCutscenes`, `StreetRoomPainter` (StreetRoom's drawing),
   `PartyFactory` / `PartyOrders` / `PartyCheckout` / `PartyWalker`
   (CustomerManager's parties). Staff can have lines (`StaffData.dialogues`,

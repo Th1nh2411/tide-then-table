@@ -30,7 +30,7 @@ narrate \"[ERR] tọa độ 0x7F3A: vùng biển không có trong bản đồ.\"
 if_flag wave_mark marked
 narrate \"Quầng sáng chợt loé mạnh. Một tia xanh lướt trên mặt nước, chạm vào bàn tay Rin.\"
 sfx whoosh
-speak Rin \"Á! Rát quá...\"
+speak \"Rin (ngac_nhien)\" \"Á! Rát quá...\"
 slow 0.35 1.0
 narrate \"[ERR] bio-signature mismatch: user\"
 remove Rin

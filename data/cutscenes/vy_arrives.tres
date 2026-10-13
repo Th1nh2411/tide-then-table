@@ -15,14 +15,14 @@ spawn Rin rin rin_spot 1.4
 spawn Vy vy vy_start 1.4
 move_to Vy vy_stop 2.4
 face Rin left
-speak Vy \"Dạ... anh là chủ quán hả? Em là Vy, sinh viên năm cuối, nhà ở xóm trên.\"
+speak \"Vy (boi_roi)\" \"Dạ... anh là chủ quán hả? Em là Vy, sinh viên năm cuối, nhà ở xóm trên.\"
 speak Vy \"Em xin làm thêm buổi tối được không anh? Em chạy bàn quen rồi, bưng món với dọn bàn nhanh lắm.\"
 emote Rin ? 1.0
 speak Bảo \"Mày chạy muốn rớt dép mỗi tối còn suy nghĩ gì nữa.\"
 speak Vy \"Lương... hai trăm một ca là được rồi ạ.\"
 choice \"Nhận Vy làm luôn\" hire \"Để anh tính đã\" later
 label hire
-speak Rin \"Ok, tối nay làm luôn nha Vy.\"
+speak \"Rin (vui)\" \"Ok, tối nay làm luôn nha Vy.\"
 emote Vy heart 1.2
 speak Vy \"Dạ! Em cảm ơn anh!\"
 set_flag vy_hire_now

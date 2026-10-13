@@ -16,7 +16,7 @@ spawn Nam co_nam nam_shop 1.4
 move_to Nam nam_visit 1.6
 face Rin right
 speak \"Cô Năm\" \"Rin nè, mấy đêm nay con đi câu có thấy gì lạ phía đông bắc không?\"
-speak Rin \"Dạ... sương dày lắm cô. Con chưa dám chạy vô.\"
+speak \"Rin (lo)\" \"Dạ... sương dày lắm cô. Con chưa dám chạy vô.\"
 speak \"Cô Năm\" \"Hồi cô còn con gái, có một mùa trời ngoài đó sáng xanh cả góc. Ông bà kêu là cá Ông về.\"
 if_flag wave_mark marked
 goto tale

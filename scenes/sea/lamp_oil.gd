@@ -9,6 +9,8 @@ extends Node
 
 signal oil_changed(amount: float, capacity: float)
 signal oil_low
+## The last stretch: the lamp is about to go out.
+signal oil_critical
 signal oil_empty
 
 ## Lamp tank upgrade: its value is the tank capacity. Without it: base_capacity.
@@ -25,6 +27,8 @@ signal oil_empty
 @export var minigame_burn_scale: float = 0.0
 ## Warn once when the tank drops to this fraction.
 @export var low_fraction: float = 0.25
+## Warn again (once) at this fraction.
+@export var critical_fraction: float = 0.1
 
 ## Tonight's weather burn multiplier (WeatherController).
 var weather_burn_scale: float = 1.0
@@ -32,6 +36,7 @@ var capacity: float = 100.0
 var amount: float = 100.0
 
 var _low_sent: bool = false
+var _critical_sent: bool = false
 var _empty_sent: bool = false
 
 
@@ -72,6 +77,9 @@ func _apply() -> void:
 	if not _low_sent and fraction() <= low_fraction:
 		_low_sent = true
 		oil_low.emit()
+	if not _critical_sent and fraction() <= critical_fraction and not is_empty():
+		_critical_sent = true
+		oil_critical.emit()
 	if not _empty_sent and is_empty():
 		_empty_sent = true
 		oil_empty.emit()

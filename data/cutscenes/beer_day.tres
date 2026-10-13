@@ -14,7 +14,7 @@ spawn Bao bao bao_stove 1.4
 spawn Rin rin rin_spot 1.4
 spawn Guest guest guest_seat 1.4
 speak Khách \"Ông chủ ơi, quán có bia không? Ăn hải sản mà thiếu bia buồn lắm.\"
-speak Rin \"Dạ hôm nay chưa có... mai em có liền!\"
+speak \"Rin (boi_roi)\" \"Dạ hôm nay chưa có... mai em có liền!\"
 emote Rin ... 1.0
 speak Bảo \"Thấy chưa. Quán nhậu mà không có bia thì ai ngồi lâu.\"
 speak Rin \"Cô Năm có bán bia hơi. Để tao qua hỏi.\"

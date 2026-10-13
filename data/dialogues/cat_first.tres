@@ -8,5 +8,5 @@ id = "cat_first"
 requires_flag = "cat_adopted"
 priority = 5
 script_text = "{pet}: Meo.
-Rin: Ăn no chưa mậy? Tối qua giành cá với tao đó.
+Rin (vui): Ăn no chưa mậy? Tối qua giành cá với tao đó.
 Con mèo lim dim mắt, đuôi phẩy nhẹ."

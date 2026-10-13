@@ -30,7 +30,7 @@ func _test_round_trip() -> void:
 	GameState.day = 6
 	GameState.last_rating = 4
 	GameState.upgrade_levels = {"boat": 2, "rod": 1}
-	GameState.story_flags = {"saw_glowing_fish": true}
+	GameState.story_flags = {"saw_glowing_fish": true, "fog_omen_day": 4}
 	var item := InventoryItem.new(_fish("cua"), 0.7)
 	item.freshness = 65.0
 	GameState.storage.append(item)
@@ -71,6 +71,8 @@ func _test_round_trip() -> void:
 	_check("size record", is_equal_approx(GameState.best_size(_fish("cua")), 1.4))
 	_check("item size", GameState.storage.size() == 1 and is_equal_approx(GameState.storage[0].size, 1.25))
 	_check("day history", GameState.day_history.size() == 1 and int(GameState.day_history[0].get("earned", 0)) == 300)
+	_check("whole numbers stay ints (JSON floats)", GameState.day_history[0].get("earned") is int
+		and GameState.story_flags.get("fog_omen_day") is int)
 	var loaded: InventoryItem = GameState.storage[0] if GameState.storage.size() == 1 else null
 	_check("storage item", loaded != null and loaded.fish.id == "cua"
 		and is_equal_approx(loaded.quality, 0.7) and is_equal_approx(loaded.freshness, 65.0))

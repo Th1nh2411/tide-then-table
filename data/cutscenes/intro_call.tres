@@ -12,7 +12,7 @@ fade_in 1.5
 narrate \"Ba tháng sau khi startup của Rin và Bảo sập.\"
 narrate \"Rin nằm dài trong phòng trọ, lướt tin tuyển dụng tới mỏi tay.\"
 emote Lying ... 1.2
-speak Rin \"Gửi hai trăm cái CV. Không ai gọi lại.\"
+speak \"Rin (buon)\" \"Gửi hai trăm cái CV. Không ai gọi lại.\"
 pause 0.4
 narrate \"Bụng réo. Trên bàn chỉ còn đúng một gói mì.\"
 emote Lying ! 1.0
@@ -29,11 +29,11 @@ speak Rin \"Bảo. Mày còn nấu mì được không?\"
 speak Bảo \"Hỏi gì kỳ vậy. Từ hồi công ty sập, tao ở nhà nấu cho cả nhà ăn.\"
 speak Rin \"Mở quán đi. Quán hải sản vỉa hè, ở Xóm Đèn, chỗ nhà cũ của ông nội tao.\"
 speak Rin \"Ông còn để lại chiếc ghe. Đêm tao ra khơi câu, chiều mày đứng bếp, tao bưng bê.\"
-speak Bảo \"Mày? Bưng bê? Thằng code xuyên đêm không thèm bước ra khỏi phòng?\"
+speak \"Bảo (ngac_nhien)\" \"Mày? Bưng bê? Thằng code xuyên đêm không thèm bước ra khỏi phòng?\"
 speak Rin \"Thất nghiệp rồi, gì cũng làm.\"
 pause 0.4
 speak Bảo \"...Được. Nhưng tao là bếp trưởng. Món nướng mày tự lo, tao không đứng khói than đâu.\"
-speak Rin \"Chốt! À, cái app Rin's Catch tao vẫn giữ. Sửa lại xài quản lý kho cá.\"
+speak \"Rin (vui)\" \"Chốt! À, cái app Rin's Catch tao vẫn giữ. Sửa lại xài quản lý kho cá.\"
 speak Bảo \"Cái app đó... thôi kệ. Mai tao bắt xe về.\"
 emote Rin heart 1.0
 narrate \"Một tuần sau, hai đứa dọn về Xóm Đèn. Đêm đầu tiên, Rin thắp đèn ra khơi.\"

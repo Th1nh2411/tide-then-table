@@ -91,12 +91,7 @@ func set_oil(amount: float, capacity: float) -> void:
 	var fraction := amount / capacity
 	_oil_label.text = "Dầu đèn %d%%" % roundi(fraction * 100.0)
 	_oil_label.modulate = late_color if fraction <= 0.25 else (warning_color if fraction <= 0.5 else Color.WHITE)
-	if fraction <= 0.25:
-		_warning_label.text = "Dầu sắp cạn! Về bến trước khi tắt đèn"
-		_warning_label.modulate = late_color
-		_warning_label.show()
-	else:
-		_warning_label.hide()
+	_warning_label.hide()  # Rin says it instead (LampOil.oil_low / oil_critical)
 
 
 func set_nets(available: int, total: int) -> void:
