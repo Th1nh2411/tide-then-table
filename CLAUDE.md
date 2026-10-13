@@ -67,7 +67,9 @@ Vietnamese, keep code comments in short English.
   it reads scene internals (`_closer`, `_menu_panel`...), keep it in sync.
 - Playtest builds: `tools/export.sh` (runs the tests, then the presets in
   `export_presets.cfg` → `build/mac/RinTheFisher.zip`, `build/windows/
-  RinTheFisher.exe`; needs export templates for this exact Godot version).
+  RinTheFisher.exe`; needs export templates for this exact Godot version,
+  in ~/Library/Application Support/Godot/export_templates/<version>; macOS
+  universal needs `import_etc2_astc` on, already set in project.godot).
   Hand out `PLAYTEST.md` with it.
 - Debug keys (debug builds): sea 1-3 boat, F2 open the fog; restaurant F1
   fish, F2 beer; both F3 play this scene's cutscenes one by one, F4 toggle
