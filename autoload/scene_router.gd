@@ -50,6 +50,20 @@ func _input(event: InputEvent) -> void:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if fullscreen
 			else DisplayServer.WINDOW_MODE_FULLSCREEN)
 		get_viewport().set_input_as_handled()
+	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F7 and OS.is_debug_build():
+		_toggle_palette_preview()
+		get_viewport().set_input_as_handled()
+
+
+## F7 (debug): see the whole game in the art palette (PalettePreview).
+func _toggle_palette_preview() -> void:
+	var preview := get_node_or_null("PalettePreview")
+	if preview:
+		preview.queue_free()
+		return
+	preview = PalettePreview.new()
+	preview.name = "PalettePreview"
+	add_child(preview)
 
 
 func go_to(scene_path: String, fade_color: Color = Color.BLACK) -> void:

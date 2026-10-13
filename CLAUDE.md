@@ -14,7 +14,10 @@ Vietnamese, keep code comments in short English.
 - No plugins. Placeholder art (`ColorRect`, `_draw()`) until PNGs exist:
   `Art` (scenes/common/art.gd) draws `assets/sprites/<name>.png` stretched
   into the thing's in-game rect and returns false when missing, so every
-  hook is `if not Art.draw(...): <placeholder>` (sheets: `draw_frame`,
+  hook is `if not Art.draw(...): <placeholder>` (palette "Xóm Đèn": 37 colours
+  from Apollo + 4 in assets/palette/, F7 in debug builds shows the game in it
+  (`PalettePreview`), `tools/pixelize.py` cleans AI drafts into sprites;
+  sheets: `draw_frame`,
   `draw_sheet`, `draw_person`; names listed in ASSETS.md "Tên file"). No
   audio files. Sounds are built in code: autoload `Sfx` (`Sfx.play("catch")`,
   `Sfx.hold("sizzle", on)`, `Sfx.ambience("sea")` per scene; recipes in

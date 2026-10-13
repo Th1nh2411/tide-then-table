@@ -5,6 +5,29 @@ những gì cần vẽ để thay dần. **Code nạp ảnh đã có** (`Art`): 
 vào `assets/sprites/` là game dùng ngay, thiếu ảnh nào thì vẫn vẽ tạm cái đó. Xem
 mục "Tên file" ở cuối.
 
+## Bảng màu và cách làm (vẽ tay + AI)
+
+- **Bảng màu "Xóm Đèn" — 37 màu**, rút từ Apollo (AdamCYounis, Lospec) + 4 màu riêng. Mỗi hàng là một dải
+  sáng → tối: xanh biển 6 · đất/da 6 · nâu cam 5 · đỏ 3 · xanh lá 3 · tím 2 (sương, cá biến dị) · xám xanh 8
+  · riêng 4 (đỏ biển hiệu, vàng nón lá, xanh ngọc phát sáng, trắng đèn tuýp). File: `assets/palette/
+  xom_den.gpl` (Aseprite: Palette → Load), `xom_den.hex`, `xom_den.png` (ảnh mẫu màu, đưa cho AI làm tham
+  chiếu). Chỉ dùng màu trong bảng.
+- **Số màu tối đa mỗi hình:** nhân vật 16x32 → 10, chân dung 64x64 → 16, hải sản / món ăn 16x16 → 6, cả màn
+  biển đêm khoảng 12–16 (học DREDGE: ít màu, chỉ thứ quan trọng mới sáng).
+- **Quán** dùng nửa ấm (màu đất, cam, đỏ/xanh ghế nhựa, vàng nón lá); **biển đêm** dùng nửa lạnh, 3–4 màu xanh
+  đen làm nền, chỉ đèn (cam) và thứ phát sáng (xanh ngọc) là sáng — giống DREDGE: cái gì quan trọng mới sáng.
+- **Xem trước:** chạy game bản debug, bấm **F7** → cả màn hình vẽ lại chỉ bằng bảng màu này (bấm lại để tắt).
+- **AI làm nháp, tay làm xong:** AI hợp với chân dung, hải sản, món ăn, đồ đứng yên, nền xa; tự vẽ tay sprite đi
+  bộ (animation), ô gạch lặp, và đồ đậm chất Việt (nón lá, thuyền thúng, xe đẩy inox, biển hiệu chữ Việt).
+  Lệnh cho AI: "pixel art, <cỡ>, limited palette, transparent background, no anti-aliasing" + ảnh mẫu màu +
+  một hình đã vẽ chuẩn làm tham chiếu; tả nhân vật cố định (vd "Rin: young Vietnamese man, conical hat, blue
+  shirt").
+- **Làm sạch ảnh AI:** `python3 tools/pixelize.py nhap.png assets/sprites/portraits/rin.png --size 64x64`
+  → xoá nền, cắt sát, thu về đúng cỡ (đặt sát đáy, giữa), mỗi ô lấy màu bảng gần nhất, bỏ viền mờ; ảnh phóng x8
+  để xem ở `build/pixelize/`. Sau đó sửa tay trong Aseprite (mắt, tay, viền ngoài 1 màu đậm, sáng tối theo một
+  hướng đèn). Tuỳ chọn: `--max-colors 10` (giữ đúng giới hạn màu ở trên), `--keep-bg`, `--no-trim`,
+  `--bg-tolerance 60`.
+
 ## Quy ước chung
 
 - **Cỡ chuẩn trong game:** ô 16 px, nhân vật 16x32 (kiểu Stardew), màn hình 640x360, phóng nguyên lần x3.
