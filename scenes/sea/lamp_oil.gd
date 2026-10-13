@@ -76,7 +76,8 @@ func _apply() -> void:
 	oil_changed.emit(amount, capacity)
 	if not _low_sent and fraction() <= low_fraction:
 		_low_sent = true
-		oil_low.emit()
+		if fraction() > critical_fraction:  # dropped past both at once: only the last call
+			oil_low.emit()
 	if not _critical_sent and fraction() <= critical_fraction and not is_empty():
 		_critical_sent = true
 		oil_critical.emit()

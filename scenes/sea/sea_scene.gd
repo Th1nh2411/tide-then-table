@@ -26,6 +26,7 @@ const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 ## Seconds the boat spins into the whirlpool before the white fade.
 @export var whirlpool_pull_seconds: float = 2.0
 
+var _guide: SeaGuide
 var _day_ended: bool = false
 
 @onready var _boat: Boat = $Boat
@@ -52,6 +53,7 @@ func _ready() -> void:
 	camera.limit_right = _bounds.map_size.x
 	camera.limit_bottom = _bounds.map_size.y
 	_debug_label.visible = OS.is_debug_build()
+	_cutscene.hidden_nodes.append($DebugLayer)
 	if boat_upgrade:
 		_boat.apply_boat_data(GameState.get_upgrade_value(boat_upgrade))
 
@@ -113,6 +115,7 @@ func _add_quest_tracker() -> void:
 ## First-time pointers (SeaGuide).
 func _add_guide() -> void:
 	var guide: SeaGuide = SeaGuide.new()
+	_guide = guide
 	guide.boat = _boat
 	guide.spawner = _fishing.spawner
 	guide.fishing = _fishing
@@ -265,5 +268,7 @@ func _end_sea_day(towed: bool) -> void:
 
 
 ## Above Rin on the boat, on screen (his speech bubble).
+## Over Rin's head, higher while a first-time pointer sits there.
 func _rin_head() -> Vector2:
-	return _boat.get_global_transform_with_canvas().origin + Vector2(0, -40)
+	var lift := 78.0 if _guide and _guide.is_showing() else 40.0
+	return _boat.get_global_transform_with_canvas().origin + Vector2(0, -lift)

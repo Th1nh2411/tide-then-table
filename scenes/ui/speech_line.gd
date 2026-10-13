@@ -88,21 +88,29 @@ func _show(bubble: Bubble, text: String, seconds: float) -> void:
 	bubble.panel.show()
 	bubble.shown_at = _now()
 	bubble.hide_at = INF if seconds <= 0.0 else bubble.shown_at + seconds
+	_place_all()  # right away: the game may pause before the next frame
 
 
 func _process(_delta: float) -> void:
 	var now := _now()
-	var view := get_viewport_rect().size
-	var bottom := view.y - 20.0  # unanchored bubbles stack up from here
 	for speaker: String in _bubbles:
 		var bubble: Bubble = _bubbles[speaker]
 		if not bubble.queue.is_empty() and (now >= bubble.shown_at + min_seconds or now >= bubble.hide_at):
 			var next: Array = bubble.queue.pop_front()
 			_show(bubble, next[0], next[1])
-		if not bubble.panel.visible:
-			continue
-		if now >= bubble.hide_at + fade_seconds:
+		if bubble.panel.visible and now >= bubble.hide_at + fade_seconds:
 			bubble.panel.hide()
+	_place_all()
+
+
+## Fades and places every bubble over its speaker.
+func _place_all() -> void:
+	var now := _now()
+	var view := get_viewport_rect().size
+	var bottom := view.y - 20.0  # unanchored bubbles stack up from here
+	for speaker: String in _bubbles:
+		var bubble: Bubble = _bubbles[speaker]
+		if not bubble.panel.visible:
 			continue
 		var fade_in := clampf((now - bubble.shown_at) / fade_seconds, 0.0, 1.0)
 		var fade_out := clampf((bubble.hide_at + fade_seconds - now) / fade_seconds, 0.0, 1.0)
