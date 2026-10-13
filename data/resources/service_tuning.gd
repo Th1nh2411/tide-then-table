@@ -30,6 +30,11 @@ extends Resource
 @export var more_round_chance: float = 0.35
 @export var max_more_rounds: int = 1
 
+## Rush hour (only once Rin has Nhịp Sóng, WaveMark): between these shift
+## seconds walk-ins come this much more often.
+@export var rush_from: float = 70.0
+@export var rush_to: float = 110.0
+@export var rush_interval_scale: float = 0.4
 ## Decor upgrade (index = its level): spawn interval and well-off customers.
 @export var decor_interval_scale: Array[float] = [1.0, 0.85, 0.72]
 @export var rich_chance_by_decor: Array[float] = [0.0, 0.15, 0.3]

@@ -50,7 +50,14 @@ func walk_in_due(delta: float) -> bool:
 	if _spawn_left > 0.0:
 		return false
 	_spawn_left = _rng.randf_range(tuning.min_spawn_interval, tuning.max_spawn_interval) * _interval_scale
+	if is_rush():
+		_spawn_left *= tuning.rush_interval_scale
 	return true
+
+
+## Rush hour right now (WaveMark.has_power() only).
+func is_rush() -> bool:
+	return WaveMark.has_power() and _shift_time >= tuning.rush_from and _shift_time < tuning.rush_to
 
 
 ## A new party at one of `free_seats` (`visit` = a regular's visit, or {}

@@ -46,7 +46,12 @@ func _interact() -> void:
 			else:
 				hud.flash_message("Không đủ tiền nhờ vá thuyền")
 		1:
-			await dialog.ask(title, "Ông Tám: " + pick_rumor(Story.stage(), _rng), PackedStringArray(["Đi tiếp"]))
+			var line := pick_rumor(Story.stage(), _rng)
+			if WaveMark.has_power() and not GameState.has_flag("tam_mark"):
+				GameState.set_flag("tam_mark")
+				line = "(nhìn tay con) Cá Ông đánh dấu con rồi đó. Biển nhường con một nhịp thở, " \
+					+ "lúc nguy thì gọi nó. Mà gọi hoài là nó đòi lại đó nghe."
+			await dialog.ask(title, "Ông Tám: " + line, PackedStringArray(["Đi tiếp"]))
 
 
 ## Random rumor from those unlocked at `stage`; story ones come up more.

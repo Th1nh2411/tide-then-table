@@ -11,6 +11,9 @@ extends Node2D
 ## placeholder ignores it.
 @export var art_scale: float = 1.0
 
+## Scene speed for every actor (CutsceneEffects.slow): bobbing, glows, emotes.
+static var speed: float = 1.0
+
 var _facing: float = 1.0
 var _walking: bool = false
 var _time: float = 0.0
@@ -47,7 +50,7 @@ func emote(kind_name: String, seconds: float) -> void:
 
 
 func _process(delta: float) -> void:
-	_time += delta
+	_time += delta * speed
 	queue_redraw()
 
 
@@ -76,6 +79,8 @@ func _draw() -> void:
 			_draw_crate()
 		"rin_bed":
 			_draw_lying()
+		"rin_faint":
+			_draw_fainted()
 		"glow":
 			_draw_glow()
 	draw_set_transform(Vector2.ZERO)
@@ -99,6 +104,8 @@ func _draw_art(bob: float) -> bool:
 			return Art.draw(self, "characters/crate", Rect2(-10, -14, 20, 14))
 		"rin_bed":
 			return Art.draw(self, "characters/rin_bed", Rect2(-16, -16, 32, 16))
+		"rin_faint":
+			return Art.draw(self, "characters/rin_faint", Rect2(-16, -10, 32, 10))
 		"glow":
 			return Art.draw_sheet(self, "characters/glow", Rect2(-40, -40, 80, 80), 4, 0, _time, 3.0)
 	return false
@@ -137,6 +144,14 @@ func _draw_lying() -> void:
 	var glow := 0.7 + 0.3 * sin(_time * 5.0)
 	draw_rect(Rect2(-8, -11, 3, 4), Color(0.6, 0.85, 1.0, glow))  # phone
 	draw_circle(Vector2(-10, -6), 6.0, Color(0.6, 0.85, 1.0, 0.12 * glow))
+
+
+## Rin passed out on his side, the mark on his hand glowing.
+func _draw_fainted() -> void:
+	draw_rect(Rect2(-9, -6, 14, 5), Color(0.2, 0.45, 0.8))  # body
+	draw_rect(Rect2(5, -5, 6, 3), Color(0.25, 0.2, 0.15))  # legs
+	draw_circle(Vector2(-11, -4), 3.5, Color(0.95, 0.8, 0.65))
+	draw_circle(Vector2(-3, -1), 1.6, Color(0.5, 3.0, 2.6, 0.5 + 0.4 * sin(_time * 2.0)))  # the hand
 
 
 ## A slow "breathing" glow (colours above 1 survive the night tint).

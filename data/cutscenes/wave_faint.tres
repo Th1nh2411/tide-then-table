@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="Cutscene" format=3]
+
+[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="1_cut"]
+
+[resource]
+script = ExtResource("1_cut")
+id = "wave_faint"
+min_day = 1
+priority = 60
+script_text = "# Cá thu phát sáng cắn tay Rin ngay lúc câu: Rin thấy quầng sáng rồi ngất trên ghe; ông Tám tìm thấy.
+camera @boat 0 2.5
+spawn Rin rin @boat
+emote Rin ! 0.8
+sfx bite
+narrate \"Con cá thu phát sáng giãy mạnh, ngoạm trúng bàn tay Rin.\"
+speak Rin \"Á!\"
+spawn Spark glow @boat 0.12
+narrate \"Vết cắn sáng xanh, lan dần lên cánh tay. Tai ù đi, mặt biển chòng chành.\"
+slow 0.35 1.0
+narrate \"Phía đông bắc, giữa màn sương, có một quầng sáng xanh nhấp nháy... như đang thở.\"
+speak Rin \"Cái gì... vậy...\"
+remove Rin
+remove Spark
+spawn Lying rin_faint @boat
+fade_out 1.5
+slow 1 0
+narrate \"...\"
+narrate \"Gần sáng, ông Tám chèo ra thăm lưới thì thấy chiếc ghe trôi lững lờ, Rin nằm bất tỉnh trong đó.\"
+narrate \"Ông kéo ghe về bến, nhắn Bảo ra đưa Rin về nhà.\"
+set_flag wave_fainted"

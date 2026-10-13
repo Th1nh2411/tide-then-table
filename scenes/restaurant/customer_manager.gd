@@ -145,6 +145,11 @@ func waiting_parties() -> Array[Customer]:
 	return result
 
 
+## Rush hour now (PartyFactory).
+func is_rush() -> bool:
+	return _accepting and _factory.is_rush()
+
+
 func _process(delta: float) -> void:
 	if not _accepting:
 		return

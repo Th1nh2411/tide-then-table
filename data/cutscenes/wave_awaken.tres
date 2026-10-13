@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="Cutscene" format=3]
+
+[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="1_cut"]
+
+[resource]
+script = ExtResource("1_cut")
+id = "wave_awaken"
+min_day = 1
+priority = 60
+requires_flag = "wave_fainted"
+script_text = "# Sau đêm ngất: Rin tỉnh dậy trễ, chạy ra quán dưới mưa (quên dù), mưa đứng yên giữa không trung: Rin nhận ra năng lực.
+fade_out 0
+narrate \"Rin tỉnh dậy trên giường. Ngoài cửa sổ trời xám xịt.\"
+speak Rin \"Mấy giờ rồi... Ba giờ chiều?! Trễ mở quán rồi!\"
+narrate \"Đầu còn ong ong. Trên mu bàn tay hằn một vệt xanh hình con sóng.\"
+camera run_view 0 1.5
+rain on
+ambience rain
+spawn Bao bao bao_stop 1.4
+spawn Rin rin door 1.4
+fade_in 0.6
+speak Rin \"Chết, quên dù!\"
+move_to Rin run_mid 1.6
+sfx whoosh
+slow 0.02 1.2
+emote Rin ! 1.2
+narrate \"Vệt sóng trên tay sáng lên. Những giọt mưa chậm dần... rồi đứng yên giữa không trung.\"
+narrate \"Không còn tiếng mưa. Chỉ còn tiếng tim đập.\"
+speak Rin \"Mưa... dừng lại?\"
+narrate \"Rin đưa tay chạm vào một giọt nước. Nó vỡ ra thật chậm, như phim quay chậm.\"
+speak Rin \"Là cái vết này. Đêm qua... con cá đó... ánh sáng đó...\"
+slow 1 0.8
+narrate \"Ào! Tiếng mưa đổ ập xuống trở lại.\"
+speak Bảo \"Rin! Mày đứng giữa mưa ngẩn ra cái gì vậy? Vô lẹ!\"
+move_to Rin rin_spot 1.4
+speak Rin \"(Mọi thứ chậm lại... Nếu gọi được nó lúc quán đông thì sao?)\"
+set_flag wave_mark
+rain off
+ambience street
+camera room_view 0.8 1"

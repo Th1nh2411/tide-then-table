@@ -6,6 +6,7 @@
 [ext_resource type="Resource" path="res://data/dialogues/vy_fog.tres" id="4_fog"]
 [ext_resource type="Resource" path="res://data/dialogues/vy_cat.tres" id="5_cat"]
 [ext_resource type="Resource" path="res://data/dialogues/vy_omen.tres" id="6_omen"]
+[ext_resource type="Resource" path="res://data/dialogues/vy_mark.tres" id="7_mark"]
 
 [resource]
 script = ExtResource("1_staff")
@@ -19,5 +20,5 @@ tip_bonus = 0.15
 body_color = Color(0.9, 0.45, 0.55, 1)
 pitch = "Em là Vy, sinh viên năm cuối ở xóm trên. Anh cho em làm thêm buổi tối nha? Em chạy bàn quen rồi."
 arrives_on_day = 3
-dialogues = Array[ExtResource("2_dlg")]([ExtResource("3_app"), ExtResource("4_fog"), ExtResource("5_cat"), ExtResource("6_omen")])
+dialogues = Array[ExtResource("2_dlg")]([ExtResource("3_app"), ExtResource("4_fog"), ExtResource("5_cat"), ExtResource("6_omen"), ExtResource("7_mark")])
 idle_lines = Array[String](["Vy: Bàn số 3 dọn xong rồi anh!", "Vy: Hôm nay khách đông ghê.", "Vy: Anh Bảo nấu món hấp thơm quá trời."])

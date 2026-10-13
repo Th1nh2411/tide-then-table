@@ -25,6 +25,8 @@ const ENDING_SCENE_PATH: String = "res://scenes/ending/ending_scene.tscn"
 @export var trip_end_cutscenes: Array[Cutscene] = []
 ## Seconds the boat spins into the whirlpool before the white fade.
 @export var whirlpool_pull_seconds: float = 2.0
+## The glowing mackerel bites Rin and he passes out on the boat (WaveMark).
+@export var faint_cutscene: Cutscene
 
 var _day_ended: bool = false
 
@@ -58,6 +60,9 @@ func _ready() -> void:
 	_dock.boat_entered.connect(_on_dock_entered)
 	_hull.hull_changed.connect(_refresh_dock_prompt)
 	_hull.boat_broken.connect(_on_boat_broken)
+	var wave := WavePower.new()
+	wave.can_use = _fishing.minigame.is_running
+	add_child(wave)
 	var card := NewCatchCard.new()
 	add_child(card)
 	_hold_manager.new_species_caught.connect(card.show_fish)
@@ -154,6 +159,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_fish_caught(fish: FishData, _quality: float, _count: int, _size: float) -> void:
+	if fish.id == Story.OMEN_FISH_ID and not GameState.has_flag(WaveMark.BITTEN_FLAG) \
+			and not GameState.has_flag(WaveMark.FAINTED_FLAG):
+		GameState.set_flag(WaveMark.BITTEN_FLAG)
+		Story.trigger_omen()
+		_pass_out.call_deferred()
+		return
 	if Story.on_fish_caught(fish):
 		_hud.flash_message("[WARN] App báo: loài này không có trong database... Ngoài khơi đông bắc có gì đó lạ.", 3.0)
 
@@ -240,7 +251,21 @@ func _rescue(text: String, fee: int) -> void:
 	_end_sea_day(true)
 
 
-func _end_sea_day(towed: bool) -> void:
+## Bitten by the glowing mackerel: once the catch card is closed, Rin passes
+## out on the boat (it also shows the omen), Ông Tám tows him home for free.
+func _pass_out() -> void:
+	while get_tree().paused:  # the NEW card / a full hold first
+		await get_tree().process_frame
+	if _day_ended or faint_cutscene == null:
+		return
+	_boat.set_physics_process(false)
+	GameState.set_flag(DialogueLibrary.SEEN_PREFIX + "fog_omen")  # this was the omen
+	await _cutscene.play(faint_cutscene)
+	GameState.trip_notes.append("Ông Tám kéo ghe về bến, không lấy tiền: \"Con nghỉ đi.\"")
+	_end_sea_day(true, false)
+
+
+func _end_sea_day(towed: bool, trip_end_scenes: bool = true) -> void:
 	# Guard: docking and a rescue can both fire on the same frame.
 	if _day_ended:
 		return
@@ -251,7 +276,7 @@ func _end_sea_day(towed: bool) -> void:
 	_hud.hide_dock()
 	_events.on_trip_end(towed)
 	GameState.finish_sea_day(DayClock.current_minutes, towed, _hold_manager.get_items())
-	var scene := DialogueLibrary.pick(trip_end_cutscenes) as Cutscene
+	var scene := DialogueLibrary.pick(trip_end_cutscenes) as Cutscene if trip_end_scenes else null
 	if scene:
 		await _cutscene.play(scene)
 	SceneRouter.go_to(REST_SCENE_PATH)

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Dialogue" format=3]
+
+[ext_resource type="Script" path="res://data/resources/dialogue.gd" id="1_dlg"]
+
+[resource]
+script = ExtResource("1_dlg")
+id = "vy_mark"
+min_day = 1
+priority = 14
+requires_flag = "wave_mark"
+script_text = "Vy: Anh Rin, tay anh bị gì vậy? Sao có vệt xanh xanh như hình con sóng?
+Rin: Hôm trước ra khơi... nói ra em không tin đâu.
+Vy: Ông nội em kể, ngày xưa ai được cá Ông \"đánh dấu\" thì biển nhường cho người đó một nhịp.
+Vy: Anh đừng giỡn với nó nha. Mà nếu quán đông quá... thì cũng đỡ được chút ha."

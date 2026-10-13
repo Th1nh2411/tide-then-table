@@ -44,6 +44,8 @@ func cell() -> Vector2i:
 
 
 func _process(delta: float) -> void:
+	if WavePower.rin_unslowed:  # Nhịp Sóng: the street is slowed, Rin isn't
+		delta /= maxf(Engine.time_scale, 0.001)
 	_dash_cool -= delta
 	for puff in _dust:
 		puff["age"] = float(puff["age"]) + delta

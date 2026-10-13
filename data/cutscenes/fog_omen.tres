@@ -8,7 +8,7 @@ id = "fog_omen"
 min_day = 1
 priority = 30
 requires_flag = "fog_omen_day"
-script_text = "# Điềm báo: sau đêm có cá thu phát sáng (hoặc ngày 4), quầng sáng lạ trong sương đông bắc.
+script_text = "# Điềm báo (ngày 4 nếu chưa bị cá cắn): quầng sáng trong sương chạm vào tay Rin ở bến, Rin ngất; Bảo tìm thấy.
 tint dawn
 camera dock_view 0 2.5
 fade_in 1.0
@@ -27,6 +27,15 @@ camera dock_view 1.5 2.5
 speak Rin \"Cái gì vậy trời...\"
 narrate \"Điện thoại rung. App Rin's Catch tự bật lên.\"
 narrate \"[ERR] tọa độ 0x7F3A: vùng biển không có trong bản đồ.\"
-speak Rin \"Vùng không có trong bản đồ? Code tao viết đâu có dòng này...\"
-speak Rin \"Mai phải ra đó coi thử.\"
-fade_out 1.2"
+narrate \"Quầng sáng chợt loé mạnh. Một tia xanh lướt trên mặt nước, chạm vào bàn tay Rin.\"
+sfx whoosh
+speak Rin \"Á! Rát quá...\"
+slow 0.35 1.0
+narrate \"[ERR] bio-signature mismatch: user\"
+remove Rin
+spawn Lying rin_faint rin_stop
+fade_out 1.5
+slow 1 0
+narrate \"...\"
+narrate \"Rạng sáng, Bảo ra bến tìm thì thấy Rin nằm bất tỉnh cạnh thùng cá, bàn tay còn hơi sáng.\"
+set_flag wave_fainted"

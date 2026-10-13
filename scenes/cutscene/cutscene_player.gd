@@ -33,6 +33,7 @@ var _fade: ColorRect
 var _dialogue: DialogueBox
 var _name_layer: CanvasLayer
 var _name_edit: LineEdit
+var _effects: CutsceneEffects
 signal _name_entered(text: String)
 
 
@@ -51,6 +52,8 @@ func _ready() -> void:
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fade.set_anchors_preset(Control.PRESET_FULL_RECT)
 	fade_layer.add_child(_fade)
+	_effects = CutsceneEffects.new()
+	add_child(_effects)
 	_dialogue = DialogueBox.new()
 	add_child(_dialogue)
 	_dialogue.skipped.connect(func() -> void: _skipping = true)
@@ -94,6 +97,7 @@ func play(cutscene: Cutscene) -> void:
 			i = int(labels.get(jump, commands.size())) + 1
 
 	DialogueLibrary.mark_done(cutscene)
+	_effects.reset()
 	for actor: CutsceneActor in _actors.values():
 		actor.queue_free()
 	_actors.clear()
@@ -173,6 +177,20 @@ func _run(command: Dictionary) -> String:
 			return targets[index]
 		"goto":
 			return args[0]
+		"rain":
+			_effects.set_rain(args[0] == "on")
+		"slow":
+			if _skipping:
+				_effects.reset()
+			else:
+				await _effects.slow(_float(args, 0, 1.0), _float(args, 1, 0.5))
+		"sfx":
+			if not _skipping:
+				Sfx.play(args[0])
+		"ambience":
+			Sfx.ambience("" if args[0] == "none" else args[0])
+		"if_flag":
+			return args[1] if GameState.has_flag(args[0]) else ""
 		"pause":
 			if not _skipping:
 				await get_tree().create_timer(_float(args, 0, 0.5), true).timeout
@@ -195,8 +213,14 @@ func _run(command: Dictionary) -> String:
 	return ""
 
 
+## A marker under `markers`, or "@group": the first node in that group (the
+## boat wherever it is at sea).
 func _marker(marker_name: String) -> Vector2:
-	var node := markers.get_node_or_null(marker_name) as Node2D
+	var node: Node2D = null
+	if marker_name.begins_with("@"):
+		node = get_tree().get_first_node_in_group(marker_name.substr(1)) as Node2D
+	else:
+		node = markers.get_node_or_null(marker_name) as Node2D
 	if node == null:
 		push_warning("Cutscene marker '%s' not found" % marker_name)
 		return _camera.global_position

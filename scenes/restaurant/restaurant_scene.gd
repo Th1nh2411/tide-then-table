@@ -28,6 +28,8 @@ extends Control
 @export var arrival_cutscenes: Array[Cutscene] = []
 ## Everyone who could be hired, and the job ads.
 @export var staff_catalog: StaffCatalog
+## Nhịp Sóng in the restaurant: real seconds the street stays slowed.
+@export var wave_seconds: float = 4.0
 ## How close Rin must be to someone to talk (px).
 @export var talk_reach: float = 22.0
 
@@ -52,6 +54,7 @@ var _dialogue_box: DialogueBox
 var _guide: RestaurantGuide
 var _market_panel: MarketPanel
 var _crew: StaffCrew
+var _rush_shown: bool = false
 
 @onready var _customers: CustomerManager = $CustomerManager
 @onready var _menu_panel: MenuSetupPanel = %MenuSetupPanel
@@ -122,6 +125,12 @@ func _ready() -> void:
 	_rin.interacted.connect(_on_rin_interacted)
 	_dialogue_box = DialogueBox.new()
 	add_child(_dialogue_box)
+	var wave := WavePower.new()
+	wave.seconds = wave_seconds
+	wave.keep_rin_speed = true
+	wave.can_use = _wave_allowed
+	wave.ripple_origin = _rin_screen_position
+	add_child(wave)
 	_customers.regular_served.connect(func(who: String, price: int) -> void:
 		GameState.set_flag("regular_served_once")  # the regular's tea after the shift
 		_show_message("%s khen ngon, trả %dk!" % [who, price], 2.5))
@@ -217,6 +226,11 @@ func _process(delta: float) -> void:
 	Customer.patience_paused = _guide != null and _guide.is_showing()
 	_crew.serving = _rin.kitchen_open
 	_rin.carrying_goods = _stall.bag.total() > 0
+	if _customers.is_rush() != _rush_shown:
+		_rush_shown = _customers.is_rush()
+		if _rush_shown:
+			_show_message("Giờ cao điểm! (C: Nhịp Sóng)" if Guide.once("rush") else "Giờ cao điểm!", 2.5)
+			Sfx.play("pop")
 	if _shift_running:
 		_time_left = maxf(_time_left - delta, 0.0)
 		if _time_left <= 0.0:
@@ -323,3 +337,11 @@ func _on_renovated() -> void:
 
 func _exit_tree() -> void:
 	Customer.patience_paused = false
+
+
+func _wave_allowed() -> bool:
+	return _shift_running
+
+
+func _rin_screen_position() -> Vector2:
+	return _rin.get_global_transform_with_canvas().origin + Vector2(0, -16)

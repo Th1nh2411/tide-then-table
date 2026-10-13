@@ -200,19 +200,39 @@ Vietnamese, keep code comments in short English.
   `trip_end_cutscenes` after a trip; the restaurant plays
   `after_shift_cutscenes` when the summary closes; the intro scene plays
   `intro_call`; the restaurant plays `arrival_cutscenes` before the menu
-  (`ArrivalCutscenes`): `opening_day`, `vy_arrives` (day
+  (`ArrivalCutscenes`): `opening_day`, `wave_awaken`, `vy_arrives` (day
   3, a choice can hire her: flag `vy_hire_now`), `nam_fog_tale` (day 4); and
   `after_shift_cutscenes`: `beer_day` (after the first shift: a guest asks
-  for beer, sold from day 2), `regular_thanks` (after the first fish order is
+  for beer, sold from day 2), `nam_fog_tale` (after day 3), `regular_thanks` (after the first fish order is
   served, flag `regular_served_once`); the sea's trip-end list has `cat_arrival` and
   `fog_omen`). Commands include `remove <actor>`; actor kinds rin, bao, vy,
   co_nam, guest, cat, crate, rin_bed, glow. dialogue_test checks every marker
-  a cutscene uses exists in its scene. Anything that would double an actor
+  a cutscene uses exists in its scene. Effects (`CutsceneEffects`): `rain
+  on|off`, `slow <factor> <s>` (0.02 = frozen rain, teal tint, heartbeat),
+  `sfx`, `ambience`, `if_flag <flag> <label>`; markers may be "@group"
+  (e.g. @boat). Anything that would double an actor
   must hide while it plays: `hidden_nodes` (restaurant: Rin, Bảo, Cô Năm),
   `hidden_groups` (restaurant: "staff", "customers"), and things drawn
   inside another node check `CutscenePlayer.playing` + redraw on `started` /
   `finished` (Rin and the cat on the boat). It pauses the tree; its actors,
   camera, tweens and DialogueBox run PROCESS_MODE_ALWAYS.
+- Nhịp Sóng (Rin's power, `WaveMark` pure + `WavePower` node in both
+  scenes, key C). How he gets it: the first glowing mackerel bites him and
+  he passes out on the boat at once (sea scene `_pass_out`, cutscene
+  `wave_faint`, which also counts as the omen; Ông Tám tows him home) — or,
+  with no bite by day 4, `fog_omen` on the dock: the glow touches his hand
+  and he passes out there (Bảo finds him). Both set "wave_fainted"; the
+  restaurant arrival cutscene `wave_awaken` (late, running in the rain
+  without an umbrella, the rain freezes mid-air) sets "wave_mark".
+  Slows the world (Engine.time_scale) a few real seconds: at sea only during
+  the fishing minigame, in the restaurant the whole street while Rin keeps
+  his speed (`WavePower.rin_unslowed`, RinChef divides delta back). Charges
+  per night / per shift (2, +1 per 3 aberrant fish, max 4). Once he has it:
+  big / aberrant fish fight harder, grill dishes from 80k are trickier, and
+  the restaurant has a rush hour (`ServiceTuning.rush_*`). Lines: vy_mark,
+  cat_mark, Ông Tám once (flag "tam_mark"). First-time pointers "wave" (SeaGuide)
+  / "wave_shop" (RestaurantGuide) on the mark (`Guide.wave_badge_target`).
+  Test: scenes/test/wave_test.tscn.
 - The cat: `PetCat` (restaurant: on top of the fridge), rides at the stern at sea (`Boat._draw_cat`), flags `cat_adopted` / `cat_gone` /
   `pet_name`; use `{pet}` in dialogue/cutscene text.
 - Dialogue: write a `Dialogue` .tres in `data/dialogues/` ("Name: line" per

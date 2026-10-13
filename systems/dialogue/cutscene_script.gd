@@ -6,7 +6,7 @@ extends RefCounted
 ##   fade_out <s> / fade_in <s>        screen to black / back
 ##   tint dawn|night|day               world color
 ##   camera <marker> [s] [zoom]        move the cutscene camera to a marker
-##   spawn <actor> <kind> <marker> [scale]   kinds: rin, bao, vy, co_nam, guest, cat, crate, rin_bed, glow
+##   spawn <actor> <kind> <marker> [scale]   kinds: rin, bao, vy, co_nam, guest, cat, crate, rin_bed, rin_faint, glow
 ##   remove <actor>                    take an actor off the stage
 ##   move_to <actor> <marker> <s>      walk there (waits)
 ##   face <actor> left|right
@@ -15,6 +15,10 @@ extends RefCounted
 ##   narrate "text"                    line without a speaker
 ##   choice "option" <label> "option" <label> ...   jump by the answer
 ##   label <name> / goto <name>
+##   if_flag <flag> <label>            jump there if the story flag is set
+##   rain on|off / slow <factor> <s>   rain; slow the scene (0.02 = frozen)
+##   sfx <sound> / ambience <loop|none>
+## Markers may be "@group": the first node in that group (e.g. @boat).
 ##   pause <s>
 ##   name_pet <default>                ask the pet's name ({pet})
 ##   set_flag <name>

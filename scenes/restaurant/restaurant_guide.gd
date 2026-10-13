@@ -66,6 +66,9 @@ func _add_rules() -> void:
 		func() -> bool: return renovation.visible)
 	add("sail", "Xong thì ra khơi", _sail_active,
 		func() -> Vector2: return Guide.control_center(sail_button))
+	add("wave_shop", "C: cả phố chậm lại", func() -> bool: return WaveMark.has_power() and serving.call(),
+		wave_badge_target,
+		func() -> bool: return WavePower.active)
 
 
 func _staff_active() -> bool:

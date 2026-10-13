@@ -47,6 +47,7 @@
 [ext_resource type="Script" path="res://scenes/cutscene/cutscene_player.gd" id="45_cutscene"]
 [ext_resource type="Resource" path="res://data/cutscenes/cat_arrival.tres" id="46_cat"]
 [ext_resource type="Script" path="res://data/resources/cutscene.gd" id="47_cutdata"]
+[ext_resource type="Resource" path="res://data/cutscenes/wave_faint.tres" id="93_faint"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_whirl"]
 radius = 24.0
@@ -67,6 +68,7 @@ size = Vector2(70, 90)
 
 [node name="SeaScene" type="Node2D"]
 script = ExtResource("1_sea")
+faint_cutscene = ExtResource("93_faint")
 boat_upgrade = ExtResource("23_boatup")
 fish_catalog = ExtResource("17_catalog")
 trip_end_cutscenes = Array[ExtResource("47_cutdata")]([ExtResource("46_cat"), ExtResource("60_cutomen")])

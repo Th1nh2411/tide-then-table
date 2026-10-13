@@ -91,6 +91,9 @@ func _start_stage(game: MinigameBase) -> void:
 	_hint_label.text = _game.get_hint()
 	# First time with each game only; the how-to lives in Hướng dẫn.
 	_hint_label.visible = Guide.once("game_" + str(_game.get_script().get_global_name()))
+	if not _hint_label.visible and WaveMark.has_power() and Guide.once("wave_power"):
+		_hint_label.text = "C: Nhịp Sóng · chậm lại vài giây"
+		_hint_label.visible = true
 
 
 func _create_fight() -> MinigameBase:

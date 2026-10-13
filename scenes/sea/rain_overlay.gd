@@ -8,6 +8,10 @@ extends Control
 @export var slant: Vector2 = Vector2(-0.25, 1.0)
 @export var drop_length: float = 7.0
 @export var color: Color = Color(0.7, 0.8, 1.0, 0.35)
+@export var width: float = 1.0
+
+## 1 = normal; near 0 the drops hang in the air (CutsceneEffects.slow).
+var speed_scale: float = 1.0
 
 var _drops: PackedVector2Array = []
 var _rng := RandomNumberGenerator.new()
@@ -25,7 +29,7 @@ func _process(delta: float) -> void:
 	if not visible:
 		return
 	var view := get_viewport_rect().size
-	var step := slant.normalized() * fall_speed * delta
+	var step := slant.normalized() * fall_speed * delta * speed_scale
 	for i in _drops.size():
 		var drop := _drops[i] + step
 		if drop.y > view.y:
@@ -35,6 +39,9 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	var tail := slant.normalized() * drop_length
+	# Slowed down, the streaks shrink to beads hanging in the air.
+	var tail := slant.normalized() * drop_length * clampf(speed_scale * 2.0, 0.15, 1.0)
 	for drop in _drops:
-		draw_line(drop, drop - tail, color, 1.0)
+		draw_line(drop, drop - tail, color, width)
+		if speed_scale < 0.5:
+			draw_circle(drop, width + 0.6, Color(color, minf(color.a + 0.3, 1.0)))

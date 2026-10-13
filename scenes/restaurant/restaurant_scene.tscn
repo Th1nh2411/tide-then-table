@@ -52,6 +52,8 @@
 [ext_resource type="Script" path="res://data/resources/dish_data.gd" id="49_dishdata"]
 [ext_resource type="Script" path="res://scenes/restaurant/menu_board.gd" id="51_board"]
 [ext_resource type="Resource" path="res://data/dishes/bia_con_meo.tres" id="50_bia"]
+[ext_resource type="Resource" path="res://data/dialogues/cat_mark.tres" id="91_catmark"]
+[ext_resource type="Resource" path="res://data/cutscenes/wave_awaken.tres" id="92_awaken"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -62,8 +64,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_rest")
-after_shift_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("51_cutbeer"), ExtResource("54_cutreg")])
-arrival_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("50_cutopen"), ExtResource("52_cutvy"), ExtResource("53_cutnam")])
+after_shift_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("51_cutbeer"), ExtResource("53_cutnam"), ExtResource("54_cutreg")])
+arrival_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("50_cutopen"), ExtResource("52_cutvy"), ExtResource("92_awaken")])
 menu = ExtResource("4_menu")
 fish_catalog = ExtResource("6_fish")
 fridge_upgrade = ExtResource("11_fridgeup")
@@ -91,7 +93,7 @@ script = ExtResource("33_cat")
 
 [node name="Talker" type="Node" parent="World/PetCat"]
 script = ExtResource("27_talker")
-dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("34_cat1"), ExtResource("35_cat2"), ExtResource("36_cat3")])
+dialogues = Array[ExtResource("32_dlgdata")]([ExtResource("34_cat1"), ExtResource("35_cat2"), ExtResource("36_cat3"), ExtResource("91_catmark")])
 idle_lines = Array[String](["Meo.", "Rừ... rừ...", "Meo~ (liếc cái kệ cá)", "...", "Meo! (đuôi phẩy phẩy)"])
 
 [node name="People" type="Node2D" parent="World"]
@@ -351,6 +353,12 @@ position = Vector2(268, 138)
 
 [node name="board_view" type="Marker2D" parent="CutsceneMarkers"]
 position = Vector2(330, 230)
+
+[node name="run_view" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(170, 190)
+
+[node name="run_mid" type="Marker2D" parent="CutsceneMarkers"]
+position = Vector2(150, 216)
 
 [node name="CutscenePlayer" type="Node2D" parent="." node_paths=PackedStringArray("markers", "hidden_nodes")]
 script = ExtResource("37_cutscene")

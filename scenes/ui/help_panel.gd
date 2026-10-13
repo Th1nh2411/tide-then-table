@@ -7,7 +7,7 @@ extends CanvasLayer
 
 signal closed
 
-const SECTIONS: Array[String] = ["Biển", "Quán", "Điện thoại", "Mẹo"]
+const SECTIONS: Array[String] = ["Biển", "Quán", "Điện thoại", "Nhịp Sóng", "Mẹo"]
 const TEXTS: Array[String] = [
 	"""LÁI THUYỀN
   W / S: tiến / lùi      A / D: bẻ lái
@@ -95,6 +95,10 @@ SỬA QUÁN (trước giờ mở / sau khi bán xong)
   Sổ sách: lãi từng ngày.
   Nâng cấp: đồ nghề đi biển (thuyền, cần câu, đèn), có hiệu lực từ chuyến sau.
   (Đồ trong quán thì sửa bằng nút "Sửa quán".)""",
+	"""NHỊP SÓNG (C, sau đêm điềm báo)
+  Vệt sóng trên tay Rin: bấm C để làm chậm mọi thứ vài giây.
+  Ngoài biển: lúc đang câu / kéo lưới. Ở quán: cả phố chậm lại, Rin vẫn chạy nhanh.
+  Mỗi đêm và mỗi ca được vài lần (chấm xanh góc dưới trái); câu cá dị biến để có thêm.""",
 	"""MẸO
   Màu bọt cho biết loài cá. Càng ra xa bờ cá càng xịn và to.
   Bóng cá lớn dưới bọt = cá to, giá cao.

@@ -57,6 +57,9 @@ func _add_rules() -> void:
 		func() -> bool: return dock.is_boat_inside())
 	add("dock", "E: dỡ cá / về ngủ", func() -> bool: return dock.is_boat_inside() and _catches > 0,
 		func() -> Vector2: return Guide.screen_of(dock, Vector2(0, -14)))
+	add("wave", "C khi câu: chậm lại", func() -> bool: return WaveMark.has_power() and DayClock.running,
+		wave_badge_target,
+		func() -> bool: return WavePower.active)
 
 
 func _at_sea() -> bool:

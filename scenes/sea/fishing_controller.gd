@@ -78,7 +78,8 @@ func _on_fishing_requested(spot: FishingSpot) -> void:
 	hud.hide_prompt()
 	spot.use_cast()
 	oil.spend(oil_per_cast)
-	var zone_scale := _get_zone_scale() * CatchRoll.size_zone_scale(_size, size_difficulty)
+	var zone_scale := _get_zone_scale() * CatchRoll.size_zone_scale(_size, size_difficulty) \
+		* WaveMark.fight_scale(fish, CatchRoll.is_big(_size))
 	minigame.start(fish, zone_scale, 1, _size)
 
 

@@ -20,6 +20,11 @@ extends CookingGameBase
 @export var view_size: Vector2 = Vector2(84, 60)
 @export var flip_seconds: float = 0.2
 @export var drop_seconds: float = 0.3
+## Once Rin has Nhịp Sóng (WaveMark): dishes from this price grill faster
+## with narrower zones.
+@export var hard_from_price: int = 80
+@export var hard_zone_scale: float = 0.7
+@export var hard_speed_scale: float = 0.85
 
 var _needle: float = 0.0
 var _side: int = 0
@@ -35,6 +40,10 @@ var _flip_left: float = 0.0
 func setup(p_dish: DishData) -> void:
 	super(p_dish)
 	_rng.randomize()
+	if WaveMark.has_power() and dish.base_price >= hard_from_price:
+		side_seconds *= hard_speed_scale
+		ok_zone = _narrowed(ok_zone, hard_zone_scale)
+		perfect_zone = _narrowed(perfect_zone, hard_zone_scale)
 	custom_minimum_size = Vector2(view_size.x + 10 + bar_size.x, maxf(view_size.y, bar_size.y + 34))
 	input_delay = maxf(input_delay, drop_seconds)  # it lands first
 	_done_by_side.resize(sides)
@@ -116,3 +125,9 @@ func _draw_grill() -> void:
 	var smoke := clampf((_needle - _ok.x) / maxf(1.0 - _ok.x, 0.01), 0.0, 1.0) if _side < sides else 0.0
 	var rect := Rect2(Vector2(0, floorf((size.y - view_size.y) * 0.5)), view_size)
 	GrillView.draw(self, rect, fish_id, top, edge, flip, drop * drop, smoke, _time, shown >= 0)
+
+
+static func _narrowed(zone: Vector2, factor: float) -> Vector2:
+	var middle := (zone.x + zone.y) * 0.5
+	var half := (zone.y - zone.x) * 0.5 * factor
+	return Vector2(middle - half, middle + half)
