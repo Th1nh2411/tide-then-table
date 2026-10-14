@@ -48,7 +48,7 @@ Kích thước 16x32. Hướng: xuống / lên / trái (phải = lật trái). �
 
 | Tên | Hoạt cảnh cần có | Ghi chú |
 |---|---|---|
-| Rin | đứng, đi bộ (4 hướng), lướt (Shift), cầm đĩa, cầm túi đồ, nướng (đứng sau lò, quay xuống), rót bia | áo xanh dương, phục vụ quán |
+| Rin | đứng, đi bộ (4 hướng), lướt (Shift), cầm đĩa, cầm túi đồ, nướng (đứng sau lò, quay xuống), rót bia | tóc đen rối, kính gọng đen, da ngăm, áo ba lỗ trắng, dây chuyền đen (mặt lưỡi câu bạc), khuyên tai, quần short đen |
 | Bảo | đứng sau bếp, đảo chảo (3–4 khung), nói chuyện | áo cam, tạp dề + mũ đầu bếp |
 | Vy | đứng, đi bộ (4 hướng), cầm đĩa, dọn bàn | nữ chính, áo hồng, tóc dài; có tạp dề khi làm |
 | Cô Năm | đứng sau quầy, vẫy tay | bà bán tạp hoá, áo xanh lá, tóc bạc |
@@ -59,7 +59,8 @@ Kích thước 16x32. Hướng: xuống / lên / trái (phải = lật trái). �
 | Mèo (Mỡ) | ngồi, đi, nằm ngủ, vẫy đuôi | mèo mập màu cam, ~16x16 |
 
 **Chân dung hộp thoại (P2, kiểu Nine Sols):** bán thân lớn (đầu + vai), vuông 64x64 (game phóng lên 136x136,
-hoặc vẽ 128x128 cho chi tiết), **quay mặt sang phải** (người đứng bên phải màn hình được lật tự động), vai chạm
+hoặc vẽ 128x128 cho chi tiết), góc 3/4 như chân dung Rin, **file luôn quay mặt sang phải**; Rin đứng bên trái,
+mọi nhân vật khác đứng bên phải và được game lật tự động → trên màn hình quay sang trái, nhìn về phía Rin. Vai chạm
 mép dưới. File `portraits/<id>.png`, nét mặt thêm `portraits/<id>_<nét>.png` (trong thoại ghi `Rin (vui): ...`;
 thiếu file nét mặt thì dùng ảnh thường). id = tên không dấu: `rin`, `bao`, `vy`, `co_nam`, `ong_tam`,
 `khach_quen`, `cat` (mèo). Nét gợi ý: `vui`, `lo`, `ngac_nhien`, `buon`.
