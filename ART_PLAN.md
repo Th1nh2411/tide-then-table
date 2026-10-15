@@ -115,6 +115,27 @@ Thứ tự: chân dung (Bảo, Vy, Cô Năm, mèo) → hải sản trong khoang 
 → đồ trong quán (`create_map_object`, view "high top-down") → nhân vật còn lại + khách → hải sản trên vỉ
 (`grill/`) → thuyền (`sea/`). Ô gạch / mặt nước để sau (game chưa dùng tile tự nối).
 
+## Chia việc: PixelLab vs công cụ miễn phí (đã chốt)
+
+Model AI phổ thông (Gemini, FLUX, SDXL + LoRA pixel) vẽ ảnh to "giả pixel": lưới lệch, nhiều màu, viền nhòe;
+thu về 16–64 px thì mất chi tiết. PixelLab vẽ thẳng ở độ phân giải nhỏ, ép được bảng màu, có góc top-down và
+hoạt hình. Ở cỡ 16 px kiểu gì cũng sửa tay nhiều (sheet Rin / Bảo đã phải dựng tay) → **dồn lượt PixelLab vào
+chỗ không thay được, còn lại làm miễn phí.**
+
+| Asset | Làm bằng | Ghi chú |
+|---|---|---|
+| Sprite người 16x32 + đi bộ 4 hướng (Vy, Cô Năm, khách...), mèo | **PixelLab** | Không công cụ miễn phí nào giữ cùng một nhân vật qua 4 hướng x 4 khung. Vẫn dựng sheet tay như Bảo |
+| Đồ trong quán (`create_map_object`) | **PixelLab** | Giữ đúng góc 3/4 giữa các món; đồ free hay lệch góc |
+| Chân dung 64x64 | **Miễn phí:** Gemini (sửa ảnh theo ảnh mẫu `portraits/rin.png`) → `tools/pixelize.py` → sửa tay | Gần bằng PixelLab; khó nhất là giữ cùng phong cách. Chưa ra thì quay về cách `edit_image_pixen` ở bước 3 |
+| Cá trong khoang, món ăn 16x16, hải sản trên vỉ | **Miễn phí:** vẽ tay trong Pixelorama hoặc `pixelart_workbench` (công cụ pixel miễn phí của PixelLab MCP), AI chỉ để tham khảo dáng | Cỡ này tay người thường đẹp hơn; ≤ 6 màu, gán màu Xóm Đèn |
+
+- Công cụ miễn phí dùng được: Gemini / ChatGPT / Bing Image Creator (phác), Pixelorama hoặc LibreSprite (vẽ tay),
+  `pixelart_workbench` (sửa pixel không tốn lượt), `tools/pixelize.py` (về đúng cỡ + bảng màu).
+- Không làm: tự cài SD / ComfyUI / Draw Things + LoRA — tốn công thử model, không đáng với dev solo.
+- Làm thử trước khi làm hàng loạt: một con cá (cá mú) bằng Gemini → `pixelize.py`, đặt cạnh `fish/muc.png`
+  (PixelLab) trong khoang để so; chủ dự án duyệt rồi mới chốt cách cho cả nhóm `fish/` / `dishes/`.
+- Trước khi phát hành: kiểm tra điều khoản thương mại từng công cụ (bản free có nơi giới hạn hoặc để ảnh công khai).
+
 ## Lưu ý chi phí
 
 - Tính theo lượt tạo. Chế độ thường ~1 lượt; `create_image_pro` và mọi chế độ "pro" 10–25 lượt mỗi lần → chỉ dùng
