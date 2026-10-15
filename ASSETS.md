@@ -183,7 +183,7 @@ Thêm 1 icon 16x16 mỗi loài cho Dex / thông báo (P2).
 | `characters/guest.png` hoặc `guest_1.png`…`guest_4.png` | khách thường (nhiều dáng thì game chọn ngẫu nhiên) |
 | `characters/guest_rich.png`, `guest_regular.png` | khách sang, khách quen |
 | `characters/staff.png` | nhân viên thuê (riêng ai thì `characters/<id>.png`: hung, hanh, phat, ngan, co_sau, khoa, ti, lam, quan) |
-| `characters/cat.png` | mèo: 4 cột khung 16x16, hàng 1 = ngồi vẫy đuôi, hàng 2 = đi (cutscene) |
+| `characters/cat.png` | mèo: 8 cột khung 24x24 (chân chạm đáy), hàng 1 = ngồi (vẫy đuôi, chớp mắt), hàng 2 = đi sang phải (cutscene); dựng bằng `tools/make_cat_sheet.py` |
 | `characters/crate.png` (20x14), `rin_bed.png` (32x16), `glow.png` (80x80, 4 khung ngang) | đồ trong cutscene |
 
 **Quán** (`restaurant/`):

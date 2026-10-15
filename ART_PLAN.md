@@ -31,6 +31,12 @@ bảng màu, giới hạn màu) và `CLAUDE.md` (cách game nạp art: `Art`, F7
     tay sang Xóm Đèn): dọn kính trắng loáng (tròng `ebede9` + `c7cfcc`), dây tối + móc bạc, áo trắng `ebede9`
     (kem `e7d5b3` trùng tông da, lưng nhìn như cởi trần); khung 1/3 đứng yên, 2/4 nhún lên 1 px + nhấc 1 chân
     (ngang: 2 chân dạng, chân xa tối hơn). Không chạy `pixellab_import.py` cho Rin nữa (mất phần sửa tay).
+    **Kính trên sprite 16x32 không có gọng** (viền 1 px quá to so với mặt): kiểu gọng mày (theo ảnh mẫu chibi của
+    chủ dự án, thu về mặt 9 px): thanh gọng `090a14` phía trên + 1 px sống mũi, tròng 2x2 `a4dddb` / `ebede9` có
+    1 px con ngươi `151d28` (phía mũi); không viền hông / dưới. Mặt ngang: thanh trên chạy ra sau làm càng kính,
+    1 px gọng trước, tròng 2x2 con ngươi nhìn về trước. Dựng lại: `tools/rin_glasses.py` biến thể "e" (áp lên
+    sheet gốc trong git). Chân dung
+    64x64 vẫn giữ gọng đen.
 - Bài học bước 2:
   - `create_image_pro` ở đúng cỡ game (64x64, 40x20) đẹp hơn hẳn pixflux + thu nhỏ; cỡ ≤ 42 px cho 64 ứng viên.
     Tốn 10 lượt mỗi lần → dùng cho chân dung + hải sản, chọn nhiều thứ trong một lần nếu được.

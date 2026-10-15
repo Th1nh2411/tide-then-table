@@ -41,12 +41,12 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var at := sit_position
-	# Sheet: 4 frames per row, row 0 = sitting (tail swishing).
-	if not Art.draw_sheet(self, "characters/cat", Rect2(at + Vector2(-8, -16), Vector2(16, 16)), 4, 0, _time, 3.0):
+	# Sheet: 8 frames of 24x24 per row, row 0 = sitting (tail flick, blink).
+	if not Art.draw_sheet(self, "characters/cat", Rect2(at + Vector2(-12, -24), Vector2(24, 24)), 8, 0, _time, 3.0):
 		_draw_placeholder(at)
 	var talker := get_node_or_null("Talker") as Talker
 	if talker and talker.has_news():
-		draw_string(ThemeDB.fallback_font, at + Vector2(-8, -22), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 12,
+		draw_string(ThemeDB.fallback_font, at + Vector2(-8, -26), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 12,
 			Color(1, 0.85, 0.3))
 
 

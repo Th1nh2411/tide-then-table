@@ -98,7 +98,7 @@ func _draw_art(bob: float) -> bool:
 		"rin", "bao", "vy", "co_nam", "guest":
 			return Art.draw_person(self, "characters/" + kind, facing, _time, _walking)
 		"cat":
-			return Art.draw_sheet(self, "characters/cat", Rect2(-8, -16, 16, 16), 4, 1 if _walking else 0,
+			return Art.draw_sheet(self, "characters/cat", Rect2(-12, -24, 24, 24), 8, 1 if _walking else 0,
 				_time, 6.0 if _walking else 3.0, _facing < 0.0)
 		"crate":
 			return Art.draw(self, "characters/crate", Rect2(-10, -14, 20, 14))

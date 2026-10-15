@@ -160,11 +160,18 @@ func _draw() -> void:
 func _draw_crew(half: Vector2) -> void:
 	if cutscene and cutscene.playing:
 		return
-	if _has_cat:
-		draw_set_transform(Vector2(-half.x * 0.55, half.y * 0.2), -rotation)
+	var cat_at := Vector2(-half.x * 0.55, half.y * 0.2)
+	var rin_at := Vector2(-half.x * 0.1, 0)
+	# Y-sort on screen: whoever stands lower is drawn last (in front).
+	var cat_in_front := cat_at.rotated(rotation).y > rin_at.rotated(rotation).y
+	if _has_cat and not cat_in_front:
+		draw_set_transform(cat_at, -rotation)
 		_draw_cat()
-	draw_set_transform(Vector2(-half.x * 0.1, 0), -rotation)
+	draw_set_transform(rin_at, -rotation)
 	_draw_rin()
+	if _has_cat and cat_in_front:
+		draw_set_transform(cat_at, -rotation)
+		_draw_cat()
 	draw_set_transform(Vector2.ZERO)
 
 
@@ -183,7 +190,11 @@ func _draw_rin() -> void:
 ## The cat sitting up, eyes glowing a little (over-bright so they show
 ## through the night tint).
 func _draw_cat() -> void:
-	if Art.draw_sheet(self, "characters/cat", Rect2(-4, -8, 8, 8), 4, 0, _cat_time, 3.0):
+	var glow := Color(0.6, 3.0, 2.0, 0.6 + 0.4 * sin(_cat_time * 0.7))
+	if Art.draw_sheet(self, "characters/cat", Rect2(-6, -12, 12, 12), 8, 0, _cat_time, 3.0):
+		# Its eyes still glow at sea (sheet eyes at x 9 / 13, y 11-12 of 24).
+		draw_rect(Rect2(-1.5, -6.5, 0.5, 1.0), glow)
+		draw_rect(Rect2(0.5, -6.5, 0.5, 1.0), glow)
 		return
 	var fur := Color(0.95, 0.6, 0.25)
 	draw_circle(Vector2(0, -2.2), 2.4, fur)  # body
@@ -191,7 +202,6 @@ func _draw_cat() -> void:
 	draw_colored_polygon(PackedVector2Array([Vector2(-0.7, -6.4), Vector2(-0.3, -8), Vector2(0.4, -6.6)]), fur)
 	draw_colored_polygon(PackedVector2Array([Vector2(1.0, -6.6), Vector2(1.7, -8), Vector2(2.1, -6.2)]), fur)
 	draw_line(Vector2(-2, -1), Vector2(-3.5, -3 + sin(_cat_time * 2.0)), fur, 1.0)  # tail
-	var glow := Color(0.6, 3.0, 2.0, 0.6 + 0.4 * sin(_cat_time * 0.7))
 	draw_circle(Vector2(0.1, -5.4), 0.4, glow)
 	draw_circle(Vector2(1.3, -5.4), 0.4, glow)
 
