@@ -56,7 +56,7 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var bob := absf(sin(_time * 10.0)) * 1.5 if _walking else 0.0
-	if _draw_art(bob):
+	if _draw_art():
 		draw_set_transform(Vector2.ZERO)
 		if _emote:
 			_draw_emote()
@@ -90,9 +90,9 @@ func _draw() -> void:
 
 ## The kind's PNG if there is one: people use their restaurant sheet, the
 ## cat its sheet, others one picture ("characters/crate", "characters/rin_bed",
-## "characters/glow").
-func _draw_art(bob: float) -> bool:
-	draw_set_transform(Vector2(0, -bob), 0.0, Vector2.ONE * art_scale)
+## "characters/glow"). Sheets animate the walk themselves, so no bob here.
+func _draw_art() -> bool:
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE * art_scale)
 	var facing := Vector2i(int(_facing), 0)
 	match kind:
 		"rin", "bao", "vy", "co_nam", "guest":

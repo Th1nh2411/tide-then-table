@@ -17,6 +17,8 @@ const ROW_DOWN := 0
 const ROW_UP := 1
 const ROW_LEFT := 2
 const ROW_BUSY := 3
+## Walk columns in play order (Stardew ping-pong): step, passing, step, passing.
+const WALK_CYCLE: Array[int] = [1, 2, 3, 2]
 
 ## Where the PNGs live (tests point this elsewhere).
 static var root: String = "res://assets/sprites/"
@@ -116,13 +118,14 @@ static func person_frame(image_size: Vector2, facing: Vector2i, walking: bool, b
 	var column := 0
 	if row == ROW_BUSY:
 		column = int(time * 4.0) % PERSON_COLUMNS
-	elif walking:
-		column = int(walk_time * 8.0) % PERSON_COLUMNS
+	elif walking:  # ping-pong 1-2-3-2, column 0 is the idle pose
+		column = WALK_CYCLE[int(walk_time * 8.0) % WALK_CYCLE.size()]
 	return {"rows": rows, "row": mini(row, rows - 1), "column": column, "flip": flip}
 
 
-## A rect with negative width draws mirrored.
+## A rect with negative width draws mirrored. Godot 4.7 keeps the rect in
+## place and only mirrors the texture, so the position stays the same.
 static func _flipped(rect: Rect2, flip_h: bool) -> Rect2:
 	if not flip_h:
 		return rect
-	return Rect2(rect.position.x + rect.size.x, rect.position.y, -rect.size.x, rect.size.y)
+	return Rect2(rect.position, Vector2(-rect.size.x, rect.size.y))

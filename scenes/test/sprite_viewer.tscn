@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/test/sprite_viewer.gd" id="1"]
+
+[node name="SpriteViewer" type="Node2D"]
+texture_filter = 1
+script = ExtResource("1")

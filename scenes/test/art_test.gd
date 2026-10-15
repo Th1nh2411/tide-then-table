@@ -26,14 +26,24 @@ func _ready() -> void:
 		and down["row"] == Art.ROW_DOWN and down["column"] == 0)
 	failures += _check("up row", Art.person_frame(size, Vector2i.UP, false, false, 0.0, 0.0)["row"] == Art.ROW_UP)
 	var right := Art.person_frame(size, Vector2i.RIGHT, true, false, 0.3, 0.0)
-	failures += _check("right = left row mirrored, walking frame 2", right["row"] == Art.ROW_LEFT
-		and right["flip"] and right["column"] == 2)
+	failures += _check("right = left row mirrored, walk ping-pongs 1-2-3-2", right["row"] == Art.ROW_LEFT
+		and right["flip"] and right["column"] == 3
+		and Art.person_frame(size, Vector2i.DOWN, true, false, 0.4, 0.0)["column"] == 2
+		and Art.person_frame(size, Vector2i.DOWN, true, false, 0.0, 0.0)["column"] == 1)
 	failures += _check("busy row when the sheet has it",
 		Art.person_frame(size, Vector2i.DOWN, false, true, 0.0, 0.0)["row"] == Art.ROW_BUSY)
 	var small := Art.person_frame(Vector2(64, 96), Vector2i.DOWN, false, true, 0.0, 0.0)
 	failures += _check("3-row sheet: busy falls back to facing", small["rows"] == 3 and small["row"] == Art.ROW_DOWN)
 	failures += _check("2x art (128x256) has the same layout",
 		Art.person_frame(Vector2(128, 256), Vector2i.LEFT, false, false, 0.0, 0.0)["rows"] == 4)
+	failures += _check("diagonal keeps a matching facing",
+		StreetPerson.facing_for(Vector2(1, 1), Vector2i.DOWN) == Vector2i.DOWN
+		and StreetPerson.facing_for(Vector2(1, -1), Vector2i.RIGHT) == Vector2i.RIGHT)
+	failures += _check("diagonal from an unrelated facing turns sideways",
+		StreetPerson.facing_for(Vector2(-1, -1), Vector2i.DOWN) == Vector2i.LEFT)
+	failures += _check("straight moves use the main axis",
+		StreetPerson.facing_for(Vector2(0.2, 1), Vector2i.LEFT) == Vector2i.DOWN
+		and StreetPerson.facing_for(Vector2.ZERO, Vector2i.UP) == Vector2i.UP)
 	DirAccess.remove_absolute(TEST_ROOT + "characters/tester.png")
 	Art.root = old_root
 	Art.clear_cache()

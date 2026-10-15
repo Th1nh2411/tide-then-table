@@ -116,6 +116,42 @@ F7 bật/tắt) để chủ dự án duyệt. Chưa duyệt thì chưa làm ti�
   Sprite = `create_character` pro (10 lượt) với chân dung làm `concept_image_url`, size 32, rồi dựng sheet tay
   như Rin (ảnh đứng yên xén về 16 px, khung 2/4 nhún + nhấc chân, ngang tự vẽ chân sải); hàng 4 "đang bận" =
   người nhún 1 px + một tay nhấc 1 px, xen kẽ. Bảo: character id `6c8fa01a-acd4-4ddc-aaf3-10f5bfc40bf1`.
+  **Tỉ lệ người (từ 2026-10-15, theo mẫu Stardew 16x32 chủ dự án chọn):** người kín cả 32 dòng của khung:
+  **đầu 11 dòng (0–10), thân 8 (11–18), chân 13 (19–31)**, tay ở dòng ~13–18; như sheet Vy: người rộng ~13 px (tay
+  3 px), quần / váy / hông tới dòng 22, chẻ chân từ dòng 23, ống chân 3 px nằm giữa bàn chân. Sheet Rin / Bảo cũ (đầu to, chân 6
+  dòng) được chuyển bằng `tools/reproportion.py` (bớt / nhân dòng tóc, giữ mặt + thân, quần dài 4 dòng, kéo dài ống chân; hàng trước / sau gọt tay và ống chân); hàng đi
+  xuống / lên dựng bằng `tools/walk_frames.py` (ping-pong 1-2-3-2: khung bước hạ người 1 px, tay đánh ngược chân).
+  Nhân vật mới vẽ thẳng theo tỉ lệ này.
+- **Vy (sheet quán, 2026-10-15):** `tools/make_vy_sheet.py`. Hàng đi xuống (đứng + đi ping-pong) lấy từ ảnh mẫu
+  chủ dự án chọn `tools/ref/vy_spritesheet.webp` (ảnh minh họa walk cycle kiểu Stardew tải trên mạng, **chưa rõ giấy
+  phép — kiểm tra / thay trước khi phát hành công khai**): lấy mẫu về 80x80, xoá nền, đổi màu theo vùng (tóc cam →
+  đen bóng, áo xanh → hồng `c65197`, quần → váy kem + chân trần, bốt → giày trắng) + bông tai vàng, kẹp xanh. Mẫu
+  chỉ có hướng trước nên hàng đi lên / ngang vẽ tay bằng bản đồ ký tự trong script, theo đúng bóng dáng hàng trước
+  (rộng 13, váy tới dòng 21, viền váy 22, ống chân 3 px, giày 30–31): sau lưng tóc dài phủ lưng + kẹp + bông tai;
+  ngang có bím vắt trước ngực, tay đánh khi bước (`side_frame`); hàng lên chạy `walk_frames.py ... 1`. Chưa có hàng "bận"; bản "sau" (tóc buộc cao) để sau.
+  Hàng 1–2 chủ dự án đã sửa tay trực tiếp trên `vy.png` (đừng chạy lại `make_vy_sheet.py`). Hàng 3 (2026-10-15) lấy
+  từ `build/pixelize/thirdrow.aseprite` (4 hướng đứng của ảnh mẫu, phóng ~5x trên nền trắng) bằng
+  `tools/vy_third_row.py`: đọc thẳng file .aseprite (không cần Aseprite CLI), lấy mẫu từng hình theo lưới 5 px riêng,
+  đổi màu theo vùng sang màu sẵn có của Vy (tóc nâu → đen, áo vàng → hồng, váy đỏ → kem, chân viền `564432`, giày
+  trắng), viền váy đặt ở dòng 22, kéo ống chân tới dòng 29. Rồi thành dáng đi trái: hình quay trái (cột 4) chỉnh
+  theo tỉ lệ hàng 1–2 (đầu dòng 0–11, áo 12–17 nhân đôi 2 dòng áo, váy 18–22, chân 23–31) làm khung đứng, PixelLab
+  `animate_image` (1 lượt) "walking to the left" → `pixellab_walk.py row ... --keep-head --head 12` (khung 2 / 4 / 3).
+  Tóc búi của ảnh mẫu: chủ dự án vẽ lại.
+- **Sheet quán làm lại bằng PixelLab (2026-10-15, 16 lượt):** đầu vào luôn là **ảnh đứng của sheet** (cột 0 mỗi
+  hàng), ghép bằng `tools/pixellab_walk.py row` (ép về màu của ảnh đứng, đặt chân sát đáy, `--keep-head` dán đầu vẽ
+  tay lên mọi khung cho kính / mặt không đổi; game chạy 1-2-3-2 nên đưa bước / lướt / bước kia).
+  - **Hướng ngang:** `animate_image` (1 lượt) trên ảnh đứng đệm 32x32 (người ở x=8), "walking to the left", 4 khung
+    → sải chân thật, tay đánh. Chọn 3 khung, bỏ khung tụt đầu.
+  - **Hướng trước / sau:** `animate_image` ở cỡ này **hỏng** (mất kính, người co lùn, cả bản 8 khung lẫn ảnh x2).
+    Dùng `animate_with_skeleton_v3` (2 lượt / 3 khung) trên ảnh đứng phóng x2 đệm 64x64, tự đặt 18 khớp
+    (bước phải / lướt hạ người 1 px / bước trái; chân bước hạ 0.5 px, chân nhấc lên 2 px, tay đánh ngược); hướng
+    sau đổi nhãn LEFT/RIGHT. Giữ đúng nhân vật. Khớp nằm trong `scratchpad` lúc làm; dáng 3 người gần như trùng
+    nên dùng chung (cột/dòng theo khung 16x32: vai (3,12)/(11,12), hông (5,20)/(9,20), gối hàng 25, cổ chân 30).
+  - **Hàng bận Bảo:** `animate_image` ghim khung cuối = khung đầu (lặp mượt): nhún vai + tay, nhẹ.
+  - **Tóc Rin:** `reproportion.py` từng cắt tóc 8 → 5 dòng (bẹp); `tools/rin_hair.py` lấy lại 8 dòng tóc từ sheet
+    git 388d11d, bỏ 2 dòng ống chân + 1 dòng quần → đầu Rin **14 dòng** (ngoại lệ tỉ lệ, theo ý chủ dự án).
+    Khung AI dựng với `--head 14 --cut-rows 21,26,27`.
+  - Còn lại sau đợt này: 24 lượt (trial).
 
 Thứ tự: chân dung (Bảo, Vy, Cô Năm, mèo) → hải sản trong khoang (`fish/`) → món ăn (`dishes/`, 16x16, ≤ 6 màu)
 → đồ trong quán (`create_map_object`, view "high top-down") → nhân vật còn lại + khách → hải sản trên vỉ

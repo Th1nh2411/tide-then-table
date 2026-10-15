@@ -109,10 +109,10 @@ func _draw() -> void:
 	super()
 	if carrying_goods:  # a green plastic shopping bag in his hand
 		var side := -7.0 if facing.x >= 0 else 7.0
-		draw_rect(Rect2(side - 3, -9, 6, 7), Color(0.3, 0.7, 0.35))
-		draw_line(Vector2(side - 2, -9), Vector2(side, -12), Color(0.3, 0.7, 0.35), 1.0)
-		draw_line(Vector2(side + 2, -9), Vector2(side, -12), Color(0.3, 0.7, 0.35), 1.0)
-		draw_rect(Rect2(side - 2, -10, 4, 2), Color(0.35, 0.65, 0.25))  # greens sticking out
+		draw_rect(Rect2(side - 3, -13, 6, 7), Color(0.3, 0.7, 0.35))
+		draw_line(Vector2(side - 2, -13), Vector2(side, -16), Color(0.3, 0.7, 0.35), 1.0)
+		draw_line(Vector2(side + 2, -13), Vector2(side, -16), Color(0.3, 0.7, 0.35), 1.0)
+		draw_rect(Rect2(side - 2, -14, 4, 2), Color(0.35, 0.65, 0.25))  # greens sticking out
 
 
 func _try_move(step: Vector2) -> void:

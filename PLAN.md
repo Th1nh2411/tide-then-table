@@ -440,6 +440,8 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng 
 
 ---
 
+> **Art nhân vật (2026-10-15):** sprite người 16x32 theo tỉ lệ Stardew (kín khung: đầu 11 / thân 8 / chân 13, chi tiết ở ART_PLAN "Tỉ lệ người"); Rin, Bảo đã chuyển (`tools/reproportion.py`), Vy: hàng trước đổi màu từ ảnh mẫu `tools/ref/vy_spritesheet.webp` (chưa rõ giấy phép, xem ART_PLAN), hàng sau / ngang vẽ tay (`tools/make_vy_sheet.py`); đi bộ ping-pong 1-2-3-2 (`Art.WALK_CYCLE`, `tools/walk_frames.py`), đi chéo giữ hướng ổn định (`StreetPerson.facing_for`), lật sprite sang phải hết lệch (Godot 4.7 giữ rect width âm tại chỗ). Sheet quán Rin / Bảo + hàng ngang Vy làm lại bằng PixelLab (khung bước thật, `tools/pixellab_walk.py`); Rin lấy lại tóc gốc 8 dòng (`tools/rin_hair.py`, đầu 14 dòng).
+
 ## 9. Tiến độ
 
 | Phase                    | Trạng thái   | Ghi chú                                                                                                                                                                                                    |

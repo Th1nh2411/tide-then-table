@@ -72,14 +72,29 @@ func _follow_path(delta: float) -> void:
 
 
 func _set_facing(step: Vector2) -> void:
-	if absf(step.x) > absf(step.y):
-		facing = Vector2i(int(signf(step.x)), 0)
-	else:
-		facing = Vector2i(0, int(signf(step.y)))
+	facing = facing_for(step, facing)
+
+
+## 4-way facing for a move. Near-diagonal moves keep the current facing when
+## it is one of the two axes (no flip-flopping), else face sideways.
+static func facing_for(step: Vector2, current: Vector2i) -> Vector2i:
+	var side := Vector2i(int(signf(step.x)), 0)
+	var vertical := Vector2i(0, int(signf(step.y)))
+	var ax := absf(step.x)
+	var ay := absf(step.y)
+	if ax == 0.0 and ay == 0.0:
+		return current
+	if minf(ax, ay) >= 0.5 * maxf(ax, ay):  # roughly diagonal
+		if current == side or current == vertical:
+			return current
+		return side
+	return side if ax > ay else vertical
 
 
 func _draw() -> void:
-	var bob := absf(sin(_walk_time * 12.0)) * 1.5 if is_walking() else 0.0
+	var bob := 0.0  # placeholder bob; sheets have their own walk frames
+	if is_walking() and not Art.has(sprite_name()):
+		bob = absf(sin(_walk_time * 12.0)) * 1.5
 	draw_circle(Vector2(0, 1), 6.0, Color(0, 0, 0, 0.25))  # shadow
 	draw_set_transform(Vector2(0, -bob))
 	var drawn := Art.draw_person(self, sprite_name(), facing, _walk_time, is_walking(), is_busy_pose(),
@@ -87,7 +102,7 @@ func _draw() -> void:
 	if not drawn:
 		_draw_placeholder_body()
 	if carried:
-		StreetProps.draw_plate(self, carried, Vector2(float(facing.x) * 7.0, -12 + (2.0 if facing == Vector2i.DOWN else 0.0)))
+		StreetProps.draw_plate(self, carried, Vector2(float(facing.x) * 7.0, -16 + (2.0 if facing == Vector2i.DOWN else 0.0)))
 	draw_set_transform(Vector2.ZERO)
 	if label:
 		draw_string(ThemeDB.fallback_font, Vector2(-12, -36), label, HORIZONTAL_ALIGNMENT_CENTER, 24, 7,

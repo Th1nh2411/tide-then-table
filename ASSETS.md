@@ -172,8 +172,11 @@ Thêm 1 icon 16x16 mỗi loài cho Dex / thông báo (P2).
 Đặt trong `assets/sprites/`. Có file là game dùng, không có thì vẽ tạm. Mở editor 1 lần để Godot import
 (chưa import thì game vẫn đọc được khi chạy thử). Kích thước ghi theo 1x; vẽ 2x thì nhân đôi.
 
-**Nhân vật** (`characters/`), sprite sheet **4 cột**, mỗi khung 16x32, các hàng:
-1. đi xuống (cột 1 = đứng yên, cột 1–4 = bước đi), 2. đi lên, 3. đi sang trái (sang phải = game tự lật),
+**Nhân vật** (`characters/`), sprite sheet **4 cột**, mỗi khung 16x32, người kín cả khung: đầu 11 dòng, thân 8,
+chân 13 (xem ART_PLAN "Tỉ lệ người"), các hàng:
+1. đi xuống (cột 1 = đứng yên; đi = cột 2→3→4→3 kiểu ping-pong Stardew: 2 và 4 = bước, tay đánh ngược chân, 3 = đứng,
+2 và 4 hạ người 1 px; `tools/walk_frames.py` dựng hàng xuống / lên từ khung đứng yên), 2. đi lên,
+3. đi sang trái (cột 2 / 4 = sải chân, 3 = đứng; sang phải = game tự lật),
 4. (tuỳ chọn) "đang bận": khách ngồi ăn, Bảo đảo chảo — 4 khung lặp.
 → 1 sheet đủ 4 hàng = 64x128.
 
