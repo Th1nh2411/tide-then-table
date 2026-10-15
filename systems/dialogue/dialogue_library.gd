@@ -32,6 +32,8 @@ static func can_play(dialogue: Dialogue) -> bool:
 		return false
 	if dialogue.requires_flag and not GameState.story_flags.has(dialogue.requires_flag):
 		return false
+	if dialogue.blocked_by_flag and GameState.story_flags.has(dialogue.blocked_by_flag):
+		return false
 	return not (dialogue.once and is_seen(dialogue))
 
 

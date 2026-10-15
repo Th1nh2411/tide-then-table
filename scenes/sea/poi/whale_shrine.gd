@@ -12,7 +12,7 @@ extends PointOfInterest
 @export_multiline var keeper_lines: Array[String] = [
 	"Ông từ: \"Cá Ông là thần hộ mạng dân biển. Ai gặp nạn ngoài khơi, Ông dìu vô bờ. Thắp nhang rồi hẵng ra con.\"",
 	"Ông từ: \"Mấy đêm nay ngư dân thấy cá Ông bơi ra hướng đông bắc rồi lặn mất, không trồi lên thở. Lạ lắm con.\"",
-	"Ông từ: \"Hồi xưa ông nội con cũng chèo vô đám sương đó... Con đi thì nhớ đường về.\"",
+	"Ông từ: \"Hai năm trước ông nội con chèo thúng vô đám sương đó, không về... Con đi thì nhớ đường về.\"",
 ]
 
 var _blessed: bool = false

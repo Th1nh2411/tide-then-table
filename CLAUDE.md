@@ -276,7 +276,7 @@ Vietnamese, keep code comments in short English.
   line, "Name (mood): line" picks a portrait mood; `DialogueBox` is Nine Sols
   style: `DialoguePortrait` bust in a bottom corner — Rin left, others right —
   art `portraits/<slug>[_<mood>]`, placeholder drawn otherwise — and a bubble
-  with a tail; no speaker = narration box; min_day / requires_flag / once / sets_flag / priority) and add it to
+  with a tail; no speaker = narration box; min_day / requires_flag / blocked_by_flag / once / sets_flag / priority) and add it to
   a `Talker` child of the character (character needs `talk_position()`, optional
   `can_talk()`). `DialogueLibrary` picks and marks seen (story_flags →
   saved); `DialogueBox` shows it (pauses). Rin talks with E next to them.
@@ -317,7 +317,7 @@ Vietnamese, keep code comments in short English.
   restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is
   an IT graduate (male) whose failed startup (with friend Bảo, now the
   restaurant's chef — he cooked the best instant noodles in their dorm) left
-  this app; story (PLAN.md §1): the fog hides a portal to a
+  this app; story (PLAN.md §1, keep lines in line with its timeline + fog rules: Rin's grandpa ông Tư vanished in the fog two years ago, Vy is ông Tám's granddaughter): the fog hides a portal to a
   parallel sea, cá Ông are its guardians, the Thâm Lam corporation exploits
   it. Clues appear as `[WARN]`/`[ERR]`
   log lines and glitched aberrant-fish names.

@@ -13,6 +13,8 @@ extends Resource
 @export var min_day: int = 1
 ## Story flag that must be set ("" = none).
 @export var requires_flag: String = ""
+## Can't play once this story flag is set ("" = none), e.g. early-mood lines.
+@export var blocked_by_flag: String = ""
 ## Plays only once (remembered as story flag "dlg_<id>", saved with the game).
 @export var once: bool = true
 ## Story flag set when it finishes ("" = none).

@@ -39,7 +39,7 @@ THUYỀN
 
 ĐIỂM GHÉ
   Lại gần chỗ có đèn (miếu, chòi, hải đăng, bè...) bấm E.
-  Bè tôm hùm anh Năm mua cá trong khoang (nửa giá): bán hết, hoặc "Chọn con để bán"
+  Bè tôm hùm anh Út mua cá trong khoang (nửa giá): bán hết, hoặc "Chọn con để bán"
     rồi kéo cá vào ô "Bán" / chuột phải vào con cá.""",
 	"""CHUẨN BỊ
   Bấm vào bảng hiệu LED (viền vàng nhấp nháy): chọn món và số phần, rồi "Mở quán" ("Đóng" để làm việc khác trước).

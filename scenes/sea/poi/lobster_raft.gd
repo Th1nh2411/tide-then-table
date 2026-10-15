@@ -1,6 +1,6 @@
 class_name LobsterRaft
 extends PointOfInterest
-## Anh Năm's lobster raft on the reef: buys fish from the hold right now at
+## Anh Út's lobster raft on the reef: buys fish from the hold right now at
 ## a low "night market" price, to make room without going back to dock —
 ## the whole hold at once, or picked one by one in the hold window (sell mode:
 ## drag onto "Bán" / right-click).
@@ -13,12 +13,12 @@ extends PointOfInterest
 func _interact() -> void:
 	var items := hold_manager.hold.items.duplicate()
 	if items.is_empty():
-		await dialog.ask(title, "Anh Năm: \"Khoang trống trơn mà ghé chi? Đi câu đi em.\"",
+		await dialog.ask(title, "Anh Út: \"Khoang trống trơn mà ghé chi? Đi câu đi em.\"",
 			PackedStringArray(["Đi tiếp"]))
 		return
 	var value := sale_value(items, sell_ratio)
 	var choice := await dialog.ask(title,
-		"Anh Năm: \"Khoang đầy hả? Để anh mua đỡ, giá chợ đêm thôi nghen.\"\n(%d con trong khoang)" % items.size(),
+		"Anh Út: \"Khoang đầy hả? Để anh mua đỡ, giá chợ đêm thôi nghen.\"\n(%d con trong khoang)" % items.size(),
 		PackedStringArray(["Chọn con để bán", "Bán hết khoang: %dk" % value, "Thôi, để đem về quán"]))
 	if choice == 0:
 		_sell_some()
@@ -28,7 +28,7 @@ func _interact() -> void:
 	for item: InventoryItem in items:
 		hold_manager.hold.remove(item)
 	GameState.add_money(value)
-	hud.flash_message("Bán cho anh Năm %d con, được %dk." % [items.size(), value], 2.0)
+	hud.flash_message("Bán cho anh Út %d con, được %dk." % [items.size(), value], 2.0)
 
 
 ## Opens the hold in sell mode; tells how much it came to when closed.
@@ -39,12 +39,12 @@ func _sell_some() -> void:
 		total[0] += 1
 		total[1] += price
 	ui.sold.connect(on_sold)
-	ui.open_sell("bè tôm hùm anh Năm (giá chợ đêm)", func(item: InventoryItem) -> int:
+	ui.open_sell("bè tôm hùm anh Út (giá chợ đêm)", func(item: InventoryItem) -> int:
 		return sale_value([item], sell_ratio))
 	await ui.closed
 	ui.sold.disconnect(on_sold)
 	if total[0] > 0:
-		hud.flash_message("Bán cho anh Năm %d con, được %dk." % total, 2.0)
+		hud.flash_message("Bán cho anh Út %d con, được %dk." % total, 2.0)
 
 
 ## What the raft pays for these items.

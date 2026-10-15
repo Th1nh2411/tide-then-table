@@ -25,9 +25,12 @@ emote Rin ! 0.8
 narrate \"Nghe tới hai chữ sáng xanh, vệt sóng trên tay Rin nhói lên. Rin giấu tay ra sau lưng.\"
 speak Rin \"(Sáng xanh... giống hệt con cá đêm qua.)\"
 label tale
-speak \"Cô Năm\" \"Rồi có mấy chiếc ghe đi vô... về thì về, mà không ai kể lại được đã thấy gì.\"
+speak \"Cô Năm\" \"Ghe nào chạy vô mép sương thì về được, mà về là không ai kể lại được đã thấy gì.\"
+speak \"Cô Năm (lo)\" \"Còn ông Tư nhà con... hai năm trước chèo thúng đi sâu vô đó, rồi không về.\"
+emote Rin ... 1.0
 emote Bao ... 1.0
-speak Bảo \"Cô kể làm thằng Rin nó tò mò rồi đó.\"
+speak Bảo \"Rin... mày đừng có tính ra đó kiếm ông nha.\"
+speak Rin \"Tao đâu có tính gì. ...Chưa tính.\"
 speak \"Cô Năm\" \"Tò mò thì được, mà dại thì đừng. Thuyền chưa chắc thì đừng có ra xa nghe con.\"
 move_to Nam nam_shop 1.4
 remove Nam

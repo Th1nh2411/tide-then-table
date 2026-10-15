@@ -7,8 +7,9 @@ script = ExtResource("1_dlg")
 id = "vy_app"
 min_day = 4
 priority = 10
-script_text = "Vy (kieu): Anh Rin, cái app trên điện thoại anh nhìn quê dữ vậy. Anh tự viết hả?
-Rin: Ừ. Hồi làm startup với Bảo. Giờ xài quản lý quán.
-Vy: Log toàn chữ đỏ [ERR] kìa. Có dòng \"tọa độ không tồn tại\" nữa.
-Rin (boi_roi): ...Chắc GPS lỗi. Kệ, chạy được là được.
+blocked_by_flag = "vy_warmed"
+script_text = "Vy (kieu): Cái giọng trong app anh tự xưng NEO hả? Nó gọi anh là \"anh Rin\", lễ phép hơn anh nữa.
+Rin: NEO là cái AI hồi startup. Tụi anh lấy lõi của nó trong một bộ SDK có sẵn.
+Vy: SDK của ai?
+Rin (boi_roi): ...Không nhớ. Kệ, chạy được là được.
 Vy (che): Hèn chi startup anh sập."

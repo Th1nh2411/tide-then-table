@@ -12,7 +12,7 @@ const READ_FLAG: String = "bottles_read"
 	"\"Biển ở đây có hai lớp. Lớp mình chèo thuyền, và một lớp nữa nằm ngay bên dưới.\"",
 	"\"Cá Ông dẫn tôi tới mép sương rồi lặn xuống. Nó muốn tôi đi theo.\"",
 	"\"Có tàu lạ sơn xanh đen, không treo cờ, thả máy móc xuống chỗ sương. Cá Ông nổi lên húc tàu đi. Chúng không ác, chúng đang giữ nhà.\"",
-	"\"Nếu con tôi đọc được: đừng tìm tôi. Hay là... cứ tìm đi.\"",
+	"\"Nếu thằng cháu tôi đọc được: đừng tìm ông. Hay là... cứ tìm đi.\"",
 	"\"La bàn chỉ thẳng xuống dưới. Tôi đi đây.\"",
 ]
 

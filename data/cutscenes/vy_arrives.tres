@@ -7,7 +7,7 @@ script = ExtResource("1_cut")
 id = "vy_arrives"
 min_day = 4
 priority = 25
-script_text = "# Ngày 4: Vy, tiểu thư xóm trên, xài hết tiền đi chơi nên xin làm thêm buổi tối.
+script_text = "# Ngày 4: Vy, tiểu thư trên thành phố, cháu ông Tám, bị gửi về quê cả hè và cắt tiền tiêu vặt nên xin làm thêm buổi tối.
 camera kitchen_view 0 1.6
 fade_in 0.6
 spawn Bao bao bao_stove 1.4
@@ -17,9 +17,9 @@ move_to Vy vy_stop 2.4
 face Rin left
 speak \"Vy (che)\" \"Trời ơi mùi cá... Ủa, ai là chủ quán ở đây?\"
 speak Rin \"Anh. Chắc vậy.\"
-speak \"Vy (kieu)\" \"Em là Vy, nhà ở xóm trên. Lương một ca bao nhiêu vậy anh?\"
+speak \"Vy (kieu)\" \"Em là Vy, cháu ông Tám. Lương một ca bao nhiêu vậy anh?\"
 emote Rin ? 1.0
-speak Vy \"Em cần tiền đi chơi với tụi bạn. Ba mẹ cắt tiền tiêu vặt, kêu tự kiếm đi rồi biết.\"
+speak Vy \"Ba mẹ gửi em về ở với ông cả hè, cắt luôn tiền tiêu vặt. Mà em còn chuyến đi chơi với tụi bạn.\"
 speak Vy \"Hai trăm một ca. Em chỉ bưng với dọn thôi nha, không đụng cá sống đâu.\"
 speak Bảo \"Tiểu thư hả trời. Mày chạy muốn rớt dép mỗi tối, nhận đi.\"
 choice \"Nhận Vy làm luôn\" hire \"Để anh tính đã\" later

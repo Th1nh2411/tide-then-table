@@ -30,6 +30,11 @@ func _ready() -> void:
 	_check("sets_flag on finish", GameState.has_flag("talked_omen"))
 	DialogueLibrary.mark_done(chat)
 	_check("repeatable stays", DialogueLibrary.can_play(chat))
+	var early := _dialogue("early", 1, "", true, 50)
+	early.blocked_by_flag = "grown_up"
+	_check("blocked_by_flag: plays before", DialogueLibrary.can_play(early))
+	GameState.set_flag("grown_up")
+	_check("blocked_by_flag: not after", not DialogueLibrary.can_play(early))
 	# Small talk switches set once the mood flag is set (Vy warming up).
 	var talker := Talker.new()
 	talker.idle_lines.assign(["early"])

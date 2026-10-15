@@ -115,7 +115,7 @@ Biển hiển thị zoom x2 cho cùng tỉ lệ với quán. Vẽ asset biển t
 | Hải đăng Đá Canh Đêm | 32x48 | |
 | Miếu Cá Ông | 32x32 | |
 | Chòi ông lão (Gò Vỏ Ốc) | 32x32 | |
-| Bè tôm hùm anh Năm | 36x24 | lồng lưới, cột đèn |
+| Bè tôm hùm anh Út | 36x24 | lồng lưới, cột đèn |
 | Xoáy nước phát sáng | 64x64, 4–6 khung | trong sương đông bắc |
 | Sương mù | lớp phủ lặp | |
 | Sự kiện đêm | 16–32 px | ghe mắc cạn, chai thư, đàn sứa (phát sáng), đàn cá heo |

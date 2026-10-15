@@ -8,7 +8,7 @@ id = "vy_stay"
 min_day = 5
 priority = 11
 requires_flag = "vy_warmed"
-script_text = "Vy: Anh Rin, em đủ tiền đi chơi rồi.
+script_text = "Vy: Anh Rin, em gần đủ tiền đi chơi rồi.
 Rin: Vậy hả. Em nghỉ thì... chắc cũng ổn. Sao cũng được.
 Vy (kieu): Ai nói em nghỉ? Em hủy chuyến rồi. Đi với tụi nó chán lắm, ở đây còn có mì anh Bảo.
 Vy: Còn anh đó. Ngoài câu cá với bưng bê, anh thích cái gì?

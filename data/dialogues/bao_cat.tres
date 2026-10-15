@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_dlg")
 id = "bao_cat"
-min_day = 3
+min_day = 2
 requires_flag = "cat_adopted"
 priority = 6
-script_text = "Bảo: Ủa, con mèo trên quầy là sao? Mày nuôi mèo hồi nào vậy?
-Rin: Hôm qua ở bến. Nó ăn vụng cá rồi... ở luôn. Tên {pet}.
+script_text = "Bảo: Ủa, con mèo trên tủ lạnh là sao? Mày nuôi mèo hồi nào vậy?
+Rin: Ở bến, lúc dỡ cá. Nó ăn vụng rồi... ở luôn. Tên {pet}.
 Bảo (boi_roi): Tao cho nó con tôm, nó ngửi rồi bỏ đi. Mèo gì chê tôm.
-Bảo (vui): Mà nó ngồi trên quầy, khách vô ai cũng vuốt. Coi bộ chiêu tài đó."
+Bảo (vui): Mà nó nằm trên tủ lạnh, khách vô ai cũng vuốt. Coi bộ chiêu tài đó."

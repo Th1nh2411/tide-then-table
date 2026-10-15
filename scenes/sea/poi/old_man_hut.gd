@@ -12,11 +12,12 @@ extends PointOfInterest
 	"\"Bọt màu nâu đục là cá mú núp dưới đó. Rạn đá với ngoài khơi mới có.\"",
 	"\"Câu được con to thì để dành giao khách quen, họ trả gấp mấy lần chợ.\"",
 	"\"Chạy chậm mà đụng đá thì không sao. Chạy hết ga mà đụng là thủng thuyền liền.\"",
-	"\"Bè tôm hùm của thằng Năm ở rạn đá, khoang đầy thì ghé bán đỡ cho nó.\"",
+	"\"Bè tôm hùm của thằng Út ở rạn đá, khoang đầy thì ghé bán đỡ cho nó.\"",
+	"\"Ông Tư nội con với tui đi biển chung từ hồi còn trai. Ổng mà thấy con ra khơi chắc mừng lắm.\"",
 ]
 ## Extra rumors once the omen happened / the fog is open (Story.stage() 1, 2).
 @export_multiline var omen_rumors: Array[String] = [
-	"\"Đêm qua tui thấy ánh xanh dưới nước phía đông bắc. Ba chục năm đi biển chưa thấy bao giờ.\"",
+	"\"Đêm qua tui thấy ánh xanh dưới nước phía đông bắc. Từ hồi ông Tư đi tới giờ mới thấy lại.\"",
 ]
 @export_multiline var fog_rumors: Array[String] = [
 	"\"Cái la bàn của tui cứ quay mòng mòng mỗi lần tới gần đám sương. Con cẩn thận.\"",
@@ -51,6 +52,10 @@ func _interact() -> void:
 				GameState.set_flag("tam_mark")
 				line = "(nhìn tay con) Cá Ông đánh dấu con rồi đó. Biển nhường con một nhịp thở, " \
 					+ "lúc nguy thì gọi nó. Mà gọi hoài là nó đòi lại đó nghe."
+			elif GameState.has_flag("worked_vy") and not GameState.has_flag("tam_vy"):
+				GameState.set_flag("tam_vy")
+				line = "Con Vy nhà tui làm ở quán con hả? Nó khó tánh, chê đủ thứ. " \
+					+ "Mà thương ai là thương thiệt, con chịu khó nghe."
 			await dialog.ask(title, "Ông Tám: " + line, PackedStringArray(["Đi tiếp"]))
 
 

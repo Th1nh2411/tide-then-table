@@ -8,7 +8,6 @@ id = "vy_omen"
 min_day = 1
 priority = 12
 requires_flag = "fog_omen_day"
-script_text = "Vy: Anh thấy ánh sáng ngoài sương rồi phải không? Cả xóm đồn ầm lên.
-Rin: Ừ. Mai sương mở, chắc anh ra đó coi. Tới đâu hay tới đó.
-Vy (lo): Tới đâu hay tới đó cái gì! Đem đèn dư dầu, đừng ráng quá.
-Vy (boi_roi): Anh mà mất tích thì ai trả lương em... với lại quán còn chờ anh về."
+script_text = "Vy: Cả xóm đồn ầm, có ánh sáng xanh ngoài sương. Anh chủ quán định ra đó hả?
+Rin: Ừ. Mai sương mở, chắc anh ra coi. Tới đâu hay tới đó.
+Vy (kieu): Tới đâu hay tới đó... Đi thì trả lương em trước đã nha."
