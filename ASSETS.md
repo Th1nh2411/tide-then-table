@@ -49,7 +49,7 @@ Kích thước 16x32. Hướng: xuống / lên / trái (phải = lật trái). �
 | Tên | Hoạt cảnh cần có | Ghi chú |
 |---|---|---|
 | Rin | đứng, đi bộ (4 hướng), lướt (Shift), cầm đĩa, cầm túi đồ, nướng (đứng sau lò, quay xuống), rót bia | tóc đen rối, kính gọng đen, da ngăm, áo ba lỗ trắng, dây chuyền đen (mặt lưỡi câu bạc), khuyên tai, quần short đen |
-| Bảo | đứng sau bếp, đảo chảo (3–4 khung), nói chuyện | áo cam, tạp dề + mũ đầu bếp |
+| Bảo | đứng sau bếp, đảo chảo (3–4 khung), nói chuyện | áo cam, tạp dề kem, tóc đen ngắn có mái, không đội mũ |
 | Vy | đứng, đi bộ (4 hướng), cầm đĩa, dọn bàn | nữ chính, áo hồng, tóc dài; có tạp dề khi làm |
 | Cô Năm | đứng sau quầy, vẫy tay | bà bán tạp hoá, áo xanh lá, tóc bạc |
 | Khách | đi bộ, ngồi ghế (quay xuống), ăn (gắp đũa 2 khung), tức giận bỏ đi | 3–4 dáng người, đổi màu áo bằng code |

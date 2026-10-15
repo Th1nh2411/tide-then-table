@@ -68,7 +68,8 @@ Chuyển file PixelLab tải về thành đúng file game cần:
 Mô tả nhân vật cố định (dùng lại mọi lần):
 - **Rin:** young Vietnamese man, messy fluffy black hair with bangs, black rectangular glasses, tanned skin, small
   silver earring, white tank top (singlet), thin black chain necklace with a small silver fish-hook pendant, dark shorts, sandals, kind face. Cựu sinh viên IT, giờ đi câu đêm + chạy bàn.
-- **Bảo:** Vietnamese man, early 20s, a bit chubby, white cook shirt, orange apron, short black hair, cheerful.
+- **Bảo:** Vietnamese man, early 20s, a bit chubby, round cheerful face, short black hair, no hat,
+  orange short-sleeve t-shirt, cream apron, dark trousers (áo cam, tạp dề, không đội mũ — chủ dự án bỏ mũ đầu bếp).
 - **Vy:** Vietnamese woman, early 20s, long dark hair, pink shirt, apron when working, gentle.
 - **Cô Năm:** Vietnamese woman in her 60s, grey hair in a bun, green blouse, grocery seller.
 - **Mèo (Mỡ):** chubby orange cat.
@@ -88,6 +89,13 @@ F7 bật/tắt) để chủ dự án duyệt. Chưa duyệt thì chưa làm ti�
 - Cách làm: dùng `portraits/rin.png` làm ảnh mẫu phong cách (`create_image_pro` `style_image_url`, hoặc
   `edit_image_pixen` từ ảnh nhân vật), mô tả "three-quarter view facing right"; ép / gán màu như chân dung Rin.
 - Kiểm tra trong game: hộp thoại Rin ↔ nhân vật đó, hai người phải nhìn nhau.
+- **Cách đã chạy tốt (Bảo, 2026-10-15):** chân dung = `edit_image_pixen` (1 lượt) trên `portraits/rin.png` phóng
+  x2 với mô tả "turn this into a different character, same three-quarter bust facing right, same framing...";
+  lấy mẫu về 64x64, gán màu tay (bảng màu trong lần làm của Bảo: áo `de9e41` / bóng `be772b`, da `d7b594`);
+  bỏ má hồng (ra vệt bẩn), dọn quầng nâu quanh mắt; mắt vẽ tay kiểu Rin (mí trên `151d28`, lòng trắng `ebede9`, con ngươi lệch về hướng nhìn). Bỏ mũ: `edit_image_pixen` "remove the chef hat", chỉ lấy hàng 0–23 (tóc), mặt giữ bản vẽ tay.
+  Sprite = `create_character` pro (10 lượt) với chân dung làm `concept_image_url`, size 32, rồi dựng sheet tay
+  như Rin (ảnh đứng yên xén về 16 px, khung 2/4 nhún + nhấc chân, ngang tự vẽ chân sải); hàng 4 "đang bận" =
+  người nhún 1 px + một tay nhấc 1 px, xen kẽ. Bảo: character id `6c8fa01a-acd4-4ddc-aaf3-10f5bfc40bf1`.
 
 Thứ tự: chân dung (Bảo, Vy, Cô Năm, mèo) → hải sản trong khoang (`fish/`) → món ăn (`dishes/`, 16x16, ≤ 6 màu)
 → đồ trong quán (`create_map_object`, view "high top-down") → nhân vật còn lại + khách → hải sản trên vỉ

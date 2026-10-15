@@ -38,7 +38,7 @@ var _shouted: Dictionary = {}  # dish -> true: already asked Rin to buy it
 func _ready() -> void:
 	body_color = Color(0.85, 0.5, 0.2)
 	apron = true
-	hat = true
+	hat = false
 	label = display_name
 	facing = Vector2i.DOWN
 
