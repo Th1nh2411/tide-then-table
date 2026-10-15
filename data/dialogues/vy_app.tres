@@ -7,8 +7,8 @@ script = ExtResource("1_dlg")
 id = "vy_app"
 min_day = 4
 priority = 10
-script_text = "Vy: Anh Rin, cái app trên điện thoại anh... anh tự viết hả?
-Rin: Ừ. Hồi còn làm startup với Bảo. Giờ dùng để quản lý quán thôi.
-Vy: Sao log của nó toàn chữ đỏ [ERR] vậy anh? Em thấy có dòng "tọa độ không tồn tại".
-Rin (boi_roi): ...Chắc GPS lỗi. Code hồi đó viết vội lắm.
-Vy (vui): Hì, anh nói y chang Bảo luôn."
+script_text = "Vy (kieu): Anh Rin, cái app trên điện thoại anh nhìn quê dữ vậy. Anh tự viết hả?
+Rin: Ừ. Hồi làm startup với Bảo. Giờ xài quản lý quán.
+Vy: Log toàn chữ đỏ [ERR] kìa. Có dòng \"tọa độ không tồn tại\" nữa.
+Rin (boi_roi): ...Chắc GPS lỗi. Kệ, chạy được là được.
+Vy (che): Hèn chi startup anh sập."

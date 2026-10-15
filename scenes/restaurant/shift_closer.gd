@@ -45,6 +45,8 @@ func close(reason: String, plan: MenuPlan) -> String:
 		FishOrders.release(visit)
 	var order_lines := FishOrders.expire_after_shift(fish_catalog)
 	var wages := crew.pay_wages()
+	for person in crew.roster.hired():
+		GameState.set_flag("worked_" + person.id)  # story scenes after their first shift
 	var stars := DayRating.stars(served, left_angry, variety_multiplier < 1.0)
 	GameState.last_rating = stars
 	GameState.add_day_record({"day": GameState.day, "earned": earned, "market": market_spent,

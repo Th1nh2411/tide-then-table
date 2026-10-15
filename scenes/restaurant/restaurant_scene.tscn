@@ -54,6 +54,7 @@
 [ext_resource type="Resource" path="res://data/dishes/bia_con_meo.tres" id="50_bia"]
 [ext_resource type="Resource" path="res://data/dialogues/cat_mark.tres" id="91_catmark"]
 [ext_resource type="Resource" path="res://data/cutscenes/wave_awaken.tres" id="92_awaken"]
+[ext_resource type="Resource" path="res://data/cutscenes/vy_stands_up.tres" id="93_vystand"]
 
 [node name="RestaurantScene" type="Control"]
 layout_mode = 3
@@ -64,7 +65,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_rest")
-after_shift_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("51_cutbeer"), ExtResource("53_cutnam"), ExtResource("54_cutreg")])
+after_shift_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("51_cutbeer"), ExtResource("53_cutnam"), ExtResource("54_cutreg"), ExtResource("93_vystand")])
 arrival_cutscenes = Array[ExtResource("39_cutdata")]([ExtResource("50_cutopen"), ExtResource("52_cutvy"), ExtResource("92_awaken")])
 menu = ExtResource("4_menu")
 fish_catalog = ExtResource("6_fish")

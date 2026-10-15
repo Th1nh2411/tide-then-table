@@ -150,5 +150,7 @@ func _sync_workers() -> void:
 				talker.display_name = person.display_name
 				talker.dialogues = person.dialogues
 				talker.idle_lines = person.idle_lines
+				talker.later_flag = person.later_flag
+				talker.later_idle_lines = person.later_idle_lines
 				worker.add_child(talker)
 			people_layer.add_child(worker)

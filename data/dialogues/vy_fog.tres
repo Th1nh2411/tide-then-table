@@ -5,9 +5,11 @@
 [resource]
 script = ExtResource("1_dlg")
 id = "vy_fog"
-min_day = 3
+min_day = 4
 priority = 9
-script_text = "Vy: Hồi nhỏ ông nội em hay kể, ngoài phía đông bắc có một dải sương không bao giờ tan.
-Vy: Đêm nào trăng tối, trong sương sáng lên xanh xanh, như có ai thắp đèn dưới nước.
-Rin: Ông em có ra đó lần nào chưa?
-Vy: Ông nói ghe nào đi vô đó thì về... nhưng không ai nhớ đã thấy gì. Kỳ ha?"
+requires_flag = "vy_warmed"
+script_text = "Vy: Anh Rin, hôm qua em về hỏi ông nội chuyện dải sương phía đông bắc.
+Vy: Ông nói đêm trăng tối, trong sương sáng xanh xanh, như có ai thắp đèn dưới nước.
+Rin: Ông em ra đó lần nào chưa?
+Vy (lo): Ông nói ghe nào đi vô thì về, mà không ai nhớ đã thấy gì. Ông dặn em kể anh nghe.
+Vy (boi_roi): Không phải em lo cho anh đâu nha. Em tò mò thôi."

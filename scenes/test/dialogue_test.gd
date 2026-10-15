@@ -30,6 +30,17 @@ func _ready() -> void:
 	_check("sets_flag on finish", GameState.has_flag("talked_omen"))
 	DialogueLibrary.mark_done(chat)
 	_check("repeatable stays", DialogueLibrary.can_play(chat))
+	# Small talk switches set once the mood flag is set (Vy warming up).
+	var talker := Talker.new()
+	talker.idle_lines.assign(["early"])
+	talker.later_flag = "warm_test"
+	talker.later_idle_lines.assign(["later"])
+	_check("idle lines: early set first", talker.current_idle_lines() == talker.idle_lines)
+	GameState.set_flag("warm_test")
+	_check("idle lines: later set after the flag", talker.current_idle_lines() == talker.later_idle_lines)
+	talker.free()
+	var vy: StaffData = load("res://data/staff/vy.tres")
+	_check("Vy has two moods of small talk", vy.later_flag == "vy_warmed" and not vy.later_idle_lines.is_empty())
 	# Cutscene scripts.
 	var tokens := CutsceneScript.tokenize('speak Rin "Ê! Con đó tao định bán mà!"')
 	_check("tokenize keeps quoted text", tokens.size() == 3 and tokens[2] == "Ê! Con đó tao định bán mà!")

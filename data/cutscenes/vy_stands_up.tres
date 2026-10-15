@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="Cutscene" format=3]
+
+[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="1_cut"]
+
+[resource]
+script = ExtResource("1_cut")
+id = "vy_stands_up"
+min_day = 4
+priority = 22
+requires_flag = "worked_vy"
+sets_flag = "vy_warmed"
+script_text = "# Sau ca đầu Vy làm: khách say chê quán, Vy cãi lại trước cả Rin; rồi ba người ăn mì của Bảo.
+camera kitchen_view 0 1.6
+fade_in 0.6
+spawn Bao bao bao_stove 1.4
+spawn Rin rin rin_spot 1.4
+spawn Vy vy vy_stop 1.4
+spawn Guest guest guest_seat 1.4
+speak Khách \"Ông chủ! Quán gì dơ dữ, ghế nhựa, cá thì tanh. Tính rẻ lại coi!\"
+speak \"Rin (boi_roi)\" \"Dạ... chú thấy bớt sao thì bớt, sao cũng được...\"
+emote Vy ! 0.8
+face Vy left
+speak \"Vy (che)\" \"Bàn em mới lau ba lần đó chú! Quán người ta sạch hơn nhà chú đó!\"
+speak Vy \"Cá anh Rin câu đêm qua, tươi rói. Chú ăn sạch dĩa rồi mới chê hả?\"
+emote Guest ... 1.0
+speak Khách \"...Thì tính đủ đi. Mai tui dẫn tụi nó tới.\"
+remove Guest
+emote Vy ? 1.0
+speak \"Vy (boi_roi)\" \"Ủa... sao em lại đi bênh cái quán này?\"
+speak Bảo \"Ai biết. Ngồi xuống ăn mì đi, tao nấu ba gói.\"
+narrate \"Sau ca, ba người ngồi ghế nhựa ăn mì. Bảo kể chuyện startup sập, Rin cười như chuyện của ai.\"
+speak Vy \"Hai anh mất hết rồi mà còn cười được hả?\"
+speak Rin \"Mất thì mất. Trời cho cái ghe với cái quán, thì làm cái quán.\"
+speak \"Vy (kieu)\" \"Anh sống kiểu gì mà câu nào cũng là sao cũng được vậy?\"
+emote Rin ... 1.2
+speak Rin \"...Chưa ai hỏi anh câu đó.\"
+speak \"Vy (vui)\" \"Mì ngon thiệt. Mai em tới sớm.\"
+camera room_view 0.8 1"

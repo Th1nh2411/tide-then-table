@@ -24,6 +24,9 @@ extends Resource
 ## small talk once those are used up.
 @export var dialogues: Array[Dialogue] = []
 @export_multiline var idle_lines: Array[String] = []
+## Small talk after this story flag is set (Vy warming up: "vy_warmed").
+@export var later_flag: String = ""
+@export_multiline var later_idle_lines: Array[String] = []
 
 
 ## "đi nhanh · dọn nhanh · tip +10%" from the numbers.

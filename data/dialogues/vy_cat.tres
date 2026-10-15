@@ -8,6 +8,7 @@ id = "vy_cat"
 min_day = 5
 priority = 8
 requires_flag = "cat_adopted"
-script_text = "Vy: {pet} lúc nào cũng nằm ngó ra biển, như đang đợi ai.
+script_text = "Vy (che): {pet} đừng lại gần, lông dính áo em!
+Vy: ...Mà nó lúc nào cũng nằm ngó ra biển, như đang đợi ai.
 Rin: Nó đợi cá thôi.
 Vy (lo): Không đâu... Em thấy mắt nó sáng xanh, giống cái ánh sáng ông em kể."

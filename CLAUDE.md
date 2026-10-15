@@ -239,7 +239,8 @@ Vietnamese, keep code comments in short English.
   4, a choice can hire her: flag `vy_hire_now`); and
   `after_shift_cutscenes`: `beer_day` (after the first shift: a guest asks
   for beer, sold from day 2), `nam_fog_tale` (after day 3), `regular_thanks` (after the first fish order is
-  served, flag `regular_served_once`); the sea's trip-end list has `wave_faint` (night 3), `cat_arrival`
+  served, flag `regular_served_once`); `vy_stands_up` (after Vy's first shift, flag `worked_vy`
+  set by `ShiftCloser` for every hired person; sets `vy_warmed`: Vy turns from spoiled to warm); the sea's trip-end list has `wave_faint` (night 3), `cat_arrival`
   (night 2) and `fog_omen` (night 4)). Commands include `remove <actor>`; actor kinds rin, bao, vy,
   co_nam, guest, cat, crate, rin_bed, glow. dialogue_test checks every marker
   a cutscene uses exists in its scene. Effects (`CutsceneEffects`): `rain
@@ -310,7 +311,7 @@ Vietnamese, keep code comments in short English.
   `ArrivalCutscenes`, `StreetRoomPainter` (StreetRoom's drawing),
   `PartyFactory` / `PartyOrders` / `PartyCheckout` / `PartyWalker`
   (CustomerManager's parties). Staff can have lines (`StaffData.dialogues`,
-  `idle_lines`: StaffCrew adds a Talker; Vy has 4 by day/flag).
+  `idle_lines`, `later_flag` + `later_idle_lines` for small talk after a mood change: StaffCrew adds a Talker; Vy has 6 by day/flag).
 - Art to replace the placeholders is listed in `ASSETS.md`.
 - Phone app "Rin's Catch" (`scenes/ui/phone_app.tscn`, J): in both sea and
   restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is

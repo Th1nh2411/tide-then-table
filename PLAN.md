@@ -15,7 +15,48 @@ RIN THE FISHER là game 2D: **ban đêm** (0:00–6:00) Rin thắp đèn câu, l
 
 **Bí ẩn (bản ghép):** vùng sương đông bắc là nơi một **cổng không gian** dẫn tới một vùng biển song song — "lớp biển bên dưới" mà ông nội Rin từng kể. Cá biến dị (cá thu phát sáng...) là sinh vật lọt qua cổng. **Cá Ông** trong tín ngưỡng ngư dân thật ra là một tộc sinh vật thông minh canh giữ thế giới bên kia (ban đầu tưởng là thù địch vì chúng đẩy thuyền ra khỏi sương). Ông nội và người gác đèn Đá Canh Đêm đã thấy dấu hiệu từ xưa (cổng mở chập chờn); gần đây cổng mở rộng vì một nhà khoa học của **tập đoàn Thâm Lam** (tên tự đặt) vô tình kích hoạt nó, và tập đoàn đang lén khai thác sinh vật bên kia làm nguyên liệu công nghệ. MVP dừng ở lúc Rin bị xoáy nước kéo qua cổng. Hướng màn sau: khám phá biển song song, hiểu ra tộc cá Ông chỉ bảo vệ quê hương, cùng họ đánh sập các cơ sở của Thâm Lam, rồi cổng đóng lại.
 
+- **Tính cách Rin — dễ dãi, thuận theo ý trời, đang đi tìm mục đích sống.** Ban đầu Rin là người khá dễ: ai rủ
+  gì cũng gật, không biết mình thích gì, câu cửa miệng "sao cũng được" / "tới đâu hay tới đó" / "trời kêu ai nấy
+  dạ". Học IT vì bạn bè học, làm startup vì Bảo rủ, về Xóm Đèn vì còn gói mì cuối cùng và chiếc ghe của ông. Hiền,
+  không giận ai lâu, nhưng cũng không giữ cái gì cho riêng mình — chính cái "chạy được là được" này làm Rin cắm SDK
+  của Thâm Lam mà không đọc (khớp phần twist). Diễn tiến:
+  1. *Trôi theo (ngày 1–3):* nhận mọi việc, khách chê thì bớt tiền, Bảo quyết thì nghe. Biển là thứ đầu tiên Rin
+     thấy thích mà không cần ai rủ (câu cá to đầu tiên: im lặng nhìn mặt nước rất lâu).
+  2. *Bị hỏi (ngày 4–5):* Vy là người đầu tiên hỏi thẳng "anh sống kiểu gì mà câu nào cũng là sao cũng được?",
+     "ngoài câu cá anh thích cái gì?" — Rin chưa trả lời được. Nhịp Sóng: biển "chọn" Rin, Rin vẫn chưa chọn gì.
+  3. *Chọn lần đầu (Arc Bảo):* lần đầu Rin tự quyết một mình (đi tới trạm Thâm Lam) — quyết sai cách, liều.
+  4. *Có mục đích (hồi cuối):* hiểu ra thứ mình muốn giữ là quán, mấy người ở quán và vùng biển của cá Ông; từ
+     "sao cũng được" thành "lần này tao chọn". Vẫn hiền, vẫn đùa, nhưng nói "không" được.
+  - Viết thoại Rin: câu ngắn, hay nhường, hay đùa cho qua; chưa tới bước 4 thì đừng cho Rin nói về ước mơ / lý
+    tưởng. Đã gieo: `intro_call` ("Trời kêu ai nấy dạ"), `vy_arrives`, `vy_stands_up`, `vy_stay`, `vy_omen`.
 - Nhân vật phụ dự kiến (từ STORY.md, chưa làm): chú mèo béo ở bến (thật ra là rồng từ chiều không gian kia), một nhân viên quán (nhân vật nữ chính), một người bạn đến từ thế giới bên kia.
+- **Arc Vy (nữ chính, nhân viên quán) — tiểu thư đi làm thêm.** Vy, sinh viên năm cuối, nhà khá giả ở xóm trên
+  (nhà mới xây, bố mẹ làm ăn trên thành phố, ông nội vẫn là ngư dân già của xóm — nguồn chuyện cá Ông / sương).
+  Tiêu hết tiền đi chơi, còn hụt tiền cho **chuyến đi chơi với nhóm bạn** (không nêu địa danh), bố mẹ
+  cắt tiền tiêu vặt "tự kiếm đi rồi biết" → chọn quán gần nhà nhất để làm thêm, định làm đúng đủ tiền rồi nghỉ.
+  Ban đầu không ưa ai, ghét dơ, ghét mùi cá; về sau khác hẳn. Đổi từ từ qua hành động, không đổi tính một phát.
+  1. *Tới (ngày 4, `vy_arrives`):* đứng xa xe đẩy, che mũi; hỏi lương trước khi chào; "Em chỉ bưng đồ thôi nha,
+     không đụng cá sống." Gọi Rin là "anh chủ quán", Bảo là "anh đầu bếp", không nhớ tên. Bảo: "Tiểu thư hả trời."
+  2. *Gai góc (ngày 4–5):* idle lines chê ("Bàn này ai ăn mà như bãi chiến trường vậy?", "Mùi cá dính tóc em
+     rồi!"), đeo găng tay hồng dọn bàn, đếm từng ngày lương, lướt điện thoại xem ảnh bạn đi chơi. Không ghét Rin
+     mà coi Rin là "ông chủ nghèo dễ dụ". Với mèo: sợ lông dính áo.
+  3. *Vết nứt:* một tối khách say chê quán dơ / bắt nạt Rin → Vy là người cãi lại đầu tiên ("Quán người ta sạch
+     hơn nhà anh đó!") rồi tự ngạc nhiên vì mình bênh. Lần đầu tự tay nhặt con cá rơi khỏi thùng; lần đầu ăn mì
+     Bảo nấu cùng hai người sau ca (thấy họ cười với nhau, Vy mới biết quán này là thứ họ dựng lại từ đổ nát).
+  4. *Mở lòng:* nghe Rin kể về cá Ông / sương thì nhận ra trùng chuyện ông nội → về hỏi ông, mang chuyện cũ (manh
+     mối) tới quán. Tóc buộc gọn, bỏ găng tay, gọi đúng tên mọi người; idle lines đổi giọng ("Bàn 3 xong rồi anh
+     Rin!", "Anh Bảo, em nêm thử nha?"). Đủ tiền đi chơi rồi mà vẫn ở lại — hủy chuyến, nói cho qua: "Đi với tụi nó
+     chán lắm. Ở đây còn có {pet}."
+  5. *Người giữ quán:* trong Arc Bảo, chính Vy chặn Rin ở bến và chạy đi báo Bảo (bước 2 ở dưới) — cô tiểu thư
+     từng chỉ muốn lấy lương giờ là người không muốn quán này tan. Tình cảm với Rin chỉ gợi (đỏ mặt, cãi nhỏ),
+     không thành chuyện chính trong MVP.
+  - **Đã cài:** `vy_arrives` viết lại (che mũi, hỏi lương, "không đụng cá sống"); cutscene sau ca mới
+    `vy_stands_up` (cần flag `worked_vy` — `ShiftCloser` đặt `worked_<id>` cho mỗi nhân viên làm hết ca — khách
+    say chê quán, Vy cãi lại, ba người ăn mì; đặt `vy_warmed`). Thoại: giai đoạn đầu `vy_app`, `vy_mark`; hai
+    giai đoạn đều hợp `vy_cat`, `vy_omen`; sau `vy_warmed`: `vy_fog` (đi hỏi ông nội), `vy_stay` mới (đủ tiền mà
+    ở lại, hỏi Rin thích gì). Câu nói vặt: `StaffData.later_flag` + `later_idle_lines` (Talker đổi bộ câu khi
+    flag bật). Vy vào làm ngày 4 → nếu nhận ngay thì sau ca ngày 4 đã qua bước 3; bước 4–5 nằm ở màn sau.
+    Chân dung mood `che`, `kieu` chưa có file → dùng ảnh thường.
 - **Twist dự kiến (SAU MVP, chưa code; MVP chỉ gieo manh mối):** app của startup Rin & Bảo thật ra được làm ra để phục vụ Thâm Lam (khách hàng/nhà đầu tư giấu mặt: dữ liệu ngư dân, tọa độ, sinh vật lạ chảy về tập đoàn). Bí mật lộ qua một **sự kiện thông báo của app** (push notification / log `[ERR]` không phải do Rin viết), đặt **gần cuối** (đầu hồi cuối, trước khi đánh Thâm Lam: backdoor trong app thành vũ khí); trước đó chỉ gieo manh mối nhỏ để twist không bị hụt.
   - **Ai có lỗi gì (đã chốt):**
     - **Bảo lỗi nặng hơn**: hồi startup sắp sập, Bảo một mình ký với nhà đầu tư "TL Holdings" (công ty con của Thâm Lam), biết app sẽ gửi dữ liệu về cho họ nhưng tin lời "chỉ để nghiên cứu thị trường" và nhận thêm một khoản riêng; thấy dấu hiệu lạ vẫn lờ đi. Startup sập, Bảo giấu Rin. Về Xóm Đèn rồi TL Holdings vẫn liên lạc, nhờ Bảo giữ app chạy (Bảo im lặng). Về quê đứng bếp có phần là chuộc lỗi.

@@ -8,7 +8,7 @@ id = "vy_mark"
 min_day = 1
 priority = 14
 requires_flag = "wave_mark"
-script_text = "Vy: Anh Rin, tay anh bị gì vậy? Sao có vệt xanh xanh như hình con sóng?
+script_text = "Vy (che): Ê, tay anh bị gì vậy? Xanh xanh như hình con sóng... đừng đụng vô dĩa của khách nha.
 Rin: Hôm trước ra khơi... nói ra em không tin đâu.
-Vy: Ông nội em kể, ngày xưa ai được cá Ông \"đánh dấu\" thì biển nhường cho người đó một nhịp.
-Vy (lo): Anh đừng giỡn với nó nha. Mà nếu quán đông quá... thì cũng đỡ được chút ha."
+Vy: Ông nội em kể, ai được cá Ông \"đánh dấu\" thì biển nhường cho người đó một nhịp.
+Vy (kieu): Ông nói vậy thôi, em không tin. Mà quán đông quá thì... xài đỡ cũng được."

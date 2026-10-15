@@ -9,6 +9,10 @@ extends Node
 @export var dialogues: Array[Dialogue] = []
 ## Small talk once every conversation is used up (random each time).
 @export_multiline var idle_lines: Array[String] = []
+## Once this story flag is set, small talk comes from `later_idle_lines`
+## instead (someone whose mood changed over the story).
+@export var later_flag: String = ""
+@export_multiline var later_idle_lines: Array[String] = []
 
 
 func _ready() -> void:
@@ -37,6 +41,12 @@ func talk(box: DialogueBox) -> void:
 	var dialogue := DialogueLibrary.pick(dialogues)
 	if dialogue:
 		await box.play(dialogue)
-	elif not idle_lines.is_empty():
-		var line: Array[Dictionary] = [{"speaker": display_name, "text": idle_lines.pick_random()}]
+	elif not current_idle_lines().is_empty():
+		var line: Array[Dictionary] = [{"speaker": display_name, "text": current_idle_lines().pick_random()}]
 		await box.play_lines(line)
+
+
+func current_idle_lines() -> Array[String]:
+	if later_flag and GameState.has_flag(later_flag) and not later_idle_lines.is_empty():
+		return later_idle_lines
+	return idle_lines

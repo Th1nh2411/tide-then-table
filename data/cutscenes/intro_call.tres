@@ -13,6 +13,7 @@ narrate \"Ba tháng sau khi startup của Rin và Bảo sập.\"
 narrate \"Rin nằm dài trong phòng trọ, lướt tin tuyển dụng tới mỏi tay.\"
 emote Lying ... 1.2
 speak \"Rin (buon)\" \"Gửi hai trăm cái CV. Không ai gọi lại.\"
+speak Rin \"Thôi kệ. Trời kêu ai nấy dạ. Giờ đói thì ăn đã.\"
 pause 0.4
 narrate \"Bụng réo. Trên bàn chỉ còn đúng một gói mì.\"
 emote Lying ! 1.0
