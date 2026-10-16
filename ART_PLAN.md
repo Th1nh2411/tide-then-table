@@ -141,6 +141,11 @@ F7 bật/tắt) để chủ dự án duyệt. Chưa duyệt thì chưa làm ti�
   PixelLab: chuyển động 1 px, script chính xác + giữ phần sửa tay): thở = dòng 0..eo hạ 1 px (eo: Rin 20, Bảo 18,
   Vy 17), chớp mắt = sơn lại pixel mắt ghi trong `BLINK` (Rin: kính chỉ xoá con ngươi — vẽ mí thành kính râm).
   **Sửa sheet xong chạy lại script**; mặt / eo dời chỗ thì sửa `BLINK` / `WAIST`. Xem: `scenes/test/sprite_viewer.tscn`.
+- **Tỉ lệ theo Rin (2026-10-16, chủ dự án chọn Rin làm gốc):** mọi người dùng mốc của Rin: **đầu 13 dòng (cằm /
+  cổ ở dòng 12), chẻ chân dòng 25, ống chân 25–29, bàn chân 30–31**, mặt rộng ~10–11 px (thay cho tỉ lệ 11/8/13 ở
+  trên). `tools/match_rin.py` (chạy một lần trên sheet git 9fbf6ac): bỏ 2 dòng ống chân (26, 27), vẽ đầu mới to hơn
+  cho Bảo / Vy theo từng hướng (bản đồ ký tự trong script) và dán lên mọi khung theo độ nhún của khung đó; thân giữ
+  nguyên pixel. Eo idle: Bảo 20, Vy 19. Nhân vật mới vẽ thẳng theo mốc này.
 - **Sheet quán làm lại bằng PixelLab (2026-10-15, 16 lượt):** đầu vào luôn là **ảnh đứng của sheet** (cột 0 mỗi
   hàng), ghép bằng `tools/pixellab_walk.py row` (ép về màu của ảnh đứng, đặt chân sát đáy, `--keep-head` dán đầu vẽ
   tay lên mọi khung cho kính / mặt không đổi; game chạy 1-2-3-2 nên đưa bước / lướt / bước kia).

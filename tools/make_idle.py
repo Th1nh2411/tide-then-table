@@ -16,7 +16,7 @@ from PIL import Image
 ROOT = os.path.join(os.path.dirname(__file__), "..", "assets", "sprites", "characters")
 
 # Last row that moves when breathing (bottom of the top / arms).
-WAIST = {"rin": 20, "bao": 18, "vy": 17}
+WAIST = {"rin": 20, "bao": 20, "vy": 19}
 
 # Per sheet row (0 down, 2 left): (x, y, colour) painted for shut eyes.
 BLINK = {
@@ -25,12 +25,12 @@ BLINK = {
         2: [(3, 8, "a4dddb")],
     },
     "bao": {  # whites + pupils -> skin, the upper lid stays as the shut eye
-        0: [(5, 7, "d7b594"), (6, 7, "d7b594"), (8, 7, "d7b594"), (9, 7, "d7b594")],
-        2: [(4, 6, "d7b594"), (5, 6, "d7b594")],
+        0: [(4, 8, "d7b594"), (5, 8, "d7b594"), (9, 8, "d7b594"), (10, 8, "d7b594")],
+        2: [(4, 6, "d7b594")],
     },
     "vy": {
         0: [(5, 8, "e7d5b3"), (6, 8, "e7d5b3"), (9, 8, "e7d5b3"), (10, 8, "e7d5b3")],
-        2: [(6, 7, "151d28"), (5, 8, "e7d5b3"), (6, 8, "e7d5b3")],
+        2: [(6, 8, "151d28"), (5, 9, "e7d5b3"), (6, 9, "e7d5b3")],
     },
 }
 
