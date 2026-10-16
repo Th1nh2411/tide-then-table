@@ -96,7 +96,7 @@ func _draw_art() -> bool:
 	var facing := Vector2i(int(_facing), 0)
 	match kind:
 		"rin", "bao", "vy", "co_nam", "guest":
-			return Art.draw_person(self, "characters/" + kind, facing, _time, _walking)
+			return Art.draw_person(self, "characters/" + kind, facing, _time, _walking, false, _time)
 		"cat":
 			return Art.draw_sheet(self, "characters/cat", Rect2(-12, -24, 24, 24), 8, 1 if _walking else 0,
 				_time, 6.0 if _walking else 3.0, _facing < 0.0)

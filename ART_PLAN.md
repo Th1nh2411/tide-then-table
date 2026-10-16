@@ -137,6 +137,10 @@ F7 bật/tắt) để chủ dự án duyệt. Chưa duyệt thì chưa làm ti�
   theo tỉ lệ hàng 1–2 (đầu dòng 0–11, áo 12–17 nhân đôi 2 dòng áo, váy 18–22, chân 23–31) làm khung đứng, PixelLab
   `animate_image` (1 lượt) "walking to the left" → `pixellab_walk.py row ... --keep-head --head 12` (khung 2 / 4 / 3).
   Tóc búi của ảnh mẫu: chủ dự án vẽ lại.
+- **Idle (2026-10-16):** `tools/make_idle.py` dựng `<tên>_idle.png` cho Rin, Bảo, Vy từ cột 0 của sheet (không dùng
+  PixelLab: chuyển động 1 px, script chính xác + giữ phần sửa tay): thở = dòng 0..eo hạ 1 px (eo: Rin 20, Bảo 18,
+  Vy 17), chớp mắt = sơn lại pixel mắt ghi trong `BLINK` (Rin: kính chỉ xoá con ngươi — vẽ mí thành kính râm).
+  **Sửa sheet xong chạy lại script**; mặt / eo dời chỗ thì sửa `BLINK` / `WAIST`. Xem: `scenes/test/sprite_viewer.tscn`.
 - **Sheet quán làm lại bằng PixelLab (2026-10-15, 16 lượt):** đầu vào luôn là **ảnh đứng của sheet** (cột 0 mỗi
   hàng), ghép bằng `tools/pixellab_walk.py row` (ép về màu của ảnh đứng, đặt chân sát đáy, `--keep-head` dán đầu vẽ
   tay lên mọi khung cho kính / mặt không đổi; game chạy 1-2-3-2 nên đưa bước / lướt / bước kia).

@@ -179,6 +179,9 @@ chân 13 (xem ART_PLAN "Tỉ lệ người"), các hàng:
 3. đi sang trái (cột 2 / 4 = sải chân, 3 = đứng; sang phải = game tự lật),
 4. (tuỳ chọn) "đang bận": khách ngồi ăn, Bảo đảo chảo — 4 khung lặp.
 → 1 sheet đủ 4 hàng = 64x128.
+Tuỳ chọn `characters/<tên>_idle.png` (64x96, cùng 3 hàng xuống / lên / trái): đứng yên thở + chớp mắt, cột 1 = đứng,
+2 = hít vào (thân trên hạ 1 px), 3 / 4 = cột 1 / 2 nhắm mắt; dựng bằng `tools/make_idle.py` từ cột 1 của sheet
+(chạy lại sau khi sửa sheet). Không có thì đứng yên dùng cột 1.
 
 | File | Ai |
 |---|---|

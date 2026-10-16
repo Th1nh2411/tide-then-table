@@ -19,7 +19,7 @@ Vietnamese, keep code comments in short English.
   (`PalettePreview`), `tools/pixelize.py` cleans AI drafts into sprites; PixelLab MCP is set up for
   this project, the next steps are in ART_PLAN.md;
   sheets: `draw_frame`,
-  `draw_sheet`, `draw_person`; names listed in ASSETS.md "Tên file"). No
+  `draw_sheet`, `draw_person` (standing plays `<sheet>_idle` if present: breath + blink, `tools/make_idle.py`; look at sheets in `scenes/test/sprite_viewer.tscn`); names listed in ASSETS.md "Tên file"). No
   audio files. Sounds are built in code: autoload `Sfx` (`Sfx.play("catch")`,
   `Sfx.hold("sizzle", on)`, `Sfx.ambience("sea")` per scene; recipes in
   `Sfx.SOUNDS` / `LOOPS`, synth `SfxSynth`; every Button clicks; mute in the

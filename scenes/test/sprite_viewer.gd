@@ -1,7 +1,8 @@
 extends Node2D
 ## Look at person sheets in motion (F6). Not a PASS/FAIL test.
-## Each row: one sheet; columns: down, up, left, right, busy (if the sheet has it).
-## Space toggles walking, +/- zoom.
+## Each row: one sheet; columns: walking down, up, left, right, busy (if the
+## sheet has it), then standing down, up, left (idle sheet: breathing, blinking).
+## Space stops / starts the walking columns, +/- zoom.
 
 @export var sprites: PackedStringArray = ["characters/rin", "characters/bao", "characters/vy"]
 @export var zoom := 3.0
@@ -34,10 +35,12 @@ func _unhandled_input(event: InputEvent) -> void:
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, get_viewport_rect().size), Color("577277"))
 	for i in sprites.size():
-		for j in FACINGS.size() + 1:
+		for j in FACINGS.size() + 4:  # walking x4, busy, standing down / up / left
 			var busy := j == FACINGS.size()
-			var facing: Vector2i = Vector2i.DOWN if busy else FACINGS[j]
+			var standing := j > FACINGS.size()
+			var facing: Vector2i = FACINGS[j - FACINGS.size() - 1] if standing \
+				else Vector2i.DOWN if busy else FACINGS[j]
 			var feet := (Vector2(j, i) * CELL + Vector2(12, 34)) * zoom + Vector2(8, 4)
 			draw_set_transform(feet, 0.0, Vector2(zoom, zoom))
-			Art.draw_person(self, sprites[i], facing, _time, _walking and not busy, busy, _time)
+			Art.draw_person(self, sprites[i], facing, _time, _walking and not busy and not standing, busy, _time)
 	draw_set_transform(Vector2.ZERO)

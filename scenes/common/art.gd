@@ -19,6 +19,11 @@ const ROW_LEFT := 2
 const ROW_BUSY := 3
 ## Walk columns in play order (Stardew ping-pong): step, passing, step, passing.
 const WALK_CYCLE: Array[int] = [1, 2, 3, 2]
+## Optional "<sheet>_idle" sheet (tools/make_idle.py), same rows: columns
+## standing / breathing in / both with eyes shut. Seconds per breath / blink.
+const IDLE_BREATH := 1.6
+const IDLE_BLINK := 3.7
+const IDLE_BLINK_LENGTH := 0.15
 
 ## Where the PNGs live (tests point this elsewhere).
 static var root: String = "res://assets/sprites/"
@@ -90,15 +95,31 @@ static func draw_sheet(canvas: CanvasItem, sprite: String, rect: Rect2, columns:
 ## A 16x32 person standing at the canvas origin (feet), from a sheet of
 ## PERSON_COLUMNS frames per row (frames are twice as tall as wide, so the
 ## row count follows from the image size). `busy` uses the 4th row if the
-## sheet has one.
+## sheet has one. Standing still plays "<sprite>_idle" if there is one.
 static func draw_person(canvas: CanvasItem, sprite: String, facing: Vector2i, walk_time: float,
 		walking: bool, busy: bool = false, time: float = 0.0) -> bool:
 	var tex := texture(sprite)
 	if tex == null:
 		return false
 	var f := person_frame(tex.get_size(), facing, walking, busy, walk_time, time)
+	if not walking and f["column"] == 0 and f["row"] != ROW_BUSY:
+		var idle := texture(sprite + "_idle")
+		if idle:  # each person breathes / blinks at its own phase
+			var phase := float(canvas.get_instance_id() % 997) * 0.37
+			f = person_frame(idle.get_size(), facing, false, false, walk_time, time)
+			return draw_frame(canvas, sprite + "_idle", PERSON_COLUMNS, f["rows"],
+				idle_column(time + phase), f["row"], Rect2(-8, -32, 16, 32), f["flip"])
 	return draw_frame(canvas, sprite, PERSON_COLUMNS, f["rows"], f["column"], f["row"],
 		Rect2(-8, -32, 16, 32), f["flip"])
+
+
+## Idle sheet column at `time`: breathe in for half of each breath, eyes shut
+## for a moment every IDLE_BLINK seconds.
+static func idle_column(time: float) -> int:
+	var column := 1 if fmod(time, IDLE_BREATH) >= IDLE_BREATH * 0.5 else 0
+	if fmod(time, IDLE_BLINK) < IDLE_BLINK_LENGTH:
+		column += 2
+	return column
 
 
 ## Which frame of a person sheet of `image_size`: {"rows", "row", "column", "flip"}.

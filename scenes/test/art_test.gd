@@ -44,6 +44,10 @@ func _ready() -> void:
 	failures += _check("straight moves use the main axis",
 		StreetPerson.facing_for(Vector2(0.2, 1), Vector2i.LEFT) == Vector2i.DOWN
 		and StreetPerson.facing_for(Vector2.ZERO, Vector2i.UP) == Vector2i.UP)
+	var half := Art.IDLE_BREATH * 0.5
+	failures += _check("idle breathes: standing, then breathing in, eyes shut at each blink",
+		Art.idle_column(Art.IDLE_BLINK_LENGTH + 0.01) == 0 and Art.idle_column(half + 0.05) == 1
+		and Art.idle_column(Art.IDLE_BLINK * 2.0 + 0.01) in [2, 3])
 	DirAccess.remove_absolute(TEST_ROOT + "characters/tester.png")
 	Art.root = old_root
 	Art.clear_cache()
