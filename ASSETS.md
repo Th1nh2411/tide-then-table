@@ -11,8 +11,8 @@ mục "Tên file" ở cuối.
   sáng → tối: xanh biển 6 · đất/da 6 · nâu cam 5 · đỏ 3 · xanh lá 3 · tím 2 (sương, cá biến dị) · xám xanh 8
   · riêng 4 (đỏ biển hiệu, vàng nón lá, xanh ngọc phát sáng, trắng đèn tuýp). File: `assets/palette/
   xom_den.gpl` (Aseprite: Palette → Load), `xom_den.hex`, `xom_den.png` (ảnh mẫu màu, đưa cho AI làm tham
-  chiếu). Chỉ dùng màu trong bảng.
-- **Số màu tối đa mỗi hình:** nhân vật 16x32 → 10, chân dung 64x64 → 16, hải sản / món ăn 16x16 → 6, cả màn
+  chiếu). Các asset dùng màu trong bảng Xóm Đèn; chân dung 128 đã duyệt giữ nguyên màu riêng.
+- **Số màu tối đa mỗi hình:** nhân vật 16x32 → 10, chân dung 128x128 → theo mẫu Rin/Vy đã duyệt (không ép 16 màu), hải sản / món ăn 16x16 → 6, cả màn
   biển đêm khoảng 12–16 (học DREDGE: ít màu, chỉ thứ quan trọng mới sáng).
 - **Quán** dùng nửa ấm (màu đất, cam, đỏ/xanh ghế nhựa, vàng nón lá); **biển đêm** dùng nửa lạnh, 3–4 màu xanh
   đen làm nền, chỉ đèn (cam) và thứ phát sáng (xanh ngọc) là sáng — giống DREDGE: cái gì quan trọng mới sáng.
@@ -20,24 +20,21 @@ mục "Tên file" ở cuối.
 - **AI làm nháp, tay làm xong:** AI hợp với chân dung, hải sản, món ăn, đồ đứng yên, nền xa; tự vẽ tay sprite đi
   bộ (animation), ô gạch lặp, và đồ đậm chất Việt (nón lá, thuyền thúng, xe đẩy inox, biển hiệu chữ Việt).
   Lệnh cho AI: "pixel art, <cỡ>, limited palette, transparent background, no anti-aliasing" + ảnh mẫu màu +
-  một hình đã vẽ chuẩn làm tham chiếu; tả nhân vật cố định (vd "Rin: young Vietnamese man, conical hat, blue
-  shirt").
-- **Làm sạch ảnh AI:** `python3 tools/pixelize.py nhap.png assets/sprites/portraits/rin.png --size 64x64`
-  → xoá nền, cắt sát, thu về đúng cỡ (đặt sát đáy, giữa), mỗi ô lấy màu bảng gần nhất, bỏ viền mờ; ảnh phóng x8
-  để xem ở `build/pixelize/`. Sau đó sửa tay trong Aseprite (mắt, tay, viền ngoài 1 màu đậm, sáng tối theo một
-  hướng đèn). Tuỳ chọn: `--max-colors 10` (giữ đúng giới hạn màu ở trên), `--keep-bg`, `--no-trim`,
-  `--bg-tolerance 60`.
+  một hình đã vẽ chuẩn làm tham chiếu; tả nhân vật cố định theo ART_PLAN (Rin: tóc đen rối, kính chữ nhật, áo ba lỗ trắng).
+- **Chân dung:** chuẩn **128x128**, lấy `assets/sprites/portraits/rin.png` và `vy.png`
+  đã duyệt làm chuẩn phong cách; giữ nguyên hai file và màu của chúng. Bảo cũng đã dùng bản 128, tóc ngắn mái ngố theo sprite.
+  Quy trình và trạng thái nằm ở đầu `ART_PLAN.md`.
+  Kho bản làm việc: `build/portraits/64/`, `build/portraits/128/`, `build/portraits/ref/`.
 
 ## Quy ước chung
 
 - **Cỡ chuẩn trong game:** ô 16 px, nhân vật 16x32 (kiểu Stardew), màn hình 640x360, phóng nguyên lần x3.
-- **Nếu vẽ ở 32x32 cho dễ chi tiết:** vẽ gấp đôi mọi kích thước bên dưới (ô 32, nhân vật 32x64), game sẽ thu
-  nhỏ 0.5. Chọn **một** tỉ lệ cho toàn bộ game, đừng trộn.
+- **Vẽ ở cỡ gốc:** sprite người 16x32, chân dung 128x128. Giữ cùng mật độ pixel trong từng loại asset; portrait hiện có được chuẩn bị về 128 bằng nearest-neighbor.
 - **Định dạng:** PNG nền trong suốt, không khử răng cưa (nearest), sprite sheet theo hàng: mỗi hàng là 1
   hoạt cảnh, mỗi cột là 1 khung hình.
 - **Hướng nhìn:** quán là top-down 3/4 (thấy mặt trên + mặt trước); biển là nhìn thẳng từ trên xuống.
 - **Thư mục:** `assets/sprites/<khu>/<tên>.png` (vd `assets/sprites/restaurant/food_cart_0.png`), tên đúng
-  như bảng "Tên file" ở cuối. Ảnh luôn được kéo cho vừa khung trong game, nên vẽ 1x hay 2x đều được.
+  như bảng "Tên file" ở cuối. Renderer có thể kéo ảnh, nhưng asset mới phải vẽ đúng cỡ gốc để tránh mất nét.
 - **Ban đêm ở biển** màn hình bị phủ màu tối: vật cần thấy rõ (đèn, bọt cá, phao) nên có phần sáng / viền sáng.
 
 Ưu tiên: **P1** = thấy nhiều nhất, làm trước; **P2** = làm sau; **P3** = trang trí, làm cuối.
@@ -58,8 +55,7 @@ Kích thước 16x32. Hướng: xuống / lên / trái (phải = lật trái). �
 | Nhân viên thuê (9 người) | đi bộ, cầm đĩa, dọn bàn | có thể dùng 2–3 dáng người + đổi màu |
 | Mèo (Mỡ) | ngồi, đi, nằm ngủ, vẫy đuôi | mèo mập màu cam, ~16x16 |
 
-**Chân dung hộp thoại (P2, kiểu Nine Sols):** bán thân lớn (đầu + vai), vuông 64x64 (game phóng lên 136x136,
-hoặc vẽ 128x128 cho chi tiết), góc 3/4 như chân dung Rin, **file luôn quay mặt sang phải**; Rin đứng bên trái,
+**Chân dung hộp thoại (P2, kiểu Nine Sols):** bán thân lớn (đầu + vai), vuông **128x128 pixel gốc**, hiển thị 1:1 trong khung 128x128 của viewport, nearest-neighbor, góc 3/4 như chân dung Rin, **file luôn quay mặt sang phải**; Rin đứng bên trái,
 mọi nhân vật khác đứng bên phải và được game lật tự động → trên màn hình quay sang trái, nhìn về phía Rin. Vai chạm
 mép dưới. File `portraits/<id>.png`, nét mặt thêm `portraits/<id>_<nét>.png` (trong thoại ghi `Rin (vui): ...`;
 thiếu file nét mặt thì dùng ảnh thường). id = tên không dấu: `rin`, `bao`, `vy`, `co_nam`, `ong_tam`,

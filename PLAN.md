@@ -444,6 +444,11 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng 
 
 ## 9. Tiến độ
 
+- **Art (2026-10-20):** Rin, Vy và Bảo đang dùng chân dung **128x128**, hiển thị 1:1
+  trong khung thoại 128. Rin/Vy là mẫu phong cách; Bảo tóc ngắn mái ngố theo sprite.
+  Giữ màu của portrait hiện có. Biểu cảm Rin 64 đã cất khỏi game, tạm dùng ảnh thường.
+  Chi tiết và việc tiếp theo ở `ART_PLAN.md`.
+
 | Phase                    | Trạng thái   | Ghi chú                                                                                                                                                                                                    |
 | ------------------------ | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 0 — Khởi tạo             | ✅           | Godot 4.7.2; autoload GameState/DayClock/SceneRouter, main menu, sea scene trống                                                                                                                           |

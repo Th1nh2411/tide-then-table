@@ -1,0 +1,10 @@
+Tool: built-in image_gen, two hair-only edit passes.
+References: build/portraits/ref/bao_rin_style_v1_source.png (portrait), assets/sprites/characters/bao.png (hair).
+First pass: replace swept hair with short blunt fringe matching Bao sprite, preserve face/body/clothing/composition. Result still had long pointed bangs.
+Final prompt:
+Edit this Bao portrait again, ONLY the hair. The last haircut is still too long with pointed separated bangs. Give him a genuinely SHORT Vietnamese 'mái ngố' / blunt short crop: a nearly straight continuous horizontal fringe edge across the UPPER forehead, with a visible band of bare forehead between the fringe and eyebrows. The fringe ends about one eyebrow-height ABOVE the eyebrows, not touching them. No long pointed locks hanging down, no side swept diagonal bangs, no parted fringe. Short compact rounded top close to skull, very short tidy temples and nape, ears fully exposed. Think neat youthful short schoolboy crop with blunt micro-fringe, matching a compact pixel-art sprite hair cap. Keep black hair and the same pixel illustration shading but reduce the quantity of hair and avoid large wavy anime strands. Preserve this exact man's face, cheeks, eyes, brows, nose, smile, face scale, head position, ears, all skin, neck, clothing, apron, torso, square framing and transparent background. Change only hair silhouette and hair texture; all other image regions stay the same. Single portrait PNG with real alpha transparency.
+
+Source: build/portraits/ref/bao_rin_style_v2_source.png
+128x128: build/portraits/128/bao_rin_style_v2.png (nearest-neighbor reduction via CoreGraphics).
+Current game portrait: assets/sprites/portraits/bao.png (128x128, short blunt fringe).
+The build/ files above preserve the generation draft; the game asset is the current version.

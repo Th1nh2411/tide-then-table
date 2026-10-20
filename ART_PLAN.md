@@ -1,83 +1,36 @@
-# Kế hoạch art với PixelLab MCP
+# Kế hoạch art — Xóm Đèn
 
-Viết cho phiên Claude Code mới (đã nạp tool PixelLab) và cho chủ dự án. Đọc kèm `ASSETS.md` (tên file, kích thước,
-bảng màu, giới hạn màu) và `CLAUDE.md` (cách game nạp art: `Art`, F7, `tools/pixelize.py`).
+Cập nhật: 2026-10-20. Kích thước và tên file từng loại xem `ASSETS.md`;
+code nạp art và chạy game xem `CLAUDE.md`.
 
-## Trạng thái
+## Chân dung
 
-- PixelLab MCP đã cài cho dự án này (`claude mcp list` → pixellab ✔ Connected). Tài liệu tool:
-  https://api.pixellab.ai/mcp/docs. Tool chạy **bất đồng bộ**: tạo → nhận id → `get_*` lấy kết quả (URL ảnh) →
-  `curl` tải về.
-- Bảng màu "Xóm Đèn" 37 màu: `assets/palette/xom_den.hex` (mỗi dòng RRGGBB). Ảnh mẫu màu: `xom_den.png`.
-- Game tự dùng PNG nào có trong `assets/sprites/` (thiếu thì vẽ hình tạm). F7 (bản debug) xem cả game bằng bảng màu.
-- Bước 1 + 2 xong (2026-10-13), **chờ duyệt**: `characters/rin.png`, `portraits/rin.png`, `fish/muc.png`.
-  Ảnh chụp trong game: `build/shots/` (không commit).
-- Gói trial: tối đa **1 job cùng lúc** (animate từng hướng một: `directions=["south"]`, rồi north, west với
-  cùng `animation_group_id`). Đã dùng 35/40 lượt + 1 lượt thưởng ngày. **Trial không cho `create_image_pro` khi
-  còn < 10 lượt** (không cộng lượt thưởng ngày).
-- Rin chốt dáng (2026-10-14, theo ảnh mẫu của chủ dự án): **tóc đen rối, kính gọng đen chữ nhật, da ngăm, áo ba
-  lỗ trắng, dây chuyền đen mảnh có mặt lưỡi câu bạc, khuyên tai bạc, quần short đen, dép**; không đội nón. Chân dung quay 3/4 sang phải
-    (lần 2 `edit_image_pixen`: "turn ... facing right"; màu mới chưa có trong bảng gán lấy theo màu gốc gần nhất).
-  - Chân dung: `edit_image_pixen` (1 lượt) sửa thẳng trên ảnh mẫu (thu về lưới pixel gốc ~45x56, đệm 64x64):
-    thêm kính, bỏ tay ở cằm. Màu gán **bằng tay** từng màu gốc → Xóm Đèn (tự động thì tóc ra đỏ nâu, da vàng).
-  - Nét mặt (2026-10-14): `edit_image_pixen` trên chân dung gốc phóng x2 (128), chỉ đổi nét mặt; lấy mẫu về
-    64x64, gán về đúng 13 màu của chân dung, **chỉ giữ hàng 18–37 (mặt)**, tóc dưới + cổ + thân lấy từ ảnh gốc.
-    Có `rin_vui`, `rin_ngac_nhien` (trong game); `rin_lo`, `rin_buon` (chờ duyệt, `build/pixelize/rin_moods/`).
-    Bóng dưới cằm sửa tay cho mọi nét: 1 hàng tối ngay dưới đường hàm, mảng vừa, mép dưới gọn, viền phải cổ.
-  - Sprite (làm lại 2026-10-14): `create_character` **mode pro** (10 lượt) với `concept_image_url` = chân dung
-    `portraits/rin.png` phóng x4, size 32 → dáng chibi đầu to, màu khớp chân dung; character id
-    `f07ff7e8-0d08-42f9-b22b-e231ab4b36af`. Animation `walking-4-frames` của PixelLab lem (tóc đổi hình mỗi
-    khung, chân thành cục) → **không dùng**; sheet dựng tay từ 3 ảnh đứng yên (15x28, vừa khung 16x32 1:1, màu gán
-    tay sang Xóm Đèn): dọn kính trắng loáng (tròng `ebede9` + `c7cfcc`), dây tối + móc bạc, áo trắng `ebede9`
-    (kem `e7d5b3` trùng tông da, lưng nhìn như cởi trần); khung 1/3 đứng yên, 2/4 nhún lên 1 px + nhấc 1 chân
-    (ngang: 2 chân dạng, chân xa tối hơn). Không chạy `pixellab_import.py` cho Rin nữa (mất phần sửa tay).
-    **Kính trên sprite 16x32 không có gọng** (viền 1 px quá to so với mặt): kiểu gọng mày (theo ảnh mẫu chibi của
-    chủ dự án, thu về mặt 9 px): thanh gọng `090a14` phía trên + 1 px sống mũi, tròng 2x2 `a4dddb` / `ebede9` có
-    1 px con ngươi `151d28` (phía mũi); không viền hông / dưới. Mặt ngang: thanh trên chạy ra sau làm càng kính,
-    1 px gọng trước, tròng 2x2 con ngươi nhìn về trước. Dựng lại: `tools/rin_glasses.py` biến thể "e" (áp lên
-    sheet gốc trong git). Chân dung
-    64x64 vẫn giữ gọng đen.
-- Bài học bước 2:
-  - `create_image_pro` ở đúng cỡ game (64x64, 40x20) đẹp hơn hẳn pixflux + thu nhỏ; cỡ ≤ 42 px cho 64 ứng viên.
-    Tốn 10 lượt mỗi lần → dùng cho chân dung + hải sản, chọn nhiều thứ trong một lần nếu được.
-  - `create_image_pixflux` cho con mực kém (2 lần, hình lạ) → bỏ cho hải sản.
-  - `create_character` size 48 → người cao ~53 px, thu về 32 px làm mặt lỗi. Dùng **size 29** (người cao ~35 px,
-    gần đúng 16x32, nét hơn hẳn). Nón lá phải tả rõ "pointed cone-shaped conical hat", không thì ra nón cao bồi.
-  - `edit_image_pixen` đổi hướng / thêm kính tốt, nhưng **tư thế tay chính xác thì không nghe lời** (3 lần "gãi
-    sau đầu" đều ra tay trên đỉnh đầu hoặc mất khuỷu). Tư thế cụ thể: phác khối tay thô trong Aseprite trước
-    (đúng chỗ, đúng màu da), rồi cho AI làm sạch (`edit_image_pixen` "clean up, keep the pose" hoặc
-    `create_image_pixflux` `init_image_strength` ~300); hoặc `edit_image` bản pro.
-  - Ứng viên mực khác màu (#39 xanh, #63 trắng phát sáng) có thể dùng cho cá dị biến.
+- Chuẩn **128x128**, nền trong suốt, bán thân 3/4 quay phải, vai chạm đáy.
+- **Rin và Vy đã duyệt và đang dùng:** `assets/sprites/portraits/rin.png`, `vy.png`.
+  Đây là mẫu phong cách cho các chân dung tiếp theo; giữ màu và alpha của ảnh đã duyệt.
+- Game hiển thị trong khung 128x128, tự lật nhân vật bên phải.
+  File thường: `<id>.png`; biểu cảm: `<id>_<mood>.png`. Thiếu biểu cảm thì dùng ảnh thường.
+- **Bảo:** đang dùng portrait 128 tại `assets/sprites/portraits/bao.png`, tóc ngắn mái ngố
+  theo sprite, phong cách theo Rin. Prompt tham khảo: `tools/ref/bao_rin_style_v2_prompt.txt`.
+- **Biểu cảm Rin:** cần làm lại `vui`, `buon`, `lo`, `ngac_nhien` từ base 128,
+  giữ nhất quán tóc, thân và bố cục. Bản 64 đã cất khỏi game; các bản 128 `*_raw` còn là nháp.
+- Chân dung mới được so cạnh Rin/Vy và xem trong hội thoại để kiểm tra phong cách, tỉ lệ và hướng mặt.
 
-## Bước 1 — `tools/pixellab_import.py`
+## Việc tiếp theo
 
-Đã có. `character <zip> <tên> [--walk walk] [--busy <anim>]` (zip tải từ `get_character` → "download"),
-`image <png> <loại/tên> --size WxH [--max-colors N] [--center]` (ảnh đã đúng cỡ thì giữ 1:1, chỉ ép màu).
+1. Biểu cảm Rin/Vy/Bảo; chân dung Cô Năm, mèo.
+2. Hải sản trong khoang (`fish/`), rồi món ăn (`dishes/`).
+3. Đồ trong quán, nhân vật còn lại và khách.
+4. Hải sản trên vỉ (`grill/`), thuyền (`sea/`); ô gạch và mặt nước làm sau.
 
-Chuyển file PixelLab tải về thành đúng file game cần:
+## Nhân vật
 
-- **Nhân vật:** PixelLab cho từng hướng south / north / west / east (+ khung animation). Game cần **1 sheet 4 cột**,
-  khung 16x32, hàng: 1 đi xuống (= south), 2 đi lên (= north), 3 đi sang trái (= west; phải game tự lật),
-  4 (tuỳ chọn) đang bận. Cột 1 = đứng yên, cột 1–4 = bước đi. Nhân vật PixelLab chỉ chiếm ~60% chiều cao khung:
-  cắt sát theo nội dung (bbox chung cho mọi khung để không bị nhảy), đặt chân sát đáy khung 16x32.
-- **Mọi loại:** ép về bảng màu + `--max-colors` (dùng lại hàm trong `tools/pixelize.py`), nền trong suốt, ghi đúng
-  `assets/sprites/<loại>/<tên>.png`, ảnh xem x8 vào `build/pixelize/`.
-
-## Bước 2 — làm thử 3 thứ để chốt phong cách (rồi mới làm hàng loạt)
-
-| Thứ | Tool | Tham số chính | File game |
-|---|---|---|---|
-| Chân dung Rin | `create_image_pro` | 64x64 (nếu không cho thì 128 rồi pixelize về 64), `palette` = 37 màu hex, `max_colors` 16, `no_background` true | `portraits/rin.png` (64x64, 3/4 **quay mặt sang phải**, vai chạm đáy; nhân vật khác: xem quy ước chân dung ở bước 3) |
-| Rin đi bộ | `create_character` + `animate_character` (`template_animation_id` "walking-4-frames" hoặc "walk") | `view` "low top-down", `n_directions` 4, `size` ~48, `outline` "single color black outline" | `characters/rin.png` (64x128 hoặc 64x96 nếu chưa có hàng "bận") |
-| Con mực | `create_image_pixflux` | 80x40 (tối thiểu 32x32 về diện tích), `no_background` true, `color_image` = `xom_den.png`, vẽ ngang **đầu quay sang phải** | `fish/muc.png` (40x20, tối đa 6 màu) |
-
-Mô tả nhân vật cố định (dùng lại mọi lần):
 - **Rin:** young Vietnamese man, messy fluffy black hair with bangs, black rectangular glasses, tanned skin, small
   silver earring, white tank top (singlet), thin black chain necklace with a small silver fish-hook pendant, dark shorts, sandals, kind face. Cựu sinh viên IT, giờ đi câu đêm + chạy bàn.
   Tính: dễ dãi, thuận theo ý trời, chưa biết mình muốn gì → dáng thả lỏng, vai hơi xuôi, mắt sau kính hơi lờ đờ,
   cười nửa miệng kiểu "sao cũng được"; không vẽ Rin tự tin / quyết liệt (để dành cho hồi cuối, có thể thêm mood
   `quyet` sau).
-- **Bảo:** Vietnamese man, early 20s, a bit chubby, round cheerful face, short black hair, no hat,
+- **Bảo:** Vietnamese man, early 20s, a bit chubby, round cheerful face, short black hair with a blunt fringe matching the gameplay sprite, no hat,
   orange short-sleeve t-shirt, cream apron, dark trousers (áo cam, tạp dề, không đội mũ — chủ dự án bỏ mũ đầu bếp).
 - **Vy:** young Vietnamese woman, early 20s, long glossy dark hair with soft waves and a small pastel hair clip,
   fair skin, light makeup, pastel pink fitted blouse, cream mini skirt, spotless white sneakers, tiny crossbody bag,
@@ -94,102 +47,42 @@ Mô tả nhân vật cố định (dùng lại mọi lần):
 - **Cô Năm:** Vietnamese woman in her 60s, grey hair in a bun, green blouse, grocery seller.
 - **Mèo (Mỡ):** chubby orange cat.
 
-Sau khi tải + import: chạy game có cửa sổ, chụp màn hình (quán có Rin đi, hộp thoại có chân dung, khoang có con mực,
-F7 bật/tắt) để chủ dự án duyệt. Chưa duyệt thì chưa làm tiếp.
+## Sprite gameplay — giữ phần sửa tay
 
-## Bước 3 — làm hàng loạt (sau khi duyệt)
+- Khung **16x32**, sheet 4 cột; hàng xuống, lên, trái, tùy chọn hàng bận.
+  Hướng phải dùng ảnh lật. Cột 0 đứng yên, bước đi dùng chu kỳ 1–2–3–2.
+- Tỉ lệ hiện tại theo Rin: đầu khoảng 13 dòng, chẻ chân dòng 25,
+  ống chân 25–29, bàn chân 30–31; riêng Rin giữ tóc/đầu 14 dòng đã sửa.
+- Rin có kính kiểu gọng mày trên sprite: thanh trên và sống mũi, tròng 2x2;
+  chân dung giữ kính gọng đen. Script tham khảo: `tools/rin_glasses.py`, biến thể `e`.
+- Rin đã sửa tay: chạy lại `pixellab_import.py` trên sheet này sẽ mất phần sửa.
+- Vy đã sửa tay hàng 1–2 và tóc: chạy lại `make_vy_sheet.py` sẽ ghi đè.
+  Hàng ngang từng xử lý bằng `tools/vy_third_row.py` và `tools/pixellab_walk.py`.
+- Sau khi sửa sheet, cập nhật idle bằng `tools/make_idle.py`; kiểm tra `BLINK` / `WAIST`
+  nếu vị trí mặt hoặc eo thay đổi. Mốc eo đã ghi nhận: Rin 20, Bảo 20, Vy 19.
+  Xem bằng `scenes/test/sprite_viewer.tscn`.
+- Vy chưa có hàng bận; bản tóc buộc cao theo arc làm sau.
+- Nguồn sheet Vy `tools/ref/vy_spritesheet.webp` chưa rõ giấy phép:
+  cần kiểm tra hoặc thay trước khi phát hành công khai.
 
-**Quy ước chân dung (mọi nhân vật):** cùng góc nhìn với chân dung Rin: bán thân, **3/4**, đầu + vai, vai chạm đáy,
-64x64, cùng phong cách (tóc / mảng màu phẳng, viền tối, màu gán tay sang Xóm Đèn). Trên màn hình Rin ở bên trái
-**quay sang phải**, mọi nhân vật khác ở bên phải **quay sang trái** (nhìn về phía Rin).
-- **File PNG luôn vẽ quay sang phải**, kể cả nhân vật khác: game tự lật chân dung bên phải
-  (`DialoguePortrait.mirrored`), nên file quay phải → trên màn hình quay trái. Đừng vẽ sẵn quay trái (bị lật
-  thành quay phải). Chi tiết lệch một bên (khuyên tai, rẽ ngôi, vết sẹo) sẽ đổi bên khi lật — đặt chúng theo
-  hướng nhìn trên màn hình.
-- Cách làm: dùng `portraits/rin.png` làm ảnh mẫu phong cách (`create_image_pro` `style_image_url`, hoặc
-  `edit_image_pixen` từ ảnh nhân vật), mô tả "three-quarter view facing right"; ép / gán màu như chân dung Rin.
-- Kiểm tra trong game: hộp thoại Rin ↔ nhân vật đó, hai người phải nhìn nhau.
-- **Cách đã chạy tốt (Bảo, 2026-10-15):** chân dung = `edit_image_pixen` (1 lượt) trên `portraits/rin.png` phóng
-  x2 với mô tả "turn this into a different character, same three-quarter bust facing right, same framing...";
-  lấy mẫu về 64x64, gán màu tay (bảng màu trong lần làm của Bảo: áo `de9e41` / bóng `be772b`, da `d7b594`);
-  bỏ má hồng (ra vệt bẩn), dọn quầng nâu quanh mắt; mắt vẽ tay kiểu Rin (mí trên `151d28`, lòng trắng `ebede9`, con ngươi lệch về hướng nhìn). Bỏ mũ: `edit_image_pixen` "remove the chef hat", chỉ lấy hàng 0–23 (tóc), mặt giữ bản vẽ tay.
-  Sprite = `create_character` pro (10 lượt) với chân dung làm `concept_image_url`, size 32, rồi dựng sheet tay
-  như Rin (ảnh đứng yên xén về 16 px, khung 2/4 nhún + nhấc chân, ngang tự vẽ chân sải); hàng 4 "đang bận" =
-  người nhún 1 px + một tay nhấc 1 px, xen kẽ. Bảo: character id `6c8fa01a-acd4-4ddc-aaf3-10f5bfc40bf1`.
-  **Tỉ lệ người (từ 2026-10-15, theo mẫu Stardew 16x32 chủ dự án chọn):** người kín cả 32 dòng của khung:
-  **đầu 11 dòng (0–10), thân 8 (11–18), chân 13 (19–31)**, tay ở dòng ~13–18; như sheet Vy: người rộng ~13 px (tay
-  3 px), quần / váy / hông tới dòng 22, chẻ chân từ dòng 23, ống chân 3 px nằm giữa bàn chân. Sheet Rin / Bảo cũ (đầu to, chân 6
-  dòng) được chuyển bằng `tools/reproportion.py` (bớt / nhân dòng tóc, giữ mặt + thân, quần dài 4 dòng, kéo dài ống chân; hàng trước / sau gọt tay và ống chân); hàng đi
-  xuống / lên dựng bằng `tools/walk_frames.py` (ping-pong 1-2-3-2: khung bước hạ người 1 px, tay đánh ngược chân).
-  Nhân vật mới vẽ thẳng theo tỉ lệ này.
-- **Vy (sheet quán, 2026-10-15):** `tools/make_vy_sheet.py`. Hàng đi xuống (đứng + đi ping-pong) lấy từ ảnh mẫu
-  chủ dự án chọn `tools/ref/vy_spritesheet.webp` (ảnh minh họa walk cycle kiểu Stardew tải trên mạng, **chưa rõ giấy
-  phép — kiểm tra / thay trước khi phát hành công khai**): lấy mẫu về 80x80, xoá nền, đổi màu theo vùng (tóc cam →
-  đen bóng, áo xanh → hồng `c65197`, quần → váy kem + chân trần, bốt → giày trắng) + bông tai vàng, kẹp xanh. Mẫu
-  chỉ có hướng trước nên hàng đi lên / ngang vẽ tay bằng bản đồ ký tự trong script, theo đúng bóng dáng hàng trước
-  (rộng 13, váy tới dòng 21, viền váy 22, ống chân 3 px, giày 30–31): sau lưng tóc dài phủ lưng + kẹp + bông tai;
-  ngang có bím vắt trước ngực, tay đánh khi bước (`side_frame`); hàng lên chạy `walk_frames.py ... 1`. Chưa có hàng "bận"; bản "sau" (tóc buộc cao) để sau.
-  Hàng 1–2 chủ dự án đã sửa tay trực tiếp trên `vy.png` (đừng chạy lại `make_vy_sheet.py`). Hàng 3 (2026-10-15) lấy
-  từ `build/pixelize/thirdrow.aseprite` (4 hướng đứng của ảnh mẫu, phóng ~5x trên nền trắng) bằng
-  `tools/vy_third_row.py`: đọc thẳng file .aseprite (không cần Aseprite CLI), lấy mẫu từng hình theo lưới 5 px riêng,
-  đổi màu theo vùng sang màu sẵn có của Vy (tóc nâu → đen, áo vàng → hồng, váy đỏ → kem, chân viền `564432`, giày
-  trắng), viền váy đặt ở dòng 22, kéo ống chân tới dòng 29. Rồi thành dáng đi trái: hình quay trái (cột 4) chỉnh
-  theo tỉ lệ hàng 1–2 (đầu dòng 0–11, áo 12–17 nhân đôi 2 dòng áo, váy 18–22, chân 23–31) làm khung đứng, PixelLab
-  `animate_image` (1 lượt) "walking to the left" → `pixellab_walk.py row ... --keep-head --head 12` (khung 2 / 4 / 3).
-  Tóc búi của ảnh mẫu: chủ dự án vẽ lại.
-- **Idle (2026-10-16):** `tools/make_idle.py` dựng `<tên>_idle.png` cho Rin, Bảo, Vy từ cột 0 của sheet (không dùng
-  PixelLab: chuyển động 1 px, script chính xác + giữ phần sửa tay): thở = dòng 0..eo hạ 1 px (eo: Rin 20, Bảo 18,
-  Vy 17), chớp mắt = sơn lại pixel mắt ghi trong `BLINK` (Rin: kính chỉ xoá con ngươi — vẽ mí thành kính râm).
-  **Sửa sheet xong chạy lại script**; mặt / eo dời chỗ thì sửa `BLINK` / `WAIST`. Xem: `scenes/test/sprite_viewer.tscn`.
-- **Tỉ lệ theo Rin (2026-10-16, chủ dự án chọn Rin làm gốc):** mọi người dùng mốc của Rin: **đầu 13 dòng (cằm /
-  cổ ở dòng 12), chẻ chân dòng 25, ống chân 25–29, bàn chân 30–31**, mặt rộng ~10–11 px (thay cho tỉ lệ 11/8/13 ở
-  trên). `tools/match_rin.py` (chạy một lần trên sheet git 9fbf6ac): bỏ 2 dòng ống chân (26, 27), vẽ đầu mới to hơn
-  cho Bảo / Vy theo từng hướng (bản đồ ký tự trong script) và dán lên mọi khung theo độ nhún của khung đó; thân giữ
-  nguyên pixel. Eo idle: Bảo 20, Vy 19. Nhân vật mới vẽ thẳng theo mốc này.
-- **Sheet quán làm lại bằng PixelLab (2026-10-15, 16 lượt):** đầu vào luôn là **ảnh đứng của sheet** (cột 0 mỗi
-  hàng), ghép bằng `tools/pixellab_walk.py row` (ép về màu của ảnh đứng, đặt chân sát đáy, `--keep-head` dán đầu vẽ
-  tay lên mọi khung cho kính / mặt không đổi; game chạy 1-2-3-2 nên đưa bước / lướt / bước kia).
-  - **Hướng ngang:** `animate_image` (1 lượt) trên ảnh đứng đệm 32x32 (người ở x=8), "walking to the left", 4 khung
-    → sải chân thật, tay đánh. Chọn 3 khung, bỏ khung tụt đầu.
-  - **Hướng trước / sau:** `animate_image` ở cỡ này **hỏng** (mất kính, người co lùn, cả bản 8 khung lẫn ảnh x2).
-    Dùng `animate_with_skeleton_v3` (2 lượt / 3 khung) trên ảnh đứng phóng x2 đệm 64x64, tự đặt 18 khớp
-    (bước phải / lướt hạ người 1 px / bước trái; chân bước hạ 0.5 px, chân nhấc lên 2 px, tay đánh ngược); hướng
-    sau đổi nhãn LEFT/RIGHT. Giữ đúng nhân vật. Khớp nằm trong `scratchpad` lúc làm; dáng 3 người gần như trùng
-    nên dùng chung (cột/dòng theo khung 16x32: vai (3,12)/(11,12), hông (5,20)/(9,20), gối hàng 25, cổ chân 30).
-  - **Hàng bận Bảo:** `animate_image` ghim khung cuối = khung đầu (lặp mượt): nhún vai + tay, nhẹ.
-  - **Tóc Rin:** `reproportion.py` từng cắt tóc 8 → 5 dòng (bẹp); `tools/rin_hair.py` lấy lại 8 dòng tóc từ sheet
-    git 388d11d, bỏ 2 dòng ống chân + 1 dòng quần → đầu Rin **14 dòng** (ngoại lệ tỉ lệ, theo ý chủ dự án).
-    Khung AI dựng với `--head 14 --cut-rows 21,26,27`.
-  - Còn lại sau đợt này: 24 lượt (trial).
+## Công cụ và tích hợp
 
-Thứ tự: chân dung (Bảo, Vy, Cô Năm, mèo) → hải sản trong khoang (`fish/`) → món ăn (`dishes/`, 16x16, ≤ 6 màu)
-→ đồ trong quán (`create_map_object`, view "high top-down") → nhân vật còn lại + khách → hải sản trên vỉ
-(`grill/`) → thuyền (`sea/`). Ô gạch / mặt nước để sau (game chưa dùng tile tự nối).
+- PixelLab đã được dùng cho sprite và animation; chọn công cụ theo asset đang làm.
+  Kiểm tra kết nối và số dư thực tế trước khi tạo, thay vì dùng số lượt trong lịch sử.
+- `tools/pixellab_import.py`: import nhân vật mới hoặc ảnh đơn.
+  `tools/pixellab_walk.py`: ghép animation vào sheet, có tùy chọn giữ đầu đã sửa.
+- `tools/pixelize.py`: xử lý kích thước/bảng màu khi cần; mặc định đầu ra 64x64.
+  Hai portrait 128 đã duyệt được dùng trực tiếp.
+- Bảng Xóm Đèn: `assets/palette/xom_den.hex`; giới hạn màu các loại asset xem `ASSETS.md`.
+  Chân dung theo màu của mẫu 128 đã duyệt.
+- Game đọc PNG từ `assets/sprites/`; thiếu ảnh thì dùng hình tạm.
+  F7 trong bản debug xem thử bảng màu Xóm Đèn.
 
-## Chia việc: PixelLab vs công cụ miễn phí (đã chốt)
+## File làm việc và bản sao
 
-Model AI phổ thông (Gemini, FLUX, SDXL + LoRA pixel) vẽ ảnh to "giả pixel": lưới lệch, nhiều màu, viền nhòe;
-thu về 16–64 px thì mất chi tiết. PixelLab vẽ thẳng ở độ phân giải nhỏ, ép được bảng màu, có góc top-down và
-hoạt hình. Ở cỡ 16 px kiểu gì cũng sửa tay nhiều (sheet Rin / Bảo đã phải dựng tay) → **dồn lượt PixelLab vào
-chỗ không thay được, còn lại làm miễn phí.**
-
-| Asset | Làm bằng | Ghi chú |
-|---|---|---|
-| Sprite người 16x32 + đi bộ 4 hướng (Vy, Cô Năm, khách...), mèo | **PixelLab** | Không công cụ miễn phí nào giữ cùng một nhân vật qua 4 hướng x 4 khung. Vẫn dựng sheet tay như Bảo |
-| Đồ trong quán (`create_map_object`) | **PixelLab** | Giữ đúng góc 3/4 giữa các món; đồ free hay lệch góc |
-| Chân dung 64x64 | **Miễn phí:** Gemini (sửa ảnh theo ảnh mẫu `portraits/rin.png`) → `tools/pixelize.py` → sửa tay | Gần bằng PixelLab; khó nhất là giữ cùng phong cách. Chưa ra thì quay về cách `edit_image_pixen` ở bước 3 |
-| Cá trong khoang, món ăn 16x16, hải sản trên vỉ | **Miễn phí:** vẽ tay trong Pixelorama hoặc `pixelart_workbench` (công cụ pixel miễn phí của PixelLab MCP), AI chỉ để tham khảo dáng | Cỡ này tay người thường đẹp hơn; ≤ 6 màu, gán màu Xóm Đèn |
-
-- Công cụ miễn phí dùng được: Gemini / ChatGPT / Bing Image Creator (phác), Pixelorama hoặc LibreSprite (vẽ tay),
-  `pixelart_workbench` (sửa pixel không tốn lượt), `tools/pixelize.py` (về đúng cỡ + bảng màu).
-- Không làm: tự cài SD / ComfyUI / Draw Things + LoRA — tốn công thử model, không đáng với dev solo.
-- Làm thử trước khi làm hàng loạt: một con cá (cá mú) bằng Gemini → `pixelize.py`, đặt cạnh `fish/muc.png`
-  (PixelLab) trong khoang để so; chủ dự án duyệt rồi mới chốt cách cho cả nhóm `fish/` / `dishes/`.
-- Trước khi phát hành: kiểm tra điều khoản thương mại từng công cụ (bản free có nơi giới hạn hoặc để ảnh công khai).
-
-## Lưu ý chi phí
-
-- Tính theo lượt tạo. Chế độ thường ~1 lượt; `create_image_pro` và mọi chế độ "pro" 10–25 lượt mỗi lần → chỉ dùng
-  cho chân dung. Gọi `get_balance` trước khi làm hàng loạt và báo số dư cho chủ dự án.
-- Đừng tạo lại cả loạt khi chỉ cần sửa một chỗ: dùng `edit_image` / `create_character_state`.
-- Asset dùng thương mại được trong game theo nguồn bên thứ ba; chủ dự án tự kiểm tra Điều khoản PixelLab.
+- `build/portraits/128/`: nguồn Rin/Vy đã chọn cùng các bản nháp 128.
+- `build/portraits/64/`: các bản cũ; bản ngay trước chuyển đổi ở
+  `build/portraits/64/before_128_20261020_154215/`.
+- `build/portraits/ref/`: nguồn lớn, JSON, ảnh so sánh và preview.
+- `tools/ref/`: prompt và nguồn tham khảo các lần làm trước.
+- `build/shots/`: ảnh chụp trong game. Các thư mục `build/` không commit.
