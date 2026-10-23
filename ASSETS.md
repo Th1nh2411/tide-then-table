@@ -7,12 +7,12 @@ mục "Tên file" ở cuối.
 
 ## Bảng màu và cách làm (vẽ tay + AI)
 
-- **Bảng màu "Xóm Đèn" — 37 màu**, rút từ Apollo (AdamCYounis, Lospec) + 4 màu riêng. Mỗi hàng là một dải
+- **Bảng màu "Xóm Đèn" — 38 màu**, rút từ Apollo (AdamCYounis, Lospec) + 5 màu riêng. Mỗi hàng là một dải
   sáng → tối: xanh biển 6 · đất/da 6 · nâu cam 5 · đỏ 3 · xanh lá 3 · tím 2 (sương, cá biến dị) · xám xanh 8
-  · riêng 4 (đỏ biển hiệu, vàng nón lá, xanh ngọc phát sáng, trắng đèn tuýp). File: `assets/palette/
+  · riêng 5 (đỏ biển hiệu, vàng nón lá, xanh ngọc phát sáng, trắng đèn tuýp, ánh tóc xanh đen `#2c4058`). File: `assets/palette/
   xom_den.gpl` (Aseprite: Palette → Load), `xom_den.hex`, `xom_den.png` (ảnh mẫu màu, đưa cho AI làm tham
   chiếu). Các asset dùng màu trong bảng Xóm Đèn; chân dung 128 đã duyệt giữ nguyên màu riêng.
-- **Số màu tối đa mỗi hình:** nhân vật 16x32 → 10, chân dung 128x128 → theo mẫu Rin/Vy đã duyệt (không ép 16 màu), hải sản / món ăn 16x16 → 6, cả màn
+- **Số màu tối đa mỗi hình:** nhân vật 16x32 → 10, portrait approved 128×128 giữ nguyên màu/alpha của approved, hải sản / món ăn 16x16 → 6, cả màn
   biển đêm khoảng 12–16 (học DREDGE: ít màu, chỉ thứ quan trọng mới sáng).
 - **Quán** dùng nửa ấm (màu đất, cam, đỏ/xanh ghế nhựa, vàng nón lá); **biển đêm** dùng nửa lạnh, 3–4 màu xanh
   đen làm nền, chỉ đèn (cam) và thứ phát sáng (xanh ngọc) là sáng — giống DREDGE: cái gì quan trọng mới sáng.
@@ -21,15 +21,13 @@ mục "Tên file" ở cuối.
   bộ (animation), ô gạch lặp, và đồ đậm chất Việt (nón lá, thuyền thúng, xe đẩy inox, biển hiệu chữ Việt).
   Lệnh cho AI: "pixel art, <cỡ>, limited palette, transparent background, no anti-aliasing" + ảnh mẫu màu +
   một hình đã vẽ chuẩn làm tham chiếu; tả nhân vật cố định theo ART_PLAN (Rin: tóc đen rối, kính chữ nhật, áo ba lỗ trắng).
-- **Chân dung:** chuẩn **128x128**, lấy `assets/sprites/portraits/rin.png` và `vy.png`
-  đã duyệt làm chuẩn phong cách; giữ nguyên hai file và màu của chúng. Bảo cũng đã dùng bản 128, tóc ngắn mái ngố theo sprite.
-  Quy trình và trạng thái nằm ở đầu `ART_PLAN.md`.
-  Kho bản làm việc: `build/portraits/64/`, `build/portraits/128/`, `build/portraits/ref/`.
+- **Chân dung runtime:** dùng ảnh approved 128×128 trong `build/portraits/128/approved/`, hiển thị 1:1 trong khung thoại 128. Rin approved gồm base và vui; Vy approved gồm base; Bảo chờ approved riêng.
+- **Chân dung tham khảo:** các frame 512 được thu nearest-neighbour về 128×128, lưu duy nhất ở `build/portraits/ref/rin/`, `bao/`, `vy/`. Không dùng các frame tham khảo này trực tiếp trong game.
 
 ## Quy ước chung
 
 - **Cỡ chuẩn trong game:** ô 16 px, nhân vật 16x32 (kiểu Stardew), màn hình 640x360, phóng nguyên lần x3.
-- **Vẽ ở cỡ gốc:** sprite người 16x32, chân dung 128x128. Giữ cùng mật độ pixel trong từng loại asset; portrait hiện có được chuẩn bị về 128 bằng nearest-neighbor.
+- **Vẽ ở cỡ gốc:** sprite người 16x32. Portrait runtime giữ ảnh approved 128×128 và hiển thị trong khung thoại 128×128 bằng filtering riêng.
 - **Định dạng:** PNG nền trong suốt, không khử răng cưa (nearest), sprite sheet theo hàng: mỗi hàng là 1
   hoạt cảnh, mỗi cột là 1 khung hình.
 - **Hướng nhìn:** quán là top-down 3/4 (thấy mặt trên + mặt trước); biển là nhìn thẳng từ trên xuống.
@@ -55,9 +53,9 @@ Kích thước 16x32. Hướng: xuống / lên / trái (phải = lật trái). �
 | Nhân viên thuê (9 người) | đi bộ, cầm đĩa, dọn bàn | có thể dùng 2–3 dáng người + đổi màu |
 | Mèo (Mỡ) | ngồi, đi, nằm ngủ, vẫy đuôi | mèo mập màu cam, ~16x16 |
 
-**Chân dung hộp thoại (P2, kiểu Nine Sols):** bán thân lớn (đầu + vai), vuông **128x128 pixel gốc**, hiển thị 1:1 trong khung 128x128 của viewport, nearest-neighbor, góc 3/4 như chân dung Rin, **file luôn quay mặt sang phải**; Rin đứng bên trái,
+**Chân dung hộp thoại (P2, kiểu Nine Sols):** bán thân 128×128, hiển thị 1:1 trong khung 128×128 của viewport, filtering riêng cho portrait, góc 3/4 như chân dung Rin, **file luôn quay mặt sang phải**; Rin đứng bên trái,
 mọi nhân vật khác đứng bên phải và được game lật tự động → trên màn hình quay sang trái, nhìn về phía Rin. Vai chạm
-mép dưới. File `portraits/<id>.png`, nét mặt thêm `portraits/<id>_<nét>.png` (trong thoại ghi `Rin (vui): ...`;
+mép dưới. File `portraits/<id>/base.png`, nét mặt thêm `portraits/<id>/<nét>.png` (trong thoại ghi `Rin (vui): ...`;
 thiếu file nét mặt thì dùng ảnh thường). id = tên không dấu: `rin`, `bao`, `vy`, `co_nam`, `ong_tam`,
 `khach_quen`, `cat` (mèo). Nét gợi ý: `vui`, `lo`, `ngac_nhien`, `buon`.
 

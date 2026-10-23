@@ -1,8 +1,8 @@
 class_name DialoguePortrait
 extends Control
 ## Big bust of whoever speaks in the DialogueBox (Nine Sols style), drawn in
-## the bottom corner. Art: assets/sprites/portraits/<id>_<mood>.png, else
-## <id>.png (square, facing right; the right-hand side mirrors it), else a
+## the bottom corner. Art: assets/sprites/portraits/<id>/<mood>.png, else
+## <id>/base.png (square, facing right; the right-hand side mirrors it), else a
 ## placeholder bust in the speaker's colors. <id> is the speaker's name
 ## without accents ("Cô Năm" -> co_nam); the cat is "cat".
 ## Bobs while the line is typing, slides in when the speaker changes.
@@ -32,9 +32,12 @@ var _slide: float = 0.0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Enlarge approved 128px art by 2x; nearest sampling keeps pixels crisp.
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 
-## "Rin" + "vui" -> portraits/rin_vui.png (or rin.png, or the placeholder).
+## "Rin" + "vui" -> portraits/rin/vui.png (or rin/base.png, or the placeholder).
+## While talking, an optional matching `<mood>_open.png` frame is shown.
 func set_speaker(speaker_id: String, speaker_mood: String, on_right: bool) -> void:
 	var changed := speaker_id != id or on_right != mirrored
 	id = speaker_id
@@ -60,10 +63,19 @@ static func slug(speaker: String) -> String:
 	return out
 
 
+func _closed_sprite() -> String:
+	if mood != "" and Art.has("portraits/%s/%s" % [id, mood]):
+		return "portraits/%s/%s" % [id, mood]
+	return "portraits/%s/base" % id
+
+
 func sprite() -> String:
-	if mood != "" and Art.has("portraits/%s_%s" % [id, mood]):
-		return "portraits/%s_%s" % [id, mood]
-	return "portraits/" + id
+	var closed := _closed_sprite()
+	if talking and fmod(_time, 0.24) < 0.12:
+		var open := closed + "_open"
+		if Art.has(open):
+			return open
+	return closed
 
 
 func _process(delta: float) -> void:
@@ -81,7 +93,7 @@ func _draw() -> void:
 		return
 	var side := -1.0 if mirrored else 1.0
 	var bob := -1.0 if talking and fmod(_time, 0.24) < 0.12 else 0.0
-	var shift := Vector2(-side * 28.0 * _slide, bob)
+	var shift := Vector2(-side * 28.0 * _slide, bob).round()
 	var rect := Rect2(shift, size)
 	if Art.draw(self, sprite(), rect, mirrored):
 		return

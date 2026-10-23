@@ -22,7 +22,7 @@ face Rin right
 speak \"Cô Năm\" \"Ủa, con là cháu ông Tư hả? Lớn dữ vậy. Nhà ông bỏ trống hai năm nay rồi.\"
 speak \"Cô Năm\" \"Cô bán tạp hoá bên này nè.\"
 speak \"Cô Năm\" \"Rau muống, đồ khô có hết. Thiếu gì qua cô, mua về nhớ bỏ tủ lạnh nghen.\"
-speak Rin \"Dạ, con cảm ơn cô Năm!\"
+speak \"Rin (vui)\" \"Dạ, con cảm ơn cô Năm!\"
 move_to Nam nam_shop 1.4
 remove Nam
 camera board_view 1.0 1.6

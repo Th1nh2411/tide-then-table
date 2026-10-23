@@ -444,10 +444,9 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng 
 
 ## 9. Tiến độ
 
-- **Art (2026-10-20):** Rin, Vy và Bảo đang dùng chân dung **128x128**, hiển thị 1:1
-  trong khung thoại 128. Rin/Vy là mẫu phong cách; Bảo tóc ngắn mái ngố theo sprite.
-  Giữ màu của portrait hiện có. Biểu cảm Rin 64 đã cất khỏi game, tạm dùng ảnh thường.
+- **Art (2026-10-22):** runtime dùng ảnh approved **128x128** hiển thị 1:1 trong khung thoại 128. Rin có approved base/vui, Vy có approved base; Bảo vẫn là asset tạm 512 cho tới khi có approved riêng. Giữ màu và alpha của approved.
   Chi tiết và việc tiếp theo ở `ART_PLAN.md`.
+- **Debug nhảy cảnh (2026-10-22):** F9 ở bất cứ đâu (bản debug) mở `DebugJumpMenu`: chọn ngày → "Đêm (biển)" / "Quán", hoặc bấm một cutscene bất kỳ. `StoryTimeline` (pure) dựng lại game như đã chơi tới lúc đó (cutscene trước đã xem + cờ của chúng, điềm báo ngày 4; không tự thuê Vy). Sau khi nhảy, autosave tắt tới khi tắt game (`SaveSystem.autosave_off`). Cutscene mới phải thêm mốc [ngày, lúc] vào `StoryTimeline.WHEN`; test: scenes/test/story_timeline_test.tscn.
 
 | Phase                    | Trạng thái   | Ghi chú                                                                                                                                                                                                    |
 | ------------------------ | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -461,3 +460,5 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng 
 | 7 — Vòng ngày & nâng cấp | ✅           | Sao = tỉ lệ khách được phục vụ (−1 nếu menu đơn điệu), ảnh hưởng tần suất khách hôm sau; 3 UpgradeData (thuyền 300/800, cần 120/350, tủ lạnh 150/400); tủ lạnh mua tối nay có tác dụng ngay đêm nay        |
 | 8 — Lưu game             | ✅           | SaveSystem (static) → user://save.json, ghi file tạm rồi đổi tên; autosave lúc 6:00 mỗi ngày; field thiếu/sai kiểu → mặc định, cá lạ bị bỏ qua; test: scenes/test/save_test.tscn                           |
 | 9 — Cảnh kết             | ✅           | Điềm báo (cá thu phát sáng / ngày 4) → hôm sau mở FOG góc đông bắc (3 điểm cá biến dị + xoáy nước); xoáy → fade trắng → thoại Rin → "Còn tiếp..." → menu; F2 debug mở sương                                |
+
+- **Portrait rollback — 2026-10-22:** runtime quay về ảnh approved 128×128 trong `build/portraits/128/approved/`; Rin base/vui và Vy base đã được cài lại. Bảo chưa có approved mới nên giữ asset tạm. Các sheet lớn chỉ được thu 128×128 để tham khảo trong `build/portraits/ref/`.

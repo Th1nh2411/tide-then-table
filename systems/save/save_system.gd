@@ -22,11 +22,16 @@ static func delete_save(path: String = SAVE_PATH) -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
+## Off for the rest of the session after a debug jump (DebugJumpMenu), so a
+## made-up state never overwrites the real save.
+static var autosave_off: bool = false
+
+
 ## Autosave unless the run was started with `-- --no-autosave` (tests).
 ## `resume_at`: where Continue will start ("sea" or "restaurant").
 static func autosave(resume_at: String) -> void:
 	GameState.resume_at = resume_at
-	if not OS.get_cmdline_user_args().has("--no-autosave"):
+	if not autosave_off and not OS.get_cmdline_user_args().has("--no-autosave"):
 		save_game()
 
 

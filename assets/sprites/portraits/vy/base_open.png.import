@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://jl6exhyarybm"
-path="res://.godot/imported/rin.png-bef9a6b673202a396f7f34afcdcf2cd1.ctex"
+uid="uid://dplf0xnb4ag3k"
+path="res://.godot/imported/base_open.png-41af4dba9a1e653bef49fce4f4fbe930.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/portraits/rin.png"
-dest_files=["res://.godot/imported/rin.png-bef9a6b673202a396f7f34afcdcf2cd1.ctex"]
+source_file="res://assets/sprites/portraits/vy/base_open.png"
+dest_files=["res://.godot/imported/base_open.png-41af4dba9a1e653bef49fce4f4fbe930.ctex"]
 
 [params]
 

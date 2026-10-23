@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://fi1c4iamunu2"
-path="res://.godot/imported/vy.png-e5ce89423f8dac3b3dfdccf4b8a528fd.ctex"
+uid="uid://dvgclj0cmtkui"
+path="res://.godot/imported/vui.png-3d7d4adf6ada7d32d773e79b7e8d2491.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/portraits/vy.png"
-dest_files=["res://.godot/imported/vy.png-e5ce89423f8dac3b3dfdccf4b8a528fd.ctex"]
+source_file="res://assets/sprites/portraits/bao/vui.png"
+dest_files=["res://.godot/imported/vui.png-3d7d4adf6ada7d32d773e79b7e8d2491.ctex"]
 
 [params]
 

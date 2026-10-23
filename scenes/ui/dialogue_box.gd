@@ -25,7 +25,7 @@ signal skipped
 @export var default_color: Color = Color(1.0, 0.95, 0.8)
 ## Speakers whose portrait sits on the left (the rest face them from the right).
 @export var left_speakers: PackedStringArray = ["rin"]
-@export var portrait_size: float = 128.0
+@export var portrait_size: float = 256.0
 @export var bubble_width: float = 300.0
 @export var bubble_color: Color = Color(0.96, 0.94, 0.87)
 @export var ink_color: Color = Color(0.13, 0.11, 0.14)

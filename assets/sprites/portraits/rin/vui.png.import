@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://l8cgco2q5tmu"
-path="res://.godot/imported/bao.png-bd4e317f93f1361a34f20320079af4ad.ctex"
+uid="uid://d1pg8rwt6kooe"
+path="res://.godot/imported/vui.png-9ed56b5f586e5527fdcd304369e1a1f2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/portraits/bao.png"
-dest_files=["res://.godot/imported/bao.png-bd4e317f93f1361a34f20320079af4ad.ctex"]
+source_file="res://assets/sprites/portraits/rin/vui.png"
+dest_files=["res://.godot/imported/vui.png-9ed56b5f586e5527fdcd304369e1a1f2.ctex"]
 
 [params]
 

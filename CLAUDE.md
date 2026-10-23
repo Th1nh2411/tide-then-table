@@ -14,8 +14,8 @@ Vietnamese, keep code comments in short English.
 - No plugins. Placeholder art (`ColorRect`, `_draw()`) until PNGs exist:
   `Art` (scenes/common/art.gd) draws `assets/sprites/<name>.png` stretched
   into the thing's in-game rect and returns false when missing, so every
-  hook is `if not Art.draw(...): <placeholder>` (palette "Xóm Đèn": 37 colours
-  from Apollo + 4 in assets/palette/, F7 in debug builds shows the game in it
+  hook is `if not Art.draw(...): <placeholder>` (palette "Xóm Đèn": 38 colours
+  from Apollo + 5 in assets/palette/, F7 in debug builds shows the game in it
   (`PalettePreview`), `tools/pixelize.py` cleans AI drafts into sprites; PixelLab MCP is set up for
   this project, the next steps are in ART_PLAN.md;
   sheets: `draw_frame`,
@@ -81,7 +81,10 @@ Vietnamese, keep code comments in short English.
   Hand out `PLAYTEST.md` with it.
 - Debug keys (debug builds): sea 1-3 boat, F2 open the fog; restaurant F1
   fish, F2 beer; both F3 play this scene's cutscenes one by one, F4 toggle
-  Nhịp Sóng (`CutsceneDebug`).
+  Nhịp Sóng (`CutsceneDebug`); anywhere F9 = `DebugJumpMenu`: jump to any
+  day's night / restaurant or any cutscene, state rebuilt by `StoryTimeline`
+  (pure; a new cutscene needs its [day, slot] in `StoryTimeline.WHEN`,
+  story_timeline_test checks it); autosave stays off after a jump.
 - Ad-hoc headless checks: write `scenes/test/_tmp_*.gd/.tscn`, run with
   `--headless --path . --fixed-fps 60 --quit-after N res://... -- --no-autosave`,
   then delete them. Always pass `-- --no-autosave` when a run can reach the sea

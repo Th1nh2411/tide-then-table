@@ -1,24 +1,27 @@
 # Kế hoạch art — Xóm Đèn
 
-Cập nhật: 2026-10-20. Kích thước và tên file từng loại xem `ASSETS.md`;
+Cập nhật: 2026-10-23. Kích thước và tên file từng loại xem `ASSETS.md`;
 code nạp art và chạy game xem `CLAUDE.md`.
 
 ## Chân dung
 
-- Chuẩn **128x128**, nền trong suốt, bán thân 3/4 quay phải, vai chạm đáy.
-- **Rin và Vy đã duyệt và đang dùng:** `assets/sprites/portraits/rin.png`, `vy.png`.
-  Đây là mẫu phong cách cho các chân dung tiếp theo; giữ màu và alpha của ảnh đã duyệt.
-- Game hiển thị trong khung 128x128, tự lật nhân vật bên phải.
-  File thường: `<id>.png`; biểu cảm: `<id>_<mood>.png`. Thiếu biểu cảm thì dùng ảnh thường.
-- **Bảo:** đang dùng portrait 128 tại `assets/sprites/portraits/bao.png`, tóc ngắn mái ngố
-  theo sprite, phong cách theo Rin. Prompt tham khảo: `tools/ref/bao_rin_style_v2_prompt.txt`.
-- **Biểu cảm Rin:** cần làm lại `vui`, `buon`, `lo`, `ngac_nhien` từ base 128,
-  giữ nhất quán tóc, thân và bố cục. Bản 64 đã cất khỏi game; các bản 128 `*_raw` còn là nháp.
-- Chân dung mới được so cạnh Rin/Vy và xem trong hội thoại để kiểm tra phong cách, tỉ lệ và hướng mặt.
+### Quy chuẩn approved — 2026-10-22
+
+- Runtime portrait quay về bộ **128×128 approved**, giữ nguyên màu, alpha, tỉ lệ và vị trí của ảnh trong `build/portraits/128/approved/`.
+- Approved hiện có, đã cài lại ngày 2026-10-23: `rin_base.png` → `rin/base.png`, `rin_vui_extended_v1.png` → `rin/vui.png`, và `vy_base.png` → `vy/base.png`. File runtime giữ nguyên bytes của approved.
+- Bổ sung `bao_base.png` → `bao/base.png` ngày 2026-10-23, giữ nguyên bytes approved. Các emotion và frame mở miệng Bảo cũ đã cất vào `build/portraits/before_bao_approved_20261023.*/`; game dùng base approved khi chưa có emotion mới.
+- Rin approved là dáng mảnh, áo ba lỗ che kín rốn; Vy dùng mẫu approved hiện có. Không dùng sheet 512 emotion làm runtime.
+
+### Quy ước hiển thị
+
+- Portrait thoại dùng ảnh approved 128×128, nền trong suốt, bán thân 3/4 quay phải và hiển thị 2× trong khung portrait 256×256 theo yêu cầu thử kích thước lớn.
+- Game dùng nearest, tắt mipmap, khung portrait 256×256 và vị trí nguyên pixel; cửa sổ phóng theo hệ số nguyên để giữ nét pixel. Nhân vật bên phải tự lật. File thường là `<id>/base.png`; emotion chỉ dùng khi có file approved tương ứng.
+- Đồng bộ ảnh mới 2026-10-23: `bao_open.png` → `bao/base_open.png`, `bao_vui.png` → `bao/vui.png`, `rin_base_open.png` → `rin/base_open.png`, `vy_open.png` → `vy/base_open.png`. Giữ nguyên ảnh đã có trong assets.
+- Hiện `bao_base.png` trong approved và `bao/base.png` trong assets đều vắng mặt; Bảo có `vui` và `base_open` nhưng còn thiếu base đóng miệng. Cần bổ sung bản approved để hoàn chỉnh trạng thái mặc định.
 
 ## Việc tiếp theo
 
-1. Biểu cảm Rin/Vy/Bảo; chân dung Cô Năm, mèo.
+1. Chân dung Cô Năm và mèo.
 2. Hải sản trong khoang (`fish/`), rồi món ăn (`dishes/`).
 3. Đồ trong quán, nhân vật còn lại và khách.
 4. Hải sản trên vỉ (`grill/`), thuyền (`sea/`); ô gạch và mặt nước làm sau.
@@ -71,8 +74,7 @@ code nạp art và chạy game xem `CLAUDE.md`.
   Kiểm tra kết nối và số dư thực tế trước khi tạo, thay vì dùng số lượt trong lịch sử.
 - `tools/pixellab_import.py`: import nhân vật mới hoặc ảnh đơn.
   `tools/pixellab_walk.py`: ghép animation vào sheet, có tùy chọn giữ đầu đã sửa.
-- `tools/pixelize.py`: xử lý kích thước/bảng màu khi cần; mặc định đầu ra 64x64.
-  Hai portrait 128 đã duyệt được dùng trực tiếp.
+- `tools/pixelize.py`: chỉ dùng cho asset cần pixel grid/palette; không dùng để ép portrait minh họa lớn về 128.
 - Bảng Xóm Đèn: `assets/palette/xom_den.hex`; giới hạn màu các loại asset xem `ASSETS.md`.
   Chân dung theo màu của mẫu 128 đã duyệt.
 - Game đọc PNG từ `assets/sprites/`; thiếu ảnh thì dùng hình tạm.
@@ -82,7 +84,6 @@ code nạp art và chạy game xem `CLAUDE.md`.
 
 - `build/portraits/128/`: nguồn Rin/Vy đã chọn cùng các bản nháp 128.
 - `build/portraits/64/`: các bản cũ; bản ngay trước chuyển đổi ở
-  `build/portraits/64/before_128_20261020_154215/`.
-- `build/portraits/ref/`: nguồn lớn, JSON, ảnh so sánh và preview.
+- `build/portraits/ref/`: chỉ các frame tham khảo 128×128 của Rin, Bảo và Vy.
 - `tools/ref/`: prompt và nguồn tham khảo các lần làm trước.
 - `build/shots/`: ảnh chụp trong game. Các thư mục `build/` không commit.
