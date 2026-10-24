@@ -1,5 +1,9 @@
 # Kế hoạch art — Xóm Đèn
 
+> **Portrait framing rule (approved):** Runtime portraits must show the character from the navel/upper abdomen upward, ending around the elbows (not chest-up). Keep the same crop and shoulder placement used by the existing Rin, Bao, and Vy portraits; hands and lower torso should not be visible.
+
+> **Cô Năm visual update (approved):** Cô Năm is approximately 40 years old, with a youthful modern appearance. Use a simple tied-back dark/gray hairstyle with limited gray highlights, a friendly face, and a green blouse. Match Rin's low-detail pixel-art treatment and restrained palette; avoid the older-woman/60s design and overly detailed rendering.
+
 Cập nhật: 2026-10-23. Kích thước và tên file từng loại xem `ASSETS.md`;
 code nạp art và chạy game xem `CLAUDE.md`.
 
@@ -47,7 +51,7 @@ code nạp art và chạy game xem `CLAUDE.md`.
     mím môi — ghét dơ / chê), `kieu` (khoanh tay, liếc ngang), `boi_roi` (đỏ mặt, nhìn đi chỗ khác), `vui`
     (cười thật, mắt cong — chỉ dùng nhiều ở nửa sau arc), `lo`. Bản "sau" (`vy_sau`, `vy_sau_vui`...) tóc buộc
     cao, có thể làm sau, thiếu thì dùng bản đầu.
-- **Cô Năm:** Vietnamese woman in her 60s, grey hair in a bun, green blouse, grocery seller.
+- **Cô Năm:** Vietnamese woman around 40, youthful modern appearance, simple tied-back dark/gray hair with a few silver strands, green blouse, grocery seller.
 - **Mèo (Mỡ):** chubby orange cat.
 
 ## Sprite gameplay — giữ phần sửa tay

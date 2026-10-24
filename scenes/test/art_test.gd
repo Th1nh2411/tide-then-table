@@ -51,6 +51,30 @@ func _ready() -> void:
 	DirAccess.remove_absolute(TEST_ROOT + "characters/tester.png")
 	Art.root = old_root
 	Art.clear_cache()
+	var fish_sizes := {
+		"fish/oc_huong": Vector2i(80, 80),
+		"fish/tom": Vector2i(160, 80),
+		"fish/muc": Vector2i(160, 80),
+		"fish/ca_thu": Vector2i(240, 80),
+		"fish/ca_thu_phat_sang": Vector2i(240, 80),
+		"fish/cua": Vector2i(160, 160),
+		"fish/ca_mu": Vector2i(240, 160),
+	}
+	for sprite: String in fish_sizes:
+		var texture := Art.texture(sprite)
+		failures += _check("new seafood art loads at master size: " + sprite,
+			texture != null and Vector2i(texture.get_width(), texture.get_height()) == fish_sizes[sprite])
+	var dish_ids: Array[String] = [
+		"bia_con_meo", "ca_mu_hap_xi_dau", "ca_thu_nuong", "ca_thu_sot_ca",
+		"canh_chua_ca_thu", "chao_ca_mu", "cua_hap_bia", "cua_luoc", "cua_rang_me",
+		"muc_hap_gung", "muc_luoc", "muc_nuong", "oc_huong_luoc_sa",
+		"oc_huong_nuong_mo_hanh", "rau_muong_xao_toi", "tom_luoc", "tom_nuong",
+		"tom_rang_muoi",
+	]
+	for dish_id: String in dish_ids:
+		var texture := Art.texture("dishes/" + dish_id)
+		failures += _check("new dish art loads at 64x64: " + dish_id,
+			texture != null and texture.get_width() == 64 and texture.get_height() == 64)
 	print("art_test: %s" % ("ALL PASS" if failures == 0 else "%d FAIL" % failures))
 	get_tree().quit()
 

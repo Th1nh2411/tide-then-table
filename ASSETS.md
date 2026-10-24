@@ -1,5 +1,9 @@
 # Danh sách asset cần vẽ — Rin The Fisher
 
+> **Portrait framing rule (approved):** Dialogue portraits are framed from the navel/upper abdomen upward to approximately the elbows, matching the existing character portraits. Do not use a chest-up crop; hands and lower torso should not be visible.
+
+> **Cô Năm visual update (approved):** Treat Cô Năm as approximately 40 years old and youthful. Keep the portrait low-detail with a restrained palette close to Rin's style; use a simple tied-back dark/gray hairstyle and green blouse, not the previous elderly/60s interpretation.
+
 Hiện mọi thứ trong game là hình vẽ tạm bằng code (`_draw()`). File này liệt kê
 những gì cần vẽ để thay dần. **Code nạp ảnh đã có** (`Art`): bỏ file PNG đúng tên
 vào `assets/sprites/` là game dùng ngay, thiếu ảnh nào thì vẫn vẽ tạm cái đó. Xem
@@ -12,7 +16,7 @@ mục "Tên file" ở cuối.
   · riêng 5 (đỏ biển hiệu, vàng nón lá, xanh ngọc phát sáng, trắng đèn tuýp, ánh tóc xanh đen `#2c4058`). File: `assets/palette/
   xom_den.gpl` (Aseprite: Palette → Load), `xom_den.hex`, `xom_den.png` (ảnh mẫu màu, đưa cho AI làm tham
   chiếu). Các asset dùng màu trong bảng Xóm Đèn; chân dung 128 đã duyệt giữ nguyên màu riêng.
-- **Số màu tối đa mỗi hình:** nhân vật 16x32 → 10, portrait approved 128×128 giữ nguyên màu/alpha của approved, hải sản / món ăn 16x16 → 6, cả màn
+- **Số màu tối đa mỗi hình:** nhân vật 16x32 → 10, portrait approved 128×128 giữ nguyên màu/alpha của approved, hải sản / món ăn master lớn → 6, cả màn
   biển đêm khoảng 12–16 (học DREDGE: ít màu, chỉ thứ quan trọng mới sáng).
 - **Quán** dùng nửa ấm (màu đất, cam, đỏ/xanh ghế nhựa, vàng nón lá); **biển đêm** dùng nửa lạnh, 3–4 màu xanh
   đen làm nền, chỉ đèn (cam) và thứ phát sáng (xanh ngọc) là sáng — giống DREDGE: cái gì quan trọng mới sáng.
@@ -46,7 +50,7 @@ Kích thước 16x32. Hướng: xuống / lên / trái (phải = lật trái). �
 | Rin | đứng, đi bộ (4 hướng), lướt (Shift), cầm đĩa, cầm túi đồ, nướng (đứng sau lò, quay xuống), rót bia | tóc đen rối, kính gọng đen, da ngăm, áo ba lỗ trắng, dây chuyền đen (mặt lưỡi câu bạc), khuyên tai, quần short đen |
 | Bảo | đứng sau bếp, đảo chảo (3–4 khung), nói chuyện | áo cam, tạp dề kem, tóc đen ngắn có mái, không đội mũ |
 | Vy | đứng, đi bộ (4 hướng), cầm đĩa, dọn bàn | nữ chính, tiểu thư: áo hồng pastel, tóc dài uốn + kẹp, giày trắng, găng tay hồng khi dọn; bản "sau": tóc buộc cao, xắn tay áo, dép (xem ART_PLAN.md) |
-| Cô Năm | đứng sau quầy, vẫy tay | bà bán tạp hoá, áo xanh lá, tóc bạc |
+| Cô Năm | đứng sau quầy, vẫy tay | cô bán tạp hoá khoảng 40 tuổi, vẻ trẻ, áo xanh lá, tóc đen/xám buộc gọn |
 | Khách | đi bộ, ngồi ghế (quay xuống), ăn (gắp đũa 2 khung), tức giận bỏ đi | 3–4 dáng người, đổi màu áo bằng code |
 | Khách sang | như khách + cà vạt, áo vàng | |
 | Khách quen | như khách, áo xanh rêu | |
@@ -77,7 +81,7 @@ thiếu file nét mặt thì dùng ảnh thường). id = tên không dấu: `ri
 | Bàn ăn inox | 32x32 | có hộp giấy, chai tương ớt, nước mắm |
 | Ghế nhựa | 16x16 | xanh dương + đỏ |
 | Bàn bẩn | 32x32 lớp phủ | vỏ ốc, đĩa dơ |
-| Đĩa món ăn | 16x16 mỗi món | 18 món (tên ở mục "Tên file"): mỗi hải sản có món luộc, nướng, hấp hoặc xào |
+| Đĩa món ăn | 64x64 mỗi món | 18 món (tên ở mục "Tên file"): mỗi hải sản có món luộc, nướng, hấp hoặc xào |
 | Tháp bia (cầm tay) | 8x16 | |
 | Bảng LED menu | 64x40 | khung + chân; chữ chạy vẽ bằng code |
 | Tạp hoá Cô Năm | quầy 96x16, két hàng 16x16 | rau, cà chua, bình bia, bảng "TẠP HOÁ" |
@@ -125,6 +129,8 @@ Biển hiển thị zoom x2 cho cùng tỉ lệ với quán. Vẽ asset biển t
 | Cá thu phát sáng | 3x1 (bản phát sáng của cá thu) |
 | Cua | 2x2 |
 | Cá mú | 3x2 |
+
+Master hải sản dùng kích thước lớn theo số ô khoang: 1 ô = 80x80; sprite ngang/dọc giữ nền trong suốt và hiển thị bằng nearest-neighbor.
 
 Thêm 1 icon 16x16 mỗi loài cho Dex / thông báo (P2).
 
@@ -205,7 +211,7 @@ Tuỳ chọn `characters/<tên>_idle.png` (64x96, cùng 3 hàng xuống / lên /
 | `grocery_counter.png`, `grocery_crate.png` | 96x16, 16x16 | quầy và két Cô Năm |
 | `plant.png` | 16x16 | chậu cây |
 
-**Món** (`dishes/<id>.png`, 16x16): tom_luoc, tom_nuong, tom_rang_muoi, muc_luoc, muc_nuong, muc_hap_gung,
+**Món** (`dishes/<id>.png`, 64x64 master; hiển thị bằng nearest-neighbor): tom_luoc, tom_nuong, tom_rang_muoi, muc_luoc, muc_nuong, muc_hap_gung,
 oc_huong_luoc_sa, oc_huong_nuong_mo_hanh, cua_luoc, cua_hap_bia, cua_rang_me, canh_chua_ca_thu, ca_thu_nuong,
 ca_thu_sot_ca, chao_ca_mu, ca_mu_hap_xi_dau, rau_muong_xao_toi, bia_con_meo.
 
