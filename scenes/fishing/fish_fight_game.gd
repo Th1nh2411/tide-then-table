@@ -31,6 +31,9 @@ const INCIDENT_NAMES: Array[String] = ["", "Cá đang lao! Nhả dây!", "Cá đ
 @export var yank_max_chance: float = 0.95
 @export var yank_fail_tension: float = 0.28
 @export var yank_fail_slip: float = 0.10
+@export var yank_spin_seconds: float = 0.75
+@export var yank_spin_turns_min: int = 3
+@export var yank_spin_turns_max: int = 5
 ## Non-zero makes standalone tests and debugging repeatable.
 @export var random_seed: int = 0
 
@@ -42,11 +45,17 @@ var fish_position: float = 0.0
 var rod_position: float = 0.0
 var fish_direction: float = 1.0
 var max_tension: float = 0.18
+var yank_spinning: bool = false
 
 var _turn_left: float = 1.0
 var _incident_at: float = INF
 var _incident_left: float = 0.0
 var _incident_used: bool = false
+var _yank_spin_elapsed: float = 0.0
+var _yank_spin_from: float = -PI * 0.5
+var _yank_spin_to: float = -PI * 0.5
+var _yank_pointer_angle: float = -PI * 0.5
+var _yank_roll: float = 0.0
 var _rng := RandomNumberGenerator.new()
 
 
@@ -72,8 +81,10 @@ func get_hint() -> String:
 
 func get_status_text() -> String:
 	var warning := INCIDENT_NAMES[incident] if _incident_left > 0.0 else "Cá %s" % TEMPERAMENT_NAMES[temperament]
-	return "Kéo %d%%   Dây %d%%   Giật %d%%   · %s" % [roundi(progress * 100.0),
-		roundi(tension * 100.0), roundi(yank_chance() * 100.0), warning]
+	if yank_spinning:
+		warning = "Đang giật..."
+	return "Kéo %d%%   Dây %d%%   · %s" % [roundi(progress * 100.0),
+		roundi(tension * 100.0), warning]
 
 
 func get_fail_text() -> String:
@@ -90,6 +101,9 @@ func _update(delta: float) -> void:
 ## Public so the deterministic test and bot can exercise the same rules.
 func step_fight(delta: float, steer: float, reeling: bool, yank: bool = false) -> void:
 	if _done:
+		return
+	if yank_spinning:
+		_update_yank_spin(delta)
 		return
 	_update_incident(delta)
 	rod_position = clampf(rod_position + steer * rod_speed * delta, -1.0, 1.0)
@@ -109,7 +123,7 @@ func step_fight(delta: float, steer: float, reeling: bool, yank: bool = false) -
 	tension = clampf(tension, 0.0, 1.0)
 	max_tension = maxf(max_tension, tension)
 	if yank:
-		attempt_yank()
+		start_yank_spin()
 	if progress >= 1.0:
 		_finish(true, max_tension < 0.72)
 	elif tension >= 1.0 or _time >= fail_seconds:
@@ -122,6 +136,31 @@ func yank_chance() -> float:
 	var alignment := 1.0 - clampf(absf(fish_position - rod_position) * 0.75, 0.0, 1.0)
 	var chance := 0.05 + progress * 0.82 + alignment * 0.18 - tension * 0.32 - fish.difficulty * 0.12
 	return clampf(chance * minf(zone_scale, 1.35), yank_min_chance, yank_max_chance)
+
+
+## Starts a readable roulette animation. The same random roll chooses both
+## the pointer's resting angle and the result, so the wheel never lies.
+func start_yank_spin(roll: float = -1.0) -> void:
+	if yank_spinning or _done:
+		return
+	_yank_roll = _rng.randf() if roll < 0.0 else clampf(roll, 0.0, 0.9999)
+	_yank_spin_elapsed = 0.0
+	_yank_spin_from = _yank_pointer_angle
+	var turns := _rng.randi_range(yank_spin_turns_min, yank_spin_turns_max)
+	_yank_spin_to = -PI * 0.5 + _yank_roll * TAU + turns * TAU
+	yank_spinning = true
+	Sfx.play("blip")
+
+
+func _update_yank_spin(delta: float) -> void:
+	_yank_spin_elapsed += delta
+	var t := clampf(_yank_spin_elapsed / yank_spin_seconds, 0.0, 1.0)
+	var eased := 1.0 - pow(1.0 - t, 3.0)
+	_yank_pointer_angle = lerpf(_yank_spin_from, _yank_spin_to, eased)
+	if t >= 1.0:
+		yank_spinning = false
+		_yank_pointer_angle = -PI * 0.5 + _yank_roll * TAU
+		attempt_yank(_yank_roll)
 
 
 ## `roll` is injectable for deterministic tests; gameplay leaves it at -1.
@@ -185,7 +224,8 @@ func _update_incident(delta: float) -> void:
 
 
 func _draw() -> void:
-	var water := Rect2(_centered_origin(Vector2(220, 88)), Vector2(220, 88))
+	var origin := _centered_origin(Vector2(270, 132))
+	var water := Rect2(origin, Vector2(190, 88))
 	draw_rect(water, Color(0.045, 0.15, 0.24))
 	for i in 5:
 		var y := water.position.y + 12.0 + i * 16.0
@@ -201,9 +241,29 @@ func _draw() -> void:
 	draw_line(Vector2(rod_x, water.position.y - 4.0), Vector2(fish_x, water.position.y + 49.0),
 		Color(1.0, 0.85, 0.55, 0.9), 1.0)
 	draw_circle(Vector2(rod_x, water.position.y - 4.0), 4.0, Color.WHITE)
-	_draw_bar(Rect2(water.position.x, water.end.y + 10.0, water.size.x, 8.0), progress, fish_color, "Kéo")
-	_draw_bar(Rect2(water.position.x, water.end.y + 32.0, water.size.x, 8.0), tension,
+	_draw_yank_wheel(Vector2(water.end.x + 40.0, water.position.y + 44.0))
+	_draw_bar(Rect2(origin.x, water.end.y + 10.0, 270.0, 8.0), progress, fish_color, "Kéo")
+	_draw_bar(Rect2(origin.x, water.end.y + 32.0, 270.0, 8.0), tension,
 		Color(0.35, 0.9, 0.55) if tension < 0.7 else Color(1.0, 0.3, 0.2), "Dây")
+
+
+func _draw_yank_wheel(center: Vector2) -> void:
+	var radius := 29.0
+	var start := -PI * 0.5
+	var chance := yank_chance()
+	# Red base + a green arc whose angle is exactly the current success chance.
+	draw_arc(center, radius, start, start + TAU, 64, Color(0.65, 0.18, 0.2), 10.0, true)
+	draw_arc(center, radius, start, start + TAU * chance, maxi(3, roundi(64.0 * chance)),
+		Color(0.25, 0.9, 0.48), 10.0, true)
+	draw_circle(center, radius - 7.0, Color(0.07, 0.09, 0.14))
+	var tip := center + Vector2.RIGHT.rotated(_yank_pointer_angle) * (radius + 2.0)
+	draw_line(center, tip, Color(1.0, 0.9, 0.48), 2.0, true)
+	draw_circle(center, 3.0, Color.WHITE)
+	var percent := "%d%%" % roundi(chance * 100.0)
+	draw_string(ThemeDB.fallback_font, center + Vector2(-12.0, 4.0), percent,
+		HORIZONTAL_ALIGNMENT_CENTER, 24.0, 9, Color.WHITE)
+	draw_string(ThemeDB.fallback_font, center + Vector2(-15.0, radius + 14.0),
+		"E: GIẬT", HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(1.0, 0.9, 0.55))
 
 
 func _draw_bar(rect: Rect2, value: float, color: Color, label: String) -> void:

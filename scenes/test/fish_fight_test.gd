@@ -7,6 +7,7 @@ var _failures: int = 0
 func _ready() -> void:
 	_test_variety()
 	_test_controls()
+	_test_yank_wheel()
 	_test_adaptive_player()
 	print("fish_fight_test: %s" % ("ALL PASS" if _failures == 0 else "%d FAIL" % _failures))
 	get_tree().quit()
@@ -69,6 +70,17 @@ func _test_adaptive_player() -> void:
 			wins += 1
 		game.free()
 	_check("adaptive player wins most hard fights", wins >= 27)
+
+
+func _test_yank_wheel() -> void:
+	var game := _game(12)
+	game.progress = 0.55
+	game.start_yank_spin(0.99)
+	_check("yank starts a spin before resolving", game.yank_spinning and not game.get("_done"))
+	for i in 60:
+		game.step_fight(1.0 / 60.0, 0.0, false)
+	_check("wheel resolves after slowing down", not game.yank_spinning)
+	game.free()
 
 
 func _game(seed: int, difficulty: float = 0.5) -> FishFightGame:

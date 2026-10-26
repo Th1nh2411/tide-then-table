@@ -18,9 +18,9 @@ CÂU CÁ
   Dừng thuyền ở đám bọt, bấm E để câu.
   Chờ phao CHÌM HẲN rồi bấm Space / chuột trái (phao nhấp là cá đang rỉa).
   Cá dính câu: A / D nghiêng cần theo cá, giữ Space / chuột trái để kéo.
-    Dây căng thì nhả ra một chút. E có thể giật cá bất cứ lúc nào: phần trăm hiện
-    trên màn hình tăng khi cá ở gần, cần đúng hướng và dây ít căng. Giật hụt làm cá
-    vùng ra xa và dây căng thêm. Mỗi con cá có tính nết khác nhau.
+    Dây căng thì nhả ra một chút. E có thể giật cá bất cứ lúc nào: cung xanh trên
+    vòng quay rộng hơn khi cá ở gần, cần đúng hướng và dây ít căng. Kim dừng trong
+    vùng xanh thì bắt được; vùng đỏ làm cá vùng xa và dây căng thêm.
   Câu tiếp cùng một đàn: cá cảnh giác và khó hơn, nhưng con cuối thường lớn hơn.
 
 LƯỚI (tôm, cua, ốc)
