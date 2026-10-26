@@ -17,9 +17,10 @@ const TEXTS: Array[String] = [
 CÂU CÁ
   Dừng thuyền ở đám bọt, bấm E để câu.
   Chờ phao CHÌM HẲN rồi bấm Space / chuột trái (phao nhấp là cá đang rỉa).
-  Cá dính câu thì giật dây theo nhịp: mỗi cú giật là một nốt rơi xuống làn A S D F,
-    bấm đúng phím khi nốt chạm vạch, nốt dài thì giữ phím. Trúng: thanh Kéo đầy dần,
-    trượt hay bấm nhầm: Dây mòn. Cá càng khó càng nhiều làn, nhiều nốt.
+  Cá dính câu: A / D nghiêng cần theo cá, giữ Space / chuột trái để kéo.
+    Dây căng thì nhả ra một chút. Khi Kéo gần đầy, E để giật mạnh kết thúc sớm
+    (lệch hướng hoặc dây đang căng thì dễ đứt). Mỗi con cá có tính nết khác nhau.
+  Câu tiếp cùng một đàn: cá cảnh giác và khó hơn, nhưng con cuối thường lớn hơn.
 
 LƯỚI (tôm, cua, ốc)
   Q: thả lưới khi thuyền đứng yên. Để một lúc, quay lại phao bấm E để kéo.

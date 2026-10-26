@@ -282,6 +282,8 @@ Map MVP là một vùng biển nhỏ quanh một làng chài, chia thành các v
 
 > **Câu lâu hơn (sau Phase 9):** câu cần có 2 giai đoạn: **chờ cá cắn** (phao nhấp = cá rỉa, phao chìm hẳn = giật; giật sớm 1 lần được tha, 2 lần cá bỏ đi; không giật kịp = mất mồi) rồi mới đánh cá. TENSION có 3 giai đoạn theo thời gian vật lộn, không có thanh sức (vùng vẫy mạnh + lao bứt có báo trước → giằng co → đuối sức; cá khó: khỏe 5s, đuối từ 10s; cá dễ: 2s / 4.5s), ra ngoài vùng xanh thì thanh kéo tụt. Màn hình chỉ còn 2 thanh: Kéo, Dây. Đồng hồ đứng yên khi câu (dầu không cháy). Nút/phím **Khoang [Tab]** trong lúc câu sẽ tạm dừng game.
 
+> **Đánh cá tự do, mỗi lượt khác nhau (nhánh `feature/varied-fishing-fights`):** sau khi cá cắn, A/D nghiêng cần theo cá, giữ Space/chuột để kéo, nhả để hạ căng dây; gần bắt được có thể E giật mạnh kết thúc sớm nhưng lệch hướng/dây căng dễ đứt. Mỗi con nhận một trong bốn tính nết (lì, quẫy, nhát, khôn) và tối đa một biến cố (lao, đổi hướng, vùng lần cuối). Câu liên tiếp cùng điểm làm đàn cảnh giác và khó hơn, đổi lại con cuối đàn lớn hơn. Thay `RhythmGame` trong luồng thật bằng `FishFightGame`; lưới vẫn dùng `HaulGame`.
+
 > **Bắt bằng lưới (thêm sau Phase 6):** loài có `catch_method = NET` (hiện là ốc hương) không ra ở điểm câu. Bấm Q để thả lưới ở vùng có loài đó, ngâm càng lâu càng nhiều (đầy sau 3 giờ game, tối đa 8 con), rồi quay lại phao bấm E để chơi minigame **Kéo lưới**: giữ để kéo, dây đỏ (vướng đá) thì nhả, kéo cố sẽ rơi ốc. Thuyền mang 2 lưới; lưới còn ngoài biển khi cập bến sẽ mất ốc.
 
 ### BoatData (Resource)

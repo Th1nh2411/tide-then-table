@@ -3,7 +3,8 @@ extends Resource
 ## One catchable species. One .tres per species lives in res://data/fish/.
 
 enum Zone { NEARSHORE, REEF, OPEN_SEA, FOG }
-## RHYTHM = rod fight (RhythmGame), HAUL = hauling a net. Index 1 is no
+## RHYTHM is the save-compatible value for rod fishing (FishFightGame),
+## HAUL = hauling a net. Index 1 is no
 ## longer used (the old timing game); kept so saved values stay the same.
 enum Minigame { RHYTHM, UNUSED, HAUL }
 ## ROD = bites at fishing spots. NET = only from nets the player drops and hauls.
@@ -20,7 +21,7 @@ enum CatchMethod { ROD, NET }
 @export var zones: Array[Zone] = []
 @export var minigame: Minigame = Minigame.RHYTHM
 @export var catch_method: CatchMethod = CatchMethod.ROD
-## 0..1. Drives how many notes / lanes / long pulls the fight has (RhythmChart).
+## 0..1. Drives fish speed and line tension in the rod fight.
 @export_range(0.0, 1.0) var difficulty: float = 0.5
 @export var base_price: int = 10
 ## Relative chance among species of the same zone.

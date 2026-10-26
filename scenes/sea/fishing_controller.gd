@@ -27,6 +27,9 @@ signal fish_caught(fish: FishData, quality: float, count: int, size: float)
 ## Mean size added at depth 1 / on a big-shadow spot.
 @export var size_depth_bonus: float = 0.25
 @export var size_big_bonus: float = 0.35
+## Each consecutive cast at one school grows the fish, but makes it harder.
+@export var chain_size_bonus: float = 0.08
+@export var chain_difficulty_step: float = 0.08
 ## How much a bigger fish fights harder (see CatchRoll.size_zone_scale).
 @export var size_difficulty: float = 0.3
 
@@ -58,7 +61,7 @@ func _on_spot_fishable_changed(spot: FishingSpot, can_fish: bool) -> void:
 
 
 func _show_spot_prompt(spot: FishingSpot) -> void:
-	hud.show_prompt("E: Câu · %s · %d lượt" % [spot.hint_text(), spot.casts_left])
+	hud.show_prompt("E: Câu · %s%s · %d lượt" % [spot.hint_text(), spot.chain_text(), spot.casts_left])
 
 
 func _on_fishing_requested(spot: FishingSpot) -> void:
@@ -70,16 +73,19 @@ func _on_fishing_requested(spot: FishingSpot) -> void:
 		return
 	_current_spot = spot
 	_active = true
+	var chain_level := spot.casts_used
 	_size = CatchRoll.snap_size(CatchRoll.roll_size(_rng, spot.depth,
 		spot.big_shadow and fish == spot.featured, size_spread, size_depth_bonus, size_big_bonus),
 		fish.typical_kg)
+	_size = CatchRoll.snap_size(minf(_size + chain_level * chain_size_bonus, CatchRoll.MAX_SIZE), fish.typical_kg)
 	boat.speed = 0.0
 	boat.set_physics_process(false)
 	hud.hide_prompt()
 	spot.use_cast()
 	oil.spend(oil_per_cast)
 	var zone_scale := _get_zone_scale() * CatchRoll.size_zone_scale(_size, size_difficulty) \
-		* WaveMark.fight_scale(fish, CatchRoll.is_big(_size))
+		* WaveMark.fight_scale(fish, CatchRoll.is_big(_size)) \
+		* maxf(1.0 - chain_level * chain_difficulty_step, 0.75)
 	minigame.start(fish, zone_scale, 1, _size)
 
 

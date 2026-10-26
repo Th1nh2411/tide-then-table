@@ -25,6 +25,8 @@ signal fishing_requested(spot: FishingSpot)
 ## Set by the spawner before the spot enters the tree.
 var zone: FishData.Zone = FishData.Zone.NEARSHORE
 var casts_left: int = 3
+## Consecutive casts make the school wary; the last one is its larger leader.
+var casts_used: int = 0
 ## 0 = by the shore, 1 = far out (see CatchRoll.depth_at).
 var depth: float = 0.0
 ## Species most casts here bring up (null = plain zone random).
@@ -75,8 +77,17 @@ func hint_text() -> String:
 	return "bóng cá lớn: %s" % fish_name if big_shadow else "có vẻ là %s" % fish_name
 
 
+func chain_text() -> String:
+	if casts_used >= 2 and casts_left == 1:
+		return " · cá đầu đàn"
+	if casts_used > 0:
+		return " · đàn cảnh giác"
+	return ""
+
+
 ## Consume one cast. The spot removes itself when empty.
 func use_cast() -> void:
+	casts_used += 1
 	casts_left -= 1
 	if casts_left <= 0:
 		_set_can_fish(false)

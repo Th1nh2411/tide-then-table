@@ -1,8 +1,8 @@
 class_name FishingMinigame
 extends CanvasLayer
 ## Fishing overlay. For rod fish it runs two stages: BiteGame (wait for the
-## bite and strike) then the fight (TIMING or TENSION). Nets go straight to
-## HAUL. Shows the result briefly, then reports quality and how many were
+## bite and strike) then a free-form rod fight. Nets go straight to HAUL.
+## Shows the result briefly, then reports quality and how many were
 ## caught (more than 1 when hauling a net). LampOil doesn't burn while this
 ## overlay is running: time stops while fishing.
 
@@ -105,7 +105,7 @@ func _start_stage(game: MinigameBase) -> void:
 
 
 func _create_fight() -> MinigameBase:
-	var game := RhythmGame.new()
+	var game := FishFightGame.new()
 	game.tugged.connect(_portrait.jolt)
 	return game
 
