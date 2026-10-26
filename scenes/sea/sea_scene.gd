@@ -81,6 +81,7 @@ func _ready() -> void:
 	_hud.go_home_pressed.connect(_go_home)
 	_nets.nets_changed.connect(_hud.set_nets)
 	_fishing.fish_caught.connect(_on_fish_caught)
+	_fishing.rin_fainted.connect(_on_rin_fainted)
 	_fog.whirlpool_entered.connect(_on_whirlpool_entered)
 	_oil.oil_changed.connect(_hud.set_oil)
 	_oil.oil_low.connect(_hud.flash_message.bind("NEO: Dầu đèn còn 25%, trời sắp rạng. Tôi đề nghị anh quay về bến.", 3.0))
@@ -246,6 +247,11 @@ func _on_oil_empty() -> void:
 	_rescue("Hết dầu đèn, tối om... đành gọi cứu hộ kéo về", oil_rescue_fee)
 
 
+func _on_rin_fainted() -> void:
+	GameState.trip_notes.append("Rin bất tỉnh khi vật lộn với cá ngoài khơi.")
+	_rescue("Choáng quá... mình ngất trên ghe. May có người thấy kéo về", 0)
+
+
 ## Pay the rescue boat (as much as the player has) and get towed home.
 func _rescue(text: String, fee: int) -> void:
 	if _day_ended:
@@ -253,7 +259,8 @@ func _rescue(text: String, fee: int) -> void:
 	_boat.set_physics_process(false)
 	var paid := mini(fee, GameState.money)
 	GameState.spend_money(paid)
-	_hud.show_message("%s (-%dk)" % [text, paid])
+	var cost_text := " (-%dk)" % paid if paid > 0 else ""
+	_hud.show_message(text + cost_text)
 	await get_tree().create_timer(tow_message_seconds).timeout
 	_end_sea_day(true)
 

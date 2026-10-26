@@ -7,6 +7,8 @@ extends CanvasLayer
 ## overlay is running: time stops while fishing.
 
 signal finished(fish: FishData, caught: bool, quality: float, count: int)
+signal fight_stun_changed(value: float)
+signal rin_fainted
 ## The player pressed the hold button / key during the minigame.
 signal hold_requested
 
@@ -27,6 +29,8 @@ var _size: float = 1.0
 var _in_bite_stage: bool = false
 ## False if the player struck too early while waiting (no perfect catch).
 var _bite_clean: bool = true
+var _starting_stun: float = 0.0
+var _fainted: bool = false
 
 @onready var _title_label: Label = %TitleLabel
 @onready var _hint_label: Label = %HintLabel
@@ -64,13 +68,16 @@ func is_running() -> bool:
 ## `zone_scale` > 1 makes the game easier (rod/net upgrade).
 ## `count` = how many fish are at stake (shellfish in a net).
 ## `size` only changes the "hooked" title; difficulty comes in via zone_scale.
-func start(fish: FishData, zone_scale: float = 1.0, count: int = 1, size: float = 1.0) -> void:
+func start(fish: FishData, zone_scale: float = 1.0, count: int = 1, size: float = 1.0,
+		starting_stun: float = 0.0) -> void:
 	if is_running():
 		return
 	_fish = fish
 	_zone_scale = zone_scale
 	_count = count
 	_size = size
+	_starting_stun = starting_stun
+	_fainted = false
 	_bite_clean = true
 	_result_label.text = ""
 	_title_label.modulate = Color.WHITE
@@ -106,7 +113,9 @@ func _start_stage(game: MinigameBase) -> void:
 
 func _create_fight() -> MinigameBase:
 	var game := FishFightGame.new()
+	game.stun = _starting_stun
 	game.tugged.connect(_portrait.jolt)
+	game.rin_fainted.connect(_on_rin_fainted)
 	return game
 
 
@@ -133,14 +142,24 @@ func _on_game_completed(success: bool, perfect: bool) -> void:
 	if success:
 		var amount := " %d con" % _game.catch_count if _game.catch_count > 1 else ""
 		_result_label.text = "Bắt được%s!%s" % [amount, " (hoàn hảo)" if perfect else ""]
+	elif _fainted:
+		_result_label.text = "Rin bất tỉnh!"
 	else:
 		_result_label.text = _game.get_fail_text()
 	var quality := perfect_quality if perfect else normal_quality
 	var count := _game.catch_count if success else 0
+	if _game is FishFightGame:
+		fight_stun_changed.emit((_game as FishFightGame).stun)
 	await get_tree().create_timer(result_seconds).timeout
 	_free_game()
 	hide()
 	finished.emit(_fish, success, quality, count)
+	if _fainted:
+		rin_fainted.emit()
+
+
+func _on_rin_fainted() -> void:
+	_fainted = true
 
 
 func _free_game() -> void:

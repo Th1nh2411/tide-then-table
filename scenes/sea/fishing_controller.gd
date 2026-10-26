@@ -9,6 +9,7 @@ extends Node
 ## Emitted on a successful catch; the hold manager stores it.
 ## `size` 1.0 = average (scales price and weight).
 signal fish_caught(fish: FishData, quality: float, count: int, size: float)
+signal rin_fainted
 
 @export var catalog: FishCatalog
 @export var spawner: FishingSpotSpawner
@@ -38,6 +39,8 @@ var _current_spot: FishingSpot
 var _size: float = 1.0
 ## True while the shared minigame overlay is running one of OUR casts.
 var _active: bool = false
+## Carries between rod fights this trip; reaching 1 ends the night.
+var trip_stun: float = 0.0
 
 
 func _ready() -> void:
@@ -45,6 +48,8 @@ func _ready() -> void:
 	spawner.spot_fishable_changed.connect(_on_spot_fishable_changed)
 	spawner.fishing_requested.connect(_on_fishing_requested)
 	minigame.finished.connect(_on_minigame_finished)
+	minigame.fight_stun_changed.connect(_on_fight_stun_changed)
+	minigame.rin_fainted.connect(rin_fainted.emit)
 
 
 func is_fishing() -> bool:
@@ -86,7 +91,11 @@ func _on_fishing_requested(spot: FishingSpot) -> void:
 	var zone_scale := _get_zone_scale() * CatchRoll.size_zone_scale(_size, size_difficulty) \
 		* WaveMark.fight_scale(fish, CatchRoll.is_big(_size)) \
 		* maxf(1.0 - chain_level * chain_difficulty_step, 0.75)
-	minigame.start(fish, zone_scale, 1, _size)
+	minigame.start(fish, zone_scale, 1, _size, trip_stun)
+
+
+func _on_fight_stun_changed(value: float) -> void:
+	trip_stun = clampf(value, 0.0, 1.0)
 
 
 func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: int) -> void:

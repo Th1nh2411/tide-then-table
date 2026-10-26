@@ -135,8 +135,9 @@ Vietnamese, keep code comments in short English.
   upright). World coordinates / speeds are unchanged; art for the sea is
   drawn at screen size and placed at scale 0.5.
 - Sea scene controllers: `FishingController` (rod spots → `FishingMinigame`:
-  BiteGame then `FishFightGame` (A/D follows the fish, hold Space to reel,
-  release to calm the line; temperament + one incident vary each fight); spot picks species via its featured fish +
+  BiteGame then `FishFightGame` (arcade rodeo: A/D moves the boat into line,
+  Space reels/gives slack, telegraphed attacks can be countered, E spins a
+  green/yellow/red all-in wheel; trip stun reaches 100% = Rin faints and is rescued); spot picks species via its featured fish +
   depth (`FishPortrait` right of the minigame, standing up (`vertical`): a shadow + "?" while waiting for the
   bite and for species not in the Dex yet, named "???"), `CatchRoll` rolls size: deeper = pricier/bigger, size scales price
   and difficulty; records in `GameState.best_sizes`), `NetController` (Q nets → HaulGame; nets bring shrimp / crab / snails, each rolled from the zone with its own size: near shore mostly shrimp, reef mostly crab — rods catch fish and squid only),
