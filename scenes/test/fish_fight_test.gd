@@ -32,11 +32,24 @@ func _test_controls() -> void:
 	game.tension = 0.7
 	game.step_fight(0.5, 0.0, false)
 	_check("releasing calms the line", game.tension < 0.7)
+	game.progress = 0.1
+	game.rod_position = game.fish_position
+	game.tension = 0.2
+	var early_chance := game.yank_chance()
 	game.progress = 0.82
 	game.rod_position = game.fish_position
 	game.tension = 0.3
-	game.step_fight(0.01, 0.0, false, true)
-	_check("safe final yank lands fish", game.get("_done") and game.progress >= 1.0)
+	var late_chance := game.yank_chance()
+	_check("yank chance rises as fish gets closer", late_chance > early_chance)
+	game.progress = 0.1
+	var tension_before := game.tension
+	_check("yank is allowed early", not game.attempt_yank(1.0) and game.tension > tension_before)
+	game.progress = 0.82
+	game.rod_position = game.fish_position
+	game.tension = 0.3
+	game.attempt_yank(0.0)
+	game.step_fight(0.01, 0.0, false)
+	_check("successful yank lands fish", game.get("_done") and game.progress >= 1.0)
 	game.free()
 
 

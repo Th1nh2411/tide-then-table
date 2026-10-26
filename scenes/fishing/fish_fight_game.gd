@@ -26,6 +26,11 @@ const INCIDENT_NAMES: Array[String] = ["", "Cá đang lao! Nhả dây!", "Cá đ
 @export var incident_seconds_min: float = 2.5
 @export var incident_seconds_max: float = 5.0
 @export var surge_duration: float = 1.1
+@export_group("Final yank")
+@export var yank_min_chance: float = 0.05
+@export var yank_max_chance: float = 0.95
+@export var yank_fail_tension: float = 0.28
+@export var yank_fail_slip: float = 0.10
 ## Non-zero makes standalone tests and debugging repeatable.
 @export var random_seed: int = 0
 
@@ -62,12 +67,13 @@ func setup(p_fish: FishData, p_zone_scale: float) -> void:
 
 
 func get_hint() -> String:
-	return "A/D: nghiêng cần · giữ Space: kéo · nhả: hạ căng · E: giật mạnh khi gần"
+	return "A/D: nghiêng cần · giữ Space: kéo · nhả: hạ căng · E: thử giật cá"
 
 
 func get_status_text() -> String:
 	var warning := INCIDENT_NAMES[incident] if _incident_left > 0.0 else "Cá %s" % TEMPERAMENT_NAMES[temperament]
-	return "Kéo %d%%   Dây %d%%   · %s" % [roundi(progress * 100.0), roundi(tension * 100.0), warning]
+	return "Kéo %d%%   Dây %d%%   Giật %d%%   · %s" % [roundi(progress * 100.0),
+		roundi(tension * 100.0), roundi(yank_chance() * 100.0), warning]
 
 
 func get_fail_text() -> String:
@@ -102,16 +108,36 @@ func step_fight(delta: float, steer: float, reeling: bool, yank: bool = false) -
 	progress = clampf(progress, 0.0, 1.0)
 	tension = clampf(tension, 0.0, 1.0)
 	max_tension = maxf(max_tension, tension)
-	if yank and progress >= 0.78:
-		if alignment >= 0.68 and tension <= 0.64:
-			progress = 1.0
-		else:
-			tension = minf(tension + 0.38, 1.0)
-		tugged.emit()
+	if yank:
+		attempt_yank()
 	if progress >= 1.0:
 		_finish(true, max_tension < 0.72)
 	elif tension >= 1.0 or _time >= fail_seconds:
 		_finish(false, false)
+
+
+## Chance is readable and continuous: getting close matters most, while good
+## alignment and a calm line can make an early gamble viable.
+func yank_chance() -> float:
+	var alignment := 1.0 - clampf(absf(fish_position - rod_position) * 0.75, 0.0, 1.0)
+	var chance := 0.05 + progress * 0.82 + alignment * 0.18 - tension * 0.32 - fish.difficulty * 0.12
+	return clampf(chance * minf(zone_scale, 1.35), yank_min_chance, yank_max_chance)
+
+
+## `roll` is injectable for deterministic tests; gameplay leaves it at -1.
+func attempt_yank(roll: float = -1.0) -> bool:
+	var result := _rng.randf() if roll < 0.0 else roll
+	var success := result <= yank_chance()
+	if success:
+		progress = 1.0
+		_finish(true, max_tension < 0.72)
+	else:
+		progress = maxf(progress - yank_fail_slip, 0.0)
+		tension = minf(tension + yank_fail_tension + fish.difficulty * 0.08, 1.0)
+		fish_direction *= -1.0
+		_reset_turn()
+	tugged.emit()
+	return success
 
 
 func _move_fish(delta: float, reeling: bool) -> void:
