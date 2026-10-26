@@ -1,12 +1,15 @@
 class_name FishingMinigame
 extends CanvasLayer
 ## Fishing overlay. For rod fish it runs two stages: BiteGame (wait for the
-## bite and strike) then the fight (TIMING or TENSION). Nets go straight to
-## HAUL. Shows the result briefly, then reports quality and how many were
+## bite and strike) then a free-form rod fight. Nets go straight to HAUL.
+## Shows the result briefly, then reports quality and how many were
 ## caught (more than 1 when hauling a net). LampOil doesn't burn while this
 ## overlay is running: time stops while fishing.
 
 signal finished(fish: FishData, caught: bool, quality: float, count: int)
+signal fight_stun_changed(value: float)
+signal rin_fainted
+signal catch_size_changed(value: float)
 ## The player pressed the hold button / key during the minigame.
 signal hold_requested
 
@@ -27,6 +30,8 @@ var _size: float = 1.0
 var _in_bite_stage: bool = false
 ## False if the player struck too early while waiting (no perfect catch).
 var _bite_clean: bool = true
+var _starting_stun: float = 0.0
+var _fainted: bool = false
 
 @onready var _title_label: Label = %TitleLabel
 @onready var _hint_label: Label = %HintLabel
@@ -64,13 +69,16 @@ func is_running() -> bool:
 ## `zone_scale` > 1 makes the game easier (rod/net upgrade).
 ## `count` = how many fish are at stake (shellfish in a net).
 ## `size` only changes the "hooked" title; difficulty comes in via zone_scale.
-func start(fish: FishData, zone_scale: float = 1.0, count: int = 1, size: float = 1.0) -> void:
+func start(fish: FishData, zone_scale: float = 1.0, count: int = 1, size: float = 1.0,
+		starting_stun: float = 0.0) -> void:
 	if is_running():
 		return
 	_fish = fish
 	_zone_scale = zone_scale
 	_count = count
 	_size = size
+	_starting_stun = starting_stun
+	_fainted = false
 	_bite_clean = true
 	_result_label.text = ""
 	_title_label.modulate = Color.WHITE
@@ -81,12 +89,12 @@ func start(fish: FishData, zone_scale: float = 1.0, count: int = 1, size: float 
 		_show_species()
 		_start_stage(HaulGame.new())
 	else:
-		# The species stays a mystery until it's hooked.
-		_in_bite_stage = true
-		_title_label.text = "Đang câu..."
+		# The player lowers the hook into a visible school and chooses a fish.
+		_in_bite_stage = false
+		_title_label.text = "Thả dây vào đàn cá"
 		_portrait.silhouette = 1.0  # who's down there? a shadow until hooked
 		_portrait.mystery = true
-		_start_stage(BiteGame.new())
+		_start_stage(_create_fight())
 	show()
 
 
@@ -98,16 +106,33 @@ func _start_stage(game: MinigameBase) -> void:
 	_game_holder.add_child(_game)
 	_hint_label.text = _game.get_hint()
 	# First time with each game only; the how-to lives in Hướng dẫn.
-	_hint_label.visible = Guide.once("game_" + str(_game.get_script().get_global_name()))
+	var guide_id := "game_fish_school_v1" if _game is FishFightGame \
+		else "game_" + str(_game.get_script().get_global_name())
+	_hint_label.visible = Guide.once(guide_id)
 	if not _hint_label.visible and WaveMark.has_power() and Guide.once("wave_power"):
 		_hint_label.text = "C: Nhịp Sóng · chậm lại vài giây"
 		_hint_label.visible = true
 
 
 func _create_fight() -> MinigameBase:
-	var game := RhythmGame.new()
+	var game := FishFightGame.new()
+	game.stun = _starting_stun
 	game.tugged.connect(_portrait.jolt)
+	game.rin_fainted.connect(_on_rin_fainted)
+	game.fish_hooked.connect(_on_fish_hooked)
 	return game
+
+
+func _on_fish_hooked(size_scale: float) -> void:
+	_size = CatchRoll.snap_size(clampf(_size * size_scale, CatchRoll.MIN_SIZE, CatchRoll.MAX_SIZE),
+		_fish.typical_kg)
+	catch_size_changed.emit(_size)
+	_show_species()
+	_title_label.text = "Móc được: %s %s%s!" % [_species_name(), _fish.weight_text(_size),
+		" (to!)" if CatchRoll.is_big(_size) else ""]
+	_title_label.modulate = aberrant_title_color if _fish.is_aberrant else Color.WHITE
+	_hint_label.text = _game.get_hint()
+	_hint_label.visible = Guide.once("game_fish_haul_v1")
 
 
 func _process(_delta: float) -> void:
@@ -133,14 +158,24 @@ func _on_game_completed(success: bool, perfect: bool) -> void:
 	if success:
 		var amount := " %d con" % _game.catch_count if _game.catch_count > 1 else ""
 		_result_label.text = "Bắt được%s!%s" % [amount, " (hoàn hảo)" if perfect else ""]
+	elif _fainted:
+		_result_label.text = "Rin bất tỉnh!"
 	else:
 		_result_label.text = _game.get_fail_text()
 	var quality := perfect_quality if perfect else normal_quality
 	var count := _game.catch_count if success else 0
+	if _game is FishFightGame:
+		fight_stun_changed.emit((_game as FishFightGame).stun)
 	await get_tree().create_timer(result_seconds).timeout
 	_free_game()
 	hide()
 	finished.emit(_fish, success, quality, count)
+	if _fainted:
+		rin_fainted.emit()
+
+
+func _on_rin_fainted() -> void:
+	_fainted = true
 
 
 func _free_game() -> void:

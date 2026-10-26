@@ -77,6 +77,11 @@ func _test_spot() -> void:
 	_check("spot hint known -> name", spot.hint_text().contains("Cá thu"))
 	spot.big_shadow = true
 	_check("spot hint big shadow", spot.hint_text().begins_with("bóng cá lớn"))
+	spot.casts_left = 3
+	spot.use_cast()
+	_check("school gets wary after one cast", spot.chain_text().contains("cảnh giác"))
+	spot.use_cast()
+	_check("last cast is the school leader", spot.chain_text().contains("đầu đàn"))
 	spot.free()
 
 
