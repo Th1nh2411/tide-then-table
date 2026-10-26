@@ -50,6 +50,7 @@ func _ready() -> void:
 	minigame.finished.connect(_on_minigame_finished)
 	minigame.fight_stun_changed.connect(_on_fight_stun_changed)
 	minigame.rin_fainted.connect(rin_fainted.emit)
+	minigame.catch_size_changed.connect(_on_catch_size_changed)
 
 
 func is_fishing() -> bool:
@@ -96,6 +97,10 @@ func _on_fishing_requested(spot: FishingSpot) -> void:
 
 func _on_fight_stun_changed(value: float) -> void:
 	trip_stun = clampf(value, 0.0, 1.0)
+
+
+func _on_catch_size_changed(value: float) -> void:
+	_size = value
 
 
 func _on_minigame_finished(fish: FishData, caught: bool, quality: float, count: int) -> void:

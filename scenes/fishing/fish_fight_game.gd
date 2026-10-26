@@ -1,65 +1,55 @@
 class_name FishFightGame
 extends MinigameBase
-## Arcade fishing rodeo. A/D moves the boat into line with the fish; Space
-## reels or gives slack. Reading a telegraphed dash creates a counter window.
+## One cast shows a small school. A/D moves the boat and line sideways, W/S
+## raises/lowers the hook, and Space hooks the fish the player actually aims at.
 
 signal tugged
 signal rin_fainted
+signal fish_hooked(size_scale: float)
 
-enum Temperament { STEADY, ERRATIC, SHY, CLEVER }
-enum Attack { DASH, DIVE, FEINT }
-enum AttackPhase { WAIT, TELEGRAPH, ACTIVE, COUNTER }
 enum YankResult { GREEN, YELLOW, RED }
 
-const TEMPERAMENT_NAMES: Array[String] = ["lì", "quẫy", "nhát", "khôn"]
-const ATTACK_NAMES: Array[String] = ["LAO NGANG", "LẶN SÂU", "GIẢ MỆT"]
-
-@export_group("Rodeo")
-@export var reel_per_second: float = 0.12
-@export var slip_per_second: float = 0.014
-@export var boat_speed: float = 1.25
-@export var fish_speed_easy: float = 0.22
-@export var fish_speed_hard: float = 0.42
-@export var tension_recovery: float = 0.3
-@export var base_tension_gain: float = 0.045
-@export var bad_angle_gain: float = 0.28
-@export var fail_seconds: float = 32.0
-@export_group("Attacks")
-@export var attack_wait: Vector2 = Vector2(1.8, 3.4)
-@export var telegraph_seconds: float = 0.7
-@export var attack_seconds: float = 0.8
-@export var counter_seconds: float = 0.65
-@export var counter_pull: float = 0.14
-@export var missed_attack_stun: float = 0.14
+@export_group("Free hook")
+@export var school_size: int = 6
+@export var boat_speed: float = 1.2
+@export var hook_follow_speed: float = 1.65
+@export var hook_depth_speed: float = 0.58
+@export var hook_radius: float = 0.14
+@export var snap_cooldown: float = 0.3
+@export var fish_speed_easy: float = 0.16
+@export var fish_speed_hard: float = 0.32
+@export_group("Haul")
+@export var reel_speed: float = 0.13
+@export var give_slack_speed: float = 0.1
+@export var tension_recovery: float = 0.28
+@export var base_tension_gain: float = 0.04
+@export var bad_angle_gain: float = 0.3
+@export var fail_seconds: float = 30.0
 @export_group("Balance")
-@export var balance_speed: float = 1.7
-@export var edge_stun_per_second: float = 0.16
+@export var balance_speed: float = 1.6
+@export var edge_stun_per_second: float = 0.15
 @export var fall_stun: float = 0.16
 @export_group("Yank wheel")
 @export var yank_min_green: float = 0.05
-@export var yank_max_green: float = 0.82
+@export var yank_max_green: float = 0.84
 @export var yank_spin_seconds: float = 0.75
 @export var yank_spin_turns: Vector2i = Vector2i(3, 5)
 @export var random_seed: int = 0
 
-var temperament: Temperament = Temperament.STEADY
-var attack: Attack = Attack.DASH
-var attack_phase: AttackPhase = AttackPhase.WAIT
+var boat_position: float = 0.0
+var hook_position: Vector2 = Vector2(0.0, 0.08)
 var progress: float = 0.0
-var tension: float = 0.16
+var tension: float = 0.12
 var balance: float = 0.0
 var stun: float = 0.0
-var combo: int = 0
-var fish_position: float = 0.0
-var boat_position: float = 0.0
-var fish_direction: float = 1.0
+var hooked_index: int = -1
 var yank_spinning: bool = false
+var school: Array[Dictionary] = []
 
-var _phase_left: float = 1.0
-var _turn_left: float = 1.0
-var _released_for_attack: bool = false
+var _snap_left: float = 0.0
+var _fight_time: float = 0.0
 var _fall_cooldown: float = 0.0
-var _max_tension: float = 0.16
+var _max_tension: float = 0.12
 var _wheel_elapsed: float = 0.0
 var _wheel_from: float = -PI * 0.5
 var _wheel_to: float = -PI * 0.5
@@ -74,30 +64,22 @@ func setup(p_fish: FishData, p_zone_scale: float) -> void:
 		_rng.seed = random_seed
 	else:
 		_rng.randomize()
-	temperament = _rng.randi_range(0, Temperament.size() - 1) as Temperament
-	fish_position = _rng.randf_range(-0.65, 0.65)
-	fish_direction = -1.0 if _rng.randf() < 0.5 else 1.0
-	_schedule_attack()
-	_reset_turn()
-	custom_minimum_size = Vector2(300, 176)
+	_spawn_school()
+	custom_minimum_size = Vector2(310, 184)
 
 
 func get_hint() -> String:
-	return "A/D: chạy theo cá · Space: kéo/nhả · nhả lúc cá lao, kéo lại để phản đòn · E: tất tay"
+	if hooked_index < 0:
+		return "A/D: đưa thuyền · W/S: nâng/hạ lưỡi · Space: móc cá"
+	return "A/D: chạy theo cá · W: kéo lên · S: nhả dây · E: tất tay"
 
 
 func get_status_text() -> String:
-	var action := "Cá %s · Combo x%d" % [TEMPERAMENT_NAMES[temperament], combo]
-	if attack_phase == AttackPhase.TELEGRAPH:
-		action = "%s! NHẢ DÂY" % ATTACK_NAMES[attack]
-	elif attack_phase == AttackPhase.ACTIVE:
-		action = "%s!" % ATTACK_NAMES[attack]
-	elif attack_phase == AttackPhase.COUNTER:
-		action = "KÉO NGAY: PHẢN ĐÒN!"
-	elif yank_spinning:
-		action = "Đang giật tất tay..."
-	return "Kéo %d%%  Dây %d%%  Choáng %d%% · %s" % [roundi(progress * 100.0),
-		roundi(tension * 100.0), roundi(stun * 100.0), action]
+	if hooked_index < 0:
+		return "Đưa lưỡi chạm con cá muốn bắt rồi bấm Space"
+	var text := "Kéo %d%%  Dây %d%%  Choáng %d%%" % [roundi(progress * 100.0),
+		roundi(tension * 100.0), roundi(stun * 100.0)]
+	return text + (" · Đang giật tất tay..." if yank_spinning else "")
 
 
 func get_fail_text() -> String:
@@ -107,24 +89,137 @@ func get_fail_text() -> String:
 
 
 func _update(delta: float) -> void:
-	step_fight(delta, Input.get_axis("turn_left", "turn_right"), _cast_held(),
-		Input.is_action_just_pressed("interact"))
+	var depth_axis := Input.get_axis("throttle_forward", "throttle_back")
+	step_fight(delta, Input.get_axis("turn_left", "turn_right"), depth_axis,
+		_cast_just_pressed(), Input.is_action_just_pressed("interact"))
 
 
-## Public for the deterministic player simulation in fish_fight_test.
-func step_fight(delta: float, steer: float, reeling: bool, yank: bool = false) -> void:
+## Public for deterministic tests. `depth`: -1 raises, +1 lowers the hook.
+func step_fight(delta: float, steer: float, depth: float, snap: bool = false,
+		yank: bool = false) -> void:
 	if _done:
 		return
 	if yank_spinning:
 		_update_wheel(delta)
 		return
+	_snap_left = maxf(_snap_left - delta, 0.0)
 	boat_position = clampf(boat_position + steer * boat_speed * delta, -1.0, 1.0)
-	_update_attack(delta, reeling)
-	_move_fish(delta, reeling)
-	_apply_line(delta, reeling)
-	_update_balance(delta, reeling)
-	if yank:
-		start_yank_spin()
+	_update_school(delta)
+	if hooked_index < 0:
+		_move_free_hook(delta, depth)
+		if snap and _snap_left <= 0.0:
+			_try_hook()
+	else:
+		_fight_time += delta
+		_haul_hooked_fish(delta, depth)
+		_update_balance(delta, depth < -0.05)
+		if yank:
+			start_yank_spin()
+	_check_result()
+
+
+func _spawn_school() -> void:
+	school.clear()
+	for i in school_size:
+		var size_scale := _rng.randf_range(0.78, 1.28)
+		school.append({
+			"pos": Vector2(_rng.randf_range(-0.9, 0.9), _rng.randf_range(0.25, 0.95)),
+			"speed": _rng.randf_range(fish_speed_easy, lerpf(fish_speed_easy, fish_speed_hard, fish.difficulty)),
+			"dir": -1.0 if _rng.randf() < 0.5 else 1.0,
+			"size": size_scale,
+			"phase": _rng.randf_range(0.0, TAU),
+		})
+
+
+func _update_school(delta: float) -> void:
+	for i in school.size():
+		var entry: Dictionary = school[i]
+		var pos: Vector2 = entry["pos"]
+		var direction: float = entry["dir"]
+		var speed: float = entry["speed"]
+		# A hooked fish fights harder when it is large, but still obeys the same
+		# simple movement as every other fish—there are no hidden states.
+		if i == hooked_index:
+			speed *= 1.0 + float(entry["size"]) * 0.35
+		pos.x += direction * speed * delta
+		if absf(pos.x) >= 1.0:
+			pos.x = clampf(pos.x, -1.0, 1.0)
+			entry["dir"] = -direction
+		entry["pos"] = pos
+
+
+func _move_free_hook(delta: float, depth: float) -> void:
+	hook_position.x = move_toward(hook_position.x, boat_position, hook_follow_speed * delta)
+	hook_position.y = clampf(hook_position.y + depth * hook_depth_speed * delta, 0.05, 1.0)
+
+
+func _try_hook() -> void:
+	_snap_left = snap_cooldown
+	var nearest := -1
+	var nearest_distance := INF
+	for i in school.size():
+		var pos: Vector2 = school[i]["pos"]
+		var distance := hook_position.distance_to(pos)
+		if distance < nearest_distance:
+			nearest_distance = distance
+			nearest = i
+	if nearest < 0 or nearest_distance > hook_radius:
+		# A miss flicks the hook upward so repeated tapping is not optimal.
+		hook_position.y = maxf(hook_position.y - 0.08, 0.05)
+		Sfx.play("blip")
+		return
+	hooked_index = nearest
+	hook_position = school[nearest]["pos"]
+	var size_scale: float = school[nearest]["size"]
+	fish_hooked.emit(size_scale)
+	tugged.emit()
+	Sfx.play("bite")
+
+
+func _haul_hooked_fish(delta: float, depth: float) -> void:
+	var entry: Dictionary = school[hooked_index]
+	var pos: Vector2 = entry["pos"]
+	var reeling := depth < -0.05
+	if reeling:
+		pos.y -= reel_speed * zone_scale * delta
+		var pull := 1.0 + float(entry["size"]) * 0.35
+		tension += (base_tension_gain + (1.0 - alignment()) * bad_angle_gain) * pull / zone_scale * delta
+	elif depth > 0.05:
+		pos.y = minf(pos.y + give_slack_speed * delta, 1.0)
+		tension -= tension_recovery * zone_scale * delta
+	else:
+		tension -= tension_recovery * 0.45 * zone_scale * delta
+	entry["pos"] = pos
+	hook_position = pos
+	progress = 1.0 - pos.y
+
+
+func alignment() -> float:
+	if hooked_index < 0:
+		return 1.0
+	var fish_x: float = (school[hooked_index]["pos"] as Vector2).x
+	return 1.0 - clampf(absf(fish_x - boat_position) * 0.65, 0.0, 1.0)
+
+
+func _update_balance(delta: float, reeling: bool) -> void:
+	_fall_cooldown = maxf(_fall_cooldown - delta, 0.0)
+	var fish_x: float = (school[hooked_index]["pos"] as Vector2).x
+	var pull := (fish_x - boat_position) * (1.2 if reeling else 0.55)
+	balance = move_toward(balance, clampf(pull, -1.1, 1.1), balance_speed * delta)
+	if absf(balance) > 0.8:
+		stun += edge_stun_per_second * delta
+	if absf(balance) >= 0.98 and _fall_cooldown <= 0.0:
+		stun += fall_stun
+		var entry: Dictionary = school[hooked_index]
+		var pos: Vector2 = entry["pos"]
+		pos.y = minf(pos.y + 0.07, 1.0)
+		entry["pos"] = pos
+		balance *= 0.45
+		_fall_cooldown = 0.8
+		tugged.emit()
+
+
+func _check_result() -> void:
 	progress = clampf(progress, 0.0, 1.0)
 	tension = clampf(tension, 0.0, 1.0)
 	stun = clampf(stun, 0.0, 1.0)
@@ -132,127 +227,27 @@ func step_fight(delta: float, steer: float, reeling: bool, yank: bool = false) -
 	if stun >= 1.0:
 		rin_fainted.emit()
 		_finish(false, false)
-	elif progress >= 1.0:
-		_finish(true, _max_tension < 0.7 and stun < 0.5)
-	elif tension >= 1.0 or _time >= fail_seconds:
+	elif hooked_index >= 0 and progress >= 0.96:
+		_finish(true, _max_tension < 0.65 and stun < 0.45)
+	elif tension >= 1.0 or (hooked_index >= 0 and _fight_time >= fail_seconds):
 		_finish(false, false)
 
 
-func alignment() -> float:
-	return 1.0 - clampf(absf(fish_position - boat_position) * 0.65, 0.0, 1.0)
-
-
-func _apply_line(delta: float, reeling: bool) -> void:
-	var difficulty := 0.75 + fish.difficulty * 0.65
-	if reeling:
-		if attack_phase == AttackPhase.COUNTER:
-			progress += counter_pull + combo * 0.01
-			tension = maxf(tension - 0.16, 0.0)
-			stun = maxf(stun - 0.04, 0.0)
-			combo += 1
-			attack_phase = AttackPhase.WAIT
-			_schedule_attack()
-			tugged.emit()
-		progress += reel_per_second * (0.4 + alignment() * 0.6) * zone_scale * delta
-		var attack_gain := 0.42 if attack_phase == AttackPhase.ACTIVE else 0.0
-		tension += (base_tension_gain + (1.0 - alignment()) * bad_angle_gain + attack_gain) \
-			* difficulty / zone_scale * delta
-	else:
-		tension -= tension_recovery * zone_scale * delta
-		progress -= slip_per_second * difficulty * delta
-
-
-func _update_balance(delta: float, reeling: bool) -> void:
-	_fall_cooldown = maxf(_fall_cooldown - delta, 0.0)
-	var pull := (fish_position - boat_position) * (1.15 if reeling else 0.55)
-	if attack_phase == AttackPhase.ACTIVE:
-		pull *= 1.8
-	balance = move_toward(balance, clampf(pull, -1.1, 1.1), balance_speed * delta)
-	if absf(balance) > 0.78:
-		stun += edge_stun_per_second * delta
-	if absf(balance) >= 0.98 and _fall_cooldown <= 0.0:
-		stun += fall_stun
-		progress = maxf(progress - 0.07, 0.0)
-		balance *= 0.45
-		combo = 0
-		_fall_cooldown = 0.8
-		tugged.emit()
-
-
-func _update_attack(delta: float, reeling: bool) -> void:
-	_phase_left -= delta
-	if (attack_phase == AttackPhase.TELEGRAPH or attack_phase == AttackPhase.ACTIVE) and not reeling:
-		_released_for_attack = true
-	if _phase_left > 0.0:
-		return
-	match attack_phase:
-		AttackPhase.WAIT:
-			attack = _rng.randi_range(0, Attack.size() - 1) as Attack
-			attack_phase = AttackPhase.TELEGRAPH
-			_phase_left = telegraph_seconds
-			_released_for_attack = false
-			tugged.emit()
-		AttackPhase.TELEGRAPH:
-			attack_phase = AttackPhase.ACTIVE
-			_phase_left = attack_seconds * (1.2 if attack == Attack.DIVE else 1.0)
-			if attack == Attack.FEINT:
-				fish_direction *= -1.0
-		AttackPhase.ACTIVE:
-			if _released_for_attack:
-				attack_phase = AttackPhase.COUNTER
-				_phase_left = counter_seconds
-			else:
-				stun += missed_attack_stun + fish.difficulty * 0.08
-				balance += fish_direction * 0.35
-				combo = 0
-				attack_phase = AttackPhase.WAIT
-				_schedule_attack()
-		AttackPhase.COUNTER:
-			attack_phase = AttackPhase.WAIT
-			_schedule_attack()
-
-
-func _move_fish(delta: float, reeling: bool) -> void:
-	_turn_left -= delta
-	if _turn_left <= 0.0:
-		fish_direction *= -1.0
-		_reset_turn()
-	var speed := lerpf(fish_speed_easy, fish_speed_hard, fish.difficulty)
-	if temperament == Temperament.ERRATIC:
-		speed *= 1.25
-	elif temperament == Temperament.SHY:
-		speed *= 1.3 if reeling else 0.7
-	elif temperament == Temperament.CLEVER and attack_phase == AttackPhase.TELEGRAPH:
-		speed *= 0.35
-	if attack_phase == AttackPhase.ACTIVE:
-		speed *= 2.1 if attack != Attack.DIVE else 1.3
-	fish_position += fish_direction * speed * delta
-	if absf(fish_position) >= 1.0:
-		fish_position = clampf(fish_position, -1.0, 1.0)
-		fish_direction *= -1.0
-
-
-func _schedule_attack() -> void:
-	_phase_left = _rng.randf_range(attack_wait.x, attack_wait.y)
-
-
-func _reset_turn() -> void:
-	var scale := 1.4 if temperament == Temperament.STEADY else 0.6 if temperament == Temperament.ERRATIC else 1.0
-	_turn_left = _rng.randf_range(1.0, 2.5) * scale
-
-
 func yank_green_chance() -> float:
-	var chance := 0.04 + progress * 0.58 + alignment() * 0.18 + combo * 0.055 \
-		- tension * 0.22 - absf(balance) * 0.16 - stun * 0.2 - fish.difficulty * 0.08
+	if hooked_index < 0:
+		return 0.0
+	var size_scale: float = school[hooked_index]["size"]
+	var chance := 0.06 + progress * 0.66 + alignment() * 0.2 - tension * 0.24 \
+		- absf(balance) * 0.16 - stun * 0.2 - (size_scale - 1.0) * 0.12
 	return clampf(chance * minf(zone_scale, 1.3), yank_min_green, yank_max_green)
 
 
 func yank_yellow_chance() -> float:
-	return minf(0.2 + progress * 0.08 + combo * 0.015, 0.34)
+	return minf(0.2 + progress * 0.1, 0.32) if hooked_index >= 0 else 0.0
 
 
 func start_yank_spin(roll: float = -1.0) -> void:
-	if yank_spinning or _done:
+	if yank_spinning or _done or hooked_index < 0:
 		return
 	_wheel_roll = _rng.randf() if roll < 0.0 else clampf(roll, 0.0, 0.9999)
 	_wheel_elapsed = 0.0
@@ -271,6 +266,7 @@ func _update_wheel(delta: float) -> void:
 		yank_spinning = false
 		_pointer_angle = -PI * 0.5 + _wheel_roll * TAU
 		resolve_yank(_wheel_roll)
+		_check_result()
 
 
 func resolve_yank(roll: float) -> YankResult:
@@ -278,45 +274,55 @@ func resolve_yank(roll: float) -> YankResult:
 	if roll <= yank_green_chance():
 		result = YankResult.GREEN
 		progress = 1.0
-		_finish(true, _max_tension < 0.7 and stun < 0.5)
+		_finish(true, _max_tension < 0.65 and stun < 0.45)
 	elif roll <= yank_green_chance() + yank_yellow_chance():
 		result = YankResult.YELLOW
-		progress += 0.16
+		var entry: Dictionary = school[hooked_index]
+		var pos: Vector2 = entry["pos"]
+		pos.y = maxf(pos.y - 0.16, 0.0)
+		entry["pos"] = pos
+		progress = 1.0 - pos.y
 		stun += 0.1
-		balance += fish_direction * 0.18
+		balance += float(entry["dir"]) * 0.18
 	else:
-		progress -= 0.12
+		var entry: Dictionary = school[hooked_index]
+		var pos: Vector2 = entry["pos"]
+		pos.y = minf(pos.y + 0.12, 1.0)
+		entry["pos"] = pos
+		progress = 1.0 - pos.y
 		tension += 0.22
 		stun += 0.24
-		balance += fish_direction * 0.42
-		combo = 0
+		balance += float(entry["dir"]) * 0.4
 	tugged.emit()
 	return result
 
 
 func _draw() -> void:
-	var origin := _centered_origin(Vector2(300, 164))
-	var arena := Rect2(origin, Vector2(225, 112))
+	var origin := _centered_origin(Vector2(310, 172))
+	var arena := Rect2(origin, Vector2(235, 122))
 	draw_rect(arena, Color(0.035, 0.14, 0.24))
 	for i in 5:
-		var y := arena.position.y + 14.0 + i * 21.0
-		draw_line(Vector2(arena.position.x + 4.0, y), Vector2(arena.end.x - 4.0, y), Color(0.2, 0.55, 0.65, 0.16))
-	var boat_x := lerpf(arena.position.x + 15.0, arena.end.x - 15.0, (boat_position + 1.0) * 0.5)
-	var fish_x := lerpf(arena.position.x + 12.0, arena.end.x - 12.0, (fish_position + 1.0) * 0.5)
-	var boat_pos := Vector2(boat_x, arena.position.y + 22.0)
-	var fish_pos := Vector2(fish_x, arena.position.y + 82.0 + (12.0 if attack == Attack.DIVE and attack_phase == AttackPhase.ACTIVE else 0.0))
-	draw_line(boat_pos, fish_pos, Color(1.0, 0.86, 0.55, 0.85), 1.0)
+		var y := arena.position.y + 18.0 + i * 23.0
+		draw_line(Vector2(arena.position.x + 4, y), Vector2(arena.end.x - 4, y), Color(0.2, 0.55, 0.65, 0.16))
+	var boat_x := lerpf(arena.position.x + 14.0, arena.end.x - 14.0, (boat_position + 1.0) * 0.5)
+	var boat_pos := Vector2(boat_x, arena.position.y + 13.0)
+	var hook_pos := _to_screen(hook_position, arena)
+	draw_line(boat_pos, hook_pos, Color(1.0, 0.86, 0.55, 0.9), 1.0)
 	_draw_boat(boat_pos)
-	_draw_fish(fish_pos)
-	if attack_phase == AttackPhase.TELEGRAPH:
-		draw_line(fish_pos, fish_pos + Vector2(fish_direction * 28.0, 0), Color(1.0, 0.35, 0.2), 3.0)
-		draw_string(ThemeDB.fallback_font, fish_pos + Vector2(-22, -12), ATTACK_NAMES[attack],
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(1.0, 0.75, 0.3))
-	_draw_wheel(Vector2(arena.end.x + 38.0, arena.position.y + 49.0))
+	for i in school.size():
+		_draw_fish(_to_screen(school[i]["pos"], arena), school[i], i == hooked_index)
+	draw_circle(hook_pos, 3.0, Color.WHITE)
+	draw_arc(hook_pos, 6.0, 0.0, TAU, 16, Color(1.0, 0.85, 0.35), 1.0)
+	_draw_wheel(Vector2(arena.end.x + 38.0, arena.position.y + 52.0))
 	_draw_bar(Rect2(origin.x, arena.end.y + 8.0, 145.0, 7.0), progress, _tint(fish.color), "Kéo")
-	_draw_bar(Rect2(origin.x + 155.0, arena.end.y + 8.0, 145.0, 7.0), tension, Color(1.0, 0.55, 0.2), "Dây")
+	_draw_bar(Rect2(origin.x + 158.0, arena.end.y + 8.0, 145.0, 7.0), tension, Color(1.0, 0.55, 0.2), "Dây")
 	_draw_balance(Rect2(origin.x, arena.end.y + 28.0, 145.0, 7.0))
-	_draw_bar(Rect2(origin.x + 155.0, arena.end.y + 28.0, 145.0, 7.0), stun, Color(0.75, 0.4, 1.0), "Choáng")
+	_draw_bar(Rect2(origin.x + 158.0, arena.end.y + 28.0, 145.0, 7.0), stun, Color(0.75, 0.4, 1.0), "Choáng")
+
+
+func _to_screen(pos: Vector2, arena: Rect2) -> Vector2:
+	return Vector2(lerpf(arena.position.x + 10.0, arena.end.x - 10.0, (pos.x + 1.0) * 0.5),
+		lerpf(arena.position.y + 25.0, arena.end.y - 8.0, pos.y))
 
 
 func _draw_boat(pos: Vector2) -> void:
@@ -327,11 +333,15 @@ func _draw_boat(pos: Vector2) -> void:
 	draw_set_transform(Vector2.ZERO)
 
 
-func _draw_fish(pos: Vector2) -> void:
-	var color := _tint(fish.color)
-	draw_circle(pos, 7.0, color)
-	draw_colored_polygon(PackedVector2Array([pos - Vector2(fish_direction * 6.0, 0),
-		pos - Vector2(fish_direction * 13.0, 6.0), pos - Vector2(fish_direction * 13.0, -6.0)]), color)
+func _draw_fish(pos: Vector2, entry: Dictionary, hooked: bool) -> void:
+	var scale: float = entry["size"]
+	var direction: float = entry["dir"]
+	var color := _tint(fish.color).lightened(0.2) if hooked else _tint(fish.color)
+	draw_set_transform(pos, 0.0, Vector2.ONE * scale)
+	draw_circle(Vector2.ZERO, 5.0, color)
+	draw_colored_polygon(PackedVector2Array([Vector2(-direction * 4.0, 0),
+		Vector2(-direction * 10.0, 5.0), Vector2(-direction * 10.0, -5.0)]), color)
+	draw_set_transform(Vector2.ZERO)
 
 
 func _draw_wheel(center: Vector2) -> void:
@@ -340,10 +350,11 @@ func _draw_wheel(center: Vector2) -> void:
 	var green := yank_green_chance()
 	var yellow := yank_yellow_chance()
 	draw_arc(center, radius, start, start + TAU, 64, Color(0.65, 0.16, 0.2), 9.0, true)
-	draw_arc(center, radius, start + TAU * green, start + TAU * (green + yellow), 24,
-		Color(1.0, 0.72, 0.2), 9.0, true)
-	draw_arc(center, radius, start, start + TAU * green, maxi(3, roundi(64.0 * green)),
-		Color(0.25, 0.9, 0.48), 9.0, true)
+	if hooked_index >= 0:
+		draw_arc(center, radius, start + TAU * green, start + TAU * (green + yellow), 24,
+			Color(1.0, 0.72, 0.2), 9.0, true)
+		draw_arc(center, radius, start, start + TAU * green, maxi(3, roundi(64.0 * green)),
+			Color(0.25, 0.9, 0.48), 9.0, true)
 	draw_circle(center, radius - 6.0, Color(0.07, 0.09, 0.14))
 	draw_line(center, center + Vector2.RIGHT.rotated(_pointer_angle) * (radius + 2.0), Color.WHITE, 2.0, true)
 	draw_circle(center, 3.0, Color.WHITE)
@@ -360,7 +371,7 @@ func _draw_balance(rect: Rect2) -> void:
 	var center_x := track.position.x + track.size.x * 0.5
 	draw_line(Vector2(center_x, track.position.y), Vector2(center_x, track.end.y), Color.WHITE, 1.0)
 	draw_circle(Vector2(center_x + balance * track.size.x * 0.47, track.position.y + track.size.y * 0.5), 3.0,
-		Color(0.3, 1.0, 0.65) if absf(balance) < 0.78 else Color(1.0, 0.25, 0.2))
+		Color(0.3, 1.0, 0.65) if absf(balance) < 0.8 else Color(1.0, 0.25, 0.2))
 	draw_rect(track, Color(1, 1, 1, 0.45), false, 1.0)
 
 

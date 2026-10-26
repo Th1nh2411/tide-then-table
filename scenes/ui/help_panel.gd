@@ -17,11 +17,11 @@ const TEXTS: Array[String] = [
 CÂU CÁ
   Dừng thuyền ở đám bọt, bấm E để câu.
   Chờ phao CHÌM HẲN rồi bấm Space / chuột trái (phao nhấp là cá đang rỉa).
-  Cá dính câu: A / D chạy thuyền theo hướng cá để giữ dây thẳng và Rin đứng vững.
-    Giữ Space / chuột trái để kéo; dây căng thì nhả. Khi cá báo LAO, nhả dây;
-    cá lao xong kéo ngay để PHẢN ĐÒN và tăng combo.
-  E giật tất tay bất cứ lúc nào: xanh = bắt ngay, vàng = kéo gần nhưng Rin choáng,
-    đỏ = cá giật ngược. Dây thẳng, combo cao, ít căng và ít choáng làm xanh rộng hơn.
+  Trong một lượt có cả đàn cá: A / D đưa thuyền và dây sang ngang, W / S nâng-hạ
+    lưỡi. Đưa lưỡi chạm con muốn bắt rồi bấm Space / chuột trái để móc.
+  Khi đã móc: A / D chạy theo cá để giữ dây thẳng, W kéo lên, S nhả dây khi căng.
+  E giật tất tay: xanh = bắt ngay, vàng = kéo gần nhưng Rin choáng, đỏ = cá giật ngược.
+    Cá gần mặt nước, dây thẳng, ít căng và ít choáng làm vùng xanh rộng hơn.
   Choáng giữ lại giữa các lượt câu trong đêm; đầy thanh thì Rin bất tỉnh và chuyến đi kết thúc.
   Câu tiếp cùng một đàn: cá cảnh giác và khó hơn, nhưng con cuối thường lớn hơn.
 
