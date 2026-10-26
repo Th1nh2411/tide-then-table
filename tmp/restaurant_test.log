@@ -1,0 +1,32 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS  shelf add
+PASS  shelf full
+PASS  count skips regular plates
+PASS  normal order gets normal plate
+PASS  regular gets their plate
+PASS  oldest order with a plate
+PASS  then the next one
+PASS  nothing matches -> {}
+PASS  plate on chosen slot
+PASS  slot taken
+PASS  slot freed
+PASS  taken seat skipped
+PASS  dirty listed
+PASS  cleaned -> free
+PASS  left without eating -> free
+PASS  servable = portions - waiting lines
+PASS  plates on the pass count too
+PASS  no side chance -> seafood
+PASS  side chance 1 -> side
+PASS  seafood all promised -> side
+PASS  order size: 1 guest, no extra
+PASS  order size: 2 guests + extra, capped
+PASS  bill: market dish × variety × rich, regular by reward
+PASS  stage by day
+PASS  day 1 is simple: one guest, one dish, no extra round
+PASS  shift report: short lines with profit
+PASS  tip only above the threshold
+PASS  patience waits while a guide pointer shows
+PASS  restaurant view not moved by a camera
+Restaurant: TẤT CẢ PASS

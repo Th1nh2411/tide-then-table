@@ -39,7 +39,7 @@ func _draw() -> void:
 			Color(0.2, 0.15, 0.1))
 		for k in lines.size():
 			var at := rect.position + Vector2(ticket_base_width + k * dot_step, 8)
-			draw_circle(at, 3.5, lines[k].dish.color)
+			StreetProps.draw_dish_icon(self, lines[k].dish, Rect2(at - Vector2(4, 4), Vector2(8, 8)))
 			if StreetProps.rin_grills(lines[k].dish):
 				StreetProps.draw_flame(self, at + Vector2(3, -2), 6.0, Time.get_ticks_msec() * 0.001)
 			if customers.shelf.find_for(lines[k].dish, lines[k].visit):

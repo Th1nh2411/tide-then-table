@@ -16,10 +16,10 @@ const TEXTS: Array[String] = [
 
 CÂU CÁ
   Dừng thuyền ở đám bọt, bấm E để câu.
-  Chờ phao CHÌM HẲN rồi bấm Space / chuột trái (phao nhấp là cá đang rỉa).
   Trong một lượt có cả đàn cá: A / D đưa thuyền và dây sang ngang, W / S nâng-hạ
-    lưỡi. Đưa lưỡi chạm con muốn bắt rồi bấm Space / chuột trái để móc.
-  Khi đã móc: A / D chạy theo cá để giữ dây thẳng, W kéo lên, S nhả dây khi căng.
+    lưỡi. Giữ mồi gần con muốn bắt; cá sẽ tự cắn khi ở đủ gần. Dây câu đung đưa
+    theo quán tính khi thuyền di chuyển, nên cần căn cả độ trễ của lưỡi.
+  Khi cá đã cắn: A / D chạy theo cá để giữ dây thẳng, W kéo lên, S nhả dây khi căng.
   E giật tất tay: xanh = bắt ngay, vàng = kéo gần nhưng Rin choáng, đỏ = cá giật ngược.
     Cá gần mặt nước, dây thẳng, ít căng và ít choáng làm vùng xanh rộng hơn.
   Choáng giữ lại giữa các lượt câu trong đêm; đầy thanh thì Rin bất tỉnh và chuyến đi kết thúc.

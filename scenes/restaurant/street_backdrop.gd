@@ -30,8 +30,8 @@ func _draw() -> void:
 func _draw_shop_front() -> void:
 	var bottom := room.merged_rect("W").end.y
 	var width := room.grid.size.x * room.cell_size
-	if Art.draw(self, "restaurant/shop_front", Rect2(0, 0, width, bottom)):
-		return
+	# Keep the base behind the transparent pixel-art facade so gaps in doors,
+	# shelves and awnings never expose the clear viewport.
 	draw_rect(Rect2(Vector2.ZERO, Vector2(width, bottom)), Color(0.86, 0.78, 0.55))
 	for x0: float in [0.0, 208.0]:
 		draw_rect(Rect2(x0 + 8, 24, 160, bottom - 24), Color(0.32, 0.27, 0.23))
@@ -41,6 +41,7 @@ func _draw_shop_front() -> void:
 		var grocery := i * 16 >= int(grocery_from_x)  # Cô Năm's green awning
 		var stripe := Color(0.25, 0.6, 0.3) if grocery else Color(0.15, 0.5, 0.75)
 		draw_rect(Rect2(i * 16, bottom - 6, 16, 7), stripe if i % 2 == 0 else Color(0.95, 0.95, 0.9))
+	Art.draw(self, "restaurant/shop_front", Rect2(0, 0, width, bottom))
 
 
 ## Cô Năm's grocery next door, open: lit inside, shelves of goods.

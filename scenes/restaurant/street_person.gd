@@ -95,14 +95,23 @@ func _draw() -> void:
 	var bob := 0.0  # placeholder bob; sheets have their own walk frames
 	if is_walking() and not Art.has(sprite_name()):
 		bob = absf(sin(_walk_time * 12.0)) * 1.5
-	draw_circle(Vector2(0, 1), 6.0, Color(0, 0, 0, 0.25))  # shadow
-	draw_set_transform(Vector2(0, -bob))
-	var drawn := Art.draw_person(self, sprite_name(), facing, _walk_time, is_walking(), is_busy_pose(),
-		Time.get_ticks_msec() * 0.001)
+	var pose_offset := pose_draw_offset()
+	draw_circle(pose_offset + Vector2(0, 1), 6.0, Color(0, 0, 0, 0.25))  # shadow
+	draw_set_transform(pose_offset + Vector2(0, -bob))
+	var now := Time.get_ticks_msec() * 0.001
+	var busy_sprite := busy_sprite_name()
+	var drawn := false
+	if is_busy_pose() and busy_sprite != "" and Art.has(busy_sprite):
+		drawn = Art.draw_sheet(self, busy_sprite, Rect2(-8, -32, 16, 32), 4, 0, now, 4.0)
+	else:
+		# When facing away, the carried plate belongs behind the torso/arms.
+		if carried and facing == Vector2i.UP:
+			StreetProps.draw_plate(self, carried, carried_plate_position())
+		drawn = Art.draw_person(self, sprite_name(), facing, _walk_time, is_walking(), is_busy_pose(), now)
 	if not drawn:
 		_draw_placeholder_body()
-	if carried:
-		StreetProps.draw_plate(self, carried, Vector2(float(facing.x) * 7.0, -16 + (2.0 if facing == Vector2i.DOWN else 0.0)))
+	if carried and facing != Vector2i.UP:
+		StreetProps.draw_plate(self, carried, carried_plate_position())
 	draw_set_transform(Vector2.ZERO)
 	if label:
 		draw_string(ThemeDB.fallback_font, Vector2(-12, -36), label, HORIZONTAL_ALIGNMENT_CENTER, 24, 7,
@@ -114,9 +123,33 @@ func sprite_name() -> String:
 	return sprite
 
 
+func carried_plate_position() -> Vector2:
+	if facing == Vector2i.DOWN:
+		return Vector2(0, -13)
+	if facing == Vector2i.UP:
+		return Vector2(0, -17)
+	return Vector2(float(facing.x) * 7.0, -14)
+
+
 ## True while sitting / cooking: the sheet's "busy" row.
 func is_busy_pose() -> bool:
 	return false
+
+
+## Visual-only pose adjustment. Keep the node/pathfinding position unchanged.
+func pose_draw_offset() -> Vector2:
+	return Vector2.ZERO
+
+
+## Optional one-row (4 x 16x32) sheet used instead of the main sheet's busy
+## row. Subclasses can switch this by state; an absent asset falls back safely.
+func busy_sprite_name() -> String:
+	return ""
+
+
+func has_busy_sprite() -> bool:
+	var name := busy_sprite_name()
+	return name != "" and Art.has(name)
 
 
 func _draw_placeholder_body() -> void:

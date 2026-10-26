@@ -90,7 +90,7 @@ func _order_bubble(customer: Customer) -> void:
 	_bubble(at, Color(1.0, 0.88, 0.5, 0.95) if customer.regular_name else Color(1, 1, 1, 0.95), half)
 	for k in n:
 		var dot := at + Vector2(-half + 6 + k * 9, 0)
-		draw_circle(dot, 3.5, customer.orders[k].dish.color)
+		StreetProps.draw_dish_icon(self, customer.orders[k].dish, Rect2(dot - Vector2(4, 4), Vector2(8, 8)))
 		if StreetProps.rin_grills(customer.orders[k].dish):
 			StreetProps.draw_flame(self, dot + Vector2(3, -2), 6.0, _time)
 	draw_string(ThemeDB.fallback_font, at + Vector2(half - 7, 3), str(customer.seat + 1), HORIZONTAL_ALIGNMENT_LEFT,

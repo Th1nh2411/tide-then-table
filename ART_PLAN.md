@@ -4,6 +4,8 @@
 
 > **Cô Năm visual update (approved):** Cô Năm is approximately 40 years old, with a youthful modern appearance. Use a simple tied-back dark/gray hairstyle with limited gray highlights, a friendly face, and a green blouse. Match Rin's low-detail pixel-art treatment and restrained palette; avoid the older-woman/60s design and overly detailed rendering.
 
+> **Restaurant prop perspective (approved):** Props use a top-down orthographic farming-sim view: primary edges stay horizontal/vertical, top surfaces are modest, and there is no isometric convergence. Add only a hard 1–2 px dark-navy contact shadow directly under feet, wheels, or the base so objects do not float; never use soft or long cast shadows.
+
 Cập nhật: 2026-10-23. Kích thước và tên file từng loại xem `ASSETS.md`;
 code nạp art và chạy game xem `CLAUDE.md`.
 
@@ -29,6 +31,8 @@ code nạp art và chạy game xem `CLAUDE.md`.
 2. Hải sản trong khoang (`fish/`), rồi món ăn (`dishes/`).
 3. Đồ trong quán, nhân vật còn lại và khách.
 4. Hải sản trên vỉ (`grill/`), thuyền (`sea/`); ô gạch và mặt nước làm sau.
+
+Tiến độ 2026-10-25: đã thêm mặt tiền cửa hàng, bảng menu, quầy/két tạp hoá, đủ ba cấp xe đẩy/bếp, lò than, bàn ghế, nền đường, thùng lạnh, thùng rác, vòi bia, chậu cây và dây đèn trong `restaurant/`. Các prop active đã được đồng bộ theo góc top-down orthographic và có bóng tiếp xúc cứng; khách thường đã tách sprite ngồi chờ/ngồi ăn. Nhóm prop và décor nhà hàng cốt lõi đã hoàn tất.
 
 ## Nhân vật
 
@@ -69,6 +73,8 @@ code nạp art và chạy game xem `CLAUDE.md`.
   nếu vị trí mặt hoặc eo thay đổi. Mốc eo đã ghi nhận: Rin 20, Bảo 20, Vy 19.
   Xem bằng `scenes/test/sprite_viewer.tscn`.
 - Vy chưa có hàng bận; bản tóc buộc cao theo arc làm sau.
+- Rin dùng `rin_carry.png` khi bưng món; đĩa nằm giữa hai tay ở ngang eo. Túi hàng mua ngoài quán đặt giữa, ngay dưới hông và không dùng tư thế bưng món.
+- Khách thường dùng `guest_wait.png` khi ngồi chờ và `guest_eat.png` khi có món; mỗi file là một hàng 4 frame 16×32. Nếu biến thể khách chưa có file riêng thì game dùng hàng bận cũ.
 - Nguồn sheet Vy `tools/ref/vy_spritesheet.webp` chưa rõ giấy phép:
   cần kiểm tra hoặc thay trước khi phát hành công khai.
 

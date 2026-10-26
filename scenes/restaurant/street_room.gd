@@ -91,6 +91,15 @@ func _ready() -> void:
 		func(canvas: CanvasItem) -> void: StreetProps.draw_cart(canvas, grid, kitchen_level, _time))
 	_add_sorted(merged_rect("N").end.y,
 		func(canvas: CanvasItem) -> void: StreetProps.draw_grill(canvas, merged_rect("N"), _time))
+	_add_sorted(merged_rect("F").end.y,
+		func(canvas: CanvasItem) -> void: StreetProps.draw_ice_box(canvas, merged_rect("F"), fridge_level))
+	_add_sorted(merged_rect("B").end.y,
+		func(canvas: CanvasItem) -> void: StreetProps.draw_bin(canvas, merged_rect("B")))
+	_add_sorted(merged_rect("P").end.y,
+		func(canvas: CanvasItem) -> void: StreetRoomPainter.draw_plate_bench(canvas, self))
+	if not grid.cells_of("V").is_empty():
+		_add_sorted(merged_rect("V").end.y,
+			func(canvas: CanvasItem) -> void: StreetRoomPainter.draw_stall(canvas, self))
 	# One per table slot of the map; slots not in use draw nothing.
 	var slots := _table_slots()
 	for i in slots.size():

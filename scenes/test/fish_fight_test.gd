@@ -1,5 +1,5 @@
 extends Node
-## Deterministic checks for free hook control, hauling, gamble, and fainting.
+## Deterministic checks for auto bite, line sway, hauling, gamble, and fainting.
 
 var _failures: int = 0
 
@@ -24,9 +24,21 @@ func _test_school_and_free_hook() -> void:
 	var start_depth := game.hook_position.y
 	game.step_fight(0.5, 1.0, 1.0)
 	_check("A/D moves boat and S lowers hook", game.boat_position > 0.0 and game.hook_position.y > start_depth)
+	_check("moving boat leaves the hook trailing on its line", game.hook_position.x < game.boat_position)
+	game.school.clear()  # Isolate the pendulum from automatic bites.
+	var swung_past_boat := false
+	for frame in 90:
+		game.step_fight(1.0 / 60.0, 0.0, 0.0)
+		swung_past_boat = swung_past_boat or game.hook_position.x > game.boat_position + 0.005
+	_check("hook swings past the boat before settling", swung_past_boat)
+	game.free()
+
+	game = _game(3)
 	_place_hook_on(game, 0)
 	game.step_fight(0.01, 0.0, 0.0, true)
-	_check("Space hooks the aimed fish", game.hooked_index == 0)
+	_check("old hook button cannot hook fish", game.hooked_index < 0)
+	_wait_for_bite(game, 0)
+	_check("nearby fish bites automatically", game.hooked_index == 0)
 	game.free()
 
 
@@ -94,7 +106,16 @@ func _test_adaptive_player() -> void:
 
 func _hook_first(game: FishFightGame) -> void:
 	_place_hook_on(game, 0)
-	game.step_fight(0.01, 0.0, 0.0, true)
+	_wait_for_bite(game, 0)
+
+
+func _wait_for_bite(game: FishFightGame, index: int) -> void:
+	# Keep the deterministic fish and hook together while the bite timer fills.
+	for frame in ceili(game.bite_seconds / 0.02) + 1:
+		_place_hook_on(game, index)
+		game.step_fight(0.02, 0.0, 0.0)
+		if game.hooked_index >= 0:
+			break
 
 
 func _place_hook_on(game: FishFightGame, index: int) -> void:

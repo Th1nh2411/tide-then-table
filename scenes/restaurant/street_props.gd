@@ -75,11 +75,21 @@ static func draw_ice_box(canvas: CanvasItem, r: Rect2, level: int) -> void:
 
 
 static func draw_plate(canvas: CanvasItem, plate: DishShelf.Plate, at: Vector2) -> void:
-	if not Art.draw(canvas, "dishes/" + plate.dish.id, Rect2(at - Vector2(8, 8), Vector2(16, 16))):
-		canvas.draw_circle(at, 5.0, Color.WHITE)
-		canvas.draw_circle(at + Vector2(0, -1), 3.2, plate.dish.color)
+	draw_dish_icon(canvas, plate.dish, Rect2(at - Vector2(8, 8), Vector2(16, 16)))
 	if not plate.visit.is_empty():  # a regular's order
 		canvas.draw_arc(at, 5.5, 0.0, TAU, 14, Color(1.0, 0.8, 0.3), 1.0)
+
+
+## Draw the real dish PNG wherever the UI used to show a coloured vector dot.
+## The fallback keeps tests and incomplete art packs usable.
+static func draw_dish_icon(canvas: CanvasItem, dish: DishData, rect: Rect2, alpha: float = 1.0) -> bool:
+	if Art.draw(canvas, "dishes/" + dish.id, rect, false, Color(1, 1, 1, alpha)):
+		return true
+	var at := rect.get_center()
+	var radius := minf(rect.size.x, rect.size.y) * 0.5
+	canvas.draw_circle(at, radius, Color(1, 1, 1, alpha))
+	canvas.draw_circle(at + Vector2(0, -0.5), radius * 0.65, Color(dish.color, alpha))
+	return false
 
 
 ## True for dishes Rin grills himself on the charcoal grill (not Bảo's, not beer).
@@ -162,10 +172,13 @@ static func _flip(p: Vector2, facing: float, x: float, y: float, w: float, h: fl
 ## spinach, tomatoes, beer kegs) and a green front with its name, plastic
 ## crates behind it (G cells).
 static func draw_stall(canvas: CanvasItem, counter: Rect2, crates: Array[Rect2]) -> void:
+	var p := counter.position
 	if Art.has("restaurant/grocery_counter"):
 		for c in crates:
 			Art.draw(canvas, "restaurant/grocery_crate", c)
 		Art.draw(canvas, "restaurant/grocery_counter", counter)
+		canvas.draw_string(ThemeDB.fallback_font, p + Vector2(0, 15), "TẠP HOÁ",
+			HORIZONTAL_ALIGNMENT_CENTER, counter.size.x, 7, Color(1, 0.95, 0.8))
 		return
 	var crate_colors: Array[Color] = [Color(0.25, 0.45, 0.8), Color(0.3, 0.6, 0.35)]
 	var veg: Array[Color] = [Color(0.3, 0.65, 0.25), Color(0.95, 0.55, 0.15), Color(0.55, 0.3, 0.55)]
@@ -175,7 +188,6 @@ static func draw_stall(canvas: CanvasItem, counter: Rect2, crates: Array[Rect2])
 		for k in 3:
 			canvas.draw_circle(c.position + Vector2(4 + k * 4, 4), 2.5, veg[(i + k) % veg.size()])
 		canvas.draw_line(c.position + Vector2(1, 10), c.position + Vector2(15, 10), Color(0, 0, 0, 0.25), 1.0)
-	var p := counter.position
 	canvas.draw_rect(Rect2(p + Vector2(0, -4), Vector2(counter.size.x, 12)), Color(0.72, 0.55, 0.35))
 	canvas.draw_rect(Rect2(p + Vector2(0, 8), Vector2(counter.size.x, 8)), Color(0.2, 0.5, 0.3))
 	canvas.draw_string(ThemeDB.fallback_font, p + Vector2(0, 15), "TẠP HOÁ", HORIZONTAL_ALIGNMENT_CENTER,

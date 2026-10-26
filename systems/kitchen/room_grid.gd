@@ -7,9 +7,13 @@ extends RefCounted
 ## (walkable), W building, K curb, R road, L pole, M parked bike, Z crates,
 ## o spare stool, Y tree, X food cart, t rest of a table, V market stall
 ## counter, G stall crates, N charcoal grill, U beer tap, E LED menu board.
+## The h/o logical seat cells are walkable because their shifted art occupies
+## the solid table footprint immediately below.
 
 ## A seat ("h") blocks walking but is a path end: its customer walks onto it.
-const SOLID := "#SPCBFTtWKRLMZoYXQhVGNUE"
+# Stools h/o are drawn tucked into the solid table cells below them. Their old
+# cells stay walkable so collision follows the visible stool/table footprint.
+const SOLID := "#SPCBFTtWKRLMZYXQVGNUE"
 
 var cell_size: float = 24.0
 var origin: Vector2 = Vector2.ZERO
@@ -41,6 +45,23 @@ func kind(cell: Vector2i) -> String:
 
 func is_walkable(cell: Vector2i) -> bool:
 	return not SOLID.contains(kind(cell))
+
+
+## Closest walkable cell, including for cutscene actors entering off-grid.
+func nearest_walkable(cell: Vector2i) -> Vector2i:
+	var start := Vector2i(clampi(cell.x, 0, size.x - 1), clampi(cell.y, 0, size.y - 1))
+	if is_walkable(start):
+		return start
+	for radius in range(1, maxi(size.x, size.y)):
+		for y in range(start.y - radius, start.y + radius + 1):
+			for x in range(start.x - radius, start.x + radius + 1):
+				if absi(x - start.x) != radius and absi(y - start.y) != radius:
+					continue
+				var candidate := Vector2i(x, y)
+				if candidate.x >= 0 and candidate.y >= 0 and candidate.x < size.x and candidate.y < size.y \
+						and is_walkable(candidate):
+					return candidate
+	return Vector2i(-1, -1)
 
 
 ## All cells of one kind, row by row.

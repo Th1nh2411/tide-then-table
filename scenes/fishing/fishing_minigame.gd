@@ -1,7 +1,7 @@
 class_name FishingMinigame
 extends CanvasLayer
-## Fishing overlay. For rod fish it runs two stages: BiteGame (wait for the
-## bite and strike) then a free-form rod fight. Nets go straight to HAUL.
+## Fishing overlay. Rod fish bite automatically when the free-moving hook
+## stays close; the same game then continues as a rod fight. Nets use HAUL.
 ## Shows the result briefly, then reports quality and how many were
 ## caught (more than 1 when hauling a net). LampOil doesn't burn while this
 ## overlay is running: time stops while fishing.
@@ -91,7 +91,7 @@ func start(fish: FishData, zone_scale: float = 1.0, count: int = 1, size: float 
 	else:
 		# The player lowers the hook into a visible school and chooses a fish.
 		_in_bite_stage = false
-		_title_label.text = "Thả dây vào đàn cá"
+		_title_label.text = "Đưa mồi lại gần cá"
 		_portrait.silhouette = 1.0  # who's down there? a shadow until hooked
 		_portrait.mystery = true
 		_start_stage(_create_fight())
@@ -106,7 +106,7 @@ func _start_stage(game: MinigameBase) -> void:
 	_game_holder.add_child(_game)
 	_hint_label.text = _game.get_hint()
 	# First time with each game only; the how-to lives in Hướng dẫn.
-	var guide_id := "game_fish_school_v1" if _game is FishFightGame \
+	var guide_id := "game_fish_school_auto_bite_v2" if _game is FishFightGame \
 		else "game_" + str(_game.get_script().get_global_name())
 	_hint_label.visible = Guide.once(guide_id)
 	if not _hint_label.visible and WaveMark.has_power() and Guide.once("wave_power"):
@@ -128,7 +128,7 @@ func _on_fish_hooked(size_scale: float) -> void:
 		_fish.typical_kg)
 	catch_size_changed.emit(_size)
 	_show_species()
-	_title_label.text = "Móc được: %s %s%s!" % [_species_name(), _fish.weight_text(_size),
+	_title_label.text = "Cá cắn câu: %s %s%s!" % [_species_name(), _fish.weight_text(_size),
 		" (to!)" if CatchRoll.is_big(_size) else ""]
 	_title_label.modulate = aberrant_title_color if _fish.is_aberrant else Color.WHITE
 	_hint_label.text = _game.get_hint()

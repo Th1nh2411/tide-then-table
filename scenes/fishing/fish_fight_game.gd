@@ -1,7 +1,7 @@
 class_name FishFightGame
 extends MinigameBase
-## One cast shows a small school. A/D moves the boat and line sideways, W/S
-## raises/lowers the hook, and Space hooks the fish the player actually aims at.
+## One cast shows a small school. A/D moves the boat, W/S raises/lowers the
+## hook, and a fish bites by itself after the hook stays close long enough.
 
 signal tugged
 signal rin_fainted
@@ -12,10 +12,14 @@ enum YankResult { GREEN, YELLOW, RED }
 @export_group("Free hook")
 @export var school_size: int = 6
 @export var boat_speed: float = 1.2
-@export var hook_follow_speed: float = 1.65
 @export var hook_depth_speed: float = 0.58
 @export var hook_radius: float = 0.14
-@export var snap_cooldown: float = 0.3
+@export var bite_seconds: float = 0.35
+## Spring and drag use normalized arena units. Together they make the line
+## lag, overshoot, and settle instead of being glued to the moving boat.
+@export var line_spring: float = 12.0
+@export var line_drag: float = 3.0
+@export var line_max_sway: float = 0.38
 @export var fish_speed_easy: float = 0.16
 @export var fish_speed_hard: float = 0.32
 @export_group("Haul")
@@ -46,7 +50,9 @@ var hooked_index: int = -1
 var yank_spinning: bool = false
 var school: Array[Dictionary] = []
 
-var _snap_left: float = 0.0
+var _hook_velocity_x: float = 0.0
+var _bite_candidate: int = -1
+var _bite_elapsed: float = 0.0
 var _fight_time: float = 0.0
 var _fall_cooldown: float = 0.0
 var _max_tension: float = 0.12
@@ -70,13 +76,15 @@ func setup(p_fish: FishData, p_zone_scale: float) -> void:
 
 func get_hint() -> String:
 	if hooked_index < 0:
-		return "A/D: đưa thuyền · W/S: nâng/hạ lưỡi · Space: móc cá"
+		return "A/D: đưa thuyền · W/S: nâng/hạ lưỡi · Giữ lưỡi gần cá để cá tự cắn"
 	return "A/D: chạy theo cá · W: kéo lên · S: nhả dây · E: tất tay"
 
 
 func get_status_text() -> String:
 	if hooked_index < 0:
-		return "Đưa lưỡi chạm con cá muốn bắt rồi bấm Space"
+		if _bite_candidate >= 0:
+			return "Cá đang ngửi mồi... %d%%" % roundi(bite_progress() * 100.0)
+		return "Đưa lưỡi câu lại gần con cá muốn bắt"
 	var text := "Kéo %d%%  Dây %d%%  Choáng %d%%" % [roundi(progress * 100.0),
 		roundi(tension * 100.0), roundi(stun * 100.0)]
 	return text + (" · Đang giật tất tay..." if yank_spinning else "")
@@ -91,24 +99,24 @@ func get_fail_text() -> String:
 func _update(delta: float) -> void:
 	var depth_axis := Input.get_axis("throttle_forward", "throttle_back")
 	step_fight(delta, Input.get_axis("turn_left", "turn_right"), depth_axis,
-		_cast_just_pressed(), Input.is_action_just_pressed("interact"))
+		false, Input.is_action_just_pressed("interact"))
 
 
 ## Public for deterministic tests. `depth`: -1 raises, +1 lowers the hook.
-func step_fight(delta: float, steer: float, depth: float, snap: bool = false,
+## `_manual_hook` is retained for call-site compatibility but intentionally
+## ignored: pressing the old hook button can never catch a fish.
+func step_fight(delta: float, steer: float, depth: float, _manual_hook: bool = false,
 		yank: bool = false) -> void:
 	if _done:
 		return
 	if yank_spinning:
 		_update_wheel(delta)
 		return
-	_snap_left = maxf(_snap_left - delta, 0.0)
 	boat_position = clampf(boat_position + steer * boat_speed * delta, -1.0, 1.0)
 	_update_school(delta)
 	if hooked_index < 0:
 		_move_free_hook(delta, depth)
-		if snap and _snap_left <= 0.0:
-			_try_hook()
+		_update_auto_bite(delta)
 	else:
 		_fight_time += delta
 		_haul_hooked_fish(delta, depth)
@@ -149,12 +157,21 @@ func _update_school(delta: float) -> void:
 
 
 func _move_free_hook(delta: float, depth: float) -> void:
-	hook_position.x = move_toward(hook_position.x, boat_position, hook_follow_speed * delta)
 	hook_position.y = clampf(hook_position.y + depth * hook_depth_speed * delta, 0.05, 1.0)
+	# Damped spring pendulum: moving the boat pulls the line, while inertia lets
+	# the hook trail behind and swing past the resting point when the boat stops.
+	_hook_velocity_x += (boat_position - hook_position.x) * line_spring * delta
+	_hook_velocity_x *= exp(-line_drag * delta)
+	hook_position.x += _hook_velocity_x * delta
+	var max_sway := lerpf(line_max_sway * 0.35, line_max_sway, hook_position.y)
+	var limited_x := clampf(hook_position.x, boat_position - max_sway, boat_position + max_sway)
+	if not is_equal_approx(limited_x, hook_position.x):
+		hook_position.x = limited_x
+		_hook_velocity_x *= -0.2
+	hook_position.x = clampf(hook_position.x, -1.0, 1.0)
 
 
-func _try_hook() -> void:
-	_snap_left = snap_cooldown
+func _update_auto_bite(delta: float) -> void:
 	var nearest := -1
 	var nearest_distance := INF
 	for i in school.size():
@@ -164,16 +181,32 @@ func _try_hook() -> void:
 			nearest_distance = distance
 			nearest = i
 	if nearest < 0 or nearest_distance > hook_radius:
-		# A miss flicks the hook upward so repeated tapping is not optimal.
-		hook_position.y = maxf(hook_position.y - 0.08, 0.05)
-		Sfx.play("blip")
+		_bite_candidate = -1
+		_bite_elapsed = 0.0
 		return
-	hooked_index = nearest
-	hook_position = school[nearest]["pos"]
-	var size_scale: float = school[nearest]["size"]
+	if nearest != _bite_candidate:
+		_bite_candidate = nearest
+		_bite_elapsed = 0.0
+	# A long frame may place the hook inside the radius only at its end; cap the
+	# contribution so a hitch cannot turn that single sample into an instant bite.
+	_bite_elapsed += minf(delta, 0.05)
+	if _bite_elapsed < bite_seconds:
+		return
+	_hook_fish(nearest)
+
+
+func _hook_fish(index: int) -> void:
+	hooked_index = index
+	hook_position = school[index]["pos"]
+	_hook_velocity_x = 0.0
+	var size_scale: float = school[index]["size"]
 	fish_hooked.emit(size_scale)
 	tugged.emit()
 	Sfx.play("bite")
+
+
+func bite_progress() -> float:
+	return clampf(_bite_elapsed / maxf(bite_seconds, 0.001), 0.0, 1.0) if _bite_candidate >= 0 else 0.0
 
 
 func _haul_hooked_fish(delta: float, depth: float) -> void:
@@ -307,17 +340,32 @@ func _draw() -> void:
 	var boat_x := lerpf(arena.position.x + 14.0, arena.end.x - 14.0, (boat_position + 1.0) * 0.5)
 	var boat_pos := Vector2(boat_x, arena.position.y + 13.0)
 	var hook_pos := _to_screen(hook_position, arena)
-	draw_line(boat_pos, hook_pos, Color(1.0, 0.86, 0.55, 0.9), 1.0)
+	_draw_fishing_line(boat_pos, hook_pos)
 	_draw_boat(boat_pos)
 	for i in school.size():
 		_draw_fish(_to_screen(school[i]["pos"], arena), school[i], i == hooked_index)
 	draw_circle(hook_pos, 3.0, Color.WHITE)
 	draw_arc(hook_pos, 6.0, 0.0, TAU, 16, Color(1.0, 0.85, 0.35), 1.0)
+	if hooked_index < 0 and _bite_candidate >= 0:
+		draw_arc(hook_pos, 8.0, -PI * 0.5, -PI * 0.5 + TAU * bite_progress(), 20,
+			Color(0.35, 1.0, 0.55), 2.0)
 	_draw_wheel(Vector2(arena.end.x + 38.0, arena.position.y + 52.0))
 	_draw_bar(Rect2(origin.x, arena.end.y + 8.0, 145.0, 7.0), progress, _tint(fish.color), "Kéo")
 	_draw_bar(Rect2(origin.x + 158.0, arena.end.y + 8.0, 145.0, 7.0), tension, Color(1.0, 0.55, 0.2), "Dây")
 	_draw_balance(Rect2(origin.x, arena.end.y + 28.0, 145.0, 7.0))
 	_draw_bar(Rect2(origin.x + 158.0, arena.end.y + 28.0, 145.0, 7.0), stun, Color(0.75, 0.4, 1.0), "Choáng")
+
+
+func _draw_fishing_line(boat_pos: Vector2, hook_pos: Vector2) -> void:
+	var points := PackedVector2Array()
+	var middle := (boat_pos + hook_pos) * 0.5
+	# Velocity bows the line opposite the hook's travel; a small downward sag
+	# keeps the pendulum readable even near its turning point.
+	var control := middle + Vector2(-_hook_velocity_x * 14.0, 3.0 + absf(hook_pos.x - boat_pos.x) * 0.06)
+	for i in 9:
+		var t := float(i) / 8.0
+		points.append(boat_pos * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + hook_pos * t * t)
+	draw_polyline(points, Color(1.0, 0.86, 0.55, 0.9), 1.0, true)
 
 
 func _to_screen(pos: Vector2, arena: Rect2) -> Vector2:

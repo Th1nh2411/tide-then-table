@@ -25,6 +25,7 @@ func _ready() -> void:
 	_check("Vy not before day 4", roster.arrivals(3).is_empty())
 	var vy := roster.arrivals(4)
 	_check("Vy comes on day 4, once", vy.size() == 1 and vy[0].id == "vy" and roster.arrivals(5).is_empty())
+	_check("Vy walks slower than Rin", vy[0].walk_speed == 80.0 and vy[0].walk_speed < 95.0)
 	_check("one ad a day", roster.can_post(3))
 	var flyer := roster.post_ad(1, 3, rng)
 	_check("flyer brings tier-1 people", flyer.size() == catalog.applicants_per_ad

@@ -77,10 +77,13 @@ func _build_row(dish: DishData) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 
-	var swatch := ColorRect.new()
+	var swatch := TextureRect.new()
 	swatch.custom_minimum_size = swatch_size
 	swatch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	swatch.color = dish.color
+	swatch.texture = Art.texture("dishes/" + dish.id)
+	swatch.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	swatch.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	swatch.tooltip_text = dish.display_name
 	row.add_child(swatch)
 
 	var name_label := _label("%s %dk" % [dish.display_name, dish.base_price], 140)

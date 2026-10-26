@@ -156,9 +156,24 @@ func is_busy_pose() -> bool:
 	return state == State.READING or state == State.DINING
 
 
+func pose_draw_offset() -> Vector2:
+	# The logical seat remains in the stool cell, while the seated art tucks
+	# under the table edge so the tabletop masks its lowest pixels.
+	return Vector2(0, 12) if is_seated() else Vector2.ZERO
+
+
+func busy_sprite_name() -> String:
+	if not is_busy_pose():
+		return ""
+	var eater := leader if leader else self
+	var action := "eat" if state == State.DINING and eater.is_eating() else "wait"
+	return "%s_%s" % [sprite_name(), action]
+
+
 func _draw() -> void:
 	super()
 	var eater := leader if leader else self
-	if state == State.DINING and eater.is_eating():  # chopsticks going up and down
+	# Old sheets need this code-drawn cue; dedicated eat sheets already contain it.
+	if state == State.DINING and eater.is_eating() and not has_busy_sprite():
 		var lift := absf(sin((eater._timer + (0.4 if leader else 0.0)) * 6.0)) * 3.0
 		draw_line(Vector2(5, -14 - lift), Vector2(9, -8 - lift), Color(0.6, 0.45, 0.3), 1.0)

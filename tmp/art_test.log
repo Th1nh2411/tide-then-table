@@ -37,4 +37,5 @@ PASS new dish art loads at 64x64: rau_muong_xao_toi
 PASS new dish art loads at 64x64: tom_luoc
 PASS new dish art loads at 64x64: tom_nuong
 PASS new dish art loads at 64x64: tom_rang_muoi
+PASS guest sheet loads as 4 columns x 4 rows of 16x32
 art_test: ALL PASS

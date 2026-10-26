@@ -14,6 +14,14 @@ func _ready() -> void:
 	var shelf := DishShelf.new(3)
 	var plate_a := DishShelf.Plate.new(a)
 	var plate_b := DishShelf.Plate.new(b)
+	var carry_rin := RinChef.new()
+	carry_rin.sprite = "characters/rin"
+	carry_rin.carried = plate_a
+	_check("Rin uses the dedicated food-carry sheet", carry_rin.sprite_name() == "characters/rin_carry")
+	_check("shopping goods are centred directly below Rin's hips",
+		is_zero_approx(carry_rin.shopping_goods_rect().get_center().x)
+		and carry_rin.shopping_goods_rect().position.y == -10)
+	carry_rin.free()
 	_check("shelf add", shelf.add(plate_a) and shelf.add(plate_b) and shelf.plates.size() == 2)
 	var visit := {"order": {"who": "Chú Ba"}}
 	var regular_plate := DishShelf.Plate.new(a, [], 1.3, visit)
@@ -70,6 +78,25 @@ func _ready() -> void:
 	add_child(room)
 	await get_tree().process_frame
 	_check("restaurant view not moved by a camera", get_viewport().get_camera_2d() == null)
+	var restaurant_room := room.get_node("World/Room") as StreetRoom
+	var chair: Vector2i = restaurant_room.tables[0]["chair"]
+	_check("shifted stool leaves no invisible collision in its old cell",
+		restaurant_room.grid.is_walkable(chair))
+	var cutscene := room.get_node("CutscenePlayer") as CutscenePlayer
+	_check("restaurant cutscene actors share the prop Y-sort layer",
+		cutscene.actor_layer == room.get_node("World/People") and cutscene.actor_layer.y_sort_enabled)
+	_check("restaurant cutscenes use the room grid for movement",
+		cutscene.navigation_room == restaurant_room)
+	var vy_from := restaurant_room.grid.nearest_walkable(restaurant_room.grid.to_cell(Vector2(-12, 136)))
+	var vy_to := restaurant_room.grid.nearest_walkable(restaurant_room.grid.to_cell(Vector2(268, 138)))
+	var vy_path := restaurant_room.grid.path(vy_from, vy_to)
+	var avoids_solids := not vy_path.is_empty()
+	var detours_around_tables := false
+	for point in vy_path:
+		var cell := restaurant_room.grid.to_cell(point)
+		avoids_solids = avoids_solids and restaurant_room.grid.is_walkable(cell)
+		detours_around_tables = detours_around_tables or cell.y == 9
+	_check("Vy arrival path avoids the table row", avoids_solids and detours_around_tables)
 	room.queue_free()
 	print("Restaurant: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
 

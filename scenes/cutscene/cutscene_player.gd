@@ -27,6 +27,10 @@ const EMOTE_MOODS := {"!": "ngac_nhien", "?": "boi_roi", "...": "buon", "heart":
 ## Size of drawn art (Art) for actors: 1 = restaurant scale (people 16x32),
 ## 0.5 at sea (the sea camera zooms x2).
 @export var actor_art_scale: float = 1.0
+## Optional world Y-sort layer. Actors spawned here sort against scene props.
+@export var actor_layer: Node2D
+## Optional room grid used to route move_to around solid restaurant props.
+@export var navigation_room: Node2D
 
 var playing: bool = false
 
@@ -138,16 +142,19 @@ func _run(command: Dictionary) -> String:
 			var actor := CutsceneActor.new()
 			actor.kind = args[1]
 			actor.art_scale = actor_art_scale
-			actor.position = _camera.marker(args[2])
+			actor.y_sorted = actor_layer != null
 			actor.scale = Vector2.ONE * _float(args, 3, 1.0)
-			add_child(actor)
+			(actor_layer if actor_layer else self).add_child(actor)
+			actor.global_position = _camera.marker(args[2])
 			_actors[args[0]] = actor
 		"move_to":
 			var actor: CutsceneActor = _actors[args[0]]
+			var target_global := _camera.marker(args[1])
+			var target: Vector2 = (actor.get_parent() as Node2D).to_local(target_global)
 			if _skipping:
-				actor.position = _camera.marker(args[1])
+				actor.position = target
 			else:
-				await actor.walk_to(_camera.marker(args[1]), _float(args, 2, 1.0))
+				await actor.walk_path(_actor_path(actor, target_global), _float(args, 2, 1.0))
 		"face":
 			(_actors[args[0]] as CutsceneActor).face(args[1])
 		"emote":
@@ -206,6 +213,28 @@ func _run(command: Dictionary) -> String:
 		_:
 			push_warning("Unknown cutscene command '%s' (line %d)" % [command["cmd"], command["line"]])
 	return ""
+
+
+func _actor_path(actor: CutsceneActor, target_global: Vector2) -> Array[Vector2]:
+	var parent := actor.get_parent() as Node2D
+	if navigation_room == null or navigation_room.get("grid") == null:
+		return [parent.to_local(target_global)]
+	var grid: RoomGrid = navigation_room.get("grid") as RoomGrid
+	var from := grid.nearest_walkable(grid.to_cell(navigation_room.to_local(actor.global_position)))
+	var to := grid.nearest_walkable(grid.to_cell(navigation_room.to_local(target_global)))
+	if from.x < 0 or to.x < 0:
+		return [parent.to_local(target_global)]
+	var grid_path := grid.path(from, to)
+	if grid_path.is_empty():
+		return [parent.to_local(target_global)]
+	var result: Array[Vector2] = []
+	for point in grid_path:
+		result.append(parent.to_local(navigation_room.to_global(point)))
+	# Preserve the authored marker exactly after reaching its safe grid cell.
+	var exact_target := parent.to_local(target_global)
+	if result[-1].distance_to(exact_target) > 0.01:
+		result.append(exact_target)
+	return result
 
 
 func _float(args: PackedStringArray, index: int, fallback: float) -> float:

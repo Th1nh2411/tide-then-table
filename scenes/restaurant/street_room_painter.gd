@@ -14,21 +14,7 @@ static func draw_room(room: StreetRoom) -> void:
 	for y in grid.size.y:
 		for x in grid.size.x:
 			draw_thing(room, Vector2i(x, y))
-	StreetProps.draw_ice_box(room, grid.cell_rect(grid.cells_of("F")[0]), room.fridge_level)
-	StreetProps.draw_bin(room, room.merged_rect("B"))
-	if not grid.cells_of("V").is_empty():
-		var crates: Array[Rect2] = []
-		for cell in grid.cells_of("G"):
-			crates.append(grid.cell_rect(cell))
-		StreetProps.draw_stall(room, room.merged_rect("V"), crates)
-	if room.shelf:
-		var cells := room.pass_cells()
-		for i in mini(cells.size(), room.shelf.capacity):
-			if room.shelf.plate_at(i):
-				StreetProps.draw_plate(room, room.shelf.plate_at(i), grid.cell_rect(cells[i]).get_center() + Vector2(0, -2))
-	if room.decor_level >= 2:
-		for i in room.tables.size():
-			StreetProps.draw_plant(room, grid.cell_rect(room.tables[i]["table"]).position + Vector2(-8, 0))
+	# Tall props are drawn by StreetRoom nodes in the people Y-sort layer.
 
 
 static func draw_ground(room: StreetRoom, cell: Vector2i) -> void:
@@ -36,25 +22,23 @@ static func draw_ground(room: StreetRoom, cell: Vector2i) -> void:
 	match room.grid.kind(cell):
 		"W":
 			pass  # StreetBackdrop
-		"K" when Art.draw(room, "restaurant/curb", r):
-			pass
-		"R" when Art.draw(room, "restaurant/road_line" if cell.y == 20 and cell.x % 3 != 0 else "restaurant/road", r):
-			pass
 		"K":
 			room.draw_rect(r, Color(0.7, 0.68, 0.62))
 			room.draw_rect(Rect2(r.position + Vector2(0, r.size.y - 4), Vector2(r.size.x, 4)), Color(0.45, 0.43, 0.4))
+			Art.draw(room, "restaurant/curb", r)
 		"R":
 			room.draw_rect(r, Color(0.22, 0.22, 0.24))
-			if cell.y == 20 and cell.x % 3 != 0:  # centre line dashes, between the lanes
+			var has_line := cell.y == 20 and cell.x % 3 != 0
+			if has_line:  # centre line dashes, between the lanes
 				room.draw_rect(Rect2(r.position + Vector2(0, 7), Vector2(r.size.x, 2)), Color(0.9, 0.85, 0.6))
-		_ when Art.draw(room, _pavement(cell), r):
-			pass
+			Art.draw(room, "restaurant/road_line" if has_line else "restaurant/road", r)
 		_:
 			var ground := Color(0.58, 0.55, 0.5)
 			if (cell.x + cell.y * 3) % 7 == 0:
 				ground = ground.darkened(0.06)
 			room.draw_rect(r, ground)
 			room.draw_rect(r, ground.darkened(0.1), false, 1.0)
+			Art.draw(room, _pavement(cell), r)
 
 
 ## Pavement tile, with up to 3 variants ("pavement_2" / "_3") for variety.
@@ -73,6 +57,8 @@ static func draw_table(canvas: CanvasItem, room: StreetRoom, seat: int) -> void:
 	var p := room.table_rect(seat).position
 	var s := room.table_rect(seat).size
 	var mid := p + Vector2(room.cell_size * 0.5 + 2, 7)  # in front of the customer's seat
+	if room.decor_level >= 2:
+		StreetProps.draw_plant(canvas, p + Vector2(-8, 0))
 	if Art.draw(canvas, "restaurant/table", Rect2(p, s)):
 		if dining.plates[seat] and dining.states[seat] == DiningTables.State.TAKEN:
 			StreetProps.draw_plate(canvas, dining.plates[seat], mid)
@@ -102,19 +88,13 @@ static func draw_thing(room: StreetRoom, cell: Vector2i) -> void:
 	var r := grid.cell_rect(cell)
 	var p := r.position
 	match grid.kind(cell):
-		"P" when Art.draw(room, _bench_piece(grid, cell), r):
+		"P":
+			pass  # drawn once in the people Y-sort layer
+		"h", "o" when Art.draw(room, "restaurant/stool_%d" % ((cell.x / 3 + cell.y) % 2),
+				Rect2(r.position + Vector2(0, 12), r.size)):
 			pass
-		"h", "o" when Art.draw(room, "restaurant/stool_%d" % ((cell.x / 3 + cell.y) % 2), r):
-			pass
-		"P":  # plate table, a long wooden bench next to the cart
-			var x0 := 0.0 if grid.kind(cell + Vector2i.LEFT) == "P" else 1.0
-			var x1 := 16.0 if grid.kind(cell + Vector2i.RIGHT) == "P" else 15.0
-			room.draw_rect(Rect2(p + Vector2(x0, 1), Vector2(x1 - x0, 11)), Color(0.72, 0.52, 0.32))
-			room.draw_rect(Rect2(p + Vector2(x0, 12), Vector2(x1 - x0, 3)), Color(0.5, 0.35, 0.2))
-			room.draw_line(p + Vector2(x0, 1), p + Vector2(x1, 1), Color(0.8, 0.6, 0.38), 1.0)
-			if x0 > 0.0 or x1 < 16.0:  # legs at the ends
-				room.draw_rect(Rect2(p + Vector2(2.0 if x0 > 0.0 else 12.0, 15), Vector2(2, 1)), Color(0.4, 0.28, 0.16))
 		"h", "o":
+			p.y += 12
 			var color := room.stool_colors[(cell.x / 3 + cell.y) % room.stool_colors.size()]
 			room.draw_rect(Rect2(p + Vector2(3, 4), Vector2(10, 8)), color)
 			room.draw_rect(Rect2(p + Vector2(3, 12), Vector2(10, 3)), color.darkened(0.3))
@@ -130,6 +110,31 @@ static func draw_thing(room: StreetRoom, cell: Vector2i) -> void:
 			room.draw_rect(Rect2(p + Vector2(6, 6), Vector2(4, 8)), Color(0.95, 0.95, 0.9))
 		"L":
 			room.draw_rect(Rect2(p + Vector2(6, -40), Vector2(4, 54)), Color(0.6, 0.6, 0.58))
+
+
+## Plate pass and its live plates, drawn as one object at the bench's feet.
+static func draw_plate_bench(canvas: CanvasItem, room: StreetRoom) -> void:
+	var grid := room.grid
+	var cells := room.pass_cells()
+	for cell in cells:
+		var r := grid.cell_rect(cell)
+		if not Art.draw(canvas, _bench_piece(grid, cell), r):
+			var x0 := 0.0 if grid.kind(cell + Vector2i.LEFT) == "P" else 1.0
+			var x1 := 16.0 if grid.kind(cell + Vector2i.RIGHT) == "P" else 15.0
+			canvas.draw_rect(Rect2(r.position + Vector2(x0, 1), Vector2(x1 - x0, 11)), Color(0.72, 0.52, 0.32))
+			canvas.draw_rect(Rect2(r.position + Vector2(x0, 12), Vector2(x1 - x0, 3)), Color(0.5, 0.35, 0.2))
+			canvas.draw_line(r.position + Vector2(x0, 1), r.position + Vector2(x1, 1), Color(0.8, 0.6, 0.38), 1.0)
+	if room.shelf:
+		for i in mini(cells.size(), room.shelf.capacity):
+			if room.shelf.plate_at(i):
+				StreetProps.draw_plate(canvas, room.shelf.plate_at(i), grid.cell_rect(cells[i]).get_center() + Vector2(0, -2))
+
+
+static func draw_stall(canvas: CanvasItem, room: StreetRoom) -> void:
+	var crates: Array[Rect2] = []
+	for cell in room.grid.cells_of("G"):
+		crates.append(room.grid.cell_rect(cell))
+	StreetProps.draw_stall(canvas, room.merged_rect("V"), crates)
 
 
 ## The plate bench is drawn per cell: "plate_bench_left" / "_mid" /
@@ -148,10 +153,15 @@ static func draw_top(canvas: CanvasItem, room: StreetRoom, time: float) -> void:
 		canvas.draw_circle(c, 15.0, Color(0.2, 0.45, 0.22, 0.92))
 		canvas.draw_circle(c + Vector2(-5, -4), 9.0, Color(0.28, 0.55, 0.28, 0.92))
 	if room.decor_level >= 1:
-		var bulbs: Array[Color] = [Color(1, 0.9, 0.5), Color(1, 0.5, 0.4), Color(0.6, 0.9, 1)]
 		var from := Vector2(room.decor_area().position.x, 82)
 		var to := Vector2(room.decor_area().end.x, 82)
-		for i in 30:
-			var t := float(i) / 29.0
-			var at := from.lerp(to, t) + Vector2(0, sin(t * PI * 3.0) * 6.0 + 6.0)
-			canvas.draw_circle(at, 1.6, Color(bulbs[i % 3], 0.7 + 0.3 * sin(time * 3.0 + i)))
+		if Art.has("restaurant/string_lights"):
+			# Native 16x8 seamless tile; keep it crisp and aligned to the world grid.
+			for x in range(int(from.x), int(to.x), 16):
+				Art.draw(canvas, "restaurant/string_lights", Rect2(x, from.y, 16, 8))
+		else:
+			var bulbs: Array[Color] = [Color(1, 0.9, 0.5), Color(1, 0.5, 0.4), Color(0.6, 0.9, 1)]
+			for i in 30:
+				var t := float(i) / 29.0
+				var at := from.lerp(to, t) + Vector2(0, sin(t * PI * 3.0) * 6.0 + 6.0)
+				canvas.draw_circle(at, 1.6, Color(bulbs[i % 3], 0.7 + 0.3 * sin(time * 3.0 + i)))

@@ -35,6 +35,10 @@ func _ready() -> void:
 	speed = 95.0
 
 
+func sprite_name() -> String:
+	return "characters/rin_carry" if carried and Art.has("characters/rin_carry") else sprite
+
+
 func front_cell() -> Vector2i:
 	return room.grid.to_cell(position) + facing
 
@@ -107,12 +111,16 @@ func _draw() -> void:
 			var from := -_dash_dir * 8.0 + side + Vector2(0, -12)
 			draw_line(from, from - _dash_dir * 12.0, Color(1, 1, 1, 0.6), 1.0)
 	super()
-	if carrying_goods:  # a green plastic shopping bag in his hand
-		var side := -7.0 if facing.x >= 0 else 7.0
-		draw_rect(Rect2(side - 3, -13, 6, 7), Color(0.3, 0.7, 0.35))
-		draw_line(Vector2(side - 2, -13), Vector2(side, -16), Color(0.3, 0.7, 0.35), 1.0)
-		draw_line(Vector2(side + 2, -13), Vector2(side, -16), Color(0.3, 0.7, 0.35), 1.0)
-		draw_rect(Rect2(side - 2, -14, 4, 2), Color(0.35, 0.65, 0.25))  # greens sticking out
+	if carrying_goods:  # shopping goods centred immediately below the hips
+		var bag := shopping_goods_rect()
+		draw_rect(bag, Color(0.3, 0.7, 0.35))
+		draw_line(Vector2(-3, -10), Vector2(-1, -13), Color(0.3, 0.7, 0.35), 1.0)
+		draw_line(Vector2(3, -10), Vector2(1, -13), Color(0.3, 0.7, 0.35), 1.0)
+		draw_rect(Rect2(-2, -12, 4, 2), Color(0.35, 0.65, 0.25))  # goods sticking out
+
+
+func shopping_goods_rect() -> Rect2:
+	return Rect2(-4, -10, 8, 7)
 
 
 func _try_move(step: Vector2) -> void:

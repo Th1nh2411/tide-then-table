@@ -1,0 +1,60 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS  can't cook with 2/3 ốc
+PASS  can cook with 3 ốc
+PASS  can't cook cua without cua
+PASS  max portions 7 ốc -> 2
+PASS  add portion
+PASS  slot limit blocks 2nd dish
+PASS  no stock for 3rd portion
+PASS  remove returns ingredients
+PASS  take portion
+PASS  return portion
+PASS  clear returns all
+PASS  auto fill uses stock (cua + 2 ốc)
+PASS  rau is an always-on market dish
+PASS  auto fill skips rau
+PASS  rau can't be planned
+PASS  market price = base × cook
+PASS  beer: always on, bought, no cooking
+PASS  beer can't be planned
+PASS  no peanuts any more
+PASS  new dishes: boiled + grilled tôm only (["tom_luoc", "tom_nuong"])
+PASS  seen dishes aren't new again
+PASS  kitchen 2 unlocks tôm rang muối
+PASS  plan blocks dishes above the kitchen level
+PASS  ...and allows them once upgraded
+PASS  regular eats the priciest cookable dish
+PASS  stock starts empty
+PASS  bought 2 portions
+PASS  cooking takes one
+PASS  bulk is cheaper per unit
+PASS  price texts
+PASS  bulk beer = 30 litres = 10 towers
+PASS  2 litres left: not enough for a tower
+PASS  stock writes the shared pantry
+PASS  rau is a fresh batch at 100
+PASS  a night: rau ages, beer doesn't
+PASS  new rau sorts after the old batch
+PASS  rau 2 nights old sells for less
+PASS  spoils after enough nights
+PASS  beer keeps overnight
+PASS  old saves: a rau count becomes a fresh batch
+PASS  bag -> fridge
+PASS  variety 1 dish x0.8
+PASS  variety 2 dishes x0.9
+PASS  variety 5 dishes x1.0
+PASS  took 3 ốc
+PASS  storage keeps the tôm
+PASS  take fails without stock
+PASS  fresh x1.0
+PASS  stale x0.7
+PASS  old x0.4
+PASS  spoiled x0
+PASS  price formula (got 57, want 57)
+PASS  pour bot: short bursts = PERFECT (PERFECT, 3.0s)
+PASS  pour bot: one long pour = OK (too much foam) (OK)
+PASS  pour bot: never letting go spills once, then runs short (BURNT, spills 1)
+PASS  judge: thick head in band = OK
+PASS  judge: over the rim band = OK edge
+PASS  spill wastes litres, never below 0

@@ -2,7 +2,7 @@ class_name MenuBoard
 extends Node2D
 ## A small LED menu board standing on the pavement by the curb (the "E" cells
 ## of the StreetRoom map): a scrolling title, then today's seafood dishes as
-## pictures only (a plate in the dish's colour) with the servings left; sold
+## pictures only (the real dish PNG) with the servings left; sold
 ## out = dimmed with a red cross. Rows: KitchenStation.menu_rows() of kind
 ## "menu" (no rau / beer, no regulars' orders). Lives in the people's y-sorted
 ## layer (origin = the board's base) so walkers behind it are hidden.
@@ -96,8 +96,8 @@ func _draw() -> void:
 		var count: int = row["count"]
 		var at := panel.position + Vector2(8 + i * icon_step, 10 + (panel.size.y - 10) * 0.5)
 		var alpha := 1.0 if count > 0 else 0.35
-		draw_circle(at, icon_radius, Color(1, 1, 1, alpha))
-		draw_circle(at + Vector2(0, -0.5), icon_radius * 0.65, Color(dish.color, alpha))
+		StreetProps.draw_dish_icon(self, dish,
+			Rect2(at - Vector2.ONE * icon_radius, Vector2.ONE * icon_radius * 2.0), alpha)
 		if DailyTrend.is_hot(dish):  # today's trending dish: a pulsing red ring
 			draw_arc(at, icon_radius + 1.5, 0.0, TAU, 16, Color(1.0, 0.3, 0.25, 0.6 + 0.4 * sin(_time * 5.0)), 1.5)
 		if StreetProps.rin_grills(dish):  # Rin grills this one

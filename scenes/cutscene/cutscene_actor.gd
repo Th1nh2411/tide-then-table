@@ -10,6 +10,8 @@ extends Node2D
 ## Drawn art (Art: "characters/<kind>", "sea/rin_bed"...) size factor; the
 ## placeholder ignores it.
 @export var art_scale: float = 1.0
+## Restaurant actors join its Y-sort layer instead of forcing foreground Z.
+var y_sorted: bool = false
 
 ## Scene speed for every actor (CutsceneEffects.slow): bobbing, glows, emotes.
 static var speed: float = 1.0
@@ -22,7 +24,7 @@ var _emote: String = ""
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	z_index = 5
+	z_index = 0 if y_sorted else 5
 
 
 func face(direction: String) -> void:
@@ -31,15 +33,33 @@ func face(direction: String) -> void:
 
 ## Walks to `target` in `seconds` (await it).
 func walk_to(target: Vector2, seconds: float) -> void:
-	if target.x != position.x:
-		_facing = signf(target.x - position.x)
-	_walking = true
-	var tween := create_tween()
-	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	tween.tween_property(self, "position", target, maxf(seconds, 0.01))
-	await tween.finished
-	_walking = false
+	await walk_path([target], seconds)
 
+
+## Walks a collision-safe polyline in the same total time as move_to.
+func walk_path(points: Array[Vector2], seconds: float) -> void:
+	if points.is_empty():
+		return
+	var total_distance := 0.0
+	var previous := position
+	for point in points:
+		total_distance += previous.distance_to(point)
+		previous = point
+	if total_distance <= 0.01:
+		position = points[-1]
+		return
+	_walking = true
+	for target in points:
+		var distance := position.distance_to(target)
+		if distance <= 0.01:
+			continue
+		if target.x != position.x:
+			_facing = signf(target.x - position.x)
+		var tween := create_tween()
+		tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		tween.tween_property(self, "position", target, maxf(seconds * distance / total_distance, 0.01))
+		await tween.finished
+	_walking = false
 
 ## Shows an emote bubble for `seconds`.
 func emote(kind_name: String, seconds: float) -> void:

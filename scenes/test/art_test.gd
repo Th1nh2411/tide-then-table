@@ -75,6 +75,52 @@ func _ready() -> void:
 		var texture := Art.texture("dishes/" + dish_id)
 		failures += _check("new dish art loads at 64x64: " + dish_id,
 			texture != null and texture.get_width() == 64 and texture.get_height() == 64)
+	var guest := Art.texture("characters/guest")
+	failures += _check("guest sheet loads as 4 columns x 4 rows of 16x32",
+		guest != null and guest.get_width() == 64 and guest.get_height() == 128)
+	var rin_carry := Art.texture("characters/rin_carry")
+	failures += _check("Rin carry sheet loads as 4 columns x 3 rows of 16x32",
+		rin_carry != null and rin_carry.get_width() == 64 and rin_carry.get_height() == 96)
+	for seated_pose: String in ["characters/guest_wait", "characters/guest_eat"]:
+		var seated := Art.texture(seated_pose)
+		failures += _check("guest seated pose loads as 4 frames of 16x32: " + seated_pose,
+			seated != null and seated.get_width() == 64 and seated.get_height() == 32)
+	var food_cart := Art.texture("restaurant/food_cart_0")
+	failures += _check("starter food cart loads at 64x32",
+		food_cart != null and food_cart.get_width() == 64 and food_cart.get_height() == 32)
+	for cart_level in [1, 2]:
+		var upgraded_cart := Art.texture("restaurant/food_cart_%d" % cart_level)
+		failures += _check("upgraded food cart loads at 64x32: level %d" % cart_level,
+			upgraded_cart != null and upgraded_cart.get_width() == 64 and upgraded_cart.get_height() == 32)
+	var restaurant_props := {
+		"restaurant/grill": Vector2i(32, 48),
+		"restaurant/table": Vector2i(32, 32),
+		"restaurant/table_dirty": Vector2i(32, 32),
+		"restaurant/stool_0": Vector2i(16, 16),
+		"restaurant/stool_1": Vector2i(16, 16),
+		"restaurant/plate_bench": Vector2i(16, 16),
+		"restaurant/pavement": Vector2i(16, 16),
+		"restaurant/pavement_2": Vector2i(16, 16),
+		"restaurant/pavement_3": Vector2i(16, 16),
+		"restaurant/curb": Vector2i(16, 16),
+		"restaurant/road": Vector2i(16, 16),
+		"restaurant/road_line": Vector2i(16, 16),
+		"restaurant/fridge_0": Vector2i(16, 32),
+		"restaurant/fridge_1": Vector2i(16, 32),
+		"restaurant/fridge_2": Vector2i(16, 32),
+		"restaurant/bin": Vector2i(16, 16),
+		"restaurant/beer_tap": Vector2i(16, 32),
+		"restaurant/shop_front": Vector2i(640, 80),
+		"restaurant/menu_board": Vector2i(64, 40),
+		"restaurant/grocery_counter": Vector2i(96, 16),
+		"restaurant/grocery_crate": Vector2i(16, 16),
+		"restaurant/plant": Vector2i(16, 16),
+		"restaurant/string_lights": Vector2i(16, 8),
+	}
+	for sprite: String in restaurant_props:
+		var texture := Art.texture(sprite)
+		failures += _check("restaurant prop loads at documented size: " + sprite,
+			texture != null and Vector2i(texture.get_width(), texture.get_height()) == restaurant_props[sprite])
 	print("art_test: %s" % ("ALL PASS" if failures == 0 else "%d FAIL" % failures))
 	get_tree().quit()
 

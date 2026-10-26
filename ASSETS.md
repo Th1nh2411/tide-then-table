@@ -4,6 +4,8 @@
 
 > **Cô Năm visual update (approved):** Treat Cô Năm as approximately 40 years old and youthful. Keep the portrait low-detail with a restrained palette close to Rin's style; use a simple tied-back dark/gray hairstyle and green blouse, not the previous elderly/60s interpretation.
 
+> **Restaurant prop perspective:** Use a top-down orthographic farming-sim view, with horizontal/vertical primary edges and no isometric convergence. Static props may use a hard 1–2 px dark-navy contact shadow immediately under their feet/base; do not use soft or long cast shadows.
+
 Hiện mọi thứ trong game là hình vẽ tạm bằng code (`_draw()`). File này liệt kê
 những gì cần vẽ để thay dần. **Code nạp ảnh đã có** (`Art`): bỏ file PNG đúng tên
 vào `assets/sprites/` là game dùng ngay, thiếu ảnh nào thì vẫn vẽ tạm cái đó. Xem
@@ -186,7 +188,9 @@ Tuỳ chọn `characters/<tên>_idle.png` (64x96, cùng 3 hàng xuống / lên /
 | File | Ai |
 |---|---|
 | `characters/rin.png`, `bao.png`, `vy.png`, `co_nam.png` | nhân vật chính (cũng dùng trong cutscene) |
+| `characters/rin_carry.png` | Rin bưng món: 64x96, cùng layout 4 cột × 3 hướng như `rin.png`; món thật vẽ đè bằng code |
 | `characters/guest.png` hoặc `guest_1.png`…`guest_4.png` | khách thường (nhiều dáng thì game chọn ngẫu nhiên) |
+| `characters/guest_wait.png`, `guest_eat.png` | khách thường ngồi chờ / ngồi ăn; mỗi file 64x32, 4 frame ngang |
 | `characters/guest_rich.png`, `guest_regular.png` | khách sang, khách quen |
 | `characters/staff.png` | nhân viên thuê (riêng ai thì `characters/<id>.png`: hung, hanh, phat, ngan, co_sau, khoa, ti, lam, quan) |
 | `characters/cat.png` | mèo: 8 cột khung 24x24 (chân chạm đáy), hàng 1 = ngồi (vẫy đuôi, chớp mắt), hàng 2 = đi sang phải (cutscene); dựng bằng `tools/make_cat_sheet.py` |
@@ -210,6 +214,7 @@ Tuỳ chọn `characters/<tên>_idle.png` (64x96, cùng 3 hàng xuống / lên /
 | `menu_board.png` | 64x40 | khung + chân bảng LED; chữ và món vẽ bằng code đè lên |
 | `grocery_counter.png`, `grocery_crate.png` | 96x16, 16x16 | quầy và két Cô Năm |
 | `plant.png` | 16x16 | chậu cây |
+| `string_lights.png` | 16x8 | tile dây đèn nối ngang, lặp theo khu bàn |
 
 **Món** (`dishes/<id>.png`, 64x64 master; hiển thị bằng nearest-neighbor): tom_luoc, tom_nuong, tom_rang_muoi, muc_luoc, muc_nuong, muc_hap_gung,
 oc_huong_luoc_sa, oc_huong_nuong_mo_hanh, cua_luoc, cua_hap_bia, cua_rang_me, canh_chua_ca_thu, ca_thu_nuong,
