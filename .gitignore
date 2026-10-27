@@ -4,6 +4,7 @@
 
 # Exports
 /build/
+/tmp/godot_user_data/
 *.tmp
 
 # OS

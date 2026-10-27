@@ -1,0 +1,30 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://scenes/restaurant3d/restaurant_scene_3d.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dishes/menu.tres" id="2"]
+[ext_resource type="Resource" path="res://data/upgrades/kitchen_upgrade.tres" id="3"]
+[ext_resource type="Resource" path="res://data/upgrades/fridge_upgrade.tres" id="4"]
+[ext_resource type="Resource" path="res://data/upgrades/seats_upgrade.tres" id="5"]
+[ext_resource type="Resource" path="res://data/upgrades/decor_upgrade.tres" id="6"]
+[ext_resource type="Resource" path="res://data/cutscenes/opening_day.tres" id="7"]
+[ext_resource type="Resource" path="res://data/cutscenes/vy_arrives.tres" id="8"]
+[ext_resource type="Resource" path="res://data/cutscenes/wave_awaken.tres" id="9"]
+[ext_resource type="Resource" path="res://data/cutscenes/beer_day.tres" id="10"]
+[ext_resource type="Resource" path="res://data/cutscenes/nam_fog_tale.tres" id="11"]
+[ext_resource type="Resource" path="res://data/cutscenes/regular_thanks.tres" id="12"]
+[ext_resource type="Resource" path="res://data/cutscenes/vy_stands_up.tres" id="13"]
+[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="14"]
+[ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="15"]
+[ext_resource type="Resource" path="res://data/staff/staff_catalog.tres" id="16"]
+
+[node name="RestaurantScene3D" type="Node3D"]
+script = ExtResource("1")
+menu = ExtResource("2")
+kitchen_upgrade = ExtResource("3")
+fridge_upgrade = ExtResource("4")
+seats_upgrade = ExtResource("5")
+decor_upgrade = ExtResource("6")
+arrival_cutscenes = Array[ExtResource("14")]([ExtResource("7"), ExtResource("8"), ExtResource("9")])
+after_shift_cutscenes = Array[ExtResource("14")]([ExtResource("10"), ExtResource("11"), ExtResource("12"), ExtResource("13")])
+fish_catalog = ExtResource("15")
+staff_catalog = ExtResource("16")

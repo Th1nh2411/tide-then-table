@@ -5,7 +5,7 @@ extends Node2D
 ## The room is a placeholder drawing (640x360); markers under
 ## CutsceneMarkers place the actors.
 
-const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
+const SEA_SCENE_PATH: String = "res://scenes/sea3d/sea_scene_3d.tscn"
 
 @export var intro: Cutscene
 

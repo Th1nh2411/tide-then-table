@@ -1,8 +1,8 @@
 extends Control
 ## Main menu: Continue (only if a save exists) / New Game / Quit.
 
-const SEA_SCENE_PATH: String = "res://scenes/sea/sea_scene.tscn"
-const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.tscn"
+const SEA_SCENE_PATH: String = "res://scenes/sea3d/sea_scene_3d.tscn"
+const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
 const INTRO_SCENE_PATH: String = "res://scenes/intro/intro_scene.tscn"
 
 @onready var _continue_button: Button = %ContinueButton

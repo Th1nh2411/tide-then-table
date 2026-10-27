@@ -7,10 +7,10 @@ extends RefCounted
 enum Slot { INTRO, SEA, ARRIVAL, AFTER_SHIFT }
 
 const CUTSCENE_DIR: String = "res://data/cutscenes/"
-const RESTAURANT_SCENE: String = "res://scenes/restaurant/restaurant_scene.tscn"
+const RESTAURANT_SCENE: String = "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
 const SCENES: Dictionary = {
 	Slot.INTRO: "res://scenes/intro/intro_scene.tscn",
-	Slot.SEA: "res://scenes/sea/sea_scene.tscn",
+	Slot.SEA: "res://scenes/sea3d/sea_scene_3d.tscn",
 	Slot.ARRIVAL: RESTAURANT_SCENE,
 	Slot.AFTER_SHIFT: RESTAURANT_SCENE,
 }

@@ -6,7 +6,7 @@ extends Control
 ## last night's kitchen upgrade) unlocks dishes (DishBook); then the
 ## restaurant (autosaved here).
 
-const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant/restaurant_scene.tscn"
+const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
 
 ## For order texts (fish names).
 @export var fish_catalog: FishCatalog
