@@ -273,7 +273,9 @@ func _end_shift(reason: String) -> void:
 		await get_tree().process_frame
 	_closing = false
 	var cooking: CookingOverlay = $CookingOverlay
-	while cooking.is_running():
+	# Walking to the grill happens before its overlay opens. Let that action
+	# (or table cleaning) finish before clearing the kitchen and showing totals.
+	while _kitchen.busy or cooking.is_running():
 		await get_tree().process_frame
 	_shift_over = true
 	_summary_label.text = _closer.close(reason, _plan)

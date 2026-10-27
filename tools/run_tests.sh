@@ -23,14 +23,19 @@ run_scene() {
 	local scene="$1"
 	# `-- --no-autosave`: the sea scene must not overwrite the player's save.
 	local out
+	local exit_code=0
 	out=$("$GODOT" --headless --path . --fixed-fps 60 --quit-after 120 "res://$scene" -- --no-autosave 2>&1)
+	exit_code=$?
 	local pass fail err
 	pass=$(grep -c '^PASS' <<<"$out")
 	fail=$(grep -c '^FAIL' <<<"$out")
 	err=$(grep -cE 'SCRIPT ERROR|^ERROR' <<<"$out")
 	printf '%-45s %3d pass  %d fail  %d errors\n' "$scene" "$pass" "$fail" "$err"
-	if [ "$fail" -gt 0 ] || [ "$err" -gt 0 ]; then
+	if [ "$fail" -gt 0 ] || [ "$err" -gt 0 ] || [ "$exit_code" -ne 0 ]; then
 		status=1
+		if [ "$exit_code" -ne 0 ]; then
+			printf '    Godot exited with status %d\n' "$exit_code"
+		fi
 		grep -E '^FAIL|SCRIPT ERROR|^ERROR' -A2 <<<"$out" | sed 's/^/    /'
 	fi
 }

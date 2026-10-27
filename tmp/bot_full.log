@@ -1,0 +1,32 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+DAY 1 | thuyền1 cần0 đèn0 bếp0 bàn0 | cá 19 (lưới 7, dỡ 3, sáng 0) | biển ~6.9 ph | phục vụ 16 bỏ 0 | ca +711k | mua ["boat:1"] | tiền 691k | stage 0 | staff [] | tổng ~15 ph
+WARNING: Hold resize dropped ca_mu
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] _on_boat_data_changed (res://scenes/sea/hold_manager.gd:87)
+         [1] apply_boat_data (res://scenes/sea/boat.gd:74)
+         [2] _unhandled_input (res://scenes/sea/sea_scene.gd:168)
+DAY 2 | thuyền2 cần1 đèn0 bếp0 bàn0 | cá 19 (lưới 7, dỡ 3, sáng 0) | biển ~6.9 ph | phục vụ 16 bỏ 0 | ca +1340k | mua ["boat:2", "rod:1"] | tiền 331k | stage 0 | staff [] | tổng ~28 ph
+WARNING: Hold resize dropped tom
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] _on_boat_data_changed (res://scenes/sea/hold_manager.gd:87)
+         [1] apply_boat_data (res://scenes/sea/boat.gd:74)
+         [2] _unhandled_input (res://scenes/sea/sea_scene.gd:168)
+WARNING: Hold resize dropped oc_huong
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] _on_boat_data_changed (res://scenes/sea/hold_manager.gd:87)
+         [1] apply_boat_data (res://scenes/sea/boat.gd:74)
+         [2] _unhandled_input (res://scenes/sea/sea_scene.gd:168)
+WARNING: Hold resize dropped oc_huong
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] _on_boat_data_changed (res://scenes/sea/hold_manager.gd:87)
+         [1] apply_boat_data (res://scenes/sea/boat.gd:74)
+         [2] _unhandled_input (res://scenes/sea/sea_scene.gd:168)
+DAY 3 | thuyền2 cần1 đèn1 bếp1 bàn0 | cá 21 (lưới 8, dỡ 1, sáng 0) | biển ~6.8 ph | phục vụ 15 bỏ 0 | ca +1173k | mua ["lamp:1", "kitchen:1"] | tiền 504k | stage 0 | staff [] | tổng ~40 ph
+DAY 4 | thuyền2 cần2 đèn2 bếp1 bàn1 | cá 35 (lưới 5, dỡ 3, sáng 0) | biển ~9.8 ph | phục vụ 17 bỏ 0 | ca +3176k | mua ["seats:1", "fridge:1", "rod:2", "lamp:2"] | tiền 580k | stage 2 | staff ["vy"] | tổng ~56 ph
+SEA d5: fog open, boat lvl 2, whirlpool y 190, range limit y -inf
+RUN ENDING | policy story | day 5 | money 580k | min money 331k | ~56 min human time | cutscenes: intro_call, sea pause d1, sea pause d1, sea pause d1, sea pause d1, arrival d1, after shift d1, sea pause d2, waiting for rest_scene, after shift d2, trip end d3, arrival d3, after shift d3, trip end d4, arrival d4, after shift d4

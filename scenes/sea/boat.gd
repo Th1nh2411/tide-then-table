@@ -141,11 +141,18 @@ func _draw() -> void:
 		Vector2(half.x * 0.3, half.y),
 	])
 	var down := Vector2.DOWN.rotated(-rotation) * hull_depth
-	draw_colored_polygon(_shifted(deck, down * 1.8), Color(0, 0, 0, 0.25))  # shadow on the water
 	# Art: one top view, bow to the right, turned with the boat (ASSETS.md).
-	if Art.draw(self, "sea/" + boat_data.id, Rect2(-half, boat_data.hull_size)):
+	# Extrude the art's own silhouette screen-down before its deck. A side
+	# baked into the PNG would rotate sideways/upward as the boat steers.
+	var sprite := "sea/" + boat_data.id
+	if Art.has(sprite):
+		for depth in range(int(ceil(hull_depth)), 0, -1):
+			var offset := Vector2.DOWN.rotated(-rotation) * float(depth)
+			Art.draw(self, sprite, Rect2(-half + offset, boat_data.hull_size), false, Color(0.28, 0.24, 0.3))
+	if Art.draw(self, sprite, Rect2(-half, boat_data.hull_size)):
 		_draw_crew(half)
 		return
+	draw_colored_polygon(_shifted(deck, down * 1.8), Color(0, 0, 0, 0.25))  # placeholder shadow
 	var side := boat_data.color.darkened(0.45)
 	for k in deck.size():
 		var a := deck[k]

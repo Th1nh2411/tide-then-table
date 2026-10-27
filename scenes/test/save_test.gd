@@ -17,6 +17,7 @@ func _ready() -> void:
 	_test_missing_fields()
 	_test_wrong_types()
 	_test_bad_storage_entries()
+	_test_out_of_range_food()
 	_test_corrupted_and_missing_file()
 	SaveSystem.delete_save(TEST_PATH)
 	GameState.reset()
@@ -111,6 +112,19 @@ func _test_corrupted_and_missing_file() -> void:
 	_check("corrupted file -> fresh game", GameState.money == GameState.STARTING_MONEY)
 	SaveSystem.delete_save(TEST_PATH)
 	_check("no file -> false", not SaveSystem.load_game(TEST_PATH))
+
+
+func _test_out_of_range_food() -> void:
+	_write('{"storage": [{"fish": "cua", "quality": -5}, {"fish": "cua", "quality": 999}], "pantry": {"rau_muong_xao_toi": [{"units": 2, "fresh": 500}, {"units": 3, "fresh": -10}, {"units": 0, "fresh": 80}, {"units": 4, "fresh": 40}]}}')
+	SaveSystem.load_game(TEST_PATH)
+	_check("fish quality stays in its valid range", GameState.storage.size() == 2
+		and GameState.storage[0].quality == 0.7 and GameState.storage[1].quality == 1.0)
+	var dish := load("res://data/dishes/rau_muong_xao_toi.tres") as DishData
+	var stock := MarketStock.new(GameState.pantry)
+	_check("spoiled and empty grocery batches skipped", stock.count(dish) == 6)
+	_check("loaded grocery batches use oldest first", stock.freshness(dish) == 40.0)
+	var batches: Array = GameState.pantry.get(dish.id, [])
+	_check("grocery freshness capped at 100", batches.size() == 2 and batches[1]["fresh"] == 100.0)
 
 
 func _write(text: String) -> void:

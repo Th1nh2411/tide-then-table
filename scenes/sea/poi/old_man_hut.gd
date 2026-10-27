@@ -37,7 +37,7 @@ func _interact() -> void:
 	if not BoatCondition.is_damaged():
 		patch_label = "Nhờ vá thuyền (thuyền còn lành)"
 	var choice := await dialog.ask(title, "Ông Tám ngồi vá lưới dưới ngọn đèn dầu.\n\"Ra trễ vậy con?\"",
-		PackedStringArray([patch_label, "Hỏi chuyện", "Đi tiếp"]))
+		PackedStringArray([patch_label, "Hỏi chuyện", "Đi tiếp"]), "ong_tam")
 	match choice:
 		0:
 			if not BoatCondition.is_damaged():
@@ -56,7 +56,7 @@ func _interact() -> void:
 				GameState.set_flag("tam_vy")
 				line = "Con Vy nhà tui làm ở quán con hả? Nó khó tánh, chê đủ thứ. " \
 					+ "Mà thương ai là thương thiệt, con chịu khó nghe."
-			await dialog.ask(title, "Ông Tám: " + line, PackedStringArray(["Đi tiếp"]))
+			await dialog.ask(title, "Ông Tám: " + line, PackedStringArray(["Đi tiếp"]), "ong_tam")
 
 
 ## Random rumor from those unlocked at `stage`; story ones come up more.

@@ -75,6 +75,7 @@ func _ready() -> void:
 	# The restaurant has no camera; nothing (e.g. the cutscene camera) may
 	# become current by itself, or the view shifts to the top-left corner.
 	var room: Node = load("res://scenes/restaurant/restaurant_scene.tscn").instantiate()
+	room.arrival_cutscenes.clear()  # keep this service regression out of story playback
 	add_child(room)
 	await get_tree().process_frame
 	_check("restaurant view not moved by a camera", get_viewport().get_camera_2d() == null)
@@ -97,8 +98,38 @@ func _ready() -> void:
 		avoids_solids = avoids_solids and restaurant_room.grid.is_walkable(cell)
 		detours_around_tables = detours_around_tables or cell.y == 9
 	_check("Vy arrival path avoids the table row", avoids_solids and detours_around_tables)
+	await _test_close_during_kitchen_action(room, restaurant_room)
 	room.queue_free()
 	print("Restaurant: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
+
+
+func _test_close_during_kitchen_action(room: Node, street: StreetRoom) -> void:
+	var kitchen := room.get_node("KitchenStation") as KitchenStation
+	var cooking := room.get_node("CookingOverlay") as CookingOverlay
+	var customers := room.get_node("CustomerManager") as CustomerManager
+	var plan: MenuPlan = room.get("_plan")
+	var dish: DishData = load("res://data/dishes/ca_thu_nuong.tres")
+	plan._portions[dish] = [[] as Array[InventoryItem]]
+	customers.waiting.append(_order(dish, {}))
+	kitchen.rin.position = street.grid.to_world(Vector2i(8, 10))
+	kitchen.rin.kitchen_open = true
+	kitchen.grill()
+	_check("grill starts with a walk before its minigame", kitchen.busy
+		and kitchen.rin.has_path() and not cooking.is_running())
+	customers.waiting.clear()  # the last guest left while Rin was approaching
+	room.set("_shift_running", true)
+	room.call("_end_shift", "Đóng quán sớm")
+	_check("closing waits for Rin's pending kitchen action", kitchen.busy
+		and not room.call("is_shift_over") and not room.get_node("SummaryPanel").visible)
+	while kitchen.rin.has_path():
+		kitchen.rin._follow_path(100.0)
+	_check("pending grill may finish before the summary", cooking.is_running()
+		and not room.call("is_shift_over"))
+	cooking.result_seconds = 0.01
+	cooking._on_game_completed(CookingGameBase.Result.OK)
+	await get_tree().create_timer(0.1).timeout
+	_check("closing finishes after the kitchen action", not kitchen.busy
+		and room.call("is_shift_over") and kitchen.rin.carried == null and not cooking.is_running())
 
 
 func _test_picker_and_bill() -> void:

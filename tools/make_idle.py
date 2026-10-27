@@ -11,15 +11,22 @@ Usage: python3 tools/make_idle.py [name ...]   (default: rin bao vy)
 """
 import os
 import sys
+import shutil
+from datetime import datetime
+from pathlib import Path
 from PIL import Image
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "assets", "sprites", "characters")
 
 # Last row that moves when breathing (bottom of the top / arms).
-WAIST = {"rin": 20, "bao": 20, "vy": 19}
+WAIST = {"rin": 20, "bao": 20, "vy": 19, "co_nam": 20}
 
 # Per sheet row (0 down, 2 left): (x, y, colour) painted for shut eyes.
 BLINK = {
+    "co_nam": {
+        0: [(5, 8, "d7b594"), (6, 8, "d7b594"), (9, 8, "d7b594")],
+        2: [(4, 7, "d7b594")],
+    },
     "rin": {  # glasses: pupils gone, the lenses flash (a lid line reads as sunglasses)
         0: [(4, 9, "a4dddb"), (8, 9, "a4dddb")],
         2: [(3, 8, "a4dddb")],
@@ -64,6 +71,11 @@ def make(name):
         for col, f in enumerate([still, down, blink(still, edits), blink(down, edits, 1)]):
             out.paste(f, (16 * col, 32 * row))
     path = os.path.join(ROOT, name + "_idle.png")
+    if os.path.exists(path):
+        backup = Path(ROOT).parents[2] / "build" / "idle" / "backups" / datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        backup.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, backup / Path(path).name)
+        print("backup", backup / Path(path).name)
     out.save(path)
     print("wrote", path)
 

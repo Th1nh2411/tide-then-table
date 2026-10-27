@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "intent": "Separate raw seafood sprite concepts, one asset per call; transparent backgrounds",
+  "requested_grid": [60, 32],
+  "actual_generated_grid": [1717, 916],
+  "native_delivery": "tools/grill_sprites.py draws deliberate polygons, lines and pixel clusters directly at 60x32. Generated concepts are not resized, quantized or copied into runtime assets.",
+  "common_constraints": "Use case: stylized-concept. Exact native 60x32 pixel canvas, one raw seafood portion centered with a 2px transparent margin. Crisp deliberate pixel art, at most six flat opaque Xom Den colors, 1px dark navy outline, no antialiasing, gradients, shadows, plate, grill, garnish, cooked color or text. Runtime adds cooking tint.",
+  "assets": {
+    "ca_thu": {
+      "prompt": "One whole raw Vietnamese mackerel ca thu, clean side view, head facing right, forked tail left. Long silver blue fish, three short dark dorsal marks, small dorsal fin and one visible eye. Restrained clusters, no individual scales. Colors #172038 #394a50 #577277 #819796 #c7cfcc #ebede9.",
+      "concept": "tmp/imagegen/grill_native/ca_thu_concept.png",
+      "runtime": "assets/sprites/grill/ca_thu.png"
+    },
+    "tom": {
+      "prompt": "One raw shrimp lies horizontally curled gently, head and two short antennae right, tail fan left. Six simple pale gray-blue segmented shell shapes, tiny navy eye, few short legs. Colors #172038 #394a50 #577277 #819796 #c7cfcc #ebede9.",
+      "concept": "tmp/imagegen/grill_native/tom_concept.png",
+      "runtime": "assets/sprites/grill/tom.png"
+    },
+    "muc": {
+      "prompt": "One raw squid lies horizontal: tapered ivory mantle left, small triangular side fins near far left, head and tiny navy eye right, six simple short curling tentacles right. Restrained broad clusters, no suction cup detail. Colors #172038 #394a50 #819796 #c7cfcc #ebede9 #d7b594.",
+      "concept": "tmp/imagegen/grill_native/muc_concept.png",
+      "runtime": "assets/sprites/grill/muc.png"
+    },
+    "oc_huong": {
+      "prompt": "Three small Vietnamese oc huong spotted babylon spiral conical shells arranged side by side horizontally, center slightly higher. Cream ivory with 3-4 broad brown rectangular patches each, dark navy outlines, simple spiral cluster, shell openings bottom, no visible meat. Colors #172038 #7a4841 #ad7757 #d7b594 #e7d5b3 #ebede9.",
+      "concept": "tmp/imagegen/grill_native/oc_huong_concept.png",
+      "runtime": "assets/sprites/grill/oc_huong.png"
+    }
+  }
+}

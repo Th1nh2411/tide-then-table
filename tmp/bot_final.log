@@ -1,0 +1,7 @@
+DAY 1 | thuyền1 cần0 đèn0 bếp0 bàn0 | cá 15 (lưới 4, dỡ 2, sáng 0) | biển ~5.8 ph | phục vụ 16 bỏ 0 | ca +832k | mua ["boat:1"] | tiền 582k | stage 0 | staff [] | tổng ~13 ph
+DAY 2 | thuyền1 cần0 đèn0 bếp0 bàn0 | cá 21 (lưới 8, dỡ 2, sáng 0) | biển ~6.7 ph | phục vụ 14 bỏ 0 | ca +1044k | mua [] | tiền 1886k | stage 0 | staff [] | tổng ~26 ph
+DAY 3 | thuyền2 cần1 đèn1 bếp1 bàn1 | cá 25 (lưới 10, dỡ 3, sáng 0) | biển ~6.0 ph | phục vụ 15 bỏ 0 | ca +2151k | mua ["boat:2", "rod:1", "lamp:1", "kitchen:1", "seats:1", "fridge:1"] | tiền 537k | stage 0 | staff [] | tổng ~38 ph
+DAY 4 | thuyền2 cần2 đèn2 bếp2 bàn1 | cá 28 (lưới 6, dỡ 2, sáng 0) | biển ~7.9 ph | phục vụ 24 bỏ 1 | ca +3768k | mua ["rod:2", "lamp:2", "kitchen:2"] | tiền 755k | stage 2 | staff ["vy"] | tổng ~51 ph
+SEA d5: fog open, boat lvl 2, whirlpool y 190, range limit y -inf
+RUN ENDING | policy story | day 5 | money 755k | min money 450k | ~52 min human time | cutscenes: intro_call, sea pause d1, sea pause d1, arrival d1, after shift d1, sea pause d2, sea pause d2, trip end d2, after shift d2, trip end d3, arrival d3, after shift d3, trip end d4, arrival d4, after shift d4
+BOT OK

@@ -91,7 +91,7 @@ func _draw() -> void:
 			_draw_person(Color(0.9, 0.45, 0.55), Color(0.12, 0.1, 0.1))
 		"co_nam":
 			_draw_person(Color(0.35, 0.6, 0.4), Color(0.55, 0.55, 0.55))
-		"guest":
+		"guest", "guest_regular", "guest_rich":
 			_draw_person(Color(0.5, 0.5, 0.6))
 		"cat":
 			_draw_cat()
@@ -115,7 +115,7 @@ func _draw_art() -> bool:
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE * art_scale)
 	var facing := Vector2i(int(_facing), 0)
 	match kind:
-		"rin", "bao", "vy", "co_nam", "guest":
+		"rin", "bao", "vy", "co_nam", "guest", "guest_regular", "guest_rich":
 			return Art.draw_person(self, "characters/" + kind, facing, _time, _walking, false, _time)
 		"cat":
 			return Art.draw_sheet(self, "characters/cat", Rect2(-12, -24, 24, 24), 8, 1 if _walking else 0,
@@ -127,7 +127,9 @@ func _draw_art() -> bool:
 		"rin_faint":
 			return Art.draw(self, "characters/rin_faint", Rect2(-16, -10, 32, 10))
 		"glow":
-			return Art.draw_sheet(self, "characters/glow", Rect2(-40, -40, 80, 80), 4, 0, _time, 3.0)
+			# Like the fallback aura, its teal must survive the sea's night tint.
+			return Art.draw_frame(self, "characters/glow", 4, 1, int(_time * 3.0) % 4, 0,
+				Rect2(-40, -40, 80, 80), false, Color(1.0, 3.0, 2.6))
 	return false
 
 

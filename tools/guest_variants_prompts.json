@@ -1,0 +1,9 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "common_prompt": "Use case: stylized-concept. One original full-body game customer character, not a sheet. Stardew scale, native16x32 pixel grid, large simple head occupying top14 rows, narrow torso, feet bottom. Facing down toward viewer, top-down3/4. Flat restrained Xom Den pixel palette at most10 colors, dark navy outline, no antialiasing, no gradients, no shadows, no props, no text. Center with transparent padding, genuinely transparent background. This is a concept for manual native pixel animation authoring; make simple readable clothing and silhouette.",
+  "rich_subject": "Vietnamese adult well-off man customer, neat black side-part short hair, golden yellow collared shirt, narrow burgundy tie, dark slate trousers, brown shoes, medium tan skin. Distinct neatly groomed face, no glasses or hat.",
+  "regular_subject": "Vietnamese middle-aged regular seafood customer, short salt-and-pepper gray hair, moss green short-sleeve button shirt, brown trousers and brown sandals, medium tan skin, relaxed friendly face, no glasses/hat/tie.",
+  "concepts": ["tmp/imagegen/guest_variants/rich_concept.png", "tmp/imagegen/guest_variants/regular_concept.png"],
+  "runtime": ["assets/sprites/characters/guest_rich.png", "assets/sprites/characters/guest_rich_wait.png", "assets/sprites/characters/guest_rich_eat.png", "assets/sprites/characters/guest_regular.png", "assets/sprites/characters/guest_regular_wait.png", "assets/sprites/characters/guest_regular_eat.png"],
+  "native_authoring": "Intentional original pixel geometry drawn at16x32 in tools/guest_variants.py, using existing approved guest only as scale/layout reference. Generated concepts are not resized into runtime files. Existing guest PNGs untouched."
+}

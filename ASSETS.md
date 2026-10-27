@@ -6,8 +6,9 @@
 
 > **Restaurant prop perspective:** Use a top-down orthographic farming-sim view, with horizontal/vertical primary edges and no isometric convergence. Static props may use a hard 1–2 px dark-navy contact shadow immediately under their feet/base; do not use soft or long cast shadows.
 
-Hiện mọi thứ trong game là hình vẽ tạm bằng code (`_draw()`). File này liệt kê
-những gì cần vẽ để thay dần. **Code nạp ảnh đã có** (`Art`): bỏ file PNG đúng tên
+Game hiện dùng PNG cho nhân vật chính, quán, hải sản, món ăn và thuyền; các nhóm
+chưa có ảnh vẫn dùng hình vẽ bằng code (`_draw()`). File này liệt kê cả asset đã
+có và backlog. **Code nạp ảnh đã có** (`Art`): bỏ file PNG đúng tên
 vào `assets/sprites/` là game dùng ngay, thiếu ảnh nào thì vẫn vẽ tạm cái đó. Xem
 mục "Tên file" ở cuối.
 
@@ -27,13 +28,13 @@ mục "Tên file" ở cuối.
   bộ (animation), ô gạch lặp, và đồ đậm chất Việt (nón lá, thuyền thúng, xe đẩy inox, biển hiệu chữ Việt).
   Lệnh cho AI: "pixel art, <cỡ>, limited palette, transparent background, no anti-aliasing" + ảnh mẫu màu +
   một hình đã vẽ chuẩn làm tham chiếu; tả nhân vật cố định theo ART_PLAN (Rin: tóc đen rối, kính chữ nhật, áo ba lỗ trắng).
-- **Chân dung runtime:** dùng ảnh approved 128×128 trong `build/portraits/128/approved/`, hiển thị 1:1 trong khung thoại 128. Rin approved gồm base và vui; Vy approved gồm base; Bảo chờ approved riêng.
+- **Chân dung runtime:** dùng ảnh approved 128×128, hiển thị nearest 2× trong khung thoại 256 theo quy ước mới ở `ART_PLAN.md`. Rin có base/vui, Vy có base; Bảo đã có base, base_open và vui trong runtime.
 - **Chân dung tham khảo:** các frame 512 được thu nearest-neighbour về 128×128, lưu duy nhất ở `build/portraits/ref/rin/`, `bao/`, `vy/`. Không dùng các frame tham khảo này trực tiếp trong game.
 
 ## Quy ước chung
 
 - **Cỡ chuẩn trong game:** ô 16 px, nhân vật 16x32 (kiểu Stardew), màn hình 640x360, phóng nguyên lần x3.
-- **Vẽ ở cỡ gốc:** sprite người 16x32. Portrait runtime giữ ảnh approved 128×128 và hiển thị trong khung thoại 128×128 bằng filtering riêng.
+- **Vẽ ở cỡ gốc:** sprite người 16x32. Portrait runtime giữ ảnh approved 128×128 và hiển thị nearest 2× trong khung thoại 256×256.
 - **Định dạng:** PNG nền trong suốt, không khử răng cưa (nearest), sprite sheet theo hàng: mỗi hàng là 1
   hoạt cảnh, mỗi cột là 1 khung hình.
 - **Hướng nhìn:** quán là top-down 3/4 (thấy mặt trên + mặt trước); biển là nhìn thẳng từ trên xuống.
@@ -59,7 +60,7 @@ Kích thước 16x32. Hướng: xuống / lên / trái (phải = lật trái). �
 | Nhân viên thuê (9 người) | đi bộ, cầm đĩa, dọn bàn | có thể dùng 2–3 dáng người + đổi màu |
 | Mèo (Mỡ) | ngồi, đi, nằm ngủ, vẫy đuôi | mèo mập màu cam, ~16x16 |
 
-**Chân dung hộp thoại (P2, kiểu Nine Sols):** bán thân 128×128, hiển thị 1:1 trong khung 128×128 của viewport, filtering riêng cho portrait, góc 3/4 như chân dung Rin, **file luôn quay mặt sang phải**; Rin đứng bên trái,
+**Chân dung hộp thoại (P2, kiểu Nine Sols):** bán thân 128×128, hiển thị nearest 2× trong khung 256×256 của viewport, góc 3/4 như chân dung Rin, **file luôn quay mặt sang phải**; Rin đứng bên trái,
 mọi nhân vật khác đứng bên phải và được game lật tự động → trên màn hình quay sang trái, nhìn về phía Rin. Vai chạm
 mép dưới. File `portraits/<id>/base.png`, nét mặt thêm `portraits/<id>/<nét>.png` (trong thoại ghi `Rin (vui): ...`;
 thiếu file nét mặt thì dùng ảnh thường). id = tên không dấu: `rin`, `bao`, `vy`, `co_nam`, `ong_tam`,
@@ -191,10 +192,11 @@ Tuỳ chọn `characters/<tên>_idle.png` (64x96, cùng 3 hàng xuống / lên /
 | `characters/rin_carry.png` | Rin bưng món: 64x96, cùng layout 4 cột × 3 hướng như `rin.png`; món thật vẽ đè bằng code |
 | `characters/guest.png` hoặc `guest_1.png`…`guest_4.png` | khách thường (nhiều dáng thì game chọn ngẫu nhiên) |
 | `characters/guest_wait.png`, `guest_eat.png` | khách thường ngồi chờ / ngồi ăn; mỗi file 64x32, 4 frame ngang |
-| `characters/guest_rich.png`, `guest_regular.png` | khách sang, khách quen |
+| `characters/guest_rich.png`, `guest_regular.png` | khách sang (áo vàng, cà vạt đỏ), khách quen (tóc muối tiêu, áo xanh rêu); mỗi sheet 64x128 |
+| `characters/guest_rich_wait.png`, `guest_rich_eat.png`, `guest_regular_wait.png`, `guest_regular_eat.png` | chờ / ăn cho mỗi biến thể, mỗi sheet 64x32, 4 frame |
 | `characters/staff.png` | nhân viên thuê (riêng ai thì `characters/<id>.png`: hung, hanh, phat, ngan, co_sau, khoa, ti, lam, quan) |
 | `characters/cat.png` | mèo: 8 cột khung 24x24 (chân chạm đáy), hàng 1 = ngồi (vẫy đuôi, chớp mắt), hàng 2 = đi sang phải (cutscene); dựng bằng `tools/make_cat_sheet.py` |
-| `characters/crate.png` (20x14), `rin_bed.png` (32x16), `glow.png` (80x80, 4 khung ngang) | đồ trong cutscene |
+| `characters/crate.png` (20x14), `rin_bed.png` (32x16), `rin_faint.png` (32x10), `glow.png` (320x80 = 4 khung 80x80 ngang) | đồ trong cutscene; glow được phép alpha theo bậc và runtime tint sáng để thấy ban đêm |
 
 **Quán** (`restaurant/`):
 
@@ -220,12 +222,12 @@ Tuỳ chọn `characters/<tên>_idle.png` (64x96, cùng 3 hàng xuống / lên /
 oc_huong_luoc_sa, oc_huong_nuong_mo_hanh, cua_luoc, cua_hap_bia, cua_rang_me, canh_chua_ca_thu, ca_thu_nuong,
 ca_thu_sot_ca, chao_ca_mu, ca_mu_hap_xi_dau, rau_muong_xao_toi, bia_con_meo.
 
-**Hải sản trên vỉ nướng** (`grill/<fish_id>.png`, khoảng 60x32, vẽ lúc **còn sống**; game tự nhuộm vàng → cháy
+**Hải sản trên vỉ nướng** (`grill/<fish_id>.png`, master 60x32, vẽ lúc **còn sống**; game tự nhuộm vàng → cháy
 và lật): ca_thu, tom, muc, oc_huong.
 
-**Cá trong khoang** (`fish/<id>.png`, mỗi ô 20x20, vẽ nằm ngang, **đầu cá quay sang phải**; game tự xoay khi
-xoay trong khoang): oc_huong 20x20, tom 40x20, muc 40x20, ca_thu 60x20, ca_thu_phat_sang 60x20, cua 40x40,
-ca_mu 60x40.
+**Cá trong khoang** (`fish/<id>.png`, master mỗi ô 80x80; ô hiển thị 20x20 bằng nearest, vẽ nằm ngang,
+**đầu cá quay sang phải**; game tự xoay khi xoay trong khoang): oc_huong 80x80, tom 160x80, muc 160x80,
+ca_thu 240x80, ca_thu_phat_sang 240x80, cua 160x160, ca_mu 240x160.
 
 **Biển** (`sea/`): `thuyen_thung.png`, `ghe_cheo.png`, `ghe_may.png` = mặt boong nhìn từ trên, **mũi thuyền
 quay sang phải** (game xoay theo hướng lái), cỡ như bảng mục 3; `rin_boat.png` 16x32 trên màn hình.

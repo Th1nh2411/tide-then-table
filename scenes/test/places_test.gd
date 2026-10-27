@@ -35,6 +35,7 @@ func _ready() -> void:
 	_check("lighthouse pages default 0", Lighthouse.pages_read() == 0)
 	GameState.set_flag(Lighthouse.PAGE_FLAG, 2.0)  # JSON float
 	_check("lighthouse pages from save", Lighthouse.pages_read() == 2)
+	_test_portrait_dialog()
 	GameState.reset()
 	print("Places: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
 
@@ -43,6 +44,21 @@ func _check(label: String, ok: bool) -> void:
 	if not ok:
 		_failures += 1
 	print("%s  %s" % ["PASS" if ok else "FAIL", label])
+
+
+func _test_portrait_dialog() -> void:
+	var dialog := PoiDialog.new()
+	add_child(dialog)
+	dialog.ask("Ông Tám", "Ra trễ vậy con?", PackedStringArray(["Đi tiếp"]), "ong_tam")
+	_check("hut dialog loads portrait and pauses", dialog._portrait.visible
+		and dialog._portrait.texture != null and get_tree().paused)
+	dialog._answered.emit(0)
+	_check("closing hut dialog restores pause", not get_tree().paused and not dialog.visible)
+	dialog.ask("Hải đăng", "Trang nhật ký", PackedStringArray(["Đi tiếp"]))
+	_check("next place has no stale portrait or extra width", not dialog._portrait.visible
+		and dialog._panel.custom_minimum_size.x == dialog.panel_width)
+	dialog._answered.emit(-1)
+	dialog.queue_free()
 
 
 func _fish(id: String) -> FishData:

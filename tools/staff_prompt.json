@@ -1,0 +1,8 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "prompt": "Use case: stylized-concept. One original Vietnamese sidewalk restaurant helper character concept, NOT Rin/Bao/Vy. One standing full-body character only, not sheet. Native pixel art style on 16x32 grid; large round head takes top14 rows, green short-sleeve shirt, simple cream apron, dark trousers, brown sandals, medium tan skin, neat short black hair with simple blunt side fringe, no glasses/hat/accessories. Facing camera, Stardew style top-down3/4 perspective. 10 flat colors maximum from #172038 #090a14 #2c4058 #c09473 #d7b594 #468232 #25562e #e7d5b3 #394a50 #ad7757. Minimal intentional pixel clusters, no realistic shading, no blur/antialiasing/gradients/shadows, genuinely transparent background. Friendly modest adult staff, hands empty, standing relaxed feet at bottom. No text or objects.",
+  "concept": "tmp/imagegen/staff_native/concept.png",
+  "reference_sheets": ["assets/sprites/characters/guest.png", "assets/sprites/characters/rin.png", "assets/sprites/characters/bao.png"],
+  "final": "assets/sprites/characters/staff.png",
+  "native_authoring": "Original deliberate pixel polygons/lines at16x32 in tools/staff_sprites.py. No resized concept pixels. Four columns idle/step/passing/opposite step, down/up/left/busy rows. Right mirrors left at runtime. No active image replaced."
+}

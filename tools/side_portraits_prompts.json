@@ -1,0 +1,26 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "date": "2026-10-27",
+  "transparent_background": true,
+  "referenced_image_paths": [
+    "/Users/nguyenthinh/WorkSpace/tide-then-table/assets/sprites/portraits/rin/base.png",
+    "/Users/nguyenthinh/WorkSpace/tide-then-table/assets/sprites/portraits/bao/base.png"
+  ],
+  "workflow": "Generated oversized concepts are references only. Final 128x128 masters are drawn directly on the native pixel grid by tools/side_portraits.py, with later face/framing revisions; concepts are not resized, sampled or quantized into final masters.",
+  "assets": [
+    {
+      "id": "ong_tam",
+      "prompt": "Use case: stylized-concept. Generate ONE pixel art dialogue portrait, native128x128 target, transparent background. Input images reference identity style/placement only; DO NOT modify them. Match reference Rin's native pixel density, thin dark navy outline, flat simple clusters, restrained highlights. Subject: Ông Tám, elderly Vietnamese fisherman about65, close friend of Rin's missing grandfather, three decades at sea; deeply tan sun-weathered face, kind thoughtful eyes, short gray hair combed back, sparse gray moustache, simple faded charcoal-brown short sleeve button shirt. Broad but lean elderly shoulders, easy calm posture. No hat, fishing tackle, hands, props, jewellery. Composition: 3/4 facing RIGHT, eye near upper right, head around rows10-62; upper body visible from head down to NAVEL/UPPER ABDOMEN, cropped around elbows at bottom128; shoulders roughly row65. This is not chest-up. Arms hang naturally along sides, hands and lower torso outside frame. Subject's right facing nose profile clear, torso turned same direction as Rin. Entire character inside sides, generous transparent top/side padding. Native128px deliberate pixel placement with single-pixel contour, maximum16 flat opaque colors, no antialias/soft alpha/gradients/bloom/shadows/noise. Warm skin earthy tones, navy outline, shirt color per subject. No text/watermark/border. Single character portrait only, no sheet or background.",
+      "source_path": "tmp/imagegen/side_portraits/ong_tam_concept.png",
+      "generated_source_path": "/Users/nguyenthinh/.codex/generated_images/01a17bab-b6ff-7e72-8ea9-6ff066468f2b/exec-ea079c9c-a432-4dec-b956-1631cfb454ba.png",
+      "final_path": "assets/sprites/portraits/ong_tam/base.png"
+    },
+    {
+      "id": "khach_quen",
+      "prompt": "Use case: stylized-concept. Generate ONE pixel art dialogue portrait, native128x128 target, transparent background. Input images reference identity style/placement only; DO NOT modify them. Match reference Rin's native pixel density, thin dark navy outline, flat simple clusters, restrained highlights. Subject: A friendly Vietnamese regular seafood restaurant customer, male middle-aged about45, former fisherman, warm medium tan skin, simple short dark hair parted loosely, open kind eyes, small closed smile, plain moss green short sleeve collared shirt. Average build. No hat, props, hands, logo, jewellery. Distinct from elderly gray-haired fisherman. Composition: 3/4 facing RIGHT, eye near upper right, head around rows10-62; upper body visible from head down to NAVEL/UPPER ABDOMEN, cropped around elbows at bottom128; shoulders roughly row65. This is not chest-up. Arms hang naturally along sides, hands and lower torso outside frame. Subject's right facing nose profile clear, torso turned same direction as Rin. Entire character inside sides, generous transparent top/side padding. Native128px deliberate pixel placement with single-pixel contour, maximum16 flat opaque colors, no antialias/soft alpha/gradients/bloom/shadows/noise. Warm skin earthy tones, navy outline, shirt color per subject. No text/watermark/border. Single character portrait only, no sheet or background.",
+      "source_path": "tmp/imagegen/side_portraits/khach_quen_concept.png",
+      "generated_source_path": "/Users/nguyenthinh/.codex/generated_images/01a17bab-b6ff-7e72-8ea9-6ff066468f2b/exec-af0e560c-37b0-4316-8e3e-88deeb9e774b.png",
+      "final_path": "assets/sprites/portraits/khach_quen/base.png"
+    }
+  ]
+}

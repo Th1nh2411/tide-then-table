@@ -91,6 +91,35 @@ func add_portion(dish: DishData, storage: Array) -> bool:
 	return true
 
 
+## Preview a slot replacement without touching the player's ingredients.
+func storage_after_returning(dish: DishData, storage: Array) -> Array:
+	var available := storage.duplicate()
+	for portion: Array in _portions.get(dish, []):
+		available.append_array(portion)
+	return available
+
+
+## Replace one menu dish with one portion of another, atomically.
+func replace_dish(previous: DishData, dish: DishData, storage: Array) -> bool:
+	if dish == previous:
+		return get_portion_count(dish) > 0
+	if dish == null or dish.always_available or dish.ingredients.is_empty() \
+		or dish.kitchen_level > kitchen_level or _portions.has(dish):
+		return false
+	var replacing := _portions.has(previous)
+	if not replacing and used_slots() >= slots:
+		return false
+	if not KitchenLogic.can_cook(dish, storage_after_returning(previous, storage)):
+		return false
+	if replacing:
+		for portion: Array in _portions[previous]:
+			storage.append_array(portion)
+		_portions.erase(previous)
+	_portions[dish] = [KitchenLogic.take_ingredients(dish, storage)]
+	changed.emit()
+	return true
+
+
 ## Undo one portion during planning: its ingredients go back to storage.
 func remove_portion(dish: DishData, storage: Array) -> void:
 	if get_portion_count(dish) == 0:

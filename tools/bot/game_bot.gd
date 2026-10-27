@@ -136,11 +136,17 @@ func _sea_night() -> bool:
 			if is_instance_valid(spot) and spot.zone == zone and nets.nets_available() > 0:
 				var t := pos.distance_to(spot.global_position) / speed
 				oil.spend(t * burn)
+				if not _sea_active(sea):
+					_record_night(sea_s, fish, docks, glow)
+					return false
 				sea_s += t + 4.0
 				pos = spot.global_position + Vector2(0, 45)
 				boat.global_position = pos
 				boat.speed = 0.0
 				await _wait(0.2)
+				if not _sea_active(sea):
+					_record_night(sea_s, fish, docks, glow)
+					return false
 				nets.call("_try_drop")
 				break
 	var net_reserve := 6.0 * nets.nets_out()
@@ -158,33 +164,54 @@ func _sea_night() -> bool:
 		if best == null:
 			break
 		oil.spend(best_t * burn)
+		if not _sea_active(sea):
+			_record_night(sea_s, fish, docks, glow)
+			return false
 		sea_s += best_t
 		pos = best.global_position
 		boat.global_position = pos
 		boat.speed = 0.0
 		await _wait(0.2)
+		if not _sea_active(sea):
+			_record_night(sea_s, fish, docks, glow)
+			return false
 		while is_instance_valid(best) and best.casts_left > 0 and oil.amount > 2.0:
 			if hold_manager.hold.fill_fraction() * hold_cells > hold_cells - 6:
 				var to_dock := pos.distance_to(dock) / speed
 				oil.spend(to_dock * burn * 2.0)
+				if not _sea_active(sea):
+					_record_night(sea_s, fish, docks, glow)
+					return false
 				sea_s += to_dock * 2.0 + 5.0
 				GameState.unload_catch(hold_manager.take_all())
 				docks += 1
 			var before := hold_manager.hold.items.size()
 			fishing.spawner.fishing_requested.emit(best)
 			await _wait(0.3)
+			if not _sea_active(sea):
+				_record_night(sea_s, fish, docks, glow)
+				return false
 			while fishing.minigame.is_running():
 				var game: MinigameBase = fishing.minigame.get("_game")
 				if game:
 					game._finish(_rng.randf() < SKILL, _rng.randf() < 0.3)
 				await _wait(0.2)
+				if not _sea_active(sea):
+					_record_night(sea_s, fish, docks, glow)
+					return false
 			sea_s += MINIGAME_SECONDS
 			await _wait(0.2)
+			if not _sea_active(sea):
+				_record_night(sea_s, fish, docks, glow)
+				return false
 			if get_tree().paused:  # overflow: throw the extra back
 				var hold_ui := sea.get_node("HoldUI") as HoldUI
 				if hold_ui.visible:
 					hold_ui.close()
 				await _through_cutscene("sea pause d%d" % GameState.day)
+				if not _sea_active(sea):
+					_record_night(sea_s, fish, docks, glow)
+					return false
 			var after := hold_manager.hold.items.size()
 			if after > before:
 				fish += after - before
@@ -195,6 +222,9 @@ func _sea_night() -> bool:
 			continue
 		var t := pos.distance_to(buoy.global_position) / speed
 		oil.spend(t * burn)
+		if not _sea_active(sea):
+			_record_night(sea_s, fish, docks, glow)
+			return false
 		sea_s += t + MINIGAME_SECONDS
 		pos = buoy.global_position
 		boat.global_position = pos
@@ -203,27 +233,51 @@ func _sea_night() -> bool:
 		var before := hold_manager.hold.items.size()
 		(buoy as NetBuoy).haul_requested.emit(buoy)
 		await _wait(0.3)
+		if not _sea_active(sea):
+			_record_night(sea_s, fish, docks, glow)
+			return false
 		while fishing.minigame.is_running():
 			var game: MinigameBase = fishing.minigame.get("_game")
 			if game:
 				game._finish(_rng.randf() < SKILL, _rng.randf() < 0.3)
 			await _wait(0.2)
+			if not _sea_active(sea):
+				_record_night(sea_s, fish, docks, glow)
+				return false
 		await _wait(0.2)
+		if not _sea_active(sea):
+			_record_night(sea_s, fish, docks, glow)
+			return false
 		if get_tree().paused:
 			var hold_ui := sea.get_node("HoldUI") as HoldUI
 			if hold_ui.visible:
 				hold_ui.close()
 			await _through_cutscene("sea pause d%d" % GameState.day)
+			if not _sea_active(sea):
+				_record_night(sea_s, fish, docks, glow)
+				return false
 		var got := hold_manager.hold.items.size() - before
 		fish += maxi(got, 0)
 		_day_line["net"] = int(_day_line.get("net", 0)) + maxi(got, 0)
 	sea_s += pos.distance_to(dock) / speed
-	_human_seconds += sea_s + 15.0
-	_day_line.merge({"fish": fish, "docks": docks, "sea_s": sea_s, "glow": glow}, true)
+	_record_night(sea_s, fish, docks, glow)
 	sea.call("_end_sea_day", false)
 	await _wait(1.5)
 	await _through_cutscene("trip end d%d" % GameState.day)
 	return false
+
+
+## A rescue or story transition can replace the scene during any bot wait.
+func _sea_active(sea: Node) -> bool:
+	if not is_instance_valid(sea) or get_tree().current_scene != sea or not DayClock.running:
+		return false
+	# Rescue has a short message delay before it stops DayClock.
+	return not (sea.get_node("LampOil") as LampOil).is_empty()
+
+
+func _record_night(seconds: float, fish: int, docks: int, glow: int) -> void:
+	_human_seconds += seconds + 15.0
+	_day_line.merge({"fish": fish, "docks": docks, "sea_s": seconds, "glow": glow}, true)
 
 
 # --- restaurant ---------------------------------------------------------------
@@ -375,10 +429,14 @@ func _through_cutscene(label: String) -> void:
 			ev.action = "interact"
 			ev.pressed = pressed
 			Input.parse_input_event(ev)
-		var key := InputEventKey.new()
-		key.physical_keycode = KEY_1
-		key.pressed = true
-		Input.parse_input_event(key)
+		# Click the actual choice button; KEY_1 can leak into sea debug
+		# boat switching when a paused popup closes during this iteration.
+		for node in get_tree().root.find_children("*", "CanvasLayer", true, false):
+			var dialogue := node as DialogueBox
+			if dialogue and dialogue.visible and dialogue._choice_count > 0:
+				(dialogue._choices.get_child(0) as Button).pressed.emit()
+				break
+
 	if t >= 120.0:
 		print("STUCK paused at %s" % label)
 

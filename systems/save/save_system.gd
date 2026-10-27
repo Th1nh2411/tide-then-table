@@ -145,7 +145,12 @@ static func apply_dict(data: Dictionary) -> void:
 				var batches: Array = []
 				for batch: Variant in entry:
 					if batch is Dictionary and _is_number(batch.get("units")) and _is_number(batch.get("fresh")):
-						batches.append({"units": maxi(int(batch["units"]), 0), "fresh": float(batch["fresh"])})
+						var units := maxi(int(batch["units"]), 0)
+						var fresh := clampf(float(batch["fresh"]), 0.0, MarketStock.FULL_FRESHNESS)
+						if units > 0 and fresh > 0.0:
+							batches.append({"units": units, "fresh": fresh})
+				# MarketStock consumes batches in order, oldest first.
+				batches.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["fresh"] < b["fresh"])
 				GameState.pantry[dish_id] = batches
 
 	var staff: Variant = data.get("staff")

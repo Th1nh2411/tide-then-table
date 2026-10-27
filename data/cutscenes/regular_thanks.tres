@@ -13,7 +13,7 @@ camera kitchen_view 0 1.6
 fade_in 0.6
 spawn Bao bao bao_stove 1.4
 spawn Rin rin rin_spot 1.4
-spawn Guest guest guest_seat 1.4
+spawn Guest guest_regular guest_seat 1.4
 speak \"Khách quen\" \"Con cá đó nướng vừa tới. Lâu lắm rồi mới ăn được cá ngoài khơi ngon vậy.\"
 speak Rin \"Dạ, chú đặt thì con ráng câu cho bằng được.\"
 speak \"Khách quen\" \"Hồi trước tui cũng đi biển. Mấy đêm sương, nghe cá Ông thở ngoài xa, ầm ầm như sóng.\"

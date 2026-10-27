@@ -6,7 +6,7 @@
 
 > **Restaurant prop perspective (approved):** Props use a top-down orthographic farming-sim view: primary edges stay horizontal/vertical, top surfaces are modest, and there is no isometric convergence. Add only a hard 1–2 px dark-navy contact shadow directly under feet, wheels, or the base so objects do not float; never use soft or long cast shadows.
 
-Cập nhật: 2026-10-23. Kích thước và tên file từng loại xem `ASSETS.md`;
+Cập nhật: 2026-10-27. Kích thước và tên file từng loại xem `ASSETS.md`;
 code nạp art và chạy game xem `CLAUDE.md`.
 
 ## Chân dung
@@ -23,14 +23,34 @@ code nạp art và chạy game xem `CLAUDE.md`.
 - Portrait thoại dùng ảnh approved 128×128, nền trong suốt, bán thân 3/4 quay phải và hiển thị 2× trong khung portrait 256×256 theo yêu cầu thử kích thước lớn.
 - Game dùng nearest, tắt mipmap, khung portrait 256×256 và vị trí nguyên pixel; cửa sổ phóng theo hệ số nguyên để giữ nét pixel. Nhân vật bên phải tự lật. File thường là `<id>/base.png`; emotion chỉ dùng khi có file approved tương ứng.
 - Đồng bộ ảnh mới 2026-10-23: `bao_open.png` → `bao/base_open.png`, `bao_vui.png` → `bao/vui.png`, `rin_base_open.png` → `rin/base_open.png`, `vy_open.png` → `vy/base_open.png`. Giữ nguyên ảnh đã có trong assets.
-- Hiện `bao_base.png` trong approved và `bao/base.png` trong assets đều vắng mặt; Bảo có `vui` và `base_open` nhưng còn thiếu base đóng miệng. Cần bổ sung bản approved để hoàn chỉnh trạng thái mặc định.
+- Kiểm kê 2026-10-27: runtime đã có `bao/base.png`, `base_open.png` và `vui.png`; không còn thiếu base đóng miệng. Trạng thái approved của nguồn được giữ theo ghi nhận ở trên.
 
 ## Việc tiếp theo
 
-1. Chân dung Cô Năm và mèo.
-2. Hải sản trong khoang (`fish/`), rồi món ăn (`dishes/`).
-3. Đồ trong quán, nhân vật còn lại và khách.
-4. Hải sản trên vỉ (`grill/`), thuyền (`sea/`); ô gạch và mặt nước làm sau.
+1. Duyệt hình ảnh nhóm mới ở các preview dưới đây; phần kỹ thuật và tích hợp đã có kiểm tra riêng.
+2. Sprite phụ đã bổ sung trong đợt bên dưới: khách sang/quen, đạo cụ cutscene và portrait phụ. Không cần 9 bản PNG nhân viên trùng nhau vì đã có `staff.png` dùng chung.
+3. Mặt nước, địa điểm ngoài biển, UI và cảnh riêng thuộc backlog P2/P3 trong `ASSETS.md`; ô gạch quán đã có. Xác minh hoặc thay nguồn sprite Vy trước phát hành công khai.
+
+### Hoàn thiện nhóm art tiếp theo — 2026-10-27
+
+- `grill/{ca_thu,tom,muc,oc_huong}.png`: 4 master 60×32, sống, mỗi ảnh 6 màu Xóm Đèn; runtime nhuộm màu/lật khi nướng.
+- `sea/{thuyen_thung,ghe_cheo,ghe_may}.png`: 32×32 / 48×20 / 60×24, boong nhìn trên, mũi +X. `Boat` đùn thành theo silhouette hướng xuống màn hình khi xoay; PNG không chứa bóng đổ.
+- `sea/rin_boat.png`: 16×32, áo ba lỗ, kính, nón lá; renderer giữ người thẳng đứng.
+- `characters/co_nam.png` 64×128 + `co_nam_idle.png` 64×96: khung 16×32, đi xuống/lên/trái, vẫy tay, thở/chớp mắt; tóc buộc thấp, áo xanh. `characters/staff.png` 64×128 là nhân viên chung, đi ba hướng và hàng bận. Mỗi nhân vật tối đa 10 màu.
+- Imagegen built-in tạo concept riêng từng asset; nguồn oversized giữ riêng trong `tmp/imagegen/`. Master được đặt pixel trực tiếp trên grid native bằng `tools/grill_sprites.py`, `make_sea_sprites.py`, `make_co_nam.py`, `staff_sprites.py`; không thu nhỏ concept thành master.
+- Kiểm kỹ thuật: `python3 tools/check_assets.py --group grill --group sea --group characters` (11 master). Approved portrait không bị xử lý lại. Ảnh fish/dish cũ đủ cỡ/alpha/giới hạn màu nhưng có màu ngoài bảng Xóm Đèn; checker báo WARN, chưa tự đổi màu art đang active.
+- Xem renderer thật: F6 `scenes/test/asset_preview.tscn` (phím 1/2/3: sống/chín/cháy) và `restaurant_art_preview.tscn` (quán có Cô Năm, Vy, nhân viên chung, tắt autosave). Ảnh chụp ở `build/shots/asset_preview_0.png`, `_1.png`, `_2.png`, `restaurant_art_preview.png`.
+- Lần đầu cài không ghi đè ảnh cũ. Các lần chỉnh mới trong đợt này đã sao lưu sea vào `build/sea/backups/20261027_*`; generator bảo vệ hoặc sao lưu trước khi ghi lại. `make_idle.py` nay cất bản cũ vào `build/idle/backups/<timestamp>/` trước khi dựng lại (đã kiểm bytes backup bằng thư mục test riêng). Trạng thái thẩm mỹ: đã tự kiểm ở native/enlarged và trong renderer; chờ chủ dự án duyệt.
+
+### Sprite phụ — 2026-10-27
+
+- Đã cài 6 PNG khách sang/quen: mỗi loại có sheet 64×128 đi xuống/lên/trái và hàng bận, cùng `_wait`/`_eat` 64×32. Khách sang áo vàng/cà vạt đỏ/tóc rẽ ngôi; khách quen tóc muối tiêu/áo xanh rêu. `Customer` tự chọn đúng ảnh, cảnh `regular_thanks` dùng actor `guest_regular` để khớp chân dung.
+- Đạo cụ: `characters/crate.png` 20×14, `rin_bed.png` 32×16, `rin_faint.png` 32×10, `glow.png` 320×80 (4 frame). Rin giữ kính, áo ba lỗ, đầu bên trái; aura giữ sáng qua tint đêm. Glow là ngoại lệ alpha theo bậc có chủ đích, không phải halo từ resize.
+- Chân dung mới: `portraits/ong_tam/base.png`, `portraits/khach_quen/base.png` 128×128, 3/4 quay phải, đến bụng trên/khuỷu tay, palette gọn. Ông Tám tóc bạc/áo nâu, khách quen tóc muối tiêu/áo xanh rêu khớp sprite. `PoiDialog.ask` có speaker tuỳ chọn, ông Tám dùng ảnh trong cả lời chào và hỏi chuyện; các địa điểm khác giữ hộp thoại gọn khi không có speaker/ảnh.
+- Nguồn tái tạo: `tools/guest_variants.py`, `tools/cutscene_sprites.py`, `tools/side_portraits.py`. Khách/portrait có concept imagegen riêng; cutscene chuyển từ thiết kế fallback GDScript có sẵn thành pixel native. Không thu nhỏ concept thành master, không sửa các PNG approved cũ. Các bản portrait nháp trước chỉnh được giữ trong `build/portraits/backups/20261027_*`.
+- QA: `python3 tools/check_assets.py --group characters --group cutscenes --group portraits`; art test nạp từng PNG đúng kích thước. Preview F6 `scenes/test/secondary_art_preview.tscn` dùng đúng `Customer`, `CutsceneActor`, `PoiDialog`, `DialogueBox`; O/K mở chân dung ông Tám/khách quen. Ảnh chụp: `build/shots/secondary_art_preview.png`, `ong_tam_poi_preview.png`, `khach_quen_dialogue_preview.png`. Đã tự kiểm kỹ thuật và hình ảnh, chưa có duyệt thẩm mỹ từ chủ dự án.
+
+Kiểm kê 2026-10-27: đã có chân dung Cô Năm và mèo, đủ 7 ảnh hải sản trong `fish/` và 18 ảnh món trong `dishes/`. Các mục này không còn là việc tạo mới; việc có file chưa thay thế bước duyệt hình ảnh. Nhóm mới phía trên được bổ sung trong đợt art tiếp theo, giữ nguyên các PNG đã duyệt từ trước.
 
 Tiến độ 2026-10-25: đã thêm mặt tiền cửa hàng, bảng menu, quầy/két tạp hoá, đủ ba cấp xe đẩy/bếp, lò than, bàn ghế, nền đường, thùng lạnh, thùng rác, vòi bia, chậu cây và dây đèn trong `restaurant/`. Các prop active đã được đồng bộ theo góc top-down orthographic và có bóng tiếp xúc cứng; khách thường đã tách sprite ngồi chờ/ngồi ăn. Nhóm prop và décor nhà hàng cốt lõi đã hoàn tất.
 

@@ -446,7 +446,25 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng 
 
 ## 9. Tiến độ
 
-- **Art (2026-10-22):** runtime dùng ảnh approved **128x128** hiển thị 1:1 trong khung thoại 128. Rin có approved base/vui, Vy có approved base; Bảo vẫn là asset tạm 512 cho tới khi có approved riêng. Giữ màu và alpha của approved.
+- **Sprite phụ đã hoàn thiện (2026-10-27, sau xác nhận mở rộng):** thêm 12 PNG: khách sang/quen (mỗi loại sheet đi + chờ + ăn), crate, Rin trên giường, Rin ngất, aura 4 frame, portrait ông Tám/khách quen. `regular_thanks` dùng sprite khách quen; ông Tám hiện portrait trong `PoiDialog`, không còn chỉ là file chưa được nạp.
+  - Kiểm chứng: checker 15 master nhân vật phụ/cutscene/portrait đều PASS, không còn filename fallback trong danh sách kiểm kê; art test 90 PASS, places test 11 PASS (pause/unpause và không giữ ảnh cũ sang địa điểm khác); toàn bộ test cùng 5 smoke scene `ALL OK`.
+  - Đã chụp renderer thực: `build/shots/secondary_art_preview.png`, `ong_tam_poi_preview.png`, `khach_quen_dialogue_preview.png`. F6 `scenes/test/secondary_art_preview.tscn`, O/K xem hai chân dung. Source/provenance/backup ở `ART_PLAN.md`; art mới chờ duyệt thẩm mỹ, approved cũ giữ nguyên.
+  - Commit gợi ý: `feat: complete secondary customer, cutscene and portrait art`.
+
+- **Art tiếp theo đã tích hợp (2026-10-27, 3 sub-agent):** 4 hải sản trên vỉ; 3 thuyền + Rin đội nón; sheet Cô Năm + idle; sheet nhân viên chung. Tổng 11 PNG mới, đúng grid native/alpha/palette, không thay các sprite Rin/Bảo/Vy đã duyệt. `Boat` đùn thành theo silhouette hướng xuống màn hình để thuyền xoay mà vẫn có độ dày.
+  - QA: checker 11/11; art test 78 PASS; toàn bộ `tools/run_tests.sh` và 5 smoke scene đều qua. Đã chụp renderer thật cho biển/vỉ nướng và quán; preview F6 ở `scenes/test/asset_preview.tscn` và `restaurant_art_preview.tscn`. Các scene preview bảo vệ autosave.
+  - Bot full cuối: `BOT OK`, kết ngày 5, khoảng 52 phút ước tính, Vy được thuê ngày 4; không error/STUCK/SAVE MISMATCH. Đợt chạy đã tìm và sửa lỗi riêng của bot: phím chọn hội thoại lọt sang debug đổi thuyền; bot đọc node chuyến biển đã kết thúc. Nay chọn button thật của `DialogueBox` và kiểm scene sau các bước chờ/cạn dầu; regression lựa chọn độc lập PASS.
+  - Master được vẽ pixel trực tiếp trên lưới gốc từ concept imagegen riêng; tool/brief/prompt và trạng thái duyệt ghi trong `ART_PLAN.md`. Các ảnh mới đã tự kiểm trực quan, chưa được chủ dự án duyệt thẩm mỹ.
+  - Backlog lúc đó gồm đạo cụ cutscene, portrait phụ, biến thể khách (đã hoàn thiện trong đợt tiếp theo ở trên) và các nhóm code-rendered P2/P3. Màu fish/dishes cũ ngoài bảng được báo WARN và giữ nguyên.
+  - Commit gợi ý: `feat: add native grill, boat, grocer and staff sprites with runtime previews`.
+
+- **Rà hoàn thiện MVP (2026-10-27, 3 sub-agent):** đã sửa đóng ca khi Rin còn đi tới lò/dọn bàn (chờ thao tác bếp xong mới tổng kết); chuẩn hoá quality cá và các batch rau đọc từ save (freshness 0–100, bỏ batch hỏng/rỗng, dùng batch cũ trước). Runner báo thất bại khi Godot thoát lỗi hoặc bot gặp engine ERROR.
+  - Kiểm chứng: `tools/run_tests.sh` → toàn bộ test và 5 smoke scene PASS, không lỗi; restaurant 39 PASS, save 39 PASS. Regression mới đã được xác nhận FAIL với code cũ. Kiểm tra runner bằng Godot giả lập thoát status 7 / in ERROR đều trả thất bại đúng.
+  - `tools/run_bot.sh` → `BOT OK`, kết thúc ngày 4 khi câu sớm cá thu phát sáng, ước tính 39 phút; không SAVE MISMATCH. Đây là một lượt bot ngẫu nhiên, không thay thế chơi thử trực tiếp.
+  - **Việc tiếp theo tại lúc rà:** art hải sản trên vỉ `grill/`, rồi thuyền `sea/` (đã làm trong đợt tiếp theo ở trên); các portrait Cô Năm/mèo, 7 hải sản khoang và 18 món đã có file. Xem thứ tự cập nhật ở `ART_PLAN.md`; kiểm tra nguồn sprite Vy trước phát hành công khai. Sau art, chơi thử theo `PLAYTEST.md` trước khi xuất bản thử.
+  - Commit gợi ý: `fix: finish pending kitchen actions before closing and sanitize food saves`.
+
+- **Art (hiện tại, kiểm kê 2026-10-27):** portrait nguồn **128x128** hiển thị nearest 2× trong khung thoại 256. Rin có base/vui, Vy có base; Bảo đã có base/base_open/vui. Giữ màu và alpha của approved.
   Chi tiết và việc tiếp theo ở `ART_PLAN.md`.
 - **Debug nhảy cảnh (2026-10-22):** F9 ở bất cứ đâu (bản debug) mở `DebugJumpMenu`: chọn ngày → "Đêm (biển)" / "Quán", hoặc bấm một cutscene bất kỳ. `StoryTimeline` (pure) dựng lại game như đã chơi tới lúc đó (cutscene trước đã xem + cờ của chúng, điềm báo ngày 4; không tự thuê Vy). Sau khi nhảy, autosave tắt tới khi tắt game (`SaveSystem.autosave_off`). Cutscene mới phải thêm mốc [ngày, lúc] vào `StoryTimeline.WHEN`; test: scenes/test/story_timeline_test.tscn.
 
@@ -463,4 +481,6 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng 
 | 8 — Lưu game             | ✅           | SaveSystem (static) → user://save.json, ghi file tạm rồi đổi tên; autosave lúc 6:00 mỗi ngày; field thiếu/sai kiểu → mặc định, cá lạ bị bỏ qua; test: scenes/test/save_test.tscn                           |
 | 9 — Cảnh kết             | ✅           | Điềm báo (cá thu phát sáng / ngày 4) → hôm sau mở FOG góc đông bắc (3 điểm cá biến dị + xoáy nước); xoáy → fade trắng → thoại Rin → "Còn tiếp..." → menu; F2 debug mở sương                                |
 
-- **Portrait rollback — 2026-10-22:** runtime quay về ảnh approved 128×128 trong `build/portraits/128/approved/`; Rin base/vui và Vy base đã được cài lại. Bảo chưa có approved mới nên giữ asset tạm. Các sheet lớn chỉ được thu 128×128 để tham khảo trong `build/portraits/ref/`.
+- **Lịch sử portrait rollback — 2026-10-22:** runtime quay về ảnh approved 128×128 trong `build/portraits/128/approved/`; Rin base/vui và Vy base đã được cài lại. Tại thời điểm đó Bảo chưa có approved mới nên giữ asset tạm (đã bổ sung sau đó, xem `ART_PLAN.md`). Các sheet lớn chỉ được thu 128×128 để tham khảo trong `build/portraits/ref/`.
+
+- **Thử art 3D — 2026-10-27 (chờ duyệt):** scene riêng `scenes/art_preview/psx_quan_preview.tscn` dựng Rin ghép khối có idle giật theo nhịp, xe đẩy, bếp than, bàn ghế nhựa, mái hiên và biển Xóm Đèn. F6 để xem; không tích hợp gameplay, không thay art active. Import và chạy render Compatibility thành công, không có script error; đã xem ảnh `build/shots/psx_quan_preview.png`. Đây là mẫu bố cục/màu/khối ban đầu, chưa chốt chất PSX hoặc horror.

@@ -16,6 +16,8 @@ var _title: Label
 var _body: Label
 var _options: VBoxContainer
 var _hint: Label
+var _panel: PanelContainer
+var _portrait: TextureRect
 
 
 func _ready() -> void:
@@ -30,9 +32,13 @@ func is_open() -> bool:
 
 
 ## Shows the dialog and waits for a choice. Options are shown as "1. ...".
-func ask(title: String, body: String, options: PackedStringArray) -> int:
+func ask(title: String, body: String, options: PackedStringArray, speaker_id: String = "") -> int:
 	_title.text = title
 	_body.text = body
+	_portrait.texture = Art.texture("portraits/%s/base" % speaker_id) if speaker_id != "" else null
+	_portrait.visible = _portrait.texture != null
+	_panel.custom_minimum_size.x = minf(panel_width + 264.0, get_viewport().get_visible_rect().size.x - 24.0) \
+		if _portrait.visible else panel_width
 	for child in _options.get_children():
 		child.queue_free()
 	for i in options.size():
@@ -76,16 +82,28 @@ func _build() -> void:
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(center)
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(panel_width, 0)
-	center.add_child(panel)
+	_panel = PanelContainer.new()
+	_panel.custom_minimum_size = Vector2(panel_width, 0)
+	center.add_child(_panel)
 	var margin := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 10)
-	panel.add_child(margin)
+	_panel.add_child(margin)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	margin.add_child(row)
+	_portrait = TextureRect.new()
+	_portrait.custom_minimum_size = Vector2(256, 256)
+	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	# Source faces right, toward the text beside it.
+	_portrait.hide()
+	row.add_child(_portrait)
 	var box := VBoxContainer.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_theme_constant_override("separation", 6)
-	margin.add_child(box)
+	row.add_child(box)
 	_title = Label.new()
 	_title.add_theme_color_override("font_color", Color(1.0, 0.75, 0.45))
 	_title.add_theme_font_size_override("font_size", 12)

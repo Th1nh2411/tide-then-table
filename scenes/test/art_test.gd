@@ -81,6 +81,15 @@ func _ready() -> void:
 	var rin_carry := Art.texture("characters/rin_carry")
 	failures += _check("Rin carry sheet loads as 4 columns x 3 rows of 16x32",
 		rin_carry != null and rin_carry.get_width() == 64 and rin_carry.get_height() == 96)
+	var co_nam := Art.texture("characters/co_nam")
+	failures += _check("Cô Năm sheet loads as 4 columns x 4 rows of 16x32",
+		co_nam != null and co_nam.get_width() == 64 and co_nam.get_height() == 128)
+	var co_nam_idle := Art.texture("characters/co_nam_idle")
+	failures += _check("Cô Năm idle loads as 4 columns x 3 rows of 16x32",
+		co_nam_idle != null and co_nam_idle.get_width() == 64 and co_nam_idle.get_height() == 96)
+	var staff := Art.texture("characters/staff")
+	failures += _check("generic staff loads as 4 columns x 4 rows of 16x32",
+		staff != null and staff.get_width() == 64 and staff.get_height() == 128)
 	for seated_pose: String in ["characters/guest_wait", "characters/guest_eat"]:
 		var seated := Art.texture(seated_pose)
 		failures += _check("guest seated pose loads as 4 frames of 16x32: " + seated_pose,
@@ -121,6 +130,38 @@ func _ready() -> void:
 		var texture := Art.texture(sprite)
 		failures += _check("restaurant prop loads at documented size: " + sprite,
 			texture != null and Vector2i(texture.get_width(), texture.get_height()) == restaurant_props[sprite])
+	var sea_and_grill := {
+		"grill/ca_thu": Vector2i(60, 32),
+		"grill/tom": Vector2i(60, 32),
+		"grill/muc": Vector2i(60, 32),
+		"grill/oc_huong": Vector2i(60, 32),
+		"sea/thuyen_thung": Vector2i(32, 32),
+		"sea/ghe_cheo": Vector2i(48, 20),
+		"sea/ghe_may": Vector2i(60, 24),
+		"sea/rin_boat": Vector2i(16, 32),
+	}
+	for sprite: String in sea_and_grill:
+		var texture := Art.texture(sprite)
+		failures += _check("sea/grill art loads at native size: " + sprite,
+			texture != null and Vector2i(texture.get_width(), texture.get_height()) == sea_and_grill[sprite])
+	var secondary_sizes := {
+		"characters/guest_rich": Vector2i(64, 128),
+		"characters/guest_rich_wait": Vector2i(64, 32),
+		"characters/guest_rich_eat": Vector2i(64, 32),
+		"characters/guest_regular": Vector2i(64, 128),
+		"characters/guest_regular_wait": Vector2i(64, 32),
+		"characters/guest_regular_eat": Vector2i(64, 32),
+		"characters/crate": Vector2i(20, 14),
+		"characters/rin_bed": Vector2i(32, 16),
+		"characters/rin_faint": Vector2i(32, 10),
+		"characters/glow": Vector2i(320, 80),
+		"portraits/ong_tam/base": Vector2i(128, 128),
+		"portraits/khach_quen/base": Vector2i(128, 128),
+	}
+	for sprite: String in secondary_sizes:
+		var texture := Art.texture(sprite)
+		failures += _check("secondary art loads at native size: " + sprite,
+			texture != null and Vector2i(texture.get_width(), texture.get_height()) == secondary_sizes[sprite])
 	print("art_test: %s" % ("ALL PASS" if failures == 0 else "%d FAIL" % failures))
 	get_tree().quit()
 
