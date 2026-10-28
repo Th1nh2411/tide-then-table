@@ -1,0 +1,43 @@
+{
+  "provider": "tencent/Hunyuan3D-2mini",
+  "runtime": "local CPU, float32",
+  "model_subfolder": "hunyuan3d-dit-v2-mini-turbo",
+  "weights": {
+    "file": "tencent/Hunyuan3D-2mini/hunyuan3d-dit-v2-mini-turbo/model.fp16.safetensors",
+    "bytes": 3822584202,
+    "flashvdm_vae": {
+      "file": "tencent/Hunyuan3D-2mini/hunyuan3d-vae-v2-mini-turbo/model.fp16.safetensors",
+      "bytes": 407410402
+    }
+  },
+  "code": "https://github.com/Tencent-Hunyuan/Hunyuan3D-2",
+  "started_utc": "2026-10-28T19:01:13.821697+00:00",
+  "input": "assets/concepts/3d_queue/props/sidewalk_tree.png",
+  "input_sha256": "f084a122827451faa0f9f2536496a4e79f9502b88f5e000d29a868d5b4a10768",
+  "shape_parameters": {
+    "steps": 5,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 128,
+    "num_chunks": 8000
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 1500,
+    "file_type": "glb",
+    "tool": "hy3dgen FaceReducer"
+  },
+  "background_removed": false,
+  "shape_stats": {
+    "number_of_faces": 67772,
+    "number_of_vertices": 33874,
+    "seconds": 207.4
+  },
+  "status": "success",
+  "raw": "sidewalk_tree_raw.glb",
+  "reduced": "sidewalk_tree_reduced.glb",
+  "raw_sha256": "b8994dec6ab02ebac650fe621637a000fbc1a36d389186f31755ad5d759877b4",
+  "reduced_sha256": "4fb72bcbc10c0e677c7a888204ae0196bf3cdf7caeca6027266b960bd306560e",
+  "reduced_faces": 1500
+}

@@ -1,0 +1,43 @@
+{
+  "provider": "tencent/Hunyuan3D-2mini",
+  "runtime": "local CPU, float32",
+  "model_subfolder": "hunyuan3d-dit-v2-mini-turbo",
+  "weights": {
+    "file": "tencent/Hunyuan3D-2mini/hunyuan3d-dit-v2-mini-turbo/model.fp16.safetensors",
+    "bytes": 3822584202,
+    "flashvdm_vae": {
+      "file": "tencent/Hunyuan3D-2mini/hunyuan3d-vae-v2-mini-turbo/model.fp16.safetensors",
+      "bytes": 407410402
+    }
+  },
+  "code": "https://github.com/Tencent-Hunyuan/Hunyuan3D-2",
+  "started_utc": "2026-10-28T18:29:48.158010+00:00",
+  "input": "assets/concepts/3d_queue/props/grocery_counter.png",
+  "input_sha256": "a08e0b44b658a5967fbe13043ba56e41d1cc88a2016ed5caf7fb95d6cbcb6424",
+  "shape_parameters": {
+    "steps": 5,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 128,
+    "num_chunks": 8000
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 1500,
+    "file_type": "glb",
+    "tool": "hy3dgen FaceReducer"
+  },
+  "background_removed": false,
+  "shape_stats": {
+    "number_of_faces": 62858,
+    "number_of_vertices": 31405,
+    "seconds": 205.5
+  },
+  "status": "success",
+  "raw": "grocery_counter_raw.glb",
+  "reduced": "grocery_counter_reduced.glb",
+  "raw_sha256": "8f9b8d130f2c6fb5a37c3c89fbb315f5f6169d7f4c7a6127302a32c5c264fd0f",
+  "reduced_sha256": "913f181ac744fb0388b327e34a2a18a32840e79d4871566a19aff25095937379",
+  "reduced_faces": 1500
+}

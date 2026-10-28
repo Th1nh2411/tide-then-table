@@ -44,7 +44,7 @@ def projected(x,y):
  # Saturation-less studio backdrop must not become a spurious cloth patch.
  if 60<sample.mean()<170 and max(sample)-min(sample)<25:return None
  return min(colors,key=lambda key:float(np.linalg.norm(sample-colors[key])))
-def region(p):
+def region(p,n):
  x,y,z=p;ax=abs(x)
  # A-pose forearms sit outside the shorts. The threshold expands downward so
  # trouser sides are never accidentally painted as skin.
@@ -52,24 +52,30 @@ def region(p):
  if arm:return 'Skin'
  if y<.12:
   return 'Sandal' if y<.048 or (y<.078 and (abs(z-.045)<.020 or abs(z+.055)<.017)) else 'Skin'
- if y<.53:return 'Skin'
+ # Flared shorts hem hangs a little below the knee line, outside the leg.
+ if y<.53 and not (y>.49 and abs(ax-.17)>.075):return 'Skin'
  if y<.955:return 'Navy'
  if y<1.49:
   if ax<.024 and 1.35<y<1.38 and z>.06:return 'Silver'
+  # Tank top: armholes cut in from the armpit up to narrow shoulder straps.
+  if y>HOLE_Y and ax>HOLE_X-(y-HOLE_Y)*HOLE_SLOPE:return 'Skin'
   # Clean colour panels follow the existing body surface: no overlapping cloth.
-  neck=1.365+3.0*x*x if z>-.015 else 1.435+1.5*x*x
+  # Front: deep scoop between wide straps; back: higher, flatter neckline.
+  neck=1.365+8.0*x*x if z>-.015 else 1.435+1.5*x*x
   if y>neck:return 'Skin'
   return 'Ivory'
  if y<1.57:return 'Skin'
- # Geometry-guided hair and glasses avoid projecting background pixels onto
+ # Glasses: Hunyuan modelled the lens rim as a thin loop standing off the cheek.
+ if 1.605<y<1.675 and .035<ax<.095 and z>.074:return 'Frame'
+ # Geometry-guided hair avoids projecting background pixels onto
  # the inferred side/rear surfaces or creating scattered dark face triangles.
  if z<-.015 and y>1.59:return 'Hair'
  if y>1.705:
   if z>.07 and x>.015 and y<1.74:return 'Skin'
   return 'Hair'
  if z>.03 and y>max(1.665,1.69+.30*x):return 'Hair'
- if 1.645<y<1.695 and z>.123:return 'Frame'
  return 'Skin'
+HOLE_Y,HOLE_X,HOLE_SLOPE=1.20,.205,.30
 
 bones=[];ids={}
 def bone(name,p,parent=None):ids[name]=len(bones);bones.append((name,np.array(p,float),parent))
@@ -170,7 +176,8 @@ def acc(data,component,kind,bounds=False,target=None):
  if bounds:a.update(min=np.atleast_1d(array.min(0)).tolist(),max=np.atleast_1d(array.max(0)).tolist())
  accessors.append(a);return len(accessors)-1
 primitives=[];face_labels=[]
-for f in faces:face_labels.append(region(points[f].mean(0)))
+for f in faces:
+ p=points[f];face_labels.append(region(p.mean(0),unit(np.cross(p[1]-p[0],p[2]-p[0]))))
 for material in colors:
  positions=[];normals=[];joints=[];weights=[]
  for face,label in zip(faces,face_labels):
@@ -208,7 +215,7 @@ data=struct.pack('<III',0x46546c67,2,length)+struct.pack('<II',len(j),0x4e4f534a
 (OUT/'rin_pilot.glb').write_bytes(data)
 metrics={'triangles':len(faces),'source_vertices':len(points),'mesh_count':1,'surfaces':len(primitives),'bones':len(bones),'animations':[a['name'] for a in animations],'height_m':1.84,'material_faces':{m:face_labels.count(m) for m in colors}}
 (OUT/'metrics.json').write_text(json.dumps(metrics,indent=2)+'\n')
-provenance={'date':'2026-10-28','source_mesh':str(SOURCE.relative_to(ROOT)),'source_sha256':hashlib.sha256(r).hexdigest(),'source_method':'Actual Tencent Hunyuan3D-2.1 inference, reduced by official Space to 3000 triangles','image_reference':str(IMAGE.relative_to(ROOT)),'concept':'assets/concepts/rin/lowpoly_turnaround_v1.png','processing':'Uniform normalization to 1.84m; flat palette per anatomical region/front image; 20-bone weighted skin and authored Idle/Walk/Carry/Raised clips; all source triangles preserved','blender_used':False,'external_base_geometry_used':False,'license':'Tencent Hunyuan 3D 2.1 Community License; source notice preserved','output_sha256':hashlib.sha256(data).hexdigest()}
+provenance={'date':'2026-10-28','source_mesh':SOURCE.relative_to(ROOT).as_posix(),'source_sha256':hashlib.sha256(r).hexdigest(),'source_method':'Actual Tencent Hunyuan3D-2.1 inference, reduced by official Space to 3000 triangles','image_reference':IMAGE.relative_to(ROOT).as_posix(),'concept':'assets/concepts/rin/lowpoly_turnaround_v1.png','processing':'Uniform normalization to 1.84m; flat palette per anatomical region/front image; 20-bone weighted skin and authored Idle/Walk/Carry/Raised clips; all source triangles preserved','blender_used':False,'external_base_geometry_used':False,'license':'Tencent Hunyuan 3D 2.1 Community License; source notice preserved','output_sha256':hashlib.sha256(data).hexdigest()}
 (OUT/'provenance.json').write_text(json.dumps(provenance,indent=2)+'\n')
 shutil.copy2(ROOT/'assets/models/characters/rin_hunyuan_shape/LICENSE-HUNYUAN.txt',OUT/'LICENSE-HUNYUAN.txt')
 print('RIN_PILOT_OK',json.dumps(metrics))

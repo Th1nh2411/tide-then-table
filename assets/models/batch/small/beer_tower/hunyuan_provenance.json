@@ -1,0 +1,43 @@
+{
+  "provider": "tencent/Hunyuan3D-2mini",
+  "runtime": "local CPU, float32",
+  "model_subfolder": "hunyuan3d-dit-v2-mini-turbo",
+  "weights": {
+    "file": "tencent/Hunyuan3D-2mini/hunyuan3d-dit-v2-mini-turbo/model.fp16.safetensors",
+    "bytes": 3822584202,
+    "flashvdm_vae": {
+      "file": "tencent/Hunyuan3D-2mini/hunyuan3d-vae-v2-mini-turbo/model.fp16.safetensors",
+      "bytes": 407410402
+    }
+  },
+  "code": "https://github.com/Tencent-Hunyuan/Hunyuan3D-2",
+  "started_utc": "2026-10-28T19:09:24.175872+00:00",
+  "input": "assets/concepts/3d_queue/small/beer_tower.png",
+  "input_sha256": "25a8897f9a31069881252d15778eaf3440c20a4f099858b21f02ae57d12b0413",
+  "shape_parameters": {
+    "steps": 5,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 128,
+    "num_chunks": 8000
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 600,
+    "file_type": "glb",
+    "tool": "hy3dgen FaceReducer"
+  },
+  "background_removed": false,
+  "shape_stats": {
+    "number_of_faces": 44780,
+    "number_of_vertices": 22392,
+    "seconds": 205.5
+  },
+  "status": "success",
+  "raw": "beer_tower_raw.glb",
+  "reduced": "beer_tower_reduced.glb",
+  "raw_sha256": "ac10f77f3336ecc9d5b747d2501f04db3637854abeb758632ef434d17426ea3a",
+  "reduced_sha256": "1ac67c2c3d1a1c3c8ce06a68b6ce39995e4f8841cd0aa3b214f26aa640c8bdb0",
+  "reduced_faces": 600
+}

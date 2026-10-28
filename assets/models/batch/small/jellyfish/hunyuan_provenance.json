@@ -1,0 +1,43 @@
+{
+  "provider": "tencent/Hunyuan3D-2mini",
+  "runtime": "local CPU, float32",
+  "model_subfolder": "hunyuan3d-dit-v2-mini-turbo",
+  "weights": {
+    "file": "tencent/Hunyuan3D-2mini/hunyuan3d-dit-v2-mini-turbo/model.fp16.safetensors",
+    "bytes": 3822584202,
+    "flashvdm_vae": {
+      "file": "tencent/Hunyuan3D-2mini/hunyuan3d-vae-v2-mini-turbo/model.fp16.safetensors",
+      "bytes": 407410402
+    }
+  },
+  "code": "https://github.com/Tencent-Hunyuan/Hunyuan3D-2",
+  "started_utc": "2026-10-28T19:26:31.961460+00:00",
+  "input": "assets/concepts/3d_queue/small/jellyfish.png",
+  "input_sha256": "cfea3dcab9dc9270ebca9f81c78629c772b71ae08df96edc878a52717f06dd5b",
+  "shape_parameters": {
+    "steps": 5,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 128,
+    "num_chunks": 8000
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 600,
+    "file_type": "glb",
+    "tool": "hy3dgen FaceReducer"
+  },
+  "background_removed": false,
+  "shape_stats": {
+    "number_of_faces": 130930,
+    "number_of_vertices": 65461,
+    "seconds": 207.9
+  },
+  "status": "success",
+  "raw": "jellyfish_raw.glb",
+  "reduced": "jellyfish_reduced.glb",
+  "raw_sha256": "f27e3821a1cbfc558343fc47587dc262425eae6f616c1e4d1b49bd48d1f35a8a",
+  "reduced_sha256": "c38592c78984f05420e8602822444aa3d8b6c518e6536d73512cc89356afae1f",
+  "reduced_faces": 600
+}

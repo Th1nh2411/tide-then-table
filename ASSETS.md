@@ -248,6 +248,7 @@ Flow đã chọn và checklist: `docs/ART_PIPELINE.md`; hướng hình ảnh: `A
 | Rin pilot có màu/rig | Hunyuan shape → material → skin/Idle/Walk/Carry | Đang triển khai |
 | Bàn và ghế đẩu pilot | Tạo từng vật rời để ráp đúng vị trí tương tác | Đang triển khai |
 | Thuyền thúng pilot | Hunyuan shape → giảm mesh → material | Đang triển khai |
+| 45 asset còn lại (11 nhân vật, 24 đồ lớn/thuyền/công trình, 10 đồ nhỏ) | Prompt ảnh đầu vào: `assets/concepts/3d_queue/PROMPTS.md`; ảnh bỏ vào `characters/`, `props/`, `small/` rồi chạy batch `hunyuan_local.ps1` | Chờ gen ảnh |
 
 Những Rin study Blender/base humanoid/mesh tự dựng bằng script đã được chuyển
 khỏi catalog và filesystem Godot. Bản lưu có manifest SHA-256 dưới `.art_backups/`,

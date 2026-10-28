@@ -1,0 +1,43 @@
+{
+  "provider": "tencent/Hunyuan3D-2mini",
+  "runtime": "local CPU, float32",
+  "model_subfolder": "hunyuan3d-dit-v2-mini-turbo",
+  "weights": {
+    "file": "tencent/Hunyuan3D-2mini/hunyuan3d-dit-v2-mini-turbo/model.fp16.safetensors",
+    "bytes": 3822584202,
+    "flashvdm_vae": {
+      "file": "tencent/Hunyuan3D-2mini/hunyuan3d-vae-v2-mini-turbo/model.fp16.safetensors",
+      "bytes": 407410402
+    }
+  },
+  "code": "https://github.com/Tencent-Hunyuan/Hunyuan3D-2",
+  "started_utc": "2026-10-28T18:16:02.318659+00:00",
+  "input": "assets/concepts/3d_queue/props/fridge_1.png",
+  "input_sha256": "ce170b356352dd8e2a4e8008b3e0798be1400f3052f28c3bb7164ce937aa33c7",
+  "shape_parameters": {
+    "steps": 5,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 128,
+    "num_chunks": 8000
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 1500,
+    "file_type": "glb",
+    "tool": "hy3dgen FaceReducer"
+  },
+  "background_removed": false,
+  "shape_stats": {
+    "number_of_faces": 79096,
+    "number_of_vertices": 39546,
+    "seconds": 207.2
+  },
+  "status": "success",
+  "raw": "fridge_1_raw.glb",
+  "reduced": "fridge_1_reduced.glb",
+  "raw_sha256": "127f5c305e1f8ef2ac9b51d5d234eb2e4e7f824fa590fd0cdad6d8f1c9c0627e",
+  "reduced_sha256": "d97d70d492bfabd6fc2dec3f32d581dbfd46722993b0ca186cc74a3b6e610eb1",
+  "reduced_faces": 1500
+}

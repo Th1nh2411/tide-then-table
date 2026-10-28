@@ -1,0 +1,43 @@
+{
+  "provider": "tencent/Hunyuan3D-2mini",
+  "runtime": "local CPU, float32",
+  "model_subfolder": "hunyuan3d-dit-v2-mini-turbo",
+  "weights": {
+    "file": "tencent/Hunyuan3D-2mini/hunyuan3d-dit-v2-mini-turbo/model.fp16.safetensors",
+    "bytes": 3822584202,
+    "flashvdm_vae": {
+      "file": "tencent/Hunyuan3D-2mini/hunyuan3d-vae-v2-mini-turbo/model.fp16.safetensors",
+      "bytes": 407410402
+    }
+  },
+  "code": "https://github.com/Tencent-Hunyuan/Hunyuan3D-2",
+  "started_utc": "2026-10-28T17:33:45.244816+00:00",
+  "input": "assets/concepts/3d_queue/characters/staff.png",
+  "input_sha256": "4bfc1f06b80e25507ccbac59b999fded18426076dab196be4b2e9e5f090d133a",
+  "shape_parameters": {
+    "steps": 5,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 128,
+    "num_chunks": 8000
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "tool": "hy3dgen FaceReducer"
+  },
+  "background_removed": false,
+  "shape_stats": {
+    "number_of_faces": 36514,
+    "number_of_vertices": 18255,
+    "seconds": 197.8
+  },
+  "status": "success",
+  "raw": "staff_raw.glb",
+  "reduced": "staff_reduced.glb",
+  "raw_sha256": "95d85194a1acdaec01cfd61fe5e9bb4b9957da50e2cfdd6ba5c12a64b16c854a",
+  "reduced_sha256": "de9d0622a51f4e37877269e97a69be25ef21588f3f5b6a51389b61f38343a9f0",
+  "reduced_faces": 3000
+}
