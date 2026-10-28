@@ -52,7 +52,7 @@ func setup(p_plan: MenuPlan, p_menu: DishCatalog, p_stock: MarketStock, p_has_st
 	has_stock = p_has_stock
 	theme = theme_
 	add_theme_stylebox_override("panel", style)
-	position = Vector2(28, 12)
+	position = Vector2(28, 66)  # below the HUD bar + quest line
 	custom_minimum_size = Vector2(584, 0)
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var box := VBoxContainer.new()
@@ -228,6 +228,11 @@ func _fill_picker() -> void:
 		button.text = "%d. %s\n%s" % [i + 1, dish.display_name, detail]
 		button.pressed.connect(select_dish.bind(dish))
 		_grid.add_child(button)
+	if picker_dishes.is_empty():
+		var empty := Label.new()
+		empty.text = "Chưa có món nào nấu được.\nRa biển bắt cá, rồi quay lại lên thực đơn."
+		empty.add_theme_font_size_override("font_size", 11)
+		_grid.add_child(empty)
 
 
 func select_dish(dish: DishData) -> bool:

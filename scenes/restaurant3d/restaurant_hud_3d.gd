@@ -87,10 +87,11 @@ func _process(delta: float) -> void:
 		state = "SẮP ĐÓNG"
 	bar.text = "NGÀY %d · %s · %s · %dk" % [GameState.day, DayClock.get_time_text(), state, GameState.money]
 	counters.text = "Phục vụ %d · Bỏ về %d · Thu %dk · Chợ %dk · %d sao" % [room.served, room.lost, room.earned, room.market_spent, GameState.last_rating]
-	menu_button.visible = not running and not over
-	renovate_button.visible = not running and not room.is_renovating()
+	var modal: bool = room.modal_open()
+	menu_button.visible = not running and not over and not modal
+	renovate_button.visible = not running and not modal
 	renovate_button.position.y = 30.0 if menu_button.visible else 6.0
-	close_button.visible = running and room.seconds_left > 0.0
+	close_button.visible = running and room.seconds_left > 0.0 and not modal
 	sail_button.visible = over and not room.is_renovating()
 	if not close_button.visible:
 		_confirm_left = 0.0

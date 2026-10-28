@@ -61,6 +61,7 @@ var hud: RestaurantHud3D
 var planning_panel: MenuPanel3D
 var panels: RestaurantPanels3D
 var crew: RestaurantCrew3D
+var service: RestaurantService3D
 var debug_keys: RestaurantDebug3D
 var story_bridge
 var cooking_overlay: CookingOverlay
@@ -114,6 +115,7 @@ func _ready() -> void:
 	tuning = _pick_tuning()
 	panels = RestaurantPanels3D.new(self)
 	crew = RestaurantCrew3D.new(self)
+	service = RestaurantService3D.new(self)
 	debug_keys = RestaurantDebug3D.new(self)
 	market_stock = MarketStock.new(GameState.pantry)
 	staff_roster = StaffRoster.new(staff_catalog, GameState.staff)
@@ -239,6 +241,12 @@ func _buy_upgrade(upgrade: UpgradeData) -> void:
 func is_renovating() -> bool:
 	return renovation != null and renovation.layer != null and renovation.layer.visible
 
+## Any full panel on screen: Rin freezes, E hints and other buttons step aside.
+## (The end-of-shift summary is a note, not a modal: Rin still walks and the evening buttons stay.)
+func modal_open() -> bool:
+	return planning_panel.visible or panels.market_panel.visible \
+		or is_renovating() or cooking_overlay.is_running()
+
 # --- Frame loop ---
 func _open_shift() -> void:
 	if shift_running or shift_over or not _has_stock():
@@ -256,7 +264,7 @@ func _physics_process(delta: float) -> void:
 		return
 	if shift_running:
 		_move_staff(delta)
-	if panels.market_panel.visible or cooking_overlay.is_running() or is_renovating():
+	if modal_open():
 		player.velocity = Vector3.ZERO
 		return
 	var axes := Input.get_vector("turn_left", "turn_right", "throttle_forward", "throttle_back")
@@ -286,7 +294,7 @@ func _physics_process(delta: float) -> void:
 		guests[i].position.y = sin(floorf(step_clock * 5.0 + float(i))) * 0.025
 
 func _process(delta: float) -> void:
-	panels.refresh_prompt(demo_camera, get_tree().paused or panels.market_panel.visible or cooking_overlay.is_running() or _focus_lost or is_renovating())
+	panels.refresh_prompt(demo_camera, get_tree().paused or _focus_lost or modal_open())
 	if cat_node:
 		cat_node.rotation.y = sin(Time.get_ticks_msec() / 650.0) * 0.06
 	panels.tick(delta)
@@ -315,52 +323,6 @@ func _process(delta: float) -> void:
 		_end_shift()
 
 # --- Orders ---
-func _spawn_order() -> void:
-	var available := plan.available_dishes()
-	for dish in menu.dishes:
-		if dish.is_market_dish() and dish.unlock_day <= GameState.day and market_stock.portions(dish) > 0:
-			available.append(dish)
-	if available.is_empty() and regular_queue.is_empty():
-		return
-	var free: Array[int] = []
-	for i in range(orders.size()):
-		if orders[i].is_empty() and not dirty_tables[i]:
-			free.append(i)
-	if free.is_empty():
-		return
-	var table := free[rng.randi_range(0, free.size() - 1)]
-	if not regular_queue.is_empty():
-		var visit: Dictionary = regular_queue.pop_front()
-		var regular_dish: DishData = visit["dish"]
-		var reserved: Array[InventoryItem] = [visit["item"]]
-		orders[table] = {"dish": regular_dish, "items": reserved, "freshness": 100.0,
-			"patience": 38.0 * tuning.regular_patience_scale, "initial_patience": 38.0 * tuning.regular_patience_scale, "visit": visit,
-			"cooked": false, "staff_claimed": false, "multiplier": 1.0, "rich": false}
-		guests[table].visible = true
-		order_labels[table].text = "%s\n%s" % [visit["order"]["who"], regular_dish.display_name]
-		_show_note("%s tới nhận món đặt ở bàn %d." % [visit["order"]["who"], table + 1])
-		return
-	var dish := available[rng.randi_range(0, available.size() - 1)]
-	var items: Array[InventoryItem] = []
-	var freshness := 100.0
-	if dish.is_market_dish():
-		market_stock.take(dish)
-		freshness = market_stock.last_freshness
-	else:
-		items = plan.take_portion(dish)
-	var decor_level := GameState.get_upgrade_level("decor")
-	var rich_chance: float = tuning.rich_chance_by_decor[clampi(decor_level, 0, tuning.rich_chance_by_decor.size() - 1)]
-	var rich := rng.randf() < rich_chance
-	var patience := 38.0 * (tuning.rich_patience_scale if rich else 1.0)
-	if PetCat.is_present():
-		patience *= tuning.cat_patience_scale
-	orders[table] = {"dish": dish, "items": items, "freshness": freshness, "patience": patience, "initial_patience": patience,
-		"visit": {}, "cooked": false, "staff_claimed": false, "multiplier": 1.0, "rich": rich,
-		"party": PartyOrders3D.start(tuning, plan, menu, market_stock)}
-	guests[table].visible = true
-	order_labels[table].text = ("KHÁCH SANG\n" if rich else "") + orders[table]["party"].label(dish)
-	_show_note("Bàn %d gọi %s." % [table + 1, dish.display_name])
-
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
 	if key == null or not key.pressed or key.echo or get_tree().paused:
@@ -396,7 +358,10 @@ func _toggle_planning() -> void:
 		planning_panel.open()
 
 func _interact() -> void:
-	if cooking_overlay.is_running():
+	if planning_panel.visible and player.position.distance_to(BOARD_POSITION) < 2.2:
+		_toggle_planning()
+		return
+	if modal_open():
 		return
 	if cat_node and player.position.distance_to(cat_node.position) < 1.3:
 		var dialogue := DialogueLibrary.pick(CAT_DIALOGUES) as Dialogue
@@ -461,141 +426,31 @@ func _on_cooking_spilled(dish: DishData) -> void:
 	if dish.is_market_dish():
 		market_stock.spill(dish, 1)
 
+# --- End of shift / leaving ---
+# --- Orders (rules in RestaurantService3D) ---
+func _spawn_order() -> void:
+	service.spawn_order()
+
 func _serve(table: int) -> void:
-	var order := orders[table]
-	if order.is_empty() or not bool(order.get("cooked", false)) or str(order.get("phase", "waiting")) != "waiting":
-		return
-	if carrying_table != table and not bool(order.get("staff_claimed", false)):
-		return
-	order["phase"] = "eating"
-	order["meal_left"] = MEAL_SECONDS
-	if carrying_table == table:
-		carrying_table = -1
-	order_labels[table].text = "Bàn %d • đang ăn" % (table + 1)
-	_show_note("Mời bàn %d dùng món!" % (table + 1))
-	_dispatch_ready()
+	service.serve(table)
 
 func _finish_meal(table: int) -> void:
-	var order := orders[table]
-	if order.is_empty() or str(order.get("phase", "")) != "eating":
-		return
-	var dish: DishData = order["dish"]
-	var ingredients: Array[InventoryItem] = order["items"]
-	var visit: Dictionary = order.get("visit", {})
-	var plate := DishShelf.Plate.new(dish, ingredients, float(order["multiplier"]), visit)
-	var variety := MenuPlan.variety_multiplier(opening_variety, MenuPanel3D.VARIETY_TABLE)
-	var price := TableBill.plate_price(plate, variety, DailyTrend.price_scale(dish))
-	if bool(order.get("rich", false)):
-		price = roundi(float(price) * tuning.rich_price_scale)
-	if dish.is_market_dish():
-		price = roundi(float(price) * KitchenLogic.freshness_multiplier(float(order["freshness"])))
-	var party: PartyOrders3D = order.get("party")
-	if party:
-		party.bill += price
-		if party.advance(order, tuning, plan, menu, market_stock):
-			order_labels[table].text = party.label(order["dish"])
-			_show_note("Bàn %d gọi tiếp %s." % [table + 1, order["dish"].display_name])
-			_dispatch_ready()
-			return
-		price = party.bill
-	var patience_ratio: float = float(order["patience"]) / float(order.get("initial_patience", 38.0))
-	var tip := roundi(price * (tuning.tip_ratio + staff_roster.tip_bonus())) if visit.is_empty() and patience_ratio > tuning.tip_patience_threshold else 0
-	GameState.add_money(price + tip)
-	earned += price + tip
-	if not visit.is_empty():
-		FishOrders.complete(visit["order"])
-		GameState.set_flag("regular_served_once")
-		visit["served"] = true
-	served += 1
-	if carrying_table == table:
-		carrying_table = -1
-	orders[table] = {}
-	dirty_tables[table] = true
-	guests[table].visible = false
-	order_labels[table].text = "Bàn %d • E dọn" % (table + 1)
-	_show_note("%s: +%dk. Cảm ơn khách bàn %d!" % [dish.display_name, price + tip, table + 1])
-	Sfx.play("coins")
-	_dispatch_ready()
+	service.finish_meal(table)
 
 func _lose_order(table: int) -> void:
-	var already_cooked: bool = bool(orders[table].get("cooked", false))
-	var left_party: PartyOrders3D = orders[table].get("party")
-	if left_party:
-		var part_paid: int = left_party.abandon(plan, market_stock)
-		GameState.add_money(part_paid)
-		earned += part_paid
-	if table == cooking_table:
-		cooking_table = -1
-	if table == carrying_table:
-		carrying_table = -1
-	if not already_cooked:
-		var dish: DishData = orders[table]["dish"]
-		var visit: Dictionary = orders[table].get("visit", {})
-		if not visit.is_empty():
-			FishOrders.release(visit)
-			visit["released"] = true
-		elif dish.is_market_dish():
-			market_stock.add(dish, dish.portion_units, float(orders[table]["freshness"]))
-		else:
-			var ingredients: Array[InventoryItem] = orders[table]["items"]
-			plan.return_portion(dish, ingredients)
-	orders[table] = {}
-	guests[table].visible = false
-	order_labels[table].text = ""
-	lost += 1
-	_show_note("Khách bàn %d đợi lâu quá nên bỏ về." % (table + 1))
-	_dispatch_ready()
+	service.lose_order(table)
 
 func _pickup_ready() -> bool:
-	if carrying_table >= 0:
-		return false
-	for i: int in range(orders.size()):
-		if orders[i].is_empty() or not bool(orders[i].get("cooked", false)) or bool(orders[i].get("staff_claimed", false)) or str(orders[i].get("phase", "waiting")) != "waiting":
-			continue
-		carrying_table = i
-		_show_note("Đem %s tới bàn %d." % [orders[i]["dish"].display_name, i + 1])
-		return true
-	_show_note("Bảo: Chưa có món trên bàn nhận.")
-	return false
+	return service.pickup_ready()
 
 func _clean_table(table: int) -> void:
-	if table < 0 or table >= dirty_tables.size() or not dirty_tables[table]:
-		return
-	dirty_tables[table] = false
-	table_plates[table].visible = false
-	order_labels[table].text = ""
-	Sfx.play("ok")
-	_show_note("Đã dọn bàn %d." % (table + 1))
+	service.clean_table(table)
+
+func _end_shift() -> void:
+	service.end_shift()
 
 func _sync_food_visuals() -> void:
-	for i: int in range(orders.size()):
-		var order: Dictionary = orders[i]
-		ready_plates[i].visible = not order.is_empty() and bool(order.get("cooked", false)) and str(order.get("phase", "waiting")) == "waiting" and carrying_table != i and not bool(order.get("staff_claimed", false))
-		table_plates[i].visible = dirty_tables[i] or (not order.is_empty() and str(order.get("phase", "waiting")) == "eating")
-
-# --- End of shift / leaving ---
-func _end_shift() -> void:
-	if shift_over:
-		return
-	shift_running = false
-	shift_over = true
-	DayClock.set_progress(1.0, DayClock.shop_open_hour, DayClock.shop_close_hour)
-	var leftover := plan.total_portions()
-	var limited_variety := opening_variety < 2
-	plan.clear(GameState.storage)
-	for visit in regular_visits:
-		if not bool(visit.get("cooked", false)) and not bool(visit.get("released", false)) and not bool(visit.get("served", false)):
-			FishOrders.release(visit)
-			visit["released"] = true
-	FishOrders.expire_after_shift(fish_catalog)
-	for person in staff_roster.hired():
-		GameState.set_flag("worked_" + person.id)
-	wages_paid = mini(staff_roster.wages(), GameState.money)
-	GameState.add_money(-wages_paid)
-	var stars := DayRating.stars(served, lost, limited_variety)
-	GameState.last_rating = stars
-	GameState.add_day_record({"day": GameState.day, "earned": earned, "market": market_spent, "rating": stars, "served": served, "left": lost, "wages": wages_paid})
-	panels.show_summary("HẾT CA • XÓM ĐÈN\nPhục vụ: %d  |  Bỏ về: %d\nThu: %dk  |  Chợ: %dk  |  Lương: %dk\nDư: %d phần  |  Đánh giá: %d sao" % [served, lost, earned, market_spent, wages_paid, leftover, stars])
+	service.sync_food_visuals()
 
 func _sail_without_shift() -> void:
 	plan.clear(GameState.storage)

@@ -169,7 +169,8 @@ func _build_ui() -> void:
 	add_child(layer)
 	panel = PanelContainer.new()
 	panel.theme = theme
-	panel.position = Vector2(120, 70)
+	panel.add_theme_stylebox_override("panel", RestaurantPanels3D.panel_style())
+	panel.position = Vector2(120, 72)
 	layer.add_child(panel)
 	var box := VBoxContainer.new()
 	panel.add_child(box)

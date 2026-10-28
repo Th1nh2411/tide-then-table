@@ -46,14 +46,14 @@ func build() -> void:
 	planning = MenuPanel3D.new()
 	layer.add_child(planning)
 	market_panel = PanelContainer.new()
-	market_panel.position = Vector2(170, 65)
-	market_panel.custom_minimum_size = Vector2(300, 225)
+	market_panel.position = Vector2(170, 72)
+	market_panel.custom_minimum_size = Vector2(300, 0)
 	layer.add_child(market_panel)
 	_market_list = VBoxContainer.new()
 	market_panel.add_child(_market_list)
 	market_panel.hide()
 	_summary_panel = PanelContainer.new()
-	_summary_panel.position = Vector2(135, 48)
+	_summary_panel.position = Vector2(135, 80)
 	_summary_panel.custom_minimum_size = Vector2(370, 110)
 	layer.add_child(_summary_panel)
 	var summary_box := VBoxContainer.new()
@@ -77,6 +77,9 @@ func build() -> void:
 	_prompt_text.add_theme_color_override("font_color", Color("f0d39b"))
 	_prompt.add_child(_prompt_text)
 	_prompt.hide()
+
+func summary_visible() -> bool:
+	return _summary_panel != null and _summary_panel.visible
 
 func say(words: String) -> void:
 	_note.text = words
