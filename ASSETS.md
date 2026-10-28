@@ -235,18 +235,20 @@ quay sang phải** (game xoay theo hướng lái), cỡ như bảng mục 3; `ri
 Chưa nạp ảnh (vẫn vẽ bằng code): xe máy, dây đèn, cây xanh, đường phố xa, nước biển, đá, địa điểm ngoài
 biển, sương mù, UI, minigame. Cần cái nào trước thì báo để nối thêm.
 
-## Model 3D thử nghiệm — chưa active
+## Art 3D — catalog hiện hành, 2026-10-28
 
-| File | Quy cách | Trạng thái |
+Flow đã chọn và checklist: `docs/ART_PIPELINE.md`; hướng hình ảnh: `ART_PLAN.md`.
+
+| Asset | Nguồn/định dạng | Trạng thái |
 |---|---|---|
-| `assets/models/characters/rin_portrait_study.glb` | Rin khoảng 1.8 m, skeleton và Idle/Walk/Carry, mesh tóc/tai/kính/áo/phụ kiện theo portrait | Candidate chờ duyệt; chỉ dùng ở scene art preview |
+| `assets/concepts/rin/lowpoly_turnaround_v1.png` | 1672×941, ảnh gen 3 góc; prompt/provenance cùng thư mục | Mẫu Rin được giữ cho flow Hunyuan |
+| `assets/models/characters/rin_hunyuan_shape/input_front.png` | 505×941, crop input | Nguồn lần inference đầu |
+| `assets/models/characters/rin_hunyuan_shape/rin_hunyuan_shape.glb` | 78,972 tam giác; GLB gốc từ Space Tencent | Source phục vụ pilot Rin |
+| `assets/models/characters/rin_hunyuan_shape/rin_hunyuan_3k_lit.glb` | 3,000 tam giác, đã thêm normals; chưa material/rig | Shape baseline, F6 `rin_hunyuan_study.tscn` |
+| Rin pilot có màu/rig | Hunyuan shape → material → skin/Idle/Walk/Carry | Đang triển khai |
+| Bàn và ghế đẩu pilot | Tạo từng vật rời để ráp đúng vị trí tương tác | Đang triển khai |
+| Thuyền thúng pilot | Hunyuan shape → giảm mesh → material | Đang triển khai |
 
-Nguồn dựng và ảnh so sánh xem `ART_PLAN.md`, phần Rin model theo portrait 2026-10-28.
-
-### Biến thể Rin dùng texture — chưa active
-
-`assets/models/characters/rin_painted/rin_painted.glb`: 1 mesh skinned, 13 material
-surfaces, 11,718 tam giác, ba albedo 256×256 nhúng trong GLB, Idle/Walk/Carry.
-Texture nguồn imagegen trong thư mục `rin_painted/textures/`; xem `README.md` và
-`provenance.json` ở đó. Preview F6 `scenes/art_preview/rin_painted_study.tscn`;
-B so sánh bản cũ/mới. Không thay portrait approved hoặc nhân vật gameplay.
+Những Rin study Blender/base humanoid/mesh tự dựng bằng script đã được chuyển
+khỏi catalog và filesystem Godot. Bản lưu có manifest SHA-256 dưới `.art_backups/`,
+chi tiết đường dẫn ở `docs/ART_PIPELINE.md`. Không thay sprite/portrait approved.

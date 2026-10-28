@@ -118,53 +118,24 @@ Tiến độ 2026-10-25: đã thêm mặt tiền cửa hàng, bảng menu, quầ
 - `tools/ref/`: prompt và nguồn tham khảo các lần làm trước.
 - `build/shots/`: ảnh chụp trong game. Các thư mục `build/` không commit.
 
-### Hướng nhân vật 3D đã chốt — 2026-10-28
+## Art 3D — hướng đang triển khai, chốt 2026-10-28
 
-- Người dùng chọn **low-poly stylized** theo ảnh tham khảo gửi trong hội thoại:
-  tỷ lệ người tương đối tự nhiên, silhouette rõ, tóc thành mảng lớn, quần áo ít
-  chi tiết, bề mặt đa giác và màu phẳng. Giữ bảng màu/ánh sáng ấm của mẫu quán đã thích.
-- Ưu tiên hình khối, tỷ lệ và chuyển động khớp đúng; không tăng độ chi tiết mặt
-  hay số polygon để bù cho cấu trúc cơ thể sai. Mặt tối giản, nhận diện bằng dáng,
-  tóc, kính, trang phục và màu sắc. Không yêu cầu sao chép từng nét portrait lên mesh.
-- Rin: dáng thanh, da rám, tóc đen/xanh đen vuốt lệch có độ phồng, kính chữ nhật,
-  áo ba lỗ màu ngà, khuyên bạc nhỏ và dây chuyền lưỡi câu. Portrait approved vẫn
-  là chuẩn nhận diện và giữ vai trò thể hiện biểu cảm chi tiết trong hội thoại.
-- Hướng triển khai: thử **Quaternius Universal Base Characters — Regular Male**
-  làm nền stylized có rig, rồi chỉnh thành Rin. Đây là lựa chọn thử nghiệm, chưa
-  tải/kiểm chứng model hoặc chốt dùng trong runtime. MPFB2 là phương án dự phòng
-  nếu tỷ lệ/topology của base không phù hợp; không chuyển sang hướng tả thực.
-- Dùng nguồn chính thức: https://quaternius.itch.io/universal-base-characters.
-  Bản Standard CC0 miễn phí; gói Source có file Blender là gói trả phí, chưa mua.
-- Điều kiện nghiệm thu: xem trước/nghiêng/sau và tại camera gameplay; kiểm vai,
-  khuỷu tay, hông, đầu gối, trọng số da khi đứng/đi/bưng đồ; không hở khớp, gãy
-  hình hoặc xuyên cơ thể rõ. Kiểm lại material, skeleton và animation sau import Godot.
-- Hai bản `rin_portrait_study` và `rin_painted` giữ làm nghiên cứu, chưa đạt chuẩn
-  ngoại hình/giải phẫu/rig để duyệt dùng chính thức. Kiểm import/clip trước đây
-  không đồng nghĩa đã đạt chất lượng biến dạng khớp.
-- Quyết định này thay hướng nhân vật ghép khối cơ học, giật/méo bắt buộc trong
-  `NEW_ART_PLAN.md`. Giữ asset active và tạo backup trước mọi thay thế.
-
-### Rin — thử model theo portrait, 2026-10-28 (chờ duyệt)
-
-- Dựng mesh Blender từ portrait runtime `portraits/rin/base.png`: tóc xanh đen rủ mái,
-  kính chữ nhật, tai/khuyên bạc, mắt/mũi/miệng, áo ba lỗ, dây lưỡi câu, tay và dép.
-- Candidate `assets/models/characters/rin_portrait_study.glb`; source/render trong
-  `build/characters/rin_portrait_study/`, generator `tools/blender/build_rin_portrait_study.py`.
-- F6 `scenes/art_preview/rin_portrait_study.tscn`: portrait gốc cạnh model, xoay bằng
-  mũi tên, 1/2/3 đứng/đi/bưng, 4 cận/toàn thân. Đã kiểm import, skeleton và Walk trong Godot.
-- Bảng so sánh `comparison.png`; bản này vẫn cách điệu, chưa được duyệt ngoại hình.
-  Không thay portrait, sprite, mesh Rin đang dùng trong gameplay. Rebuild có backup.
-
-### Rin — biến thể mesh + texture, 2026-10-28 (chờ duyệt)
-
-- Thử hướng mesh gọn + nét vẽ 2D gắn lên 3D từ bài tham khảo người dùng đưa;
-  không sao chép asset của tác giả bài Reddit.
-- `assets/models/characters/rin_painted/rin_painted.glb`: 1 mesh có rig, 13 material
-  surfaces, 11,718 tam giác; bản mesh cũ 112 mesh/surface và 19,296 tam giác.
-- imagegen tạo albedo riêng cho mặt, tóc, vải áo theo portrait Rin; bản nguồn giữ
-  ở `rin_painted/textures/`, ba ảnh 256×256 được nhúng trong GLB. Kính, tai/khuyên,
-  mũi, hình khối chính của tóc và phụ kiện vẫn là mesh; material có nhận ánh sáng.
-- F6 `scenes/art_preview/rin_painted_study.tscn`; B đổi cũ/mới, 1/2/3 đứng/đi/bưng,
-  4 cận/toàn thân, 5 cỡ trong quán. Đã xem nhiều góc và kiểm texture/rig/clip trong Godot.
-- Source/render/bản sao ở `build/characters/rin_painted/`; `comparison.png` đặt
-  portrait, mesh cũ và bản texture cạnh nhau. Chưa duyệt thẩm mỹ; chưa cài vào gameplay.
+- Low-poly stylized theo ảnh người dùng: tỷ lệ người tự nhiên, tóc mảng lớn,
+  mặt tối giản, silhouette rõ, màu phẳng có nhận ánh sáng. Giữ quán màu ấm của
+  `scenes/art_preview/psx_quan_preview.tscn` làm chuẩn phối màu/bố cục.
+- Flow chính: **gen-image → Hunyuan image-to-shape → giảm polygon/làm sạch →
+  material phẳng → rig/animation nếu cần → kiểm nhiều góc và trong Godot**.
+  Không dùng Blender hoặc mesh tự dựng thay cho inference Hunyuan ở đợt pilot này.
+- Rin giữ portrait approved làm chuẩn nhận diện: da rám, dáng thanh, tóc đen
+  vuốt lệch, kính chữ nhật, áo ba lỗ ngà, quần rộng, dép và dây lưỡi câu bạc.
+  Mẫu gen đã chọn: `assets/concepts/rin/lowpoly_turnaround_v1.png`.
+- Đợt đầu làm đủ ba pilot: **Rin**, **một bộ bàn + ghế đẩu riêng**, **thuyền thúng**.
+  Hoàn thiện/kiểm trước khi mở rộng các nhân vật và toàn bộ prop khác.
+- Nhân vật phải có skin/Idle/Walk/Carry và giữ API actor/cutscene; bàn ghế, thuyền
+  chỉ thay visual, giữ controller, collider, interaction marker, đèn và logic.
+- UI, portrait, icon tiếp tục là 2D; nước/sương/ánh sáng dùng shader và Godot.
+- Theo chỉ đạo người dùng, không dùng phần giấy phép làm điều kiện chặn demo;
+  vẫn lưu nguồn, tham số, license và checksum trong từng asset.
+- Các hướng thử cũ đã chuyển sang archive recoverable; không còn là candidate
+  cần duyệt. Lịch sử ở `docs/archive/ART_STUDIES_20261028.md`.
+- Quy trình, tiêu chí và checklist hiện hành: `docs/ART_PIPELINE.md`.

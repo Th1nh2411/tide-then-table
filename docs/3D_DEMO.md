@@ -73,13 +73,13 @@ Bot dịch chuyển nhanh giữa địa điểm và tạo kết quả minigame t
 
 Bộ sprite/portrait approved và scene tham khảo art gốc không bị thay trong đợt này.
 
-## Xem thử Rin theo portrait
+## Art 3D hiện hành
 
-Các scene dưới đây chỉ xem art, chưa thay Rin trong vòng chơi:
+Flow đã chốt: gen-image → Hunyuan → giảm mesh/material/rig → Godot.
+Ba pilot đang triển khai: Rin, một bộ bàn/ghế và thuyền thúng; xem
+`docs/ART_PIPELINE.md` để biết tiến độ và cách chạy.
 
-- `scenes/art_preview/rin_portrait_study.tscn`: bản dựng chi tiết bằng mesh.
-- `scenes/art_preview/rin_painted_study.tscn`: bản mesh gọn + texture mặt/tóc/áo.
-  Bấm F6, **B** đổi bản cũ/mới, **← →** xoay, **1/2/3** đứng/đi/bưng,
-  **4** cận/toàn thân, **5** xem cỡ trong quán.
-
-Ảnh so sánh: `build/characters/rin_painted/comparison.png`.
+Shape Rin baseline còn giữ ở `scenes/art_preview/rin_hunyuan_study.tscn`:
+F6, ←/→ xoay, 4 cận, B đổi gốc/3k. Đây là shape chưa có texture/rig.
+Mẫu phối màu quán: `scenes/art_preview/psx_quan_preview.tscn`.
+Các preview Rin cũ đã archive, không còn là lựa chọn hiện hành.

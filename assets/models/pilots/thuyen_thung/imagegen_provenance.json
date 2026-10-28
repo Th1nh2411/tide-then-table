@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-28",
+  "tool": "built-in image_gen.imagegen",
+  "prompt": "prompt.txt",
+  "output": "input.png",
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "mode": "RGBA",
+  "image_sha256": "1993114c6a7ce29c00bf8e4f60d5f792e4d88d01b67919afaa3acfc2c891d885",
+  "prompt_sha256": "a35028c92179de061f8d1f1cfa1bbad3bb3c429cceade7a4b4835f0731e2e0e9"
+}

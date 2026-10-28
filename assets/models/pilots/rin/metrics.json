@@ -1,0 +1,23 @@
+{
+  "triangles": 3000,
+  "source_vertices": 1492,
+  "mesh_count": 1,
+  "surfaces": 7,
+  "bones": 20,
+  "animations": [
+    "Idle",
+    "Walk",
+    "Carry",
+    "Raised"
+  ],
+  "height_m": 1.84,
+  "material_faces": {
+    "Skin": 1440,
+    "Ivory": 448,
+    "Navy": 602,
+    "Hair": 205,
+    "Frame": 9,
+    "Sandal": 288,
+    "Silver": 8
+  }
+}

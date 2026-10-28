@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://bd5gkyhlb6o2y"]
+
 [ext_resource type="Script" path="res://scenes/art_preview/rin_painted_study.gd" id="1"]
-[node name="RinPaintedStudy" type="Node3D"]
+
+[node name="RinPaintedStudy" type="Node3D" unique_id=1107605974]
 script = ExtResource("1")

@@ -1,0 +1,39 @@
+{
+  "source": "thuyen_thung_reduced.glb",
+  "source_sha256": "3789e69696f395b8a8532cf1700c486ab3299cf652b0e353c5338dbb96718bf4",
+  "output": "thuyen_thung.glb",
+  "output_sha256": "edba6d224903758d4bba83c9b7716c0b2b4ed1029719754a1a1d8a4d88c62773",
+  "triangles": 2400,
+  "surfaces": 6,
+  "dimensions_m": [
+    2.4,
+    0.535,
+    2.3960044195703576
+  ],
+  "origin": "center X/Z; bottom Y=.025, rim Y=.560",
+  "changes": [
+    "Affine scale/centering; same 2400 generated triangles",
+    "Constrained relaxation of existing low interior-floor vertices; rim/bench unchanged",
+    "Flat face normals",
+    "Palette materials by height/normal/interior region"
+  ],
+  "hollow_check": {
+    "top_rim_y": 0.56,
+    "interior_floor_below_y": 0.34,
+    "low_interior_fraction": 1.0,
+    "center_top_y": 0.09110256497220759,
+    "sample_top_y_range": [
+      0.0481189248982535,
+      0.1950607585276947
+    ],
+    "sample_count": 25
+  },
+  "blender_used": false,
+  "mesh_synthesis_used": false,
+  "runtime_visual_fit": {
+    "scale_y": 0.75,
+    "position_y": 0.14,
+    "rim_y_before_bob": 0.56,
+    "reason": "Keep inferred inner floor above existing flat water planes during +-0.06 m visual bob; no added floor geometry"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-28",
+  "provider": "Official Tencent Hunyuan3D-2.1 Hugging Face Space",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "source": "https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1",
+  "endpoint": "/shape_generation",
+  "parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "input": "input_front.png",
+  "input_source": "Front-view crop from assets/concepts/rin/lowpoly_turnaround_v1.png",
+  "output": "rin_hunyuan_shape.glb",
+  "triangles": 78972,
+  "skins": 0,
+  "animations": 0,
+  "textured": false,
+  "license": "Tencent Hunyuan 3D 2.1 Community License Agreement; see LICENSE-HUNYUAN.txt",
+  "sha256": {
+    "rin_hunyuan_shape.glb": "be32e97993ac0bff7e19896aece36ca27d7733c98d2aa11c789f651bac4ce00c",
+    "input_front.png": "844dd971fb06bcf318e0dd6ce24b34e147d69eff554b7dfad72b94ea3dc6086f",
+    "rin_hunyuan_3k.glb": "32c7fb8c70f6d5eb9ed2347c63eadefcad786b6d4580d5cf48bce669bb58ba0f",
+    "rin_hunyuan_3k_lit.glb": "93f6c01ecb2952af2dd2911f5e19ed1a8e0365bbd2e6698afd300f983b8fbe7c"
+  },
+  "reduced_output": {
+    "file": "rin_hunyuan_3k.glb",
+    "triangles": 3000,
+    "endpoint": "/on_export_click",
+    "parameters": {
+      "file_type": "glb",
+      "reduce_face": true,
+      "export_texture": false,
+      "target_face_num": 3000
+    }
+  },
+  "lit_output": {
+    "file": "rin_hunyuan_3k_lit.glb",
+    "source": "rin_hunyuan_3k.glb",
+    "change": "Added smooth vertex normals with tools/mesh/add_glb_normals.py; positions and triangle indices preserved",
+    "triangles": 3000
+  },
+  "input_source_historical": "Front-view crop from assets/models/characters/rin_image_guided/concept_v1.png"
+}

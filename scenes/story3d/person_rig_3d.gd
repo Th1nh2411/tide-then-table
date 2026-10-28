@@ -1,7 +1,7 @@
 class_name PersonRig3D
 extends Node3D
-## Blocky character rig shared by gameplay and cutscenes: body, head, hat,
-## swinging legs/arms, optional carried plate. Cat is a separate small model.
+## Shared gameplay/cutscene actor API. Rin uses the weighted Hunyuan pilot;
+## other actors retain the original block rig and cat remains separate.
 
 const SKIN := "ad7757"
 const DARK := "202e37"
@@ -19,6 +19,9 @@ var legs: Array[Node3D] = []
 var arms: Array[Node3D] = []
 var plate: Node3D
 var carrying := false
+var _pilot: RinPilotVisual
+var _raised := false
+var _walk_speed := 0.0
 
 
 ## Builds a rig of `kind` under `parent`. `shirt` overrides the look's shirt hex.
@@ -30,7 +33,10 @@ static func build(parent: Node3D, kind_: String, shirt: String = "") -> PersonRi
 		rig._build_cat()
 		return rig
 	var look: Dictionary = LOOKS.get(kind_, LOOKS["guest"])
-	rig._build_person(look, shirt if shirt != "" else str(look["shirt"]))
+	if kind_ == "rin":
+		rig._build_rin_pilot()
+	else:
+		rig._build_person(look, shirt if shirt != "" else str(look["shirt"]))
 	if kind_ != "guest":
 		rig.add_to_group("person_" + kind_)
 	return rig
@@ -38,6 +44,10 @@ static func build(parent: Node3D, kind_: String, shirt: String = "") -> PersonRi
 
 ## Walk cycle: `speed` 0..1 scales the swing, `clock` is the step time.
 func set_walking(speed: float, clock: float) -> void:
+	if _pilot:
+		_walk_speed = speed
+		_update_pilot_motion()
+		return
 	if kind == "cat":
 		return
 	var beat := floorf(clock * 8.0) / 8.0
@@ -53,18 +63,71 @@ func set_walking(speed: float, clock: float) -> void:
 
 func set_carrying(on: bool) -> void:
 	carrying = on
+	if _pilot:
+		_update_pilot_motion()
 	if plate:
 		plate.visible = on
-	if not on:
+	if not on and not _pilot:
 		for arm in arms:
 			arm.rotation.x = 0.0
 
 
 ## Arms up for an emote; pass false to lower them.
 func set_raised(on: bool) -> void:
+	if _pilot:
+		_raised = on
+		_update_pilot_motion()
+		return
 	if not carrying:
 		for arm in arms:
 			arm.rotation.x = -2.4 if on else 0.0
+
+
+func _build_rin_pilot() -> void:
+	_pilot = load("res://scenes/art_pilots/rin_pilot.tscn").instantiate() as RinPilotVisual
+	add_child(_pilot)
+	# Preserve the old arms[] attachment contract. A casting rod still uses its
+	# original local (0,-0.6,0) grip, but anchors now follow the actual skinned wrist.
+	for side in [-1.0, 1.0]:
+		var leg := Node3D.new()
+		add_child(leg)
+		leg.position = Vector3(side * 0.14, 0.91, -0.03)
+		legs.append(leg)
+		var arm := Node3D.new()
+		add_child(arm)
+		arm.position = Vector3(side * 0.31, 1.35, -0.025)
+		arms.append(arm)
+	plate = Node3D.new()
+	add_child(plate)
+	plate.position = Vector3(0, 1.0, 0.47)
+	plate.visible = false
+	_box(plate, Vector3.ZERO, Vector3(0.36, 0.035, 0.3), "e8d9b7")
+	for i in range(3):
+		_box(plate, Vector3(-0.1 + i * 0.1, 0.045, 0), Vector3(0.075, 0.05, 0.18), "c97649")
+	_sync_pilot_anchors()
+
+func _update_pilot_motion() -> void:
+	var clip := "Carry" if carrying else "Raised" if _raised else "Walk" if _walk_speed > 0.03 else "Idle"
+	_pilot.set_motion(clip, clampf(_walk_speed, 0.35, 1.5) if clip == "Walk" else 1.0)
+
+func _process(_delta: float) -> void:
+	if not _pilot or not _pilot.skeleton:
+		return
+	var casting := false
+	for i in range(arms.size()):
+		if arms[i].get_child_count() > 0:
+			casting = true
+			_pilot.set_cast_arm(i, arms[i].rotation.x)
+	if not casting:
+		_pilot.clear_cast()
+	_sync_pilot_anchors()
+
+func _sync_pilot_anchors() -> void:
+	if not _pilot or not _pilot.skeleton:
+		return
+	for i in range(arms.size()):
+		var wrist := _pilot.hand_position("R" if i == 0 else "L")
+		arms[i].position = wrist - arms[i].basis * Vector3(0, -0.6, 0)
 
 
 func _box(parent: Node3D, pos: Vector3, size: Vector3, hex: String) -> MeshInstance3D:

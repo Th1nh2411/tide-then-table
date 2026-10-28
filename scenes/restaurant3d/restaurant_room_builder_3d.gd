@@ -5,6 +5,7 @@ extends RefCounted
 ## orders, dirty_tables, table_plates, ready_plates, bao_model, bao_label.
 
 const L = preload("res://scenes/restaurant3d/restaurant_layout_3d.gd")
+const STOOL_PILOT = preload("res://assets/models/pilots/stool/stool.glb")
 
 static func mat(hex: String) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
@@ -149,8 +150,16 @@ static func _tables(host: Node3D) -> void:
 				box(host, p + Vector3(x, 0.4, z), Vector3(0.07, 0.8, 0.07), "577277")
 		for side in [-1.0, 1.0]:
 			var stool_pos := p + Vector3(side * 1.02, 0, 0)
-			box(host, stool_pos + Vector3(0, 0.46, 0), Vector3(0.55, 0.12, 0.55), "3c5e8b" if side < 0 else "a53030")
-			box(host, stool_pos + Vector3(0, 0.2, 0), Vector3(0.12, 0.4, 0.12), "577277")
+			# Actual Hunyuan-derived stool, canonical .55 x .55 x .52 m.
+			# The collider below stays identical to preserve pathing/interactions.
+			var stool: Node3D = STOOL_PILOT.instantiate()
+			host.add_child(stool)
+			stool.position = stool_pos
+			stool.name = "PilotStool_%d_%s" % [i, "blue" if side < 0 else "red"]
+			if side > 0:
+				var red := mat("a53030")
+				for node: Node in stool.find_children("*", "MeshInstance3D", true, false):
+					(node as MeshInstance3D).material_override = red
 			solid_block(host, stool_pos + Vector3(0, 0.26, 0), Vector3(0.55, 0.52, 0.55))
 		var guest := PersonRig3D.build(host, "guest", "7a4841" if i == 0 else "468232")
 		guest.position = p + Vector3(0, 0, 1.15)

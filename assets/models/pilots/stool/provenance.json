@@ -1,0 +1,35 @@
+{
+  "geometry_source": "stool_reduced.glb",
+  "source_sha256": "a36572115c011a0e7e203c3dffa3d245ebccfcf80986c12fce1cbdb05e4be6ab",
+  "hunyuan_provenance": "hunyuan_provenance.json",
+  "image_tool": "built-in image_gen.imagegen",
+  "image": "input.png",
+  "prompt": "prompt.txt",
+  "changes": [
+    "normalized inferred yaw and metre dimensions",
+    "bottom-centred origin",
+    "flat per-triangle normals",
+    "solid-color lit PBR material"
+  ],
+  "yaw_radians": 0.004363323129985824,
+  "axis_scale": [
+    0.27571867916078124,
+    0.33692178584584004,
+    0.29995200724318083
+  ],
+  "dimensions_xyz_m": [
+    0.55,
+    0.52,
+    0.55
+  ],
+  "triangles": 600,
+  "mesh_count": 1,
+  "surfaces": 1,
+  "no_shape_replacement": true,
+  "output": "stool.glb",
+  "output_sha256": "a1fbc9921ff066cd88c2588d647ea4cfaff5f5d1dcb9ba215b71fb1f5dbf48d1",
+  "raw_triangles": 270088,
+  "input_sha256": "9a49e65e12021bf01c198aa4d3a5855d7f46ac18707cd6b017d5583f7ada0744",
+  "prompt_sha256": "b6fc8e2fb880ded2ae0506cbfdecd33eabe6516302c8c26e71e3a303d97c8d13",
+  "status": "runtime_integrated"
+}

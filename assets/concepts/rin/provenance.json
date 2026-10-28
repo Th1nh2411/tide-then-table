@@ -1,0 +1,9 @@
+{
+  "image_tool": "built-in image_gen.imagegen",
+  "date": "2026-10-28",
+  "image": "lowpoly_turnaround_v1.png",
+  "prompt": "prompt.txt",
+  "identity_reference": "assets/sprites/portraits/rin/base.png",
+  "sha256": "37ad7095bb0ac73575662472f8cd2fce3e546763daabfb9e7b370351439788c7",
+  "archived_study": ".art_backups/art_studies_20261028_143130/assets/models/characters/rin_image_guided"
+}

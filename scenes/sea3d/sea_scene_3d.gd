@@ -358,10 +358,14 @@ func _build_map_adapter() -> void:
 
 func _build_boat() -> void:
 	if boat_data.id == "thuyen_thung":
-		_cylinder(boat_visual, Vector3(0, 0.25, 0), 1.15, 0.45, "685448")
-		_cylinder(boat_visual, Vector3(0, 0.5, 0), 1.2, 0.12, "a27d4c")
-		_cylinder(boat_visual, Vector3(0, 0.57, 0), 0.97, 0.04, "8e795d")
-		_box(boat_visual, Vector3(0, 0.66, 0.3), Vector3(1.7, 0.12, 0.28), "c09473")
+		# Generated hollow hull; controller/collider, actor and lamp remain separate.
+		var hull := preload("res://scenes/art_pilots/boat_pilot.tscn").instantiate()
+		hull.name = "HunyuanThungHull"
+		# Keep the inferred interior above the sea's flat water planes during bob.
+		# Rim remains y=.56; no replacement floor or added hull geometry.
+		hull.scale.y = 0.75
+		hull.position.y = 0.14
+		boat_visual.add_child(hull)
 	else:
 		_box(boat_visual, Vector3(0, 0.23, 0), Vector3(1.55, 0.28, 3.05), "402751")
 		_box(boat_visual, Vector3(0, 0.44, 0.15), Vector3(1.72, 0.27, 2.35), "7a4841")
@@ -371,9 +375,14 @@ func _build_boat() -> void:
 			_box(boat_visual, Vector3(x, 0.72, 0.08), Vector3(0.11, 0.35, 2.45), "be772b")
 		for z in [-0.63, 0.18, 0.95]:
 			_box(boat_visual, Vector3(0, 0.66, z), Vector3(1.31, 0.06, 0.13), "884b2b")
-	rin_figure = [_box(boat_visual, Vector3(0, 1.12, 0.30), Vector3(0.36, 0.77, 0.30), "e7d5b3"),
-		_box(boat_visual, Vector3(0, 1.63, 0.30), Vector3(0.34, 0.34, 0.34), "ad7757"),
-		_box(boat_visual, Vector3(0, 1.83, 0.30), Vector3(0.65, 0.10, 0.65), "e8c170")]
+	# Bare visual instance avoids adding a second person_rin cutscene group.
+	var rider := preload("res://scenes/art_pilots/rin_pilot.tscn").instantiate()
+	boat_visual.add_child(rider)
+	rider.name = "RinOnBoat"
+	rider.position = Vector3(0, 0.20 if boat_data.id == "thuyen_thung" else 0.65, 0.30)
+	rider.scale = Vector3.ONE * 0.85
+	rider.rotation.y = PI
+	rin_figure = [rider]
 	_box(boat_visual, Vector3(0.58, 1.02, -0.85), Vector3(0.08, 0.82, 0.08), "e7d5b3")
 	_box(boat_visual, Vector3(0.58, 1.48, -0.85), Vector3(0.33, 0.22, 0.33), "f2d98a")
 	boat_lamp = SpotLight3D.new()
