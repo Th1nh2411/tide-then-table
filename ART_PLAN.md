@@ -126,6 +126,9 @@ Tiến độ 2026-10-25: đã thêm mặt tiền cửa hàng, bảng menu, quầ
 - Flow chính: **gen-image → Hunyuan image-to-shape → giảm polygon/làm sạch →
   material phẳng → rig/animation nếu cần → kiểm nhiều góc và trong Godot**.
   Không dùng Blender hoặc mesh tự dựng thay cho inference Hunyuan ở đợt pilot này.
+- Tool gen 3D (chốt 2026-10-28): **Hunyuan3D-2mini-turbo chạy local CPU**
+  (`tools/art/hunyuan_local.ps1`) cho mọi asset; Space Hunyuan3D-2.1 chỉ dự phòng
+  vì giới hạn quota. Cài đặt và lý do chọn: `docs/ART_PIPELINE.md`.
 - Rin giữ portrait approved làm chuẩn nhận diện: da rám, dáng thanh, tóc đen
   vuốt lệch, kính chữ nhật, áo ba lỗ ngà, quần rộng, dép và dây lưỡi câu bạc.
   Mẫu gen đã chọn: `assets/concepts/rin/lowpoly_turnaround_v1.png`.

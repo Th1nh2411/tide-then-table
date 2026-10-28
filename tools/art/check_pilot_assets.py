@@ -1,7 +1,6 @@
 """Read-only checks for the archived studies and final Hunyuan art pilots.
 
-No GUI/import or asset mutations. Requires NumPy. Table blocked_by_quota is an
-accepted incomplete state. Source palette dictionaries are read with ast.literal_eval,
+No GUI/import or asset mutations. Requires NumPy. Source palette dictionaries are read with ast.literal_eval,
 never executed. A changed file snapshot is reported so active agent writes are visible.
 """
 from pathlib import Path
@@ -211,9 +210,9 @@ def check_asset(name, relative, meta_name, expected_triangles, expected_size, mi
     source = ROOT/source_value if '/' in source_value else path.parent/source_value
     assert source.is_file() and checksum(source) == meta['source_sha256'], 'Geometry lineage checksum mismatch'
     # Verify the inference chain too, not only the final derivative's checksum.
-    if name in ('stool', 'thuyen_thung'):
+    if name in ('stool', 'table', 'thuyen_thung'):
         inference = read_json(path.parent/'hunyuan_provenance.json')
-        assert inference['status'] == 'success' and inference['provider'] == 'tencent/Hunyuan3D-2.1'
+        assert inference['status'] == 'success' and inference['provider'] in ('tencent/Hunyuan3D-2.1', 'tencent/Hunyuan3D-2mini')
         assert inference['reduction']['target_face_num'] == expected_triangles
         for kind in ['raw', 'reduced']:
             origin = path.parent/inference[kind]
@@ -243,6 +242,7 @@ def main():
         jobs.insert(0, ('archive', check_archive))
     jobs += [
         ('stool', lambda: check_asset('stool', 'assets/models/pilots/stool/stool.glb', 'provenance.json', 600, (.55, .52, .55), 0, 'tools/art/build_furniture_pilot.py', 'SPECS')),
+        ('table', lambda: check_asset('table', 'assets/models/pilots/table/table.glb', 'provenance.json', 1200, (1.5, .86, 1.2), 0, 'tools/art/build_furniture_pilot.py', 'SPECS')),
         ('thuyen_thung', lambda: check_asset('thuyen_thung', 'assets/models/pilots/thuyen_thung/thuyen_thung.glb', 'prepared_provenance.json', 2400, (2.4, .535, 2.3960044), .025, 'tools/art/build_boat_pilot.py', 'PALETTE')),
         ('rin', lambda: check_asset('rin', 'assets/models/pilots/rin/rin_pilot.glb', 'provenance.json', 3000, None, 0, 'tools/art/build_rin_pilot.py', 'PALETTE')),
     ]
@@ -253,13 +253,6 @@ def main():
             job()
         except Exception as error:
             failures += 1; print('FAIL', label+':', error)
-    table = read_json(ROOT/'assets/models/pilots/table/hunyuan_provenance.json')
-    table_input = ROOT/table['input']
-    assert table_input.is_file() and checksum(table_input) == table['input_sha256'], 'Blocked table input checksum mismatch'
-    if table.get('pipeline_status') == 'blocked_by_quota' and not (ROOT/'assets/models/pilots/table/table.glb').exists():
-        print('PASS table: explicit blocked_by_quota; missing final GLB is an accepted incomplete state')
-    else:
-        failures += 1; print('FAIL table: status changed; extend the checker for the new delivered state')
     for path, previous in SNAPSHOTS.items():
         current = (path.stat().st_mtime_ns, path.stat().st_size, checksum(path))
         if current != previous:

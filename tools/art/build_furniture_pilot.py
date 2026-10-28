@@ -1,6 +1,7 @@
 """Normalize and flat-color actual Hunyuan furniture outputs. Never generates shape.
 
-Inputs: assets/models/pilots/{table,stool}/{name}_reduced.glb, produced by hunyuan_job.py.
+Inputs: assets/models/pilots/{table,stool}/{name}_reduced.glb, produced by hunyuan_local.py
+(or the Space fallback hunyuan_job.py).
 Outputs: canonical metre-scale {name}.glb with flat normals and palette materials.
 Missing inference results are reported, never replaced by procedural furniture.
 """

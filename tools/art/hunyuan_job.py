@@ -1,5 +1,8 @@
 """Generate and reduce an image-to-shape asset using Tencent's public Space.
 
+Fallback only (quota-limited): the main tool is tools/art/hunyuan_local.py.
+On Windows: tools/art/hunyuan.ps1.
+
 Run in an isolated client environment, for example:
 uvx --from gradio-client==1.3.0 python tools/art/hunyuan_job.py \
     --image assets/concepts/example.png --out-dir assets/models/pilots/example \
