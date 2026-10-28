@@ -1,0 +1,139 @@
+extends Node
+## Integration: real scene routes + minigame results + shared persistent state.
+## Travel and minigame skill are scripted; no player's save is read or written.
+
+const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
+const REST := "res://scenes/rest/rest_scene.tscn"
+const QUAN := "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
+const SAVE := "user://test_game3d_loop.json"
+var _failures: int = 0
+var _frames_elapsed: int = 0
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	# Remain a root sibling while SceneRouter replaces the actual game scenes.
+	get_tree().current_scene = null
+	_run.call_deferred()
+
+func _process(_delta: float) -> void:
+	_frames_elapsed += 1
+	if _frames_elapsed > 1000:
+		print("FAIL 3D loop timed out")
+		get_tree().quit(1)
+
+func _frames(count: int) -> void:
+	for i: int in range(count):
+		await get_tree().process_frame
+
+func _check(ok: bool, words: String) -> void:
+	print(("PASS " if ok else "FAIL ") + words)
+	if not ok:
+		_failures += 1
+
+func _scene(path: String) -> Node:
+	for i: int in range(180):
+		var current: Node = get_tree().current_scene
+		if current and current.scene_file_path == path and not SceneRouter._is_transitioning:
+			return current
+		await get_tree().process_frame
+	print("FAIL did not reach " + path)
+	get_tree().quit(1)
+	return null
+
+func _run() -> void:
+	SaveSystem.autosave_off = true
+	SceneRouter.fade_duration = 0.01
+	GameState.reset()
+	GameState.money = 1000
+	for cutscene: Cutscene in StoryTimeline.load_all():
+		GameState.set_flag("dlg_" + cutscene.id)
+	SceneRouter.go_to(SEA)
+	var sea: Node = await _scene(SEA)
+	if not sea:
+		return
+	_check(sea is Node3D, "F5 gameplay route opens native 3D sea")
+	sea.cast_cinematic_enabled = false
+	sea.boat.position = sea.shoals[sea._nearest_school_index()].pos
+	sea.boat.velocity = Vector3.ZERO
+	sea._try_fish()
+	var overlay: FishingOverlay3D = sea.overlay
+	_check(sea.fishing and overlay.active and get_tree().paused, "fishing spot starts 2D minigame and pauses 3D boat")
+	overlay._minigame.result_seconds = 0.01
+	# The deterministic success isolates scene integration from human skill.
+	overlay._minigame._game._finish(true, true)
+	await _frames(8)
+	if sea.new_catch_card.visible:
+		sea.new_catch_card._next()
+	await _frames(3)
+	_check(not overlay.active and not get_tree().paused and sea.hold.items.size() == 1,
+		"minigame result reaches real hold and resumes boat")
+	var fish: FishData = sea.hold.items[0].fish
+	_check(GameState.caught_species.has(fish.id), "catch reaches persistent Dex")
+	sea.boat.position = sea.START
+	sea.boat.velocity = Vector3.ZERO
+	sea._unload()
+	_check(sea.hold.items.is_empty() and GameState.storage.size() == 1, "dock unload transfers caught fish to pantry storage")
+	sea._end_trip(false)
+	var rest: Node = await _scene(REST)
+	if not rest:
+		return
+	_check(GameState.resume_at == "restaurant" and GameState.last_catch.size() == 1,
+		"rest card retains catch and restaurant resume point")
+	rest._wake_button.pressed.emit()
+	var quan: Node = await _scene(QUAN)
+	if not quan:
+		return
+	_check(quan is Node3D, "rest card routes to native 3D restaurant")
+	var dish: DishData = null
+	for candidate: DishData in quan.menu.dishes:
+		if ChefBao.cooks(candidate) and candidate.kitchen_level == 0 and candidate.ingredients.has(fish.id):
+			dish = candidate
+			break
+	_check(dish != null and quan.plan.add_portion(dish, GameState.storage), "caught fish reserves a real menu portion")
+	quan._open_shift()
+	quan._spawn_order()
+	var table: int = -1
+	for i: int in range(quan.orders.size()):
+		if not quan.orders[i].is_empty():
+			table = i
+			break
+	if table < 0:
+		_check(false, "guest orders a menu portion")
+		get_tree().quit(1)
+		return
+	quan._tick_bao(0.0)
+	quan._tick_bao(20.0)
+	_check(bool(quan.orders[table].get("cooked", false)), "Bao cooks the ordered dish")
+	quan.player.position = quan.PASS_POSITION
+	quan._interact()
+	_check(quan.carrying_table == table, "E at pass picks up cooked plate")
+	var before: int = GameState.money
+	quan.player.position = quan.TABLES[table] + Vector3(0, 0, 1.2)
+	quan._interact()
+	_check(str(quan.orders[table].get("phase", "")) == "eating" and GameState.money == before,
+		"E serves table; money waits until guests finish eating")
+	quan._finish_meal(table)
+	_check(GameState.money > before and quan.dirty_tables[table], "finished meal pays and leaves dirty table")
+	quan._clean_table(table)
+	_check(not quan.dirty_tables[table], "table can be cleaned for next guest")
+	quan._end_shift()
+	_check(quan.shift_over and GameState.day_history.size() == 1, "closing records real shift ledger and summary")
+	var cost: int = quan.kitchen_upgrade.next_cost(GameState.get_upgrade_level("kitchen"))
+	var upgrade_money: int = GameState.money
+	quan._buy_upgrade(quan.kitchen_upgrade)
+	_check(GameState.get_upgrade_level("kitchen") == 1 and GameState.money == upgrade_money - cost,
+		"restaurant upgrade spends money once and persists level")
+	var saved_money: int = GameState.money
+	quan._sail()
+	sea = await _scene(SEA)
+	if not sea:
+		return
+	_check(GameState.day == 2 and GameState.money == saved_money, "next night preserves money and advances day exactly once")
+	_check(SaveSystem.save_game(SAVE), "3D loop can save to isolated scratch slot")
+	var saved_day: int = GameState.day
+	GameState.money = 0
+	GameState.upgrade_levels.clear()
+	_check(SaveSystem.load_game(SAVE) and GameState.day == saved_day and GameState.money == saved_money
+		and GameState.get_upgrade_level("kitchen") == 1, "save/load retains 3D earnings, day and upgrades")
+	SaveSystem.delete_save(SAVE)
+	get_tree().quit(1 if _failures else 0)

@@ -7,7 +7,7 @@ extends CanvasLayer
 
 signal closed
 
-const SECTIONS: Array[String] = ["Biển", "Quán", "Điện thoại", "Nhịp Sóng", "Mẹo"]
+const SECTIONS: Array[String] = ["Biển", "Quán", "Điện thoại", "Nhịp Sóng", "Mẹo", "Bản 3D"]
 const TEXTS: Array[String] = [
 	"""LÁI THUYỀN
   W / S: tiến / lùi      A / D: bẻ lái
@@ -120,6 +120,35 @@ SỬA QUÁN (trước giờ mở / sau khi bán xong)
   Dự báo thời tiết có ở màn sáng và trong điện thoại.
   Câu được con đủ ký cho đơn đặt, khách quen sẽ ghé quán.
   Esc: tạm dừng. Game tự lưu lúc ra khơi và khi về bến.""",
+	"""VÒNG CHƠI 3D
+  Chơi mới / Tiếp tục vào biển 3D; sau chuyến đi là thẻ nghỉ và quán 3D.
+
+BIỂN
+  W/S: tiến-lùi, A/D: bẻ lái. Tìm bọt khí nổi trên mặt biển (chỉ thấy trong tầm đèn;
+  càng nhiều bọt càng nhiều cá), giảm ga rồi E: Rin quăng cần, màn câu mở ra.
+  Số cá trong màn câu đúng bằng số cá còn lại của đàn; hết cá thì bọt tan.
+  Q: thả lưới, quay lại gần lưới rồi E để kéo. Tab: khoang cá.
+  E ở bến: dỡ cá vào kho bờ; R ở bến: về nhà, ngủ rồi mở quán.
+  F ở bến: sửa thuyền. J: điện thoại, M: bản đồ và ghim vị trí.
+  Trong lúc câu có thể mở kho; trận câu dừng khi sắp xếp khoang.
+  Kết thúc trận câu, nhả phím điều khiển để thuyền chạy tiếp.
+
+QUÁN
+  Lên thực đơn từ cá đã bắt, hoặc mua rau/bia ở Cô Năm rồi mở quán.
+  Trước ca và sau ca Rin đi lại tự do (WASD, Shift lướt).
+  E ở bảng THỰC ĐƠN: lên món (hoặc nút Thực đơn); E ở Cô Năm: mua rau/bia.
+  Nút Sửa quán / Ra khơi nằm trên màn hình; Đóng sớm (hoặc T) bấm hai lần.
+  WASD: đi; E ở bàn NHẬN MÓN: lấy món Bảo nấu.
+  E ở lò NƯỚNG / chỗ RÓT BIA: làm món thủ công bằng minigame.
+  Lấy món tại bàn nhận, tới gần bàn khách rồi E để phục vụ.
+  Khách ăn xong mới thanh toán; E cạnh bàn bẩn để dọn.
+  Nhân viên đã thuê tự nhận món, phục vụ và dọn bàn.
+  T / Đóng sớm: ngừng nhận khách mới, phục vụ nốt khách rồi xem tổng kết.
+  Sau tổng kết: Sửa quán để nâng cấp, Ra khơi bắt đầu ngày tiếp theo.
+  J: mua đồ nghề đi biển hoặc thuê nhân viên (khi đã mở khóa).
+
+Bản 3D hiện dùng một khách/một món mỗi bàn. Hướng dẫn chi tiết theo
+ô, nhóm khách và túi đồ chợ ở tab Quán mô tả bản 2D."""
 ]
 
 var _content: Label

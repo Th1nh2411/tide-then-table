@@ -25,6 +25,8 @@ var _fish: FishData
 var _game: MinigameBase
 var _zone_scale: float = 1.0
 var _count: int = 1
+## Fish drawn in the school (3D sea passes the shoal's fish left).
+var school_size: int = 6
 ## Rolled fish size, shown once hooked (CatchRoll).
 var _size: float = 1.0
 var _in_bite_stage: bool = false
@@ -116,6 +118,7 @@ func _start_stage(game: MinigameBase) -> void:
 
 func _create_fight() -> MinigameBase:
 	var game := FishFightGame.new()
+	game.school_size = school_size
 	game.stun = _starting_stun
 	game.tugged.connect(_portrait.jolt)
 	game.rin_fainted.connect(_on_rin_fainted)

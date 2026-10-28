@@ -2,6 +2,7 @@ extends Node
 ## Scene-based smoke: use a writable APPDATA when running headless on Windows.
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_run.call_deferred()
 
 func _run() -> void:
@@ -30,7 +31,10 @@ func _run() -> void:
 	sea.poi_dialog._answered.emit(1)
 	await get_tree().process_frame
 	_check(sea.hold.items.is_empty() and GameState.money > before_money - 10, "Anh Út buys hold")
-	_check(PhoneMap._snap["places"].size() >= 6, "3D POIs on phone map")
+	var no_shoal_pins := true
+	for place: Dictionary in PhoneMap._snap["places"]:
+		no_shoal_pins = no_shoal_pins and place["label"] != "Vùng cá"
+	_check(PhoneMap._snap["places"].size() >= 5 and no_shoal_pins, "3D POIs on phone map (no shoal pins)")
 	sea.night_events.clear()
 	var bottle_node := Node3D.new()
 	sea.add_child(bottle_node)
@@ -54,11 +58,12 @@ func _run() -> void:
 	var tow_money := GameState.money
 	sea._end_trip(false)
 	_check(GameState.money == tow_money + 80 and not GameState.trip_notes.is_empty(), "tow reward at dock")
-	print("SEA POI 3D SMOKE PASS")
+	print("PASS SEA POI 3D SMOKE")
 	get_tree().paused = false
 	get_tree().quit(0)
 
 func _check(ok: bool, label: String) -> void:
+	print(("PASS " if ok else "FAIL ") + label)
 	if not ok:
 		push_error("SEA POI 3D SMOKE FAIL: " + label)
 		get_tree().paused = false

@@ -41,13 +41,14 @@ run_scene() {
 }
 
 echo "== Test scenes"
-for scene in scenes/test/*_test.tscn; do
+for scene in scenes/test/*_test.tscn scenes/test/*3d*smoke.tscn; do
 	run_scene "$scene"
 done
 
 echo "== Smoke runs"
 for scene in scenes/main_menu/main_menu.tscn scenes/sea/sea_scene.tscn \
-		scenes/restaurant/restaurant_scene.tscn scenes/ending/ending_scene.tscn scenes/intro/intro_scene.tscn; do
+		scenes/restaurant/restaurant_scene.tscn scenes/ending/ending_scene.tscn scenes/intro/intro_scene.tscn \
+		scenes/sea3d/*smoke.tscn scenes/restaurant3d/*smoke.tscn scenes/restaurant3d/*check.tscn; do
 	run_scene "$scene"
 done
 

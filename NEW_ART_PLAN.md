@@ -1,6 +1,12 @@
 
 # GAME PROJECT REQUIREMENT DOCUMENT (PRD) - UPDATED 2026
 
+> **Cập nhật đã chốt 2026-10-28:** hướng nhân vật hiện hành là low-poly stylized
+> theo ảnh tham khảo người dùng: tỷ lệ người tự nhiên, tóc mảng lớn, màu phẳng,
+> rig biến dạng khớp hợp lý. Nội dung ghép khối cơ học và chuyển động giật/méo
+> bên dưới là đề xuất cũ, không còn là yêu cầu cho nhân vật. Xem `ART_PLAN.md`
+> (hướng hình ảnh) và `PLAN.md` (các bước triển khai) để theo quyết định mới.
+
 ## Dự án: Game Lai 2.5D (Chiều Bán Hải Sản - Đêm Đi Câu Biển Sâu)
 
 ---

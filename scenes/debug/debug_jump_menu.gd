@@ -90,6 +90,10 @@ func _go(path: String, cutscene: Cutscene) -> void:
 		var player := get_tree().current_scene.get_node_or_null("CutscenePlayer") as CutscenePlayer
 		if player and not player.playing:
 			player.play(cutscene)
+		else:
+			var bridge: Variant = get_tree().current_scene.get("story_bridge")
+			if bridge is StoryBridge3D and not bridge.playing:
+				bridge.play(cutscene)
 	queue_free()
 
 

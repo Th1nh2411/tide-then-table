@@ -1,13 +1,11 @@
 #!/bin/bash
-# Plays the whole game headless (tools/bot/game_bot.gd) and prints one line
-# per day + the run summary. Never touches the real save (--no-autosave).
-#   tools/run_bot.sh            # upgrade order "story" (boat first)
-#   POLICY=balanced tools/run_bot.sh
-# Exit code != 0 when the run gets stuck, a save doesn't round-trip, or
-# there are script errors.
+# Runs the native 3D loop through its ending, with scratch saves only.
+# Travel and minigame success are scripted: this checks integration, not balance.
+# POLICY=balanced selects kitchen-first upgrades; default is boat-first.
 cd "$(dirname "$0")/.." || exit 1
 GODOT=${GODOT:-/Applications/Godot.app/Contents/MacOS/Godot}
-out=$("$GODOT" --headless --path . --fixed-fps 60 --quit-after 400000 res://tools/bot/game_bot_launch.tscn -- --no-autosave 2>&1)
+bot_scene="res://tools/bot/game_bot_3d.tscn"
+out=$("$GODOT" --headless --path . --fixed-fps 60 --quit-after 400000 "$bot_scene" -- --no-autosave 2>&1)
 exit_code=$?
 echo "$out" | grep -E "^(DAY|SEA|RUN|STUCK|SAVE MISMATCH|  before|  after)|SCRIPT ERROR|ERROR:"
 if [ "$exit_code" -ne 0 ] || echo "$out" | grep -qE "STUCK|SAVE MISMATCH|SCRIPT ERROR|^ERROR|^RUN NO ENDING" || ! echo "$out" | grep -q "^RUN ENDING"; then

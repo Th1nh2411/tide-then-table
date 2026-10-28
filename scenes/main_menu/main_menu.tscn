@@ -38,6 +38,13 @@ theme_override_font_sizes/font_size = 32
 text = "RIN THE FISHER"
 horizontal_alignment = 1
 
+[node name="Edition" type="Label" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.75, 0.61, 1)
+theme_override_font_sizes/font_size = 12
+text = "XÓM ĐÈN • BẢN 3D"
+horizontal_alignment = 1
+
 [node name="ContinueButton" type="Button" parent="CenterContainer/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 0)

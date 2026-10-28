@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-28",
+  "tool": "built-in image_gen",
+  "identity_reference": "assets/sprites/portraits/rin/base.png",
+  "face_albedo_v1.png": "Generated flat front-face albedo; superseded candidate preserved",
+  "face_albedo_v2.png": "Imagegen refinement of v1 using approved Rin identity reference; active face texture source",
+  "hair_albedo_v1.png": "Generated dark blue-black broad hair-strand albedo; no external library asset",
+  "shirt_albedo_v1.png": "Generated ivory cotton-fold albedo; no external library asset",
+  "integration": "Blender reduces embedded copies to 256x256; source PNG files remain intact",
+  "status": "experimental_not_approved"
+}

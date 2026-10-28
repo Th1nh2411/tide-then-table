@@ -1,7 +1,8 @@
 class_name StoryBridge3D
 extends Node
 ## Plays existing Cutscene story logic and dialogue over a 3D world.
-## Physical actor/camera commands need authored 3D markers and are skipped here.
+## Staging commands (actors, camera, rain, slow) run through CutsceneStage3D,
+## created lazily for `stage_kind` ("restaurant" / "sea"); without one they are skipped.
 
 signal started(cutscene: Cutscene)
 signal finished(cutscene: Cutscene)
@@ -13,6 +14,9 @@ var _dialogue: DialogueBox
 var _name_prompt: CutsceneNamePrompt
 var _fade: ColorRect
 var _moods: Dictionary = {}
+var _stage: CutsceneStage3D
+## Marker set for the staging commands (CutsceneMarkers3D.PIXELS key).
+var stage_kind: String = ""
 
 const EMOTE_MOODS := {"!": "ngac_nhien", "?": "boi_roi", "...": "buon", "heart": "vui", "note": "vui"}
 
@@ -49,6 +53,7 @@ func play(cutscene: Cutscene) -> void:
 	_dialogue.hold_pause = true
 	_moods.clear()
 	started.emit(cutscene)
+	_begin_stage()
 	var commands := CutsceneScript.parse(cutscene.script_text)
 	var labels := CutsceneScript.labels(commands)
 	var index := 0
@@ -59,6 +64,8 @@ func play(cutscene: Cutscene) -> void:
 		if jump != "":
 			index = int(labels.get(jump, commands.size())) + 1
 	DialogueLibrary.mark_done(cutscene)
+	if _stage:
+		_stage.end()
 	_dialogue.hold_pause = false
 	_dialogue.hide()
 	_fade.color.a = 0.0
@@ -106,6 +113,8 @@ func _execute(command: Dictionary) -> String:
 		"emote":
 			if args.size() >= 2 and EMOTE_MOODS.has(args[1]):
 				_moods[DialoguePortrait.slug(args[0])] = EMOTE_MOODS[args[1]]
+			if _stage and args.size() >= 2:
+				await _stage.run("emote", args, _skipping)
 		"sfx":
 			if not _skipping and not args.is_empty():
 				Sfx.play(args[0])
@@ -119,12 +128,22 @@ func _execute(command: Dictionary) -> String:
 			await _fade_to(1.0, _seconds(args, 0, 0.5))
 		"fade_in":
 			await _fade_to(0.0, _seconds(args, 0, 0.5))
-		# Actor movement, camera markers, tint and rain need 3D staging data.
-		"camera", "spawn", "remove", "move_to", "face", "tint", "rain", "slow", "label":
+		"camera", "spawn", "remove", "move_to", "face", "rain", "slow":
+			if _stage:
+				await _stage.run(command["cmd"], args, _skipping)
+		"tint", "label":
 			pass
 		_:
 			push_warning("StoryBridge3D: unknown command '%s' at line %d" % [command["cmd"], command["line"]])
 	return ""
+
+func _begin_stage() -> void:
+	if _stage == null and CutsceneMarkers3D.has_kind(stage_kind):
+		_stage = CutsceneStage3D.new()
+		add_child(_stage)
+		_stage.setup(stage_kind)
+	if _stage:
+		_stage.begin()
 
 func _with_mood(speaker: String) -> String:
 	if speaker == "" or speaker.ends_with(")"):

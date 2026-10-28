@@ -5,14 +5,9 @@ extends Node3D
 const REST_SCENE := "res://scenes/rest/rest_scene.tscn"
 const ENDING_SCENE := "res://scenes/ending/ending_scene.tscn"
 const FISHING_OVERLAY := "res://scenes/fishing3d/fishing_overlay_3d.tscn"
-const START := Vector3(0, 0, 5)
-const SHRINE_POS := Vector3(-10, 0, 2)
-const LIGHTHOUSE_POS := Vector3(-32, 0, -13)
-const HUT_POS := Vector3(-23, 0, -8)
-const RAFT_POS := Vector3(25, 0, -8)
-const WHIRLPOOL_POS := Vector3(35, 0, -38)
-const FISH_SPOTS := [Vector3(5, 0, -12), Vector3(-10, 0, -22), Vector3(15, 0, -31)]
-const SPOT_ZONES := [FishData.Zone.NEARSHORE, FishData.Zone.REEF, FishData.Zone.OPEN_SEA]
+const ROD_UPGRADE := preload("res://data/upgrades/rod_upgrade.tres")
+const LAMP_UPGRADE := preload("res://data/upgrades/lamp_upgrade.tres")
+const OIL_BURN_PER_SECOND: float = 100.0 / 240.0
 
 @export var fish_catalog: FishCatalog
 @export var boat_upgrade: UpgradeData
@@ -27,6 +22,21 @@ var boat_data: BoatData
 var weather: WeatherData
 var hold: GridInventory
 var oil := 100.0
+var oil_capacity := 100.0
+var oil_low_sent := false
+var oil_critical_sent := false
+# Same layout as the 2D sea (SeaLayout3D); shoals are rolled each night (SeaShoals3D).
+var START: Vector3 = SeaLayout3D.to_world(SeaLayout3D.DOCK_PX)
+var SHRINE_POS: Vector3 = SeaLayout3D.to_world(SeaLayout3D.SHRINE_PX)
+var LIGHTHOUSE_POS: Vector3 = SeaLayout3D.to_world(SeaLayout3D.LIGHTHOUSE_PX)
+var HUT_POS: Vector3 = SeaLayout3D.to_world(SeaLayout3D.HUT_PX)
+var RAFT_POS: Vector3 = SeaLayout3D.to_world(SeaLayout3D.RAFT_PX)
+var WHIRLPOOL_POS: Vector3 = SeaLayout3D.to_world(SeaLayout3D.WHIRLPOOL_PX)
+var shoals: Array[SeaShoals3D.Shoal] = []
+var new_catch_card: NewCatchCard
+var _wait_controls_release := false
+var _application_focused := true
+var navigation: Control
 var yaw_velocity := 0.0
 var impact_cooldown := 0.0
 var elapsed := 0.0
@@ -41,7 +51,12 @@ var header: Label
 var help: Label
 var message: Label
 var wave_marks: Array[MeshInstance3D] = []
-var buoy_nodes: Array[Node3D] = []
+var bubble_spots: Array[BubbleSpot3D] = []
+var cinematic: CastCinematic3D
+## Tests and bots can turn the cast scene off (E then opens the minigame at once).
+var cast_cinematic_enabled := true
+var rin_figure: Array[Node3D] = []
+var _cast_played := false
 var wake_marks: Array[MeshInstance3D] = []
 var material_cache: Dictionary = {}
 var wind := Vector3.ZERO
@@ -65,7 +80,8 @@ func _mat(hex: String) -> StandardMaterial3D:
 		return material_cache[hex]
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = Color(hex)
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+	mat.roughness = 0.9
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	material_cache[hex] = mat
 	return mat
@@ -122,8 +138,12 @@ func _ready() -> void:
 	weather = weather_catalog.find(GameState.weather_id) if weather_catalog else null
 	if weather and weather.wind_speed > 0.0:
 		wind = Vector3.RIGHT.rotated(Vector3.UP, rng.randf() * TAU) * weather.wind_speed / 10.0
+	oil_capacity = float(GameState.get_upgrade_value(LAMP_UPGRADE))
+	oil = oil_capacity
 	hold = GridInventory.new(boat_data.hold_size)
 	boat.position = START
+	shoals = SeaShoals3D.spawn(fish_catalog, rng, Story.is_fog_open(), weather.extra_spots if weather else 0,
+		weather.rarity_bonus if weather else 0.0, weather.species_bonus if weather else {})
 	_build_environment()
 	_build_world()
 	_build_pois()
@@ -138,24 +158,36 @@ func _ready() -> void:
 	if story_scene:
 		story_bridge = story_scene.instantiate()
 		add_child(story_bridge)
+		story_bridge.set("stage_kind", "sea")
 	var packed := load(FISHING_OVERLAY) as PackedScene
 	if packed:
 		overlay = packed.instantiate() as CanvasLayer
 		add_child(overlay)
 		overlay.connect("catch_detailed", _on_catch_detailed)
 		overlay.connect("catch_finished", _on_catch_finished)
+		overlay.connect("rin_fainted", _on_rin_fainted)
+		overlay.call("bind_hold", hold_ui)
 	else:
 		push_error("SeaScene3D: fishing overlay unavailable")
+	cinematic = CastCinematic3D.new()
+	cinematic.sea = self
+	cinematic.camera = camera
+	cinematic.boat_visual = boat_visual
+	cinematic.hidden_figure = rin_figure
+	add_child(cinematic)
 	camera.position = boat.position + Vector3(0, 7.3, 10.0)
 	camera.look_at(boat.position + Vector3(0, 0.7, -2.0))
+	_build_navigation()
 	DayClock.start_night()
+	DailyTrend.ensure()
 	Story.check_day()
 	GameState.resume_at = "sea"
 	SaveSystem.autosave("sea")
 	Sfx.ambience("sea")
-	_say("Đi theo phao sáng để tìm cá. Bến ở phía sau.", 4.0)
+	_say("Tìm bọt khí trên mặt biển. Bến ở phía sau.", 4.0)
 	if weather and weather.start_message != "":
 		_say(weather.start_message, 4.0)
+	_update_hud()
 
 func _build_environment() -> void:
 	var world_env := WorldEnvironment.new()
@@ -164,7 +196,7 @@ func _build_environment() -> void:
 	env.background_color = Color("090a14")
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("819796")
-	env.ambient_light_energy = 0.6
+	env.ambient_light_energy = 0.85
 	env.fog_enabled = true
 	env.fog_light_color = Color("172038")
 	env.fog_density = 0.018
@@ -176,50 +208,59 @@ func _build_environment() -> void:
 	add_child(world_env)
 	var moon := DirectionalLight3D.new()
 	moon.rotation_degrees = Vector3(-48, -28, 0)
-	moon.light_color = Color("a4dddb")
-	moon.light_energy = 0.42
+	moon.light_color = Color("bacac7")
+	moon.light_energy = 0.6
 	add_child(moon)
 
 func _build_world() -> void:
-	_box(self, Vector3.ZERO, Vector3(94, 0.12, 94), "172038")
-	_box(self, Vector3(0, 0.07, 26), Vector3(93, 0.02, 39), "253a5e")
-	_box(self, Vector3(-20, 0.08, -10), Vector3(14, 0.02, 53), "202e37")
-	for i in range(100):
-		var x := float((i * 37) % 85) - 42.0
-		var z := float((i * 53) % 79) - 39.0
+	var size := SeaLayout3D.size_world()
+	_box(self, Vector3.ZERO, Vector3(size.x, 0.12, size.y), "172038")
+	for z_rect: Array in [[SeaLayout3D.NEAR_RECT, "253a5e", 0.07], [SeaLayout3D.REEF_RECT, "202e37", 0.075]]:
+		var r := SeaLayout3D.rect_world(z_rect[0])
+		_box(self, Vector3(r.get_center().x, float(z_rect[2]), r.get_center().y), Vector3(r.size.x, 0.02, r.size.y), str(z_rect[1]))
+	if Story.is_fog_open():
+		var fog := SeaLayout3D.rect_world(SeaLayout3D.FOG_RECT)
+		_box(self, Vector3(fog.get_center().x, 0.085, fog.get_center().y), Vector3(fog.size.x, 0.02, fog.size.y), "2d4b52")
+	# Land strip behind the dock (the 2D shore).
+	var shore_z: float = SeaLayout3D.to_world(Vector2(0, SeaLayout3D.SHORE_PX)).z
+	_solid_box(Vector3(0, 0.2, (shore_z + size.y * 0.5) * 0.5 + 1.5), Vector3(size.x, 0.42, size.y * 0.5 - shore_z - 3.0), "394a50")
+	for i in range(170):
+		var x := float((i * 37) % 150) - 75.0
+		var z := float((i * 53) % 100) - 50.0
 		wave_marks.append(_box(self, Vector3(x, 0.11, z), Vector3(0.3 + 0.2 * (i % 4), 0.015, 0.07), "577277" if i % 3 else "3c5e8b"))
-	_solid_box(Vector3(0, 0.20, 11), Vector3(18, 0.42, 5), "394a50")
+	# Pier just behind the dock point (built around the old 5 -> START.z offset).
+	var off := Vector3(START.x, 0.0, START.z - 5.0)
+	_solid_box(off + Vector3(0, 0.20, 11), Vector3(18, 0.42, 5), "394a50")
 	for z in range(9, 16, 2):
-		_solid_box(Vector3(0, 0.45, float(z)), Vector3(3.5, 0.35, 1.7), "7a4841")
+		_solid_box(off + Vector3(0, 0.45, float(z)), Vector3(3.5, 0.35, 1.7), "7a4841")
 		for x in [-1.45, 1.45]:
-			_box(self, Vector3(x, 0.14, float(z)), Vector3(0.16, 0.42, 0.18), "402751")
-	_box(self, Vector3(-6.8, 1.5, 10), Vector3(1.0, 2.6, 1.0), "e7d5b3")
-	_box(self, Vector3(-6.8, 2.9, 10), Vector3(1.2, 0.26, 1.2), "a53030")
-	_box(self, Vector3(-6.8, 3.18, 10), Vector3(0.48, 0.25, 0.48), "f2d98a")
-	_label("BẾN XÓM ĐÈN", Vector3(0, 1.45, 13.6), 30, "e7d5b3")
-	for pos in [Vector3(-18, 0, -13), Vector3(19, 0, -21), Vector3(-25, 0, -35)]:
-		_solid_box(pos + Vector3(0, 0.32, 0), Vector3(3.2, 0.62, 2.2), "394a50")
-		_box(self, pos + Vector3(-0.7, 0.73, -0.2), Vector3(1.0, 0.45, 0.9), "577277")
+			_box(self, off + Vector3(x, 0.14, float(z)), Vector3(0.16, 0.42, 0.18), "402751")
+	_box(self, off + Vector3(-6.8, 1.5, 10), Vector3(1.0, 2.6, 1.0), "e7d5b3")
+	_box(self, off + Vector3(-6.8, 2.9, 10), Vector3(1.2, 0.26, 1.2), "a53030")
+	_box(self, off + Vector3(-6.8, 3.18, 10), Vector3(0.48, 0.25, 0.48), "f2d98a")
+	_label("BẾN XÓM ĐÈN", off + Vector3(0, 1.45, 13.6), 30, "e7d5b3")
+	for rock in SeaLayout3D.rocks():
+		var pos: Vector3 = rock["pos"]
+		var radius: float = rock["radius"]
+		_solid_box(pos + Vector3(0, 0.32, 0), Vector3(radius * 2.2, 0.62, radius * 1.6), "394a50")
+		_box(self, pos + Vector3(-radius * 0.2, 0.73, 0), Vector3(radius * 0.9, 0.45, radius * 0.7), "577277")
 		for i in range(5):
 			var angle := float(i) * TAU / 5.0
-			_box(self, pos + Vector3(cos(angle) * 2.2, 0.11, sin(angle) * 1.7), Vector3(0.52, 0.02, 0.08), "819796")
-	_solid_box(Vector3(25, 0.32, -8), Vector3(5.0, 0.55, 3.0), "7a4841")
-	for x in [23.0, 25.0, 27.0]:
-		_box(self, Vector3(x, 0.65, -8), Vector3(1.65, 0.15, 2.3), "ad7757")
-	_box(self, Vector3(27, 1.5, -9), Vector3(0.15, 1.8, 0.15), "e7d5b3")
-	_box(self, Vector3(27, 2.5, -9), Vector3(0.45, 0.2, 0.45), "f2d98a")
-	for spot in FISH_SPOTS:
-		_box(self, spot + Vector3(0, 0.09, 0), Vector3(5.3, 0.02, 5.3), "25562e")
-		for i in range(12):
-			var angle := float(i) * TAU / 12.0
-			var foam := _box(self, spot + Vector3(cos(angle) * 2.7, 0.15, sin(angle) * 2.7), Vector3(0.8, 0.025, 0.1), "a4dddb" if i % 2 else "73bed3")
-			foam.rotation.y = -angle
-		var buoy := Node3D.new()
-		add_child(buoy)
-		buoy.position = spot
-		buoy_nodes.append(buoy)
-		_cylinder(buoy, Vector3(0, 0.28, 0), 0.18, 0.35, "e7d5b3")
-		_box(buoy, Vector3(0, 0.51, 0), Vector3(0.3, 0.18, 0.3), "cf573c")
+			_box(self, pos + Vector3(cos(angle) * radius * 1.7, 0.11, sin(angle) * radius * 1.3), Vector3(0.52, 0.02, 0.08), "819796")
+	_solid_box(RAFT_POS + Vector3(0, 0.32, 0), Vector3(5.0, 0.55, 3.0), "7a4841")
+	for x in [-2.0, 0.0, 2.0]:
+		_box(self, RAFT_POS + Vector3(x, 0.65, 0), Vector3(1.65, 0.15, 2.3), "ad7757")
+	_box(self, RAFT_POS + Vector3(2.0, 1.5, -1), Vector3(0.15, 1.8, 0.15), "e7d5b3")
+	_box(self, RAFT_POS + Vector3(2.0, 2.5, -1), Vector3(0.45, 0.2, 0.45), "f2d98a")
+	# Shoals are only hinted by bubbles on the water (BubbleSpot3D).
+	var bubble_mat := StandardMaterial3D.new()
+	bubble_mat.albedo_color = Color("c9f1f0")
+	bubble_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	for shoal in shoals:
+		var spot := BubbleSpot3D.new()
+		add_child(spot)
+		spot.setup(shoal, boat, bubble_mat)
+		bubble_spots.append(spot)
 	for i in range(6):
 		var mark := _box(self, Vector3.ZERO, Vector3(0.22 + i * 0.13, 0.02, 0.10), "73bed3" if i % 2 else "a4dddb")
 		mark.visible = false
@@ -254,7 +295,9 @@ func _build_pois() -> void:
 func _build_night_events() -> void:
 	if GameState.day <= 1:
 		return
-	var positions := [Vector3(-12, 0, -9), Vector3(11, 0, -18), Vector3(-10, 0, -17), Vector3(17, 0, -10)]
+	var positions: Array[Vector3] = []
+	for px: Vector2 in [Vector2(700, 950), Vector2(1250, 870), Vector2(450, 880), Vector2(1100, 820)]:
+		positions.append(SeaLayout3D.to_world(px))
 	var kinds := NightEvents.pick_kinds(rng, rng.randi_range(1, 2), [1.0, 1.2, 1.0, 1.0])
 	for i in range(kinds.size()):
 		var kind: int = kinds[i]
@@ -279,36 +322,34 @@ func _build_night_events() -> void:
 			"time": 0.0, "towing": false, "owner": "Chú Sáu"})
 
 func _map_pos(pos: Vector3) -> Vector2:
-	return Vector2((pos.x + 47.0) * 10.0, (pos.z + 47.0) * 10.0)
+	return SeaLayout3D.to_map(pos)
 
 func _build_map_adapter() -> void:
 	# PhoneMap expects 2D map coordinates and a Node2D boat. Small proxies
 	# preserve its existing pin/legend UI while the sea world itself is 3D.
 	var rocks: Array = []
-	for pos in [Vector3(-18, 0, -13), Vector3(19, 0, -21), Vector3(-25, 0, -35)]:
-		rocks.append({"pos": _map_pos(pos), "radius": 25.0, "color": Color("577277")})
+	for rock in SeaLayout3D.rocks():
+		rocks.append({"pos": _map_pos(rock["pos"]), "radius": float(rock["radius"]) * SeaLayout3D.PX_PER_UNIT, "color": Color("577277")})
 	var places: Array = [
 		{"pos": _map_pos(RAFT_POS), "label": "Bè tôm hùm anh Út"},
 		{"pos": _map_pos(SHRINE_POS), "label": "Miếu Cá Ông"},
 		{"pos": _map_pos(LIGHTHOUSE_POS), "label": "Hải đăng Đá Canh Đêm"},
 		{"pos": _map_pos(HUT_POS), "label": "Gò Vỏ Ốc"},
-		{"pos": _map_pos(Vector3(-6.8, 0, 10)), "label": "Bến Xóm Đèn"},
+		{"pos": _map_pos(START), "label": "Bến Xóm Đèn"},
 	]
-	for spot in FISH_SPOTS:
-		places.append({"pos": _map_pos(spot), "label": "Vùng cá"})
 	PhoneMap._snap = {
-		"size": Vector2(940, 940),
+		"size": SeaLayout3D.MAP_PX,
 		"zones": [
-			{"rect": Rect2(0, 0, 940, 440), "color": Color("172038"), "fog": false, "name": "Khơi xa"},
-			{"rect": Rect2(0, 440, 940, 250), "color": Color("202e37"), "fog": false, "name": "Rạn đá"},
-			{"rect": Rect2(0, 690, 940, 250), "color": Color("253a5e"), "fog": false, "name": "Gần bờ"},
-		],
-		"land": [Rect2(380, 550, 180, 60)],
+			{"rect": SeaLayout3D.OPEN_RECT, "color": Color(0.1, 0.28, 0.48), "fog": false, "name": "Khơi xa"},
+			{"rect": SeaLayout3D.REEF_RECT, "color": Color(0.16, 0.45, 0.6), "fog": false, "name": "Rạn đá"},
+			{"rect": SeaLayout3D.NEAR_RECT, "color": Color(0.35, 0.68, 0.78), "fog": false, "name": "Gần bờ"},
+		] + ([{"rect": SeaLayout3D.FOG_RECT, "color": Color(0.2, 0.32, 0.38), "fog": true, "name": "Sương"}] if Story.is_fog_open() else []),
+		"land": [Rect2(0, SeaLayout3D.SHORE_PX, SeaLayout3D.MAP_PX.x, SeaLayout3D.MAP_PX.y - SeaLayout3D.SHORE_PX)],
 		"rocks": rocks,
 		"dock": _map_pos(START),
 		"whirlpool": _map_pos(WHIRLPOOL_POS),
 		"places": places,
-		"range_y": _map_pos(Vector3(0, 0, -5.0 - boat_data.max_depth * 48.0)).y,
+		"range_y": lerpf(SeaLayout3D.SHORE_PX, SeaLayout3D.DEEP_PX, boat_data.max_depth) if boat_data.max_depth < 1.0 else -INF,
 	}
 	map_boat_proxy = Node2D.new()
 	map_boat_proxy.add_to_group("boat")
@@ -316,17 +357,23 @@ func _build_map_adapter() -> void:
 	map_boat_proxy.position = _map_pos(boat.position)
 
 func _build_boat() -> void:
-	_box(boat_visual, Vector3(0, 0.23, 0), Vector3(1.55, 0.28, 3.05), "402751")
-	_box(boat_visual, Vector3(0, 0.44, 0.15), Vector3(1.72, 0.27, 2.35), "7a4841")
-	_box(boat_visual, Vector3(0, 0.62, -1.08), Vector3(1.22, 0.17, 0.85), "ad7757")
-	_box(boat_visual, Vector3(0, 0.56, 0.15), Vector3(1.22, 0.10, 1.68), "c09473")
-	for x in [-0.73, 0.73]:
-		_box(boat_visual, Vector3(x, 0.72, 0.08), Vector3(0.11, 0.35, 2.45), "be772b")
-	for z in [-0.63, 0.18, 0.95]:
-		_box(boat_visual, Vector3(0, 0.66, z), Vector3(1.31, 0.06, 0.13), "884b2b")
-	_box(boat_visual, Vector3(0, 1.12, 0.30), Vector3(0.36, 0.77, 0.30), "e7d5b3")
-	_box(boat_visual, Vector3(0, 1.63, 0.30), Vector3(0.34, 0.34, 0.34), "ad7757")
-	_box(boat_visual, Vector3(0, 1.83, 0.30), Vector3(0.65, 0.10, 0.65), "e8c170")
+	if boat_data.id == "thuyen_thung":
+		_cylinder(boat_visual, Vector3(0, 0.25, 0), 1.15, 0.45, "685448")
+		_cylinder(boat_visual, Vector3(0, 0.5, 0), 1.2, 0.12, "a27d4c")
+		_cylinder(boat_visual, Vector3(0, 0.57, 0), 0.97, 0.04, "8e795d")
+		_box(boat_visual, Vector3(0, 0.66, 0.3), Vector3(1.7, 0.12, 0.28), "c09473")
+	else:
+		_box(boat_visual, Vector3(0, 0.23, 0), Vector3(1.55, 0.28, 3.05), "402751")
+		_box(boat_visual, Vector3(0, 0.44, 0.15), Vector3(1.72, 0.27, 2.35), "7a4841")
+		_box(boat_visual, Vector3(0, 0.62, -1.08), Vector3(1.22, 0.17, 0.85), "ad7757")
+		_box(boat_visual, Vector3(0, 0.56, 0.15), Vector3(1.22, 0.10, 1.68), "c09473")
+		for x in [-0.73, 0.73]:
+			_box(boat_visual, Vector3(x, 0.72, 0.08), Vector3(0.11, 0.35, 2.45), "be772b")
+		for z in [-0.63, 0.18, 0.95]:
+			_box(boat_visual, Vector3(0, 0.66, z), Vector3(1.31, 0.06, 0.13), "884b2b")
+	rin_figure = [_box(boat_visual, Vector3(0, 1.12, 0.30), Vector3(0.36, 0.77, 0.30), "e7d5b3"),
+		_box(boat_visual, Vector3(0, 1.63, 0.30), Vector3(0.34, 0.34, 0.34), "ad7757"),
+		_box(boat_visual, Vector3(0, 1.83, 0.30), Vector3(0.65, 0.10, 0.65), "e8c170")]
 	_box(boat_visual, Vector3(0.58, 1.02, -0.85), Vector3(0.08, 0.82, 0.08), "e7d5b3")
 	_box(boat_visual, Vector3(0.58, 1.48, -0.85), Vector3(0.33, 0.22, 0.33), "f2d98a")
 	boat_lamp = SpotLight3D.new()
@@ -343,12 +390,13 @@ func _build_hud() -> void:
 	add_child(layer)
 	header = Label.new()
 	header.position = Vector2(14, 10)
-	header.add_theme_font_size_override("font_size", 15)
+	header.add_theme_font_size_override("font_size", 11)
 	header.add_theme_color_override("font_color", Color("e7d5b3"))
 	layer.add_child(header)
 	help = Label.new()
 	help.position = Vector2(14, 326)
-	help.text = "W/S ga  •  A/D lái  •  E câu / kéo lưới / dỡ cá  •  Q thả lưới  •  F sửa  •  R về nhà  •  H khoang"
+	help.text = "W/S ga · A/D lái · E tương tác · Q lưới · Tab khoang · J điện thoại · M bản đồ\nBến: R về nhà · F sửa thuyền · Esc tạm dừng"
+	help.add_theme_font_size_override("font_size", 9)
 	help.add_theme_color_override("font_color", Color("a4dddb"))
 	layer.add_child(help)
 	message = Label.new()
@@ -358,6 +406,8 @@ func _build_hud() -> void:
 
 func _build_shared_ui() -> void:
 	# Reuse the existing pause, inventory and phone scenes with their saved data.
+	new_catch_card = NewCatchCard.new()
+	add_child(new_catch_card)
 	var tracker := QuestTracker.new()
 	tracker.catalog = fish_catalog
 	tracker.origin = Vector2(6, 82)
@@ -380,30 +430,36 @@ func _build_shared_ui() -> void:
 		add_child(phone_app)
 
 func _physics_process(delta: float) -> void:
-	if ending or fishing:
+	if ending or fishing or poi_busy or (hold_ui and hold_ui.visible) or (phone_app and phone_app.visible):
 		return
 	elapsed += delta
 	impact_cooldown = maxf(impact_cooldown - delta, 0.0)
 	var forward := Vector3.FORWARD.rotated(Vector3.UP, boat.rotation.y)
 	var throttle := Input.get_axis("throttle_back", "throttle_forward")
 	var steer := Input.get_axis("turn_left", "turn_right")
+	if not _application_focused or _wait_controls_release:
+		if _application_focused and not _movement_controls_held():
+			_wait_controls_release = false
+		throttle = 0.0
+		steer = 0.0
 	var acceleration := boat_data.acceleration / 10.0
 	boat.velocity += forward * throttle * acceleration * delta
 	if not _at_dock():
 		boat.velocity += wind * delta
 	boat.velocity *= exp(-1.15 * delta)
-	boat.velocity = boat.velocity.limit_length(boat_data.max_speed / 10.0 * (0.65 if _is_towing() else 1.0))
+	boat.velocity = boat.velocity.limit_length(boat_data.max_speed / 10.0 * lerpf(0.6, 1.0, clampf(GameState.boat_hp / 50.0, 0.0, 1.0)) * (0.65 if _is_towing() else 1.0))
 	var forward_speed := boat.velocity.dot(forward)
 	var turn_target := steer * deg_to_rad(boat_data.turn_speed) * (0.35 + minf(absf(forward_speed) / 8.0, 0.65))
 	yaw_velocity = move_toward(yaw_velocity, turn_target, delta * (3.0 - boat_data.spin_drift))
 	boat.rotation.y += yaw_velocity * delta
 	boat.velocity.y = 0.0
 	var before := boat.position
+	var impact_speed := boat.velocity.length()
 	boat.move_and_slide()
 	boat.position.y = 0.0
 	if boat.get_slide_collision_count() > 0:
-		if before.distance_to(boat.position) < 0.3 and boat.velocity.length() > 2.0 and impact_cooldown <= 0.0:
-			BoatCondition.damage(minf(14.0, boat.velocity.length() * 1.6) * blessed_damage_scale)
+		if before.distance_to(boat.position) < 0.3 and impact_speed > 2.0 and impact_cooldown <= 0.0:
+			BoatCondition.damage(minf(14.0, impact_speed * 1.6) * blessed_damage_scale)
 			impact_cooldown = 0.85
 			_say("Mạn thuyền va vào vật cản!", 1.8)
 		boat.velocity *= 0.45
@@ -412,13 +468,14 @@ func _physics_process(delta: float) -> void:
 			_end_trip(true)
 			return
 	# Boat range is inherited from the selected upgrade.
-	var min_z := -5.0 - boat_data.max_depth * 48.0
+	var min_z := SeaLayout3D.reach_z(boat_data.max_depth)
 	if boat.position.z < min_z:
 		boat.position.z = min_z
 		boat.velocity.z = maxf(boat.velocity.z, 0.0)
 		_say("Sóng ngoài khơi đẩy thuyền trở lại.", 1.5)
-	boat.position.x = clampf(boat.position.x, -43.0, 43.0)
-	boat.position.z = clampf(boat.position.z, -43.0, 43.0)
+	var half := SeaLayout3D.size_world() * 0.5 - Vector2.ONE * 2.0
+	boat.position.x = clampf(boat.position.x, -half.x, half.x)
+	boat.position.z = clampf(boat.position.z, -half.y, SeaLayout3D.to_world(Vector2(0, SeaLayout3D.SHORE_PX)).z + 1.0)
 	map_boat_proxy.position = _map_pos(boat.position)
 	map_boat_proxy.rotation = -PI / 2.0 - boat.rotation.y
 	boat_visual.position.y = sin(elapsed * 2.5) * 0.06
@@ -426,8 +483,9 @@ func _physics_process(delta: float) -> void:
 	boat_visual.rotation.x = sin(elapsed * 2.1) * 0.018 + forward_speed * 0.004
 	for i in range(wave_marks.size()):
 		wave_marks[i].position.y = 0.11 + sin(elapsed * 2.1 + float(i) * 0.7) * 0.012
-	for i in range(buoy_nodes.size()):
-		buoy_nodes[i].position.y = sin(elapsed * 2.3 + float(i) * 1.7) * 0.07
+	var bubble_range := _bubble_range()
+	for spot in bubble_spots:
+		spot.view_range = bubble_range
 	for i in range(whirlpool_marks.size()):
 		var a := TAU * float(i) / float(whirlpool_marks.size()) + elapsed * 0.65
 		whirlpool_marks[i].position = WHIRLPOOL_POS + Vector3(cos(a) * 2.3, 0.16, sin(a) * 2.3)
@@ -445,8 +503,11 @@ func _physics_process(delta: float) -> void:
 	camera.position = camera.position.lerp(camera_target, minf(delta * 3.2, 1.0))
 	camera.look_at(boat.position + forward * 2.0 + Vector3.UP * 0.6)
 	var oil_scale := weather.oil_burn_scale if weather else 1.0
-	oil = maxf(oil - delta * (0.045 + boat.velocity.length() * 0.008) * oil_scale, 0.0)
-	DayClock.set_progress(1.0 - oil / 100.0, 0, 6)
+	if not _at_dock():
+		_spend_oil(delta * OIL_BURN_PER_SECOND * oil_scale)
+	if GameState.boat_hp <= 0.0:
+		_end_trip(true)
+		return
 	if Story.is_fog_open() and boat.position.distance_to(WHIRLPOOL_POS) < 2.0:
 		_enter_whirlpool()
 		return
@@ -477,7 +538,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			story_bridge.play(cutscene)
 			get_viewport().set_input_as_handled()
 			return
-	if ending or fishing or get_tree().paused:
+	if ending or fishing or poi_busy or (hold_ui and hold_ui.visible) or get_tree().paused:
 		return
 	if event.is_action_pressed("open_hold") and hold_ui:
 		hold_ui.open_browse()
@@ -550,12 +611,12 @@ func _update_night_events(delta: float) -> void:
 					event["time"] = 1.5
 					BoatCondition.damage(3.0 * blessed_damage_scale)
 					_say("Sứa quấn chân vịt rồi! Phải thoát khỏi đàn sứa.", 1.5)
-			elif kind == NightEvents.Kind.DOLPHINS:
-				if not event["done"] and boat.position.distance_to(node.position) < 8.0:
-					event["done"] = true
-					_say("Cá heo kìa! Đi theo tụi nó thử coi.", 2.5)
-				if event["done"]:
-					node.position = node.position.move_toward(FISH_SPOTS[1], delta * 3.0)
+		elif kind == NightEvents.Kind.DOLPHINS:
+			if not event["done"] and boat.position.distance_to(node.position) < 8.0:
+				event["done"] = true
+				_say("Cá heo kìa! Đi theo tụi nó thử coi.", 2.5)
+			if event["done"]:
+				node.position = node.position.move_toward(_dolphin_target(), delta * 3.0)
 
 func _try_visit_poi() -> bool:
 	var id := _nearest_poi()
@@ -681,33 +742,55 @@ func _enter_whirlpool() -> void:
 	await tween.finished
 	SceneRouter.go_to(ENDING_SCENE, Color.WHITE)
 
+## Lamp reach for bubbles: shrinks as the oil runs low.
+func _bubble_range() -> float:
+	var fraction := oil / maxf(oil_capacity, 1.0)
+	var base: float = boat_lamp.spot_range if is_instance_valid(boat_lamp) else 14.0
+	return base * 0.6 * lerpf(0.55, 1.0, clampf(fraction * 2.0, 0.0, 1.0))
+
+
 func _try_fish() -> void:
 	if overlay == null:
 		_say("Màn câu cá chưa được nạp.", 2.5)
 		return
-	for i in range(FISH_SPOTS.size()):
-		if boat.position.distance_to(FISH_SPOTS[i]) < 4.8 and boat.velocity.length() < 2.4:
-			var zone: FishData.Zone = SPOT_ZONES[i]
+	for i in range(shoals.size()):
+		var shoal := shoals[i]
+		if shoal.fish_left > 0 and boat.position.distance_to(shoal.pos) < 4.8 and boat.velocity.length() < 2.4:
 			var rarity := weather.rarity_bonus if weather else 0.0
 			var species_bonus := weather.species_bonus if weather else {}
-			var fish := fish_catalog.pick_random(zone, rng, FishData.CatchMethod.ROD, float(i) / 2.0, rarity, species_bonus)
+			var fish := shoal.roll_fish(fish_catalog, rng, rarity, species_bonus)
 			if fish == null:
 				_say("Chỗ này không còn cá.", 2.0)
 				return
+			var used := shoal.max_fish - shoal.fish_left
+			var school := shoal.school_count()
 			fishing = true
 			boat.velocity = Vector3.ZERO
 			yaw_velocity = 0.0
-			oil = maxf(oil - 2.0, 0.0)
-			overlay.call("start_catch", fish)
+			_spend_oil(2.0)
+			var size := CatchRoll.snap_size(CatchRoll.roll_size(rng, shoal.depth, shoal.big_shadow), fish.typical_kg)
+			size = CatchRoll.snap_size(minf(size + used * 0.08, CatchRoll.MAX_SIZE), fish.typical_kg)
+			var difficulty := float(GameState.get_upgrade_value(ROD_UPGRADE)) * CatchRoll.size_zone_scale(size) * WaveMark.fight_scale(fish, CatchRoll.is_big(size)) * maxf(1.0 - used * 0.08, 0.75)
+			# One fish leaves the shoal per cast, caught or not.
+			shoal.fish_left -= 1
+			if cast_cinematic_enabled and cinematic:
+				_cast_then_fish(shoal.pos, fish, difficulty, size, school)
+			else:
+				overlay.call("start_catch", fish, difficulty, size, 1, school)
 			return
-	_say("Đến gần phao sáng và giảm ga để câu.", 2.5)
+	_say("Tìm bọt khí trên mặt biển, đến gần rồi giảm ga để câu.", 2.5)
+
+
+func _cast_then_fish(target: Vector3, fish: FishData, difficulty: float, size: float, school: int) -> void:
+	_cast_played = true
+	await cinematic.play(target)
+	if ending or not is_inside_tree():
+		return
+	overlay.call("start_catch", fish, difficulty, size, 1, school)
+	cinematic.reveal()
 
 func _zone_at(pos: Vector3) -> FishData.Zone:
-	if pos.z >= -20.0:
-		return FishData.Zone.NEARSHORE
-	if pos.z >= -28.0:
-		return FishData.Zone.REEF
-	return FishData.Zone.OPEN_SEA
+	return SeaLayout3D.zone_at(pos, Story.is_fog_open())
 
 func _drop_net() -> void:
 	if nets.size() >= 2:
@@ -736,7 +819,7 @@ func _drop_net() -> void:
 	add_child(map_net)
 	map_net.position = _map_pos(pos)
 	nets[nets.size() - 1]["map_node"] = map_net
-	oil = maxf(oil - 1.0, 0.0)
+	_spend_oil(1.0)
 	_say("Đã thả lưới. Quay lại sau một lúc để kéo lên.", 2.5)
 
 func _try_haul_net() -> bool:
@@ -748,7 +831,7 @@ func _try_haul_net() -> bool:
 			_say("Giảm ga trước khi kéo lưới.", 2.0)
 			return true
 		var soak := elapsed - float(net["time"])
-		var count := clampi(roundi(soak / 15.0), 0, 6)
+		var count := clampi(roundi(8.0 * soak / 90.0), 0, 8)
 		var zone: FishData.Zone = net["zone"]
 		var haul: Array[Array] = []
 		var depth: float = [0.1, 0.5, 0.8, 1.0][clampi(int(zone), 0, 3)]
@@ -778,7 +861,7 @@ func _try_haul_net() -> bool:
 		fishing = true
 		boat.velocity = Vector3.ZERO
 		yaw_velocity = 0.0
-		oil = maxf(oil - 2.0, 0.0)
+		_spend_oil(2.0)
 		var bonus := 1.0 + GameState.get_upgrade_level("net") * 0.15
 		overlay.call("start_catch", main_species, bonus, 1.0, net_haul_count)
 		return true
@@ -810,24 +893,35 @@ func _on_catch_detailed(fish: FishData, caught: bool, quality: float, count: int
 	_update_hud()
 
 func _store_catch(fish: FishData, quality: float, count: int, size: float) -> void:
-	var stored := 0
+	if fish == null or count <= 0:
+		return
+	var is_new := int(GameState.caught_species.get(fish.id, 0)) == 0
+	var previous_best := GameState.best_size(fish)
+	# A landed catch belongs in the Dex even when the hold needs sorting.
+	GameState.record_catch(fish, count, size)
+	Story.on_fish_caught(fish)
+	var rewards := CollectionRewards.claim(fish, size, is_new, previous_best)
 	var overflow: Array[InventoryItem] = []
 	for i in range(count):
 		var item := InventoryItem.new(fish, quality, size)
-		if hold.auto_place(item):
-			stored += 1
-		else:
+		item.is_new = is_new
+		if not hold.auto_place(item):
 			overflow.append(item)
-	if stored > 0:
-		GameState.record_catch(fish, stored, size)
-		Story.on_fish_caught(fish)
-		_say("Bắt được %s %s. Khoang %d/%d ô." % [fish.display_name, fish.weight_text(size), hold.items.size(), hold.size.x * hold.size.y], 3.0)
+	_say("Bắt được %s %s. Khoang đầy %d%%.%s" % [fish.display_name, fish.weight_text(size), roundi(hold.fill_fraction() * 100.0), "\n" + "\n".join(rewards) if not rewards.is_empty() else ""], 4.0)
 	if not overflow.is_empty() and hold_ui:
 		hold_ui.open_overflow(overflow)
-		_say("Khoang đầy! Sắp xếp cá trong khoang.", 3.0)
+	if is_new and new_catch_card:
+		# Batch hauls finish opening overflow before the reveal claims pause.
+		new_catch_card.show_fish.call_deferred(fish, size)
 
 func _on_catch_finished(_success: bool, _fish_data: FishData) -> void:
+	if _cast_played and cinematic:
+		_cast_played = false
+		await cinematic.play_return()
+		if not is_inside_tree():
+			return
 	fishing = false
+	_wait_controls_release = true
 	boat.velocity = Vector3.ZERO
 	yaw_velocity = 0.0
 	_update_hud()
@@ -843,7 +937,7 @@ func _unload() -> void:
 	_say("Đã dỡ %d con cá. Có thể ra biển tiếp hoặc nhấn R về nhà." % items.size(), 3.0)
 	_update_hud()
 
-func _end_trip(towed: bool) -> void:
+func _end_trip(towed: bool, rescue_fee: int = -1) -> void:
 	if ending:
 		return
 	ending = true
@@ -855,7 +949,7 @@ func _end_trip(towed: bool) -> void:
 				GameState.add_money(80)
 				GameState.trip_notes.append("Kéo ghe %s về bến: +80k" % event["owner"])
 	if towed:
-		var fee := 150 if BoatCondition.is_broken() else 80
+		var fee := rescue_fee if rescue_fee >= 0 else (150 if BoatCondition.is_broken() else 80)
 		GameState.spend_money(mini(fee, GameState.money))
 		BoatCondition.tow_patch(20.0)
 		GameState.trip_notes.append("Rin được kéo thuyền về bến trong đêm.")
@@ -882,6 +976,107 @@ func _update_hud() -> void:
 			prompt = "E vớt chai thư" if int(event["kind"]) == NightEvents.Kind.BOTTLE else "E hỏi ghe chết máy"
 		else:
 			prompt = "E ghé " + str(names.get(poi, poi))
-	header.text = "%s  |  %s  |  Dầu %d%%  |  Thân thuyền %d%%  |  Cá %d  |  Lưới %d/2  |  %s" % [boat_data.display_name, DayClock.get_time_text(), roundi(oil), roundi(GameState.boat_hp), hold.items.size(), nets.size(), prompt]
+	header.text = "%s · %s · %dk · Dầu %d%% · Thân thuyền %d%%\nCá %d · Lưới %d/2 · %s" % [boat_data.display_name, DayClock.get_time_text(), GameState.money, roundi(oil / oil_capacity * 100.0), roundi(GameState.boat_hp), hold.items.size(), nets.size(), prompt]
 	if Time.get_ticks_msec() / 1000.0 > status_until:
 		message.text = ""
+
+
+func _movement_controls_held() -> bool:
+	return Input.is_action_pressed("throttle_forward") or Input.is_action_pressed("throttle_back") or Input.is_action_pressed("turn_left") or Input.is_action_pressed("turn_right")
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_application_focused = false
+		_wait_controls_release = true
+		if is_instance_valid(boat):
+			boat.velocity = Vector3.ZERO
+			yaw_velocity = 0.0
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		_application_focused = true
+
+
+func _spend_oil(units: float) -> void:
+	oil = maxf(oil - units, 0.0)
+	var fraction := oil / maxf(oil_capacity, 1.0)
+	DayClock.set_progress(1.0 - fraction, DayClock.night_start_hour, DayClock.dawn_hour)
+	if not oil_critical_sent and fraction <= 0.1 and oil > 0.0:
+		oil_critical_sent = true
+		_say("NEO: Dầu còn 10%. Anh Rin nên về bến ngay.", 3.0)
+	elif not oil_low_sent and fraction <= 0.25 and fraction > 0.1:
+		oil_low_sent = true
+		_say("NEO: Dầu đèn còn 25%. Anh Rin quay về bến nhé.", 3.0)
+	if is_instance_valid(boat_lamp):
+		boat_lamp.light_energy = 2.5 * lerpf(0.3, 1.0, clampf(fraction * 2.0, 0.0, 1.0))
+
+
+func _on_rin_fainted() -> void:
+	GameState.trip_notes.append("Rin bất tỉnh khi vật lộn với cá ngoài khơi.")
+	_say("Choáng quá... may có người kéo thuyền về bến.", 3.0)
+	if hold_ui and hold_ui.visible:
+		await hold_ui.closed
+	_end_trip(true, 0)
+
+
+func _dolphin_target() -> Vector3:
+	var i := _nearest_school_index()
+	return shoals[i].pos if i >= 0 else START
+
+
+func _build_navigation() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 2
+	add_child(layer)
+	navigation = preload("res://scenes/sea3d/sea_navigation_3d.gd").new()
+	navigation.set("world", self)
+	navigation.set("camera", camera)
+	layer.add_child(navigation)
+	var guide := Guide.new()
+	guide.blocked = func() -> bool: return fishing or ending or poi_busy or (hold_ui and hold_ui.visible) or (phone_app and phone_app.visible)
+	add_child(guide)
+	# No pointer to shoals: the hint is the bubbles themselves.
+	guide.add("sea3d_bubbles", "Tìm bọt khí trên mặt biển", func() -> bool: return not fishing and _casts_used_total() == 0,
+		func() -> Vector2: return navigation.call("screen_point", boat.position + Vector3(0, 3.0, 0)),
+		func() -> bool: return fishing or _casts_used_total() > 0)
+	guide.add("sea3d_dock", "Về bến dỡ cá", func() -> bool: return not fishing and hold.fill_fraction() >= 0.6,
+		func() -> Vector2: return navigation.call("screen_point", START),
+		func() -> bool: return hold.items.is_empty())
+
+
+func _casts_used_total() -> int:
+	var used := 0
+	for shoal in shoals:
+		used += shoal.max_fish - shoal.fish_left
+	return used
+
+
+func _nearest_school_index() -> int:
+	var nearest := -1
+	var distance := INF
+	var min_z := SeaLayout3D.reach_z(boat_data.max_depth)
+	for i in range(shoals.size()):
+		var spot: Vector3 = shoals[i].pos
+		if spot.z < min_z or shoals[i].fish_left <= 0:
+			continue
+		var d := boat.position.distance_to(spot)
+		if d < distance:
+			distance = d
+			nearest = i
+	return nearest
+
+
+func navigation_targets() -> Array[Dictionary]:
+	var targets: Array[Dictionary] = [{"pos": START, "label": "Bến", "color": "f2d98a"}]
+	for net in nets:
+		var full: int = roundi(clampf((elapsed - float(net["time"])) / 90.0, 0.0, 1.0) * 100.0)
+		targets.append({"pos": net["pos"], "label": "Lưới %d%%" % full, "color": "de9e41"})
+	for i in range(GameState.map_pins.size()):
+		var pin: Vector2 = GameState.map_pins[i]
+		targets.append({"pos": SeaLayout3D.to_world(pin), "label": "Ghim %d" % (i + 1), "color": "d99ccc"})
+	for entry: Array in [[SHRINE_POS, "Miếu"], [HUT_POS, "Ông Tám"], [LIGHTHOUSE_POS, "Hải đăng"], [RAFT_POS, "Bè tôm"]]:
+		var pos: Vector3 = entry[0]
+		if boat.position.distance_to(pos) < 20.0:
+			targets.append({"pos": pos, "label": entry[1], "color": "c6b89a"})
+	if Story.is_fog_open():
+		targets.append({"pos": WHIRLPOOL_POS, "label": "???", "color": "5ff2e0"})
+	return targets

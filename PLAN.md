@@ -484,3 +484,58 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng 
 - **Lịch sử portrait rollback — 2026-10-22:** runtime quay về ảnh approved 128×128 trong `build/portraits/128/approved/`; Rin base/vui và Vy base đã được cài lại. Tại thời điểm đó Bảo chưa có approved mới nên giữ asset tạm (đã bổ sung sau đó, xem `ART_PLAN.md`). Các sheet lớn chỉ được thu 128×128 để tham khảo trong `build/portraits/ref/`.
 
 - **Thử art 3D — 2026-10-27 (chờ duyệt):** scene riêng `scenes/art_preview/psx_quan_preview.tscn` dựng Rin ghép khối có idle giật theo nhịp, xe đẩy, bếp than, bàn ghế nhựa, mái hiên và biển Xóm Đèn. F6 để xem; không tích hợp gameplay, không thay art active. Import và chạy render Compatibility thành công, không có script error; đã xem ảnh `build/shots/psx_quan_preview.png`. Đây là mẫu bố cục/màu/khối ban đầu, chưa chốt chất PSX hoặc horror.
+
+## Vòng chơi 3D — cập nhật 2026-10-28
+
+### Kế hoạch art nhân vật đã chốt — 2026-10-28
+
+Hướng chính thức: **low-poly stylized**, tỷ lệ người tự nhiên, tóc chia mảng lớn,
+quần áo gọn, mặt tối giản, bề mặt đa giác/màu phẳng theo ảnh người dùng gửi.
+Giữ màu và ánh sáng ấm của quán. Chi tiết và tiêu chí duyệt ở
+`ART_PLAN.md` → “Hướng nhân vật 3D đã chốt”.
+
+- [x] Chốt hướng thẩm mỹ; hai Rin study hiện tại chỉ là nghiên cứu, chưa đạt chuẩn dùng chính thức.
+- [ ] Tải và kiểm base Quaternius Regular Male: topology, tỷ lệ, rig, định dạng và giấy phép của file thực tế; thử bản Standard trước.
+- [ ] Thử đi/bưng đồ và các tư thế gập khớp trong Blender; kiểm vai, khuỷu, hông, gối, xuyên mesh. Nếu base không phù hợp, đánh giá MPFB2 làm phương án dự phòng.
+- [ ] Chỉnh Rin: dáng thanh, da rám, tóc đen vuốt lệch, kính chữ nhật, áo ba lỗ ngà, khuyên bạc và dây chuyền lưỡi câu; dùng portrait approved làm chuẩn nhận diện.
+- [ ] Render nhiều góc và cỡ gameplay; xuất GLB, kiểm material/skeleton/animation trong Godot và duyệt ngoại hình trước khi thay Rin active có backup.
+- [ ] Sau khi Rin đạt chuẩn, dùng cùng quy ước tỷ lệ, shading và rig để triển khai Bảo, Vy, Cô Năm và khách.
+
+### Trạng thái vòng chơi
+
+Theo yêu cầu hiện tại, ưu tiên hoàn thiện **cả vòng câu cá → quán → nâng cấp**
+trên nhánh `try-3d`. Bản 2D vẫn là mốc tính năng; bản 3D chưa đạt toàn bộ tương đương.
+Hướng dẫn chạy, kiểm tra và danh sách còn thiếu: `docs/3D_DEMO.md`.
+
+- F5 vào menu có nhãn bản 3D; New Game/Continue → biển 3D → thẻ nghỉ → quán 3D → ngày kế.
+- Biển: cần/đèn có hiệu lực, dầu không hao ở bến, đồng hồ theo bình dầu nâng cấp;
+  đàn cá hết lượt; lưới tăng lượng theo thời gian; Dex/phần thưởng nhận cả cá overflow;
+  chỉ dẫn đàn cá/bến/lưới/POI/ghim; cứu hộ bất tỉnh; sửa input và sự kiện cá heo.
+- Minigame: Tab mở kho giữa lượt câu và tạm ngừng trận câu; giữ choáng giữa lượt,
+  bất tỉnh cứu hộ sau khi đóng kết quả; chờ nhả phím rồi mới trả quyền cho thuyền.
+- Quán: Bảo tự nấu, Rin nhận đĩa ở bàn kê, nướng/rót bia thủ công, khách ăn xong
+  trả tiền và để bàn bẩn; nhân viên nhận/giao/dọn; menu dùng được pantry-only;
+  giữ giá món hot/độ đa dạng; đóng ca chống giao dịch trùng; lựa chọn thuê Vy có hiệu lực.
+- Giữ màu/ánh sáng ấm mẫu đã được người dùng thích; HUD, panel navy và prompt E đọc rõ.
+- Kiểm thử: 18 kiểm tra liên cảnh/save của `game3d_loop_test`; 8 kiểm tra pause/kho/
+  faint của `fishing3d_inventory_test`; 13 regression biển; regression quán và smoke
+  tích hợp vào `tools/run_tests.sh`. Bot 3D đã tới ending ngày 5 (boat-first), ngày 6
+  (kitchen-first/balanced), kiểm roundtrip save mỗi ca; không dùng save thật.
+- Đợt 2 (5 phần, 2026-10-28): nhóm khách 1–2 người/1–3 món, A* nhân viên + xe máy khách,
+  túi chợ → tủ lạnh, preview sửa quán, biển 3D theo bố cục 2D + `SeaShoals3D`, dàn cảnh cutscene 3D.
+- Chưa xong: đá ngầm ẩn + cổng sương ở biển 3D, preview bếp/thùng đá, `tint` cutscene, model khách thứ hai,
+  playtest tay, pacing, art 3D.
+
+- **Rin portrait → 3D, 2026-10-28:** thêm candidate `assets/models/characters/rin_portrait_study.glb`
+  bằng Blender, tóc/tai/kính/áo/phụ kiện chi tiết; giữ portrait approved làm tham khảo.
+  Preview riêng `scenes/art_preview/rin_portrait_study.tscn` (F6, 1/2/3 animation, 4 cận,
+  mũi tên xoay). Đã xem render nhiều góc và nạp model trong Godot; kiểm skeleton,
+  ba clip và chuyển động xương chân Walk thành công. Cần chủ dự án duyệt độ giống;
+  chưa thay Rin gameplay. Generator sao lưu bản trước mỗi lần xuất.
+
+- **Rin mesh + texture, 2026-10-28:** đã thử pipeline mesh gọn + albedo imagegen
+  theo portrait (mặt/tóc/vải). Candidate riêng `assets/models/characters/rin_painted/`;
+  1 mesh/13 surfaces/11,718 tam giác so với bản trước 112 mesh/19,296 tam giác.
+  F6 `scenes/art_preview/rin_painted_study.tscn`, B so bản cũ/mới, 5 xem cỡ quán.
+  Đã kiểm ba texture nhúng, skeleton/Walk, ba clip và chuyển biến thể trong Godot;
+  xem render cận/nhiều góc/cỡ nhỏ. Chờ duyệt art; giữ nguyên bản cũ và gameplay.

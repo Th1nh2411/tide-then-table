@@ -28,14 +28,22 @@ func _run() -> void:
 			break
 	assert(table >= 0, "3D guest did not order")
 	assert(room.orders[table]["visit"]["order"]["who"] == "Chú Ba", "3D regular did not arrive")
-	room.carrying_table = table
+	room.orders[table]["dish"] = load("res://data/dishes/tom_luoc.tres")
+	room._tick_bao(0.0)
+	room._tick_bao(10.0)
+	assert(room.orders[table]["cooked"], "3D Bảo did not cook regular meal")
+	room._move_staff(10.0)
+	room._move_staff(10.0)
+	assert(room.orders[table].get("phase", "") == "eating", "3D regular did not receive cooked plate")
+	room._finish_meal(table)
 	room.player.position = room.TABLES[table] + Vector3(0, 0, 1.2)
-	room._interact()
 	assert(room.served == 1 and GameState.money > GameState.STARTING_MONEY, "3D service did not pay")
 	assert(GameState.orders.is_empty(), "3D regular order was not completed")
 	assert(room.staff_workers.size() == 1, "3D hired staff did not appear")
 	var market_dish: DishData = load("res://data/dishes/rau_muong_xao_toi.tres")
 	room._buy_market(market_dish, false)
+	room.player.position = MarketBag3D.FRIDGE_POSITION + Vector3(0.5, 0, 1.0)
+	room._interact()
 	assert(room.market_stock.portions(market_dish) > 0 and room.market_spent > 0,
 		"3D Cô Năm purchase did not reach persistent pantry")
 	room.plan.clear(GameState.storage)
@@ -47,10 +55,15 @@ func _run() -> void:
 			break
 	assert(market_table >= 0 and room.orders[market_table]["dish"].id == market_dish.id,
 		"3D market stock did not create a grocery dish order")
-	room.orders[market_table]["cooked"] = true
+	room._tick_bao(0.0)
+	room._tick_bao(10.0)
+	assert(room.orders[market_table]["cooked"], "3D Bảo did not cook grocery meal")
 	room._dispatch_ready()
 	assert(room.staff_workers[0]["table"] == market_table, "3D staff did not claim cooked plate")
 	room._move_staff(10.0)
+	room._move_staff(10.0)
+	assert(room.orders[market_table].get("phase", "") == "eating")
+	room._finish_meal(market_table)
 	assert(room.served == 2, "3D staff did not deliver grocery dish")
 	room._end_shift()
 	assert(room.shift_over and not GameState.day_history.is_empty(), "3D shift did not record results")
