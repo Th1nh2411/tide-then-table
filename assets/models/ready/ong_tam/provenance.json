@@ -7,5 +7,76 @@
   "processing": "Uniform normalization; anatomical flat palette; weighted 20-bone skin and authored Idle/Walk/Carry animation. Source triangles preserved.",
   "blender_used": false,
   "external_base_geometry_used": false,
-  "output_sha256": "0b16cbd42275de2f067cb89b10ab6cf43a6ace30a8d1cea111df81752f8537b5"
+  "output_sha256": "328065c8b3cdd81ea4d2642c65464cd9eff98a8a99ba3d6ff91eb41b0b50d711",
+  "face_detail_triangles": 40,
+  "face_refinement": {
+    "reference": "assets/sprites/portraits/ong_tam/base.png",
+    "palette_srgb": {
+      "Skin": "c09473",
+      "Shirt": "7a4841",
+      "Hair": "819796",
+      "Bottom": "172038",
+      "Shoes": "202e37"
+    },
+    "eyes": [
+      [
+        -0.056680630434782615,
+        1.4831698695652176,
+        0.10057203143805991
+      ],
+      [
+        0.056680630434782615,
+        1.483168989130435,
+        0.09831232084189427
+      ]
+    ],
+    "builder": "tools/art/refine_character_faces.py",
+    "base_binary_sha256": "563003e37a563387198c1d48820c54f53a09c5e69686c2f077ba7cd88627e0b9",
+    "base_binary_length": 606272,
+    "changes": "Base Color correction and surface-projected eye/eyelid/brow details; original body, normals, weights, rig and clips unchanged"
+  },
+  "walk_refinement": {
+    "date": "2026-10-29",
+    "builder": "tools/art/narrow_character_walk.py",
+    "mode": "lateral_only",
+    "source_snapshot": "build/character_walk_narrow/source_before/ong_tam_ong_tam.glb",
+    "source_sha256": "abb308edd730f515090f0fed0c3d397ce87dbd09e7178bf3e962b5d0aca6aa76",
+    "half_stance_m_at_1_84m": 0.12,
+    "changes": "X-only knee/ankle translation tracks; original rotations, Y/Z stride, lift, foot roll, duration and other clips retained"
+  },
+  "manual_hair_follow": {
+    "reference": "bao",
+    "reference_sha256": "7b5784e81dcab1f9f4bfd29b46778f99cbec050b5277cbcce9fd5d886b821a35",
+    "triangles_reassigned": 6,
+    "builder": "tools/art/follow_manual_hair.py",
+    "changes": "Hair material boundary only; preserve geometry, colors, rest rig and clips"
+  },
+  "rin_eye_style": {
+    "reference": "assets/models/ready/rin/rin_pilot.glb",
+    "reference_sha256": "cda58fd71756b03f573e24ae3f1860e84c3e43fca03595b1794546bdb6d3e239",
+    "centers": [
+      [
+        -0.056680627167224884,
+        1.4834692478179932
+      ],
+      [
+        0.056680627167224884,
+        1.4834682941436768
+      ]
+    ],
+    "clearance": [
+      {
+        "minimum_m": 0.0014999999999999875,
+        "maximum_m": 0.019839398969421107,
+        "samples": 167
+      },
+      {
+        "minimum_m": 0.0015000000000000013,
+        "maximum_m": 0.0230041339606757,
+        "samples": 167
+      }
+    ],
+    "builder": "tools/art/match_character_eyes_to_rin.py",
+    "changes": "Actual Rin Eye geometry/material; independently fit each eye to skin, preserve XY centers/brows/glasses"
+  }
 }

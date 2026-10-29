@@ -192,19 +192,17 @@ func _walk(actor_: Node3D, target: Vector3, seconds: float) -> void:
 	var delta := target - actor_.global_position
 	if delta.length() < WALK_UNITS_PER_SECOND_MIN:
 		return
-	if absf(delta.x) > 0.01:
-		actor_.rotation.y = PI * 0.5 * signf(delta.x)
 	var from := actor_.global_position
 	var tween := create_tween()
 	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_method(func(t: float) -> void:
 		if not is_instance_valid(actor_):
 			return
+		var before := actor_.global_position
 		actor_.global_position = from.lerp(target, t)
 		var rig := actor_ as PersonRig3D
 		if rig:
-			_clock += get_process_delta_time()
-			rig.set_walking(1.0, _clock), 0.0, 1.0, maxf(seconds, 0.01))
+			rig.drive_ground_motion(actor_.global_position-before,get_process_delta_time()), 0.0, 1.0, maxf(seconds, 0.01))
 	await tween.finished
 	_idle(actor_)
 
@@ -226,7 +224,7 @@ func _emote(actor_: Node3D, text: String, seconds: float) -> void:
 func _idle(actor_: Node3D) -> void:
 	var rig := actor_ as PersonRig3D
 	if rig:
-		rig.set_walking(0.0, 0.0)
+		rig.drive_ground_motion(Vector3.ZERO,maxf(get_process_delta_time(),.001),false)
 
 
 ## Hides the gameplay rig of the same character and copies its facing.

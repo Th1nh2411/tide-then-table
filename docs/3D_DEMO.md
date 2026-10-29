@@ -6,8 +6,7 @@ Cập nhật 2026-10-28 trên nhánh `try-3d`. Ưu tiên của đợt này là c
 ## Chạy
 
 Bấm **F5** trong Godot. Menu ghi **XÓM ĐÈN • BẢN 3D**. Chơi mới qua intro rồi
-vào biển 3D; Tiếp tục dùng điểm resume trong save hiện tại. Scene mẫu đứng yên
-`scenes/art_preview/psx_quan_preview.tscn` vẫn là bản tham khảo art, không phải game.
+vào biển 3D; Tiếp tục dùng điểm resume trong save hiện tại.
 
 - Biển: `scenes/sea3d/sea_scene_3d.tscn`.
 - Quán: `scenes/restaurant3d/restaurant_scene_3d.tscn`.
@@ -85,12 +84,10 @@ Chi tiết flow và cách rebuild: `docs/ART_PIPELINE.md`.
 Rin dùng palette portrait approved: da `#d79c6b`, áo ngà `#eee5d5`, tóc `#151d28`,
 kính `#090a14`, bạc `#cac0b7`. Không sửa sprite/portrait gốc.
 
-Mở scene và F6 để xem từng nhóm:
-
-- `scenes/art_pilots/rin_pilot_preview.tscn`: Rin cạnh portrait 2D.
-- `scenes/art_pilots/batch_characters_preview.tscn`: 11 người và mèo.
-- `scenes/art_preview/restaurant_batch_preview.tscn`: 20 prop quán/đồ nhỏ.
-- `scenes/art_preview/batch_sea_review.tscn`: 13 asset biển.
+Preview còn giữ (F6): `scenes/art_pilots/rin_pilot_preview.tscn` (Rin, phím
+1/2/3/5) và `scenes/art_pilots/rin_pilot2_compare.tscn`. Các scene preview/review
+cũ (`scenes/art_preview/`, preview batch/thuyền/đồ nội thất) đã xoá 2026-10-29;
+xem asset trực tiếp trong game.
 
 Nhân vật người có skin 20 xương và Idle/Walk/Carry; chưa có rig mặt/ngón
 tay. Mèo giữ dáng ngồi từ inference, chỉ bob/sway, chưa có rig đi bốn chân.
@@ -98,10 +95,6 @@ Các model dùng palette phẳng, chưa có texture chi tiết; kính/mặt còn
 fridge cấp 2 còn mặt trước kín từ geometry nguồn. Bản active trước sửa được
 sao lưu recoverable trong `build/batch_integration/backups/`.
 
-Shape Rin baseline còn giữ ở `scenes/art_preview/rin_hunyuan_study.tscn`:
-F6, ←/→ xoay, 4 cận, B đổi gốc/3k. Đây là shape chưa có texture/rig.
-Mẫu phối màu quán: `scenes/art_preview/psx_quan_preview.tscn`.
-Các preview Rin cũ đã archive, không còn là lựa chọn hiện hành.
 
 ### Animation — cập nhật 2026-10-29
 
@@ -135,3 +128,239 @@ Trong game: tới đàn cá, tương tác để ném cần; camera cận Rin r�
 minigame. Cinematic sample clip bằng clock, cần bám cổ tay, giữ skip và return.
 Nếu Blender đang mở bản cũ, mở lại rin.blend để thấy action `Rin_Cast` trong track
 `Cast` (cất riêng mọi chỉnh sửa chưa lưu trước). Chưa có FishingIdle/Reel riêng.
+
+### Walk — chỉnh chân ngày 2026-10-29
+
+Đã thay Walk trong `rin.blend` và `assets/models/ready/rin/rin_pilot.glb`:
+60% chu kỳ chân trụ, 40% chân bước; gót chạm trước, mũi đẩy sau, chân bước nhấc
+khỏi sàn; chân trụ duỗi hơn, bề ngang bước hẹp hơn, tay vung theo chân đối bên.
+Giữ material, hình học, Idle/Carry/Cast và trọng số dép. Nguồn trước/sau tại
+`build/rin_walk_refine/source_before.blend` và `source_after.blend`; ảnh review
+ngang/chính diện ở cùng thư mục. F6 preview, phím 2 xem Walk, ←/→ xoay.
+
+### Rin hiện hành: base pilot2 — 2026-10-29
+
+Theo lựa chọn mới, active `assets/models/ready/rin/rin_pilot.glb` dùng thân, mặt,
+rig 62 xương và 24 animation gốc của `rin_pilot2.glb`; file nguồn 2 giữ nguyên.
+Chỉ đổi màu áo/quần/da/dép theo Rin trước và ghép mesh tóc thật, vừa scalp.
+Không thêm kính hoặc sửa mặt/thân; native Walk được đối chiếu 8 thời điểm với
+bản 2 nguồn (sai số vị trí khớp dưới 0,003 m). Giữ alias Idle/Walk và thêm riêng
+Carry/Cast tương thích game. Preview F6: 1 đứng, 2 Walk gốc, 3 bưng, 5 ném cần.
+
+Nguồn chỉnh mới là `build/rin2_finish/rin_pilot2_finished.blend`; không dùng
+`rin.blend` hoặc builder Walk cũ để export đè base mới. Donor màu/tóc và bản
+active trước thay đã backup; xem `assets/models/ready/rin/provenance.json`.
+Quy trình export Blender này đã được thay bằng cách patch GLB trực tiếp ở mục dưới.
+
+### Giữ nguyên base 2, chỉ tóc/màu/kính
+
+Bản hiện hành sửa trực tiếp GLB gốc bằng `tools/art/finish_rin2_exact.py`, không
+export lại thân/mặt. Binary gốc, nodes, rig và 24 clip native giữ nguyên từng byte;
+material gốc chỉ đổi Base Color, giữ metallic/roughness và các thuộc tính khác.
+Chỉ bỏ primitive tóc cũ, ghép tóc Rin và thêm kính chữ nhật có gọng/cầu/càng kính.
+Xem `scenes/art_pilots/rin_pilot2_compare.tscn` bằng F6 để đối chiếu bản gốc/bản
+mới cùng ánh sáng/camera/animation (1 đứng, 2 đi, Space dừng, ←/→ xoay).
+Tổng 5.349 tam giác, 6 mesh; nguyên bản `rin_pilot2.glb` giữ nguyên. Không dùng
+builder export Blender cũ để ghi đè bản này.
+
+### Tóc, tay bưng/ném cần, Walk chung — 2026-10-29
+
+- Tóc Rin dựng lại theo portrait 2D (`portrait_hair()` trong
+  `finish_rin2_exact.py`): đỉnh phồng, mái rủ chéo qua trán, mai che tai, gáy phủ.
+  Tổng còn 5.338 tam giác.
+- Carry / CarryWalk / Cast của Rin viết lại bằng `tools/art/make_rin_arm_clips.py`:
+  thân/chân/ngón lấy từ Idle/Walk gốc của pilot2, chỉ Torso và chuỗi tay được key
+  (bưng đĩa hai tay trước bụng; ném cần: cầm → vung ra sau qua vai → quất tới →
+  theo đà → hạ). PersonRig dùng `CarryWalk` khi bưng mà đi (chân không trượt).
+  Hướng cần (`hand_basis`) tính so với tư thế Idle vì rest node của pilot2 là T-pose.
+- 11 nhân vật batch giữ mesh/rig 20 xương riêng; clip `Walk` được làm lại cho giống
+  Walk của Rin bằng `tools/art/retarget_walk.py` (delta xoay theo từng xương so với
+  Idle của Rin, giữ nhịp nhún hông).
+
+### Mắt và màu nhân vật ngoài Rin — 2026-10-29
+
+Đã sửa 11 người (`bao`, `vy`, `vy_sau`, `co_nam`, `ong_tam`, `guest_1`,
+`guest_2`, `guest_3`, `guest_rich`, `guest_regular`, `staff`) và `cat`.
+Rin và metadata Rin không bị sửa, đã đối chiếu SHA-256 trước/sau.
+
+- Thay hai khối mắt đen nhô khỏi mặt bằng lòng mắt, iris, pupil, mí và chân mày
+  nhỏ; đặt theo mặt từng model và skin 100% theo Head. Kính khách/staff theo concept.
+- Bảo/Vy/Cô Năm/Ông Tám/khách quen lấy màu từ portrait approved; các khách khác
+  theo concept. Mèo Mỡ giữ màu cam theo ART_PLAN và concept, sửa mắt/mảng kem.
+- Sửa các mảng tóc bị gán nhầm màu da trên Vy, Vy sau và khách nữ. Giữ vị trí
+  vertex, normals, trọng số thân, xương và các clip Idle/Walk/Carry.
+- Không sửa PNG portrait/sprite hoặc output Hunyuan gốc.
+
+Xem **`scenes/art_pilots/character_faces_review.tscn` → F6**:
+1 mặt trước, 2 góc nghiêng, 3 toàn thân. Ảnh review ở
+`build/character_face_refine/after_1.png`, `after_2.png`, `after_3.png`.
+Backup trước sửa ở `build/character_face_refine/source_before/` và backup builder.
+
+Palette/điểm đặt mắt: `PROFILES` và `EYE_ANCHORS` trong
+`tools/art/refine_character_faces.py`. Chạy lại script không chồng thêm mắt;
+builder nhân vật/mèo tự áp bước này sau khi dựng source. Thân mỗi người vẫn
+3.000 tam giác; mặt thêm 88 tam giác, hoặc 124 khi có kính; mèo thêm 64.
+
+Đã PASS kiểm 45 asset, GPU deformation/head attachment cho 11 người, flow quán
+và cutscene; kiểm rerun không đổi GLB; dữ liệu binary thân/rig/clip giữ nguyên.
+Mắt là mesh chi tiết tĩnh, chưa có clip chớp mắt hoặc điều khiển hướng nhìn.
+
+### Walk: chỉ thu hẹp bề ngang — 2026-10-29
+
+Theo điều chỉnh của người dùng, 11 người batch chỉ thu hẹp đường chân theo X
+(khoảng cổ chân chuẩn 0,386 → 0,240 m). Giữ nguyên sải trước–sau, độ nhấc chân,
+foot roll, nhịp bước và chuyển động hông từ bản gốc trước khi chỉnh Walk.
+Không bóp ngang mesh; chỉ thêm translation X ở gối/cổ chân trong Walk. Các clip
+khác đặt lại translation gốc để không giữ nhầm độ rộng Walk khi chuyển động tác.
+
+Đã đối chiếu 65 thời điểm/nhân vật: Y/Z khớp bản gốc dưới 0,000001 m;
+tất cả rotation gốc và duration được giữ nguyên. Màu, mắt, mesh và rest rig không
+đổi. Rin/mèo giữ nguyên. F6 `character_faces_review.tscn`: 4 đi trước, 5 đi nghiêng.
+Tool: `tools/art/narrow_character_walk.py`; kiểm: `tools/art/check_lateral_walk.py`.
+Nguồn sải gốc được ghi ở `walk_refinement.source_snapshot` trong provenance;
+backup tại `build/character_walk_narrow/`, log mới tại `build/character_walk_lateral/`.
+
+### Mắt Bảo theo model Rin — 2026-10-29
+
+Riêng Bảo chuyển sang mắt đen low-poly như Rin: lấy đúng primitive `Eye` và
+material từ `assets/models/ready/rin/rin_pilot.glb`, thu theo tỷ lệ đầu Bảo và
+giữ vị trí/góc mắt đang chỉnh. Không dùng lòng trắng/iris của mẫu trước; giữ
+lông mày Bảo. FaceDetails còn 40 tam giác (16 mày + 24 mắt), tổng Bảo 3.040.
+Tool: `tools/art/match_bao_eyes_to_rin.py`. Palette/body/rig/Walk/Carry không đổi;
+Rin và toàn bộ model khác không đổi. Mở character_faces_review, F6, phím 1/2.
+Backup/log: `build/bao_rin_eyes/`. Bộ refine mặt tự áp lại kiểu này riêng Bảo.
+
+
+### Đồng bộ mắt/tóc theo Bảo và Vy tô tay — 2026-10-29
+
+- Hai mẫu tóc người dùng xác nhận là Bảo và Vy. Giữ nguyên body, palette và
+  toàn bộ phân mảng tóc/áo của hai GLB người dùng đã export.
+- Sửa mắt Bảo bị chìm dưới da, đổi mắt Vy và chín người còn lại sang đúng
+  primitive/material `Eye` của Rin. Căn độ nghiêng/độ sâu riêng từng mắt trên
+  bề mặt da; khoảng hở nhỏ nhất 1,5 mm ở mẫu kiểm. Giữ XY, chân mày và kính.
+- Chín người còn lại sửa những tam giác bị lẫn material tóc theo ranh giới hai
+  mẫu. Không đổi vị trí vertex, normals, trọng số, xương, clip hoặc kiểu tóc riêng.
+- Rin và mèo được đối chiếu hash, giữ nguyên. Các bản export có action copy
+  `.001` của Vy được giữ lại; game tiếp tục chọn Idle/Walk/Carry chuẩn.
+
+F6 `scenes/art_pilots/character_faces_review.tscn`: **1** trước, **2/6** hai góc
+nghiêng, **3** toàn thân, **4/5** Walk. Ảnh mới:
+`build/character_face_refine/style_follow_{1,2,3,6}.png`; Walk ở
+`build/character_walk_narrow/style_follow_*.png`.
+
+Tool mắt: `tools/art/match_character_eyes_to_rin.py` (wrapper Bảo cũ cũng gọi
+bộ fit mới). Tool tóc: `tools/art/follow_manual_hair.py`, chạy trước bước mắt.
+`refine_character_faces.py` nhận biết bản tô tay để chỉ sửa mắt, không dựng lại
+phân mảng body. Với model có tag builder, bộ refine áp tóc rồi mắt sau khi dựng.
+
+Backup: `build/character_style_follow/source_before/`; mỗi lần thay file còn có
+backup trong `build/batch_integration/backups/`. PASS 45 asset (76.234 tam giác),
+GPU skin/head attachment + Walk/Carry của 11 người, kiểm dữ liệu gốc/rig/clip và
+bản tóc Bảo/Vy không đổi. Chạy lại bước mắt không đổi GLB hoặc chồng thêm mắt.
+Bằng chứng kiểm tra: `build/character_style_follow/{assets_check.log,gpu_check.log,preservation.json}`.
+
+
+### Thêm lại mắt Cô Năm sau export thủ công — 2026-10-29
+
+Bản `co_nam.glb` mới của người dùng không còn `CharacterFaceDetails`. Đã thêm
+lại riêng hai mắt đen từ primitive/material Rin, vị trí X ±0,052 m, Y 1,421 m,
+đặt thấp hơn mái tóc mới. Phần trước mắt áp sát da; mặt bên/sau chìm vào đầu,
+tránh hiệu ứng hai khối mắt nhô ra. Giữ nguyên body/tóc/màu/rig và tất cả clip
+của bản export thủ công. Tổng Cô Năm: 3.024 tam giác (3.000 thân + 24 mắt).
+
+Đã thêm mắt vào scene Blender đang mở, skin 100% Head. Bản editable có mắt:
+`build/co_nam_eye_restore/co_nam_eyes.blend`; backup trước sửa:
+`build/co_nam_eye_restore/live_before.blend` và `before_co_nam.glb`.
+Không export lại cả scene Blender nên object Icosphere thử nghiệm không vào game.
+
+PASS kiểm riêng geometry/weights/bảo toàn dữ liệu và GPU Walk/Carry/head attachment.
+Kiểm 45 asset vẫn từ chối các action phụ có sẵn trong export Cô Năm (ví dụ
+CarryWalk/Cast/CharacterArmature|...), vì quy tắc cũ chỉ cho Idle/Walk/Carry;
+các action này được giữ nguyên theo bản người dùng. Ảnh game:
+`build/character_face_refine/co_nam_restored_{1,2,3,6}.png`.
+
+
+### Tỷ lệ người/ghế và ánh sáng quán — 2026-10-29
+
+Theo điều chỉnh cuối của người dùng, chỉ đổi tương quan **người với ghế**;
+giữ nguyên scale nhân vật, bàn và người/thuyền ngoài biển. Ghế nhựa trong quán
+thu còn 85%: footprint khoảng 0,47 × 0,47, mặt ghế cao 0,44 thay vì 0,52.
+Collider thu theo đúng mesh để không va vào mép ghế vô hình. GLB nguồn không sửa.
+
+Quán dùng ánh sáng nền xanh xám nhẹ, ánh sáng chính ấm từ phố, sáu đèn rọi xuống
+bàn/bếp/quầy và ánh sáng phụ phía khuất. Có vỏ đèn/panel phát sáng nhìn thấy được.
+Giảm sáng chồng từ hệ omni cũ để giữ chi tiết mặt bàn và tạo vùng sáng/tối.
+Forward+ thêm SSAO ở điểm tiếp xúc; Compatibility dùng bóng thật từ đèn, không
+phụ thuộc SSAO. Đèn rọi được cân năng lượng riêng cho hai renderer.
+
+Nhân vật (kể cả đổi variant), mèo, bàn/ghế và model prop được bật shadow casting
+khi load. Ánh sáng chính phủ toàn quán; đèn bàn/bếp có shadow riêng. Ngoài biển
+giữ bố cục và tỷ lệ hiện tại, tiếp tục bóng từ trăng/đèn thuyền và bật caster trên
+model load mới. Bọt khí/vệt nước vẫn là hiệu ứng không đổ bóng.
+
+Chỉnh ghế: `WorldPresentation3D.RESTAURANT_STOOL_SCALE` tại
+`scenes/world3d/world_presentation_3d.gd`. Đèn/camera quán:
+`RestaurantRoomBuilder3D._lighting()` / `_shop_light()`.
+
+Bản kiểm hình ở `build/world_scale_lighting/`: `before_*` là Compatibility trước
+sửa; `verified_*` là Forward+/Metal sau sửa (camera gameplay + cận bàn/thuyền).
+`verified_restaurant_no_shadows.png` tắt riêng shadow để đối chiếu cùng ánh sáng.
+Scene chụp: `scenes/art_pilots/world_scale_lighting_review.tscn`, chạy với
+`--no-autosave --world-review-tag=verified`. Backup script trước sửa:
+`build/world_scale_lighting/source_before/`.
+
+Kiểm: `scenes/test/world_presentation_check.tscn` kiểm scale/collider ghế, các
+caster, sáu đèn và tỷ lệ rider/hull/cinematic; `restaurant_flow_check.tscn`,
+`traffic_check.tscn`, `sea_scene_3d_smoke.tscn` kiểm gameplay liên quan.
+
+Kết quả: PASS cả bốn kiểm tra trên; render review trên Forward+/Metal và
+Compatibility. Đối chiếu bật/tắt shadow map trên Metal thay đổi 45.553 pixel ở
+vùng gameplay, xác nhận có bóng thật. Sàn nhận bóng, không tự cast để tránh
+shadow acne giữa các viên gạch. Log: `build/world_scale_lighting/*.log`.
+
+
+### Di chuyển bám đất — 2026-10-29
+
+Rin, khách, nhân viên và diễn viên cutscene dùng nhịp chân theo **quãng đường
+thực tế**, không dựa vào giữ phím hay đồng hồ chung. Đụng tường thì dừng chân;
+trượt dọc vật cản chỉ phát bước theo phần đường thực sự đi được.
+
+- Rin tăng/giảm tốc ngắn, xoay mềm theo hướng di chuyển; tốc độ thường 3,0,
+  bưng món 2,3 đơn vị/giây. Khi đủ nhanh dùng Run native của pilot2. Dash giữ
+  tốc độ burst 11 và kết thúc về tốc độ thường, không trôi thêm do dư vận tốc.
+  Wave Power vẫn bù thời gian riêng cho Rin.
+- Nhân viên/khách dùng đường A* đã rút các đoạn thừa theo tầm nhìn có kiểm tra
+  clearance; tăng tốc, hãm lúc gần đích/góc và xoay mềm. Đường đi vẫn cache theo
+  đích, không tìm lại A* mỗi frame khi đã đến nơi.
+- `GroundGait3D` đo tốc độ chân trụ của clip rồi cache theo resource. Khi đi,
+  clock animation tiến theo đoạn đường thực tế; khi đứng dùng thời gian bình
+  thường. Callback manual tránh render FPS tự đẩy lệch nhịp với bước physics.
+- `GroundFootPlant3D` giữ điểm tiếp đất trong world space, giải IK hai xương
+  đùi/cẳng chân và giữ hướng cổ chân từ clip. Xử lý riêng Foot control ở Root
+  của Rin/pilot2 và bàn chân thuộc cẳng chân của rig batch. Nhả khi nhấc chân,
+  đổi trạng thái hoặc quá xa, tránh kéo giãn khi dash/teleport. Mặt đất hiện
+  phẳng, lấy cao độ từ origin actor và độ cao chân trong Idle.
+- Batch có `GroundCarryWalk` tạo **trong RAM**: chân từ Walk, tay từ Carry;
+  sửa lỗi bưng món mà chân vẫn đứng. Đĩa theo vị trí hai cổ tay ở cả Rin và NPC.
+- Bỏ rung Y theo bậc của khách đứng ở bàn. Cutscene di chuyển cũng dùng cùng
+  nhịp chân theo đoạn đường thay vì Walk tốc độ cố định.
+
+Không ghi đè GLB, tóc, màu, rig hay các clip nguồn. Backup script:
+`build/ground_motion/source_before/`. Scale người/ghế/thuyền và ánh sáng giữ
+như đợt trước.
+
+Xem **`scenes/art_pilots/ground_motion_review.tscn` → F6**: Rin, Vy bưng đĩa,
+nhân viên bưng đĩa, khách đi/dừng/quay lại trên sàn có lưới. Ảnh Metal tại
+`build/ground_motion/review_*.png`. `character_faces_review` vẫn là scene xem mặt
+và clip tại chỗ; dùng scene mới để đánh giá tiếp xúc chân với quãng đường đi.
+
+Kiểm mới: `scenes/test/ground_motion_check.tscn`, gồm tất cả 12 model người
+(Rin + 11 batch), Walk/CarryWalk, Run của Rin, pha bước ở 30/120 FPS, tránh vật
+cản, dừng khi bị tường chặn và hết dash. Đo ở 2,2 đơn vị/giây trên đường thẳng:
+độ trượt trung bình lúc chân trụ giảm khoảng 64–91%; ví dụ Rin Walk 0,999 →
+0,361, Vy 1,324 → 0,206, staff bưng đĩa 2,2 → 0,223. Run Rin ở 3,0 giảm
+0,663 → 0,229. Đây là phép đo trong đoạn tiếp đất, không phải bảo đảm triệt tiêu
+mọi trượt ở mọi tình huống đổi hướng.
+
+PASS flow quán, traffic/pathing, story bridge, staging/camera và cinematic ném
+cần. Log tại `build/ground_motion/{check,flow,traffic,story,stage,cast,review}.log`.

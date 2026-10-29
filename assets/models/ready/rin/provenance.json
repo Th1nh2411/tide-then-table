@@ -1,34 +1,18 @@
 {
   "date": "2026-10-29",
-  "source_mesh": "assets/models/characters/rin_hunyuan_shape/rin_hunyuan_3k_lit.glb",
-  "source_sha256": "93f6c01ecb2952af2dd2911f5e19ed1a8e0365bbd2e6698afd300f983b8fbe7c",
-  "source_method": "Actual Tencent Hunyuan3D-2.1 inference, reduced by official Space to 3000 triangles",
-  "image_reference": "assets/sprites/portraits/rin/base.png",
-  "palette_reference_sha256": "cb0d2190c7c8a056485609aac608a257c73435342c8a2bcf1fdc6bf9b1b238ac",
-  "palette_srgb": {
-    "Skin": "d79c6b",
-    "Ivory": "eee5d5",
-    "Navy": "151d28",
-    "Hair": "151d28",
-    "Frame": "090a14",
-    "Sandal": "090a14",
-    "Silver": "cac0b7"
-  },
-  "concept": "assets/concepts/rin/lowpoly_turnaround_v1.png",
-  "processing": "Hunyuan source with user-edited mesh/materials exported from rin.blend; repaired Walk and foot weights; Idle/Walk/Carry/Cast",
-  "blender_used": true,
-  "external_base_geometry_used": false,
-  "license": "Tencent Hunyuan 3D 2.1 Community License; source notice preserved",
-  "output_sha256": "5bc8857bdde3c9e1b47a6fd7429ffb8ca1644aba7baa9613d64fca72ee050932",
-  "artist_edit": {
-    "source_blend": "/Users/nguyenthinh/WorkSpace/blender/rin.blend",
-    "source_blend_sha256": "e3b3f96d5406990e3639bf0b01fb583ed1baf353d0d7f009e8b11639d11319db",
-    "source_snapshot": "build/rin_cast/source_with_cast.blend",
-    "changes": [
-      "Exported user-edited rin.blend mesh and materials without palette override",
-      "Kept repaired Walk, Idle and Carry; excluded obsolete Raised",
-      "Added authored 1.5s Cast with two-handed wind-up and follow-through; linked to cinematic and preview"
-    ],
-    "date": "2026-10-29"
-  }
+  "source_mesh": "assets/models/ready/rin/rin_pilot2.glb",
+  "source_sha256": "67c366f8c1e9ba3d3767213bc8660579a4f8028ed647a33c53d05596e8dd888c",
+  "source_method": "Direct GLB patch: original binary payload, nodes, body/face normals, rig and 24 native animations retained byte-for-byte",
+  "hair_palette_donor": "build/rin2_finish/donor_rin.glb",
+  "changes": [
+    "Base Color only; retain original material metallic/roughness and other properties",
+    "Replace only the hair primitive; attach donor hair to original Head",
+    "Add open rectangular glasses; do not modify face/eyes/brows/ears",
+    "Retain separate Carry/Cast compatibility clips"
+  ],
+  "builder": "tools/art/finish_rin2_exact.py",
+  "original_binary_sha256": "1aacc032098dccf4726b7cdf8af649e5f35936062e10db56c0f01d7a8d1a0394",
+  "hair_triangles": 264,
+  "glasses_triangles": 132,
+  "output_sha256": "5f25d3774187973c35eb814f52b75083906d9a525c7ee991dd8ca8f36a97023c"
 }

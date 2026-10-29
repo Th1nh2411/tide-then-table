@@ -4,5 +4,30 @@
   "source_method": "Hunyuan3D-2mini-turbo local inference",
   "processing": "Uniform 0.58m height; flat orange/cream palette; original inferred geometry. Rigid seated visual, no skeletal locomotion.",
   "blender_used": false,
-  "output_sha256": "625cac1d07cac19b7066ba17a24f7d813ff51048a9b871a3e4dc08986a34b48b"
+  "output_sha256": "88ae06bebb392f834897ed85612fe81be6666c2020f05e7a4391f70fc591837d",
+  "face_detail_triangles": 64,
+  "face_refinement": {
+    "reference": "assets/concepts/3d_queue/props/cat.png",
+    "palette_srgb": {
+      "Orange": "e9a05b",
+      "Cream": "eed9b5",
+      "Eyes": "e9a05b"
+    },
+    "eyes": [
+      [
+        -0.073,
+        0.464,
+        0.14863072765426355
+      ],
+      [
+        0.035,
+        0.464,
+        0.11111653325909664
+      ]
+    ],
+    "builder": "tools/art/refine_character_faces.py",
+    "base_binary_sha256": "f371f965481e779987a93e6aa4b483b3816f4a5952055188478d1b8e78d03c7b",
+    "base_binary_length": 126000,
+    "changes": "Base Color correction and surface-projected eye/eyelid/brow details; original body, normals, weights, rig and clips unchanged"
+  }
 }

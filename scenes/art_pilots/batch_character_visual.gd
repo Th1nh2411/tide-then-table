@@ -14,9 +14,13 @@ func load_variant(id: String) -> void:
 		model.queue_free()
 	model = load("res://assets/models/ready/%s/%s.glb" % [id, id]).instantiate()
 	add_child(model)
+	WorldPresentation3D.cast_shadows(model)
 	skeleton = model.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
 	animation = model.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
 	for clip: String in animation.get_animation_list():
-		animation.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
+		animation.get_animation(clip).loop_mode = Animation.LOOP_NONE if clip in ["Cast","SitDown","StandUp"] else Animation.LOOP_LINEAR
+	_motion = "Idle"
 	animation.play(_motion)
 	animation.advance(0.0)
+	skeleton.force_update_all_bone_transforms()
+	_foot_plant = GroundFootPlant3D.new(self)

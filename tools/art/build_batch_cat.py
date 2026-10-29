@@ -17,3 +17,7 @@ for name,payload in [('metrics.json',metrics),('provenance.json',dict(source_mes
 notice=source.parent/'LICENSE-HUNYUAN.txt'
 if notice.exists():shutil.copy2(notice,out/notice.name)
 print(metrics)
+
+# Reapply the reviewed orange palette and surface-fitted eyes after a rebuild.
+from refine_character_faces import refine
+refine("cat")

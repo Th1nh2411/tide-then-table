@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3]
-[ext_resource type="Script" path="res://scenes/art_pilots/rin_pilot.gd" id="1"]
-[node name="RinPilot" type="Node3D"]
+[gd_scene format=3 uid="uid://bx321bubktd4h"]
+
+[ext_resource type="Script" uid="uid://b0ifo38kjxb8i" path="res://scenes/art_pilots/rin_pilot.gd" id="1"]
+
+[node name="RinPilot" type="Node3D" unique_id=1327925315]
 script = ExtResource("1")

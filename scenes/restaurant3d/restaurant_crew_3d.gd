@@ -52,12 +52,12 @@ func move_staff(delta: float) -> void:
 			var dirty: int = host.dirty_tables.find(true)
 			if dirty >= 0:
 				var clean_target: Vector3 = L.TABLES[dirty] + Vector3(0, 0, 1.1)
-				StaffPathing3D.step(node, L.TABLES, clean_target, delta * 3.0)
+				StaffPathing3D.move(node, L.TABLES, clean_target, 3.0, delta)
 				if node.position.distance_to(clean_target) < 0.06:
 					host._clean_table(dirty)
 				continue
 			var home := Vector3(3.3 + workers.find(worker) * 0.7, 0, -0.5)
-			StaffPathing3D.step(node, L.TABLES, home, delta * 2.5)
+			StaffPathing3D.move(node, L.TABLES, home, 2.5, delta)
 			continue
 		if host.orders[table].is_empty():
 			worker["picked"] = false
@@ -66,7 +66,7 @@ func move_staff(delta: float) -> void:
 		var picked: bool = bool(worker.get("picked", false))
 		var target: Vector3 = L.TABLES[table] + Vector3(0, 0, 1.2) if picked else L.PASS_POSITION + Vector3(0, 0, 1.0)
 		var person: StaffData = worker["data"]
-		StaffPathing3D.step(node, L.TABLES, target, delta * person.walk_speed / 23.0)
+		StaffPathing3D.move(node, L.TABLES, target, person.walk_speed / 23.0, delta)
 		if node.position.distance_to(target) < 0.05:
 			if not picked:
 				worker["picked"] = true

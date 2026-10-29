@@ -1,8 +1,8 @@
 {
-  "triangles": 3000,
+  "triangles": 3024,
   "source_vertices": 1501,
-  "mesh_count": 1,
-  "surfaces": 5,
+  "mesh_count": 2,
+  "surfaces": 6,
   "bones": 20,
   "animations": [
     "Idle",
@@ -17,5 +17,7 @@
     "Bottom": 1042,
     "Hair": 210,
     "Shoes": 267
-  }
+  },
+  "body_triangles": 3000,
+  "face_detail_triangles": 24
 }

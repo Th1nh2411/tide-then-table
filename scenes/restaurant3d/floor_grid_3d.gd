@@ -80,8 +80,23 @@ func path(from: Vector3, to: Vector3) -> Array[Vector3]:
 	var b := _nearest_free(_cell(to))
 	var cells := astar.get_id_path(a, b)
 	out.append(from)
+	if cells.is_empty(): return out
 	for i in range(1, cells.size() - 1):
 		var w := _world(cells[i])
 		out.append(Vector3(w.x, from.y, w.z))
 	out.append(to)
-	return out
+	# Greedy line-of-sight shortcuts remove grid stair-steps, retaining padded clearance.
+	var smooth: Array[Vector3] = [out[0]]
+	var index := 0
+	while index < out.size()-1:
+		var next := out.size()-1
+		while next > index+1 and not _line_clear(out[index],out[next]): next -= 1
+		smooth.append(out[next])
+		index = next
+	return smooth
+
+func _line_clear(a: Vector3, b: Vector3) -> bool:
+	var samples := maxi(1,ceili(a.distance_to(b)/(CELL*.4)))
+	for i in samples+1:
+		if blocked_at(a.lerp(b,float(i)/float(samples))): return false
+	return true

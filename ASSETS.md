@@ -244,8 +244,8 @@ Flow đã chọn và checklist: `docs/ART_PIPELINE.md`; hướng hình ảnh: `A
 | `assets/concepts/rin/lowpoly_turnaround_v1.png` | 1672×941, ảnh gen 3 góc; prompt/provenance cùng thư mục | Mẫu Rin được giữ cho flow Hunyuan |
 | `assets/models/characters/rin_hunyuan_shape/input_front.png` | 505×941, crop input | Nguồn lần inference đầu |
 | `assets/models/characters/rin_hunyuan_shape/rin_hunyuan_shape.glb` | 78,972 tam giác; GLB gốc từ Space Tencent | Source phục vụ pilot Rin |
-| `assets/models/characters/rin_hunyuan_shape/rin_hunyuan_3k_lit.glb` | 3,000 tam giác, đã thêm normals; chưa material/rig | Shape baseline, F6 `rin_hunyuan_study.tscn` |
-| `assets/models/ready/rin/rin_pilot.glb` | 3,000 tam giác; 20 xương; Idle/Walk/Carry; palette portrait 2D approved | Active quán/biển/cutscene |
+| `assets/models/characters/rin_hunyuan_shape/rin_hunyuan_3k_lit.glb` | 3,000 tam giác, đã thêm normals; chưa material/rig | Shape baseline (scene study đã xoá) |
+| `assets/models/ready/rin/rin_pilot.glb` | Base `rin_pilot2.glb`; 5,349 tam giác; 62 xương; giữ 24 clip gốc; màu/tóc từ Rin trước | Active quán/biển/cutscene |
 | Bàn và ghế đẩu pilot | Hunyuan local; bàn 1,200 tam giác, ghế 600; từng vật rời | Active quán |
 | Thuyền thúng pilot | Hunyuan shape; 2,400 tam giác, material phẳng | Active biển |
 | 45 asset batch (11 nhân vật, 24 đồ lớn/thuyền/công trình, 10 đồ nhỏ) | Nguồn `assets/models/batch/`; thành phẩm `assets/models/ready/<id>/<id>.glb`; tổng 75,622 tam giác | Đã chuẩn hóa/tô màu và tích hợp game |
@@ -274,3 +274,48 @@ Walk sửa trọng số dép và nhịp bước. Nguồn chỉnh tiếp local:
 Rin có thêm clip `Cast` 1,5 giây; preview phím 5 và cinematic dùng clip này.
 Các nhân vật batch khác giữ Idle/Walk/Carry. Nguồn có Cast: `rin.blend` ở đường
 dẫn Blender nêu trên; snapshot local `build/rin_cast/source_with_cast.blend`.
+
+Rin hiện dùng **thân, mặt, rig và Walk gốc của `rin_pilot2.glb`** theo lựa chọn
+người dùng; GLB nguồn giữ nguyên. Chỉ thay material và ghép 275 tam giác tóc từ
+bản Rin trước. Có thêm Carry/Cast tương thích gameplay, không thay Walk gốc.
+Nguồn chỉnh tiếp: `build/rin2_finish/rin_pilot2_finished.blend`.
+
+Base 2 hiện được sửa GLB trực tiếp: giữ binary/normals/rig/24 clip gốc và thông số
+material, chỉ đổi Base Color, thay tóc và thêm kính. Tổng 5.349 tam giác/6 mesh.
+Scene đối chiếu: `scenes/art_pilots/rin_pilot2_compare.tscn`.
+
+### Palette/mắt model ngoài Rin — 2026-10-29
+
+11 người batch và mèo đã được sửa màu và mắt. Profile nguồn chính xác nằm ở
+`tools/art/refine_character_faces.py`: Bảo cam/kem, Vy hồng theo portrait, Cô Năm
+xanh olive/tóc tối, Ông Tám áo nâu đỏ/tóc bạc xanh, khách quen xanh/tóc muối tiêu;
+những khách còn lại theo concept. Mèo Mỡ giữ cam/kem theo art plan.
+
+Các GLB runtime vẫn ở `assets/models/ready/<id>/<id>.glb`. Giữ 3.000 tam giác
+thân và skin 20 xương cho người; mắt đen theo Rin + chân mày thêm 40 tam giác,
+kính thêm 36 cho `guest_3`, `guest_rich`, `staff`; mèo thêm 64 tam giác mắt.
+Tổng 45 model batch hiện là 76.218 tam giác. Raw/reduced nguồn và toàn bộ Rin không đổi.
+Scene review: `scenes/art_pilots/character_faces_review.tscn`.
+
+Walk 11 người batch đã thu hẹp đường cổ chân (rig chuẩn: 0,386 → 0,240 m),
+giữ mesh/màu/mắt và các clip khác. Rin/mèo không đổi. Xem phím 4/5 trong scene
+`character_faces_review.tscn`; tool `tools/art/narrow_character_walk.py`.
+
+Cả 11 người dùng mắt đen từ primitive Eye của Rin, fit từng bên lên mặt thật;
+FaceDetails 40 tam giác, hoặc 76 khi có kính. `bao`/`vy` giữ nguyên bản tóc và
+mảng màu thân người dùng tô thủ công. Chín người còn lại sửa ranh giới material
+tóc theo hai mẫu đó, giữ silhouette và màu tóc riêng. Không sửa Rin/mèo.
+Tool: `tools/art/match_character_eyes_to_rin.py`, `tools/art/follow_manual_hair.py`.
+Backup trước đợt này: `build/character_style_follow/source_before/`.
+
+
+Cô Năm sau export thủ công được thêm lại riêng 24 tam giác mắt Rin (không thêm
+lại chân mày đã xóa): `assets/models/ready/co_nam/co_nam.glb`, tổng 3.024.
+Body/tóc/palette/rig/clip người dùng giữ nguyên. Bản Blender có mắt và backup ở
+`build/co_nam_eye_restore/`; mắt cũng đã được thêm vào scene Blender đang mở.
+
+
+Ghế `ready/stool/stool.glb` giữ nguyên nguồn; runtime quán scale 0,85 cả mesh và
+collider (cao 0,442; footprint 0,4675 × 0,4675). Đây là điều chỉnh tương quan
+người/ghế, không đổi scale nhân vật/bàn/người trên thuyền. Shadow caster được
+bật lúc load qua `WorldPresentation3D`; đèn quán/SSAO không thay màu material gốc.

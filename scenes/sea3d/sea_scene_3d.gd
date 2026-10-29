@@ -120,6 +120,17 @@ func _solid_box(pos: Vector3, size: Vector3, hex: String, show_visual: bool = tr
 	collider.shape = shape
 	body.add_child(collider)
 
+## Lantern-style point light with optional shadows.
+func _glow(pos: Vector3, hex: String, energy: float, range_: float, shadow: bool) -> OmniLight3D:
+	var light := OmniLight3D.new()
+	add_child(light)
+	light.position = pos
+	light.light_color = Color(hex)
+	light.light_energy = energy
+	light.omni_range = range_
+	light.shadow_enabled = shadow
+	return light
+
 ## Batch-derived visuals are separate from the existing gameplay colliders.
 func _batch_model(parent: Node3D, id: String, position_: Vector3 = Vector3.ZERO, scale_: Vector3 = Vector3.ONE) -> Node3D:
 	var path := "res://assets/models/ready/" + id + "/" + id + ".glb"
@@ -128,6 +139,7 @@ func _batch_model(parent: Node3D, id: String, position_: Vector3 = Vector3.ZERO,
 	parent.add_child(visual)
 	visual.position = position_
 	visual.scale = scale_
+	WorldPresentation3D.cast_shadows(visual)
 	return visual
 
 func _label(text: String, pos: Vector3, size: int, hex: String) -> void:
@@ -220,6 +232,11 @@ func _build_environment() -> void:
 	moon.rotation_degrees = Vector3(-48, -28, 0)
 	moon.light_color = Color("bacac7")
 	moon.light_energy = 0.6
+	moon.shadow_enabled = true
+	moon.directional_shadow_max_distance = 40.0
+	moon.shadow_blur = 2.0
+	moon.shadow_bias = 0.1
+	moon.shadow_normal_bias = 2.0
 	add_child(moon)
 
 func _build_world() -> void:
@@ -245,6 +262,8 @@ func _build_world() -> void:
 		_solid_box(off + Vector3(0, 0.45, float(z)), Vector3(3.5, 0.35, 1.7), "7a4841", false)
 	# The inferred pier deck sits at the old collision top; posts extend underwater.
 	_batch_model(self, "dock", off + Vector3(0, -0.73, 12.0))
+	_glow(off + Vector3(-3.5, 2.4, 11.0), "ffc27a", 1.6, 9.0, true)
+	_glow(off + Vector3(4.5, 2.4, 11.0), "ffc27a", 1.2, 8.0, false)
 	_batch_model(self, "lighthouse", off + Vector3(-6.8, 0.02, 10), Vector3(0.6, 0.95, 0.6))
 	_label("BẾN XÓM ĐÈN", off + Vector3(0, 1.45, 13.6), 30, "e7d5b3")
 	var rock_index := 0
@@ -284,6 +303,10 @@ func _build_pois() -> void:
 	_batch_model(self, "old_man_hut", HUT_POS + Vector3(-1.4, 0.02, -0.5))
 	_label("GÒ VỎ ỐC", HUT_POS + Vector3(-1.4, 2.3, -0.5), 20, "f2d98a")
 	_label("BÈ TÔM HÙM ANH ÚT", RAFT_POS + Vector3(0, 2.8, 0), 20, "f2d98a")
+	_glow(SHRINE_POS + Vector3(-1.4, 2.2, 0.4), "9fe0d0", 1.4, 9.0, true)
+	_glow(LIGHTHOUSE_POS + Vector3(-1.8, 4.0, 0.4), "fff0b0", 2.4, 16.0, true)
+	_glow(HUT_POS + Vector3(-1.4, 2.0, 0.5), "ffc27a", 1.4, 8.0, true)
+	_glow(RAFT_POS + Vector3(0, 2.2, 0), "ffc27a", 1.4, 8.0, true)
 	if Story.is_fog_open():
 		for i in range(18):
 			var a := TAU * float(i) / 18.0
@@ -389,6 +412,7 @@ func _build_boat() -> void:
 	boat_lamp.light_energy = 2.5
 	boat_lamp.spot_range = 14.0
 	boat_lamp.spot_angle = 36.0
+	boat_lamp.shadow_enabled = true
 
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()

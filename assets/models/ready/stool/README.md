@@ -33,7 +33,7 @@ visuals/colliders, dish placements, interaction positions and gameplay are uncha
 Runtime source backup: `build/art_pilots/backups/furniture_before_runtime/`.
 
 Bare gallery wrapper: `scenes/art_pilots/furniture_pilot.tscn`.
-Standalone review: `scenes/art_pilots/furniture_pilot_preview.tscn`.
+Standalone review scene removed 2026-10-29; view in the restaurant.
 Review captures/logs: `build/art_pilots/furniture/`.
 
 Verified: front/side/back/three-quarter, furniture arrangement and gameplay scale;

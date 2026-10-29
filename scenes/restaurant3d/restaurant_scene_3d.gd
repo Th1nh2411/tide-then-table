@@ -91,6 +91,7 @@ var _focus_lost: bool = false
 var _dash_left: float = 0.0
 var _dash_cooldown: float = 0.0
 var _dash_direction := Vector3.ZERO
+var _movement_time_scale := 1.0
 var dirty_tables: Array[bool] = []
 var table_plates: Array[Node3D] = []
 var ready_plates: Array[Node3D] = []
@@ -261,14 +262,19 @@ func _open_shift() -> void:
 func _physics_process(delta: float) -> void:
 	if get_tree().paused or _focus_lost:
 		player.velocity = Vector3.ZERO
+		body.drive_ground_motion(Vector3.ZERO,delta,false)
 		return
 	if shift_running:
 		_move_staff(delta)
 	if modal_open():
 		player.velocity = Vector3.ZERO
+		body.drive_ground_motion(Vector3.ZERO,delta,false)
 		return
 	var axes := Input.get_vector("turn_left", "turn_right", "throttle_forward", "throttle_back")
 	var rin_scale := 1.0 / maxf(Engine.time_scale, 0.001) if WavePower.rin_unslowed else 1.0
+	# Keep acceleration and momentum in real-time units when Wave Power slows the world.
+	player.velocity *= rin_scale / _movement_time_scale
+	_movement_time_scale = rin_scale
 	var right := demo_camera.global_basis.x
 	right.y = 0.0
 	var forward := demo_camera.global_basis.z
@@ -283,15 +289,19 @@ func _physics_process(delta: float) -> void:
 		_dash_left = maxf(_dash_left - delta * rin_scale, 0.0)
 		player.velocity = _dash_direction * 11.0 * rin_scale
 	else:
-		player.velocity = direction * 4.2 * rin_scale
+		var speed := 2.3 if carrying_table >= 0 else 3.0
+		var desired := direction * speed * rin_scale
+		# Dash ends at walking/running speed, rather than coasting several extra metres.
+		player.velocity = player.velocity.limit_length(speed*rin_scale)
+		player.velocity = player.velocity.move_toward(desired,(20.0 if axes.length_squared() > .01 else 28.0)*delta*rin_scale*rin_scale)
+	var before := player.global_position
 	player.move_and_slide()
+	var moved := player.global_position-before
 	step_clock += delta * rin_scale
-	if player.velocity.length() > 0.1:
-		player.rotation.y = lerp_angle(player.rotation.y, atan2(player.velocity.x, player.velocity.z), minf(delta * 10.0, 1.0))
+	if moved.length_squared() > 0.000001:
+		player.rotation.y = lerp_angle(player.rotation.y, atan2(moved.x, moved.z), 1.0-exp(-16.0*delta*rin_scale))
 	body.set_carrying(carrying_table >= 0)
-	body.set_walking(axes.length(), step_clock)
-	for i in range(guests.size()):
-		guests[i].position.y = sin(floorf(step_clock * 5.0 + float(i))) * 0.025
+	body.drive_ground_motion(moved,delta,false)
 
 func _process(delta: float) -> void:
 	panels.refresh_prompt(demo_camera, get_tree().paused or _focus_lost or modal_open())

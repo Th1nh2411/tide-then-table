@@ -91,6 +91,7 @@ def build(asset):
   t=smooth(1.43,1.54,y);return {'Chest':1-t,'Neck':t}
  def vertex_weights(p):
   x,y,z=p;sign=1 if x>=0 else -1;tag='L' if sign==1 else 'R';ax=abs(x)
+  if y<.10:return {'Foot.'+tag:1}
   if y>=1.56:return {'Head':1}
   if y>=1.48 and ax<.14:
    t=smooth(1.48,1.56,y);return {'Neck':1-t,'Head':t}
@@ -205,6 +206,9 @@ def build(asset):
  notice=SOURCE.parent/'LICENSE-HUNYUAN.txt'
  if notice.exists():shutil.copy2(notice,OUT/notice.name)
  print(asset,json.dumps(metrics))
+ # Reapply reviewed eyes/palette and X-only Walk when regenerating a character.
+ from narrow_character_walk import patch
+ patch(asset,use_current_source=True)
 if __name__=='__main__':
  import sys
  for asset in sys.argv[1:] or CONFIG:build(asset)

@@ -26,6 +26,9 @@ var carrying := false
 var _pilot: RinPilotVisual
 var _walk_speed := 0.0
 var _casting_clip := false
+var _distance_driven := false
+var _ground_frame := -1
+var _seated := false
 
 
 ## Builds a rig of `kind` under `parent`; legacy shirt argument remains accepted.
@@ -54,6 +57,7 @@ static func build(parent: Node3D, kind_: String, shirt: String = "") -> PersonRi
 ## Walk cycle: `speed` 0..1 scales the swing, `clock` is the step time.
 func set_walking(speed: float, clock: float) -> void:
 	if _pilot:
+		_distance_driven = false
 		_walk_speed = speed
 		_update_pilot_motion()
 		return
@@ -72,6 +76,35 @@ func set_walking(speed: float, clock: float) -> void:
 		for arm in arms:
 			arm.rotation.x = -0.8
 
+
+## Displacement is in world coordinates; use the distance actually travelled after collision.
+func drive_ground_motion(displacement: Vector3, delta: float, face_travel := true) -> void:
+	if not _pilot or _casting_clip or _seated or delta <= 0.0: return
+	_distance_driven = true
+	_ground_frame = Engine.get_physics_frames()
+	var flat := Vector3(displacement.x,0,displacement.z)
+	if face_travel and flat.length_squared() > 0.000001:
+		var parent_space := get_parent_node_3d().global_basis.inverse()*flat
+		rotation.y = lerp_angle(rotation.y,atan2(parent_space.x,parent_space.z),1.0-exp(-14.0*delta))
+	_pilot.drive_ground_motion(flat.length()/maxf(global_basis.get_scale().x,.001),delta,carrying)
+	_sync_pilot_anchors()
+
+func set_seated(on: bool) -> void:
+	if not _pilot: return
+	if on and not SeatedAnimation3D.prepare(_pilot,RestaurantSeating3D.SEAT_HEIGHT): return
+	_seated = on
+	_distance_driven = false
+	_walk_speed = 0.0
+	if _pilot._foot_plant: _pilot._foot_plant.release()
+	_pilot.set_motion("SitIdle" if on else "Idle")
+
+func sample_seating(progress: float, standing_up := false) -> void:
+	if not _pilot or not SeatedAnimation3D.prepare(_pilot,RestaurantSeating3D.SEAT_HEIGHT): return
+	_seated = true
+	_distance_driven = false
+	if _pilot._foot_plant: _pilot._foot_plant.release()
+	var clip := "StandUp" if standing_up else "SitDown"
+	_pilot.sample_motion(clip,clampf(progress,0,1)*_pilot.animation.get_animation(clip).length)
 
 func set_carrying(on: bool) -> void:
 	carrying = on
@@ -117,17 +150,22 @@ func _build_rin_pilot() -> void:
 	_sync_pilot_anchors()
 
 func _update_pilot_motion() -> void:
-	if _casting_clip:
+	if _casting_clip or _distance_driven or _seated:
 		return
-	var clip := "Carry" if carrying else "Walk" if _walk_speed > 0.03 else "Idle"
-	_pilot.set_motion(clip, clampf(_walk_speed, 0.35, 1.5) if clip == "Walk" else 1.0)
+	var moving := _walk_speed > 0.03
+	var clip := ("CarryWalk" if moving else "Carry") if carrying else "Walk" if moving else "Idle"
+	if not _pilot.animation.has_animation(clip):
+		clip = "Carry" if carrying else "Idle"
+	_pilot.set_motion(clip, clampf(_walk_speed, 0.35, 1.5) if moving else 1.0)
 
 func _process(_delta: float) -> void:
 	if not _pilot or not _pilot.skeleton:
 		return
-	if _casting_clip:
+	if _casting_clip or _seated:
 		_sync_pilot_anchors()
 		return
+	if _distance_driven and Engine.get_physics_frames() > _ground_frame + 1:
+		_pilot.drive_ground_motion(0.0,_delta,carrying)
 	var casting := false
 	for i in range(arms.size()):
 		if arms[i].get_child_count() > 0:
@@ -146,6 +184,8 @@ func sample_cast(seconds: float) -> void:
 func _sync_pilot_anchors() -> void:
 	if not _pilot or not _pilot.skeleton:
 		return
+	if carrying:
+		plate.position = (_pilot.hand_position("L") + _pilot.hand_position("R")) * 0.5 + Vector3(0, -0.04, 0.08)
 	for i in range(arms.size()):
 		if _casting_clip:
 			arms[i].basis = _pilot.hand_basis("R" if i == 0 else "L")
@@ -180,10 +220,12 @@ func set_variant(id: String) -> void:
 		var hips := _pilot.skeleton.get_bone_global_rest(_pilot.skeleton.find_bone("Hips")).origin.y
 		plate.position = Vector3(0, 1.0, 0.47) * hips / 0.92
 		_update_pilot_motion()
+		if _seated: set_seated(true)
 		_sync_pilot_anchors()
 
 func _build_cat() -> void:
 	current_variant = "cat"
 	_cat_visual = load("res://assets/models/ready/cat/cat.glb").instantiate()
 	add_child(_cat_visual)
+	WorldPresentation3D.cast_shadows(_cat_visual)
 	add_to_group("person_cat")

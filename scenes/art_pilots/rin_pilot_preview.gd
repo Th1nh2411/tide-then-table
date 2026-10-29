@@ -29,7 +29,7 @@ func _ready() -> void:
 	_visual = load("res://scenes/art_pilots/rin_pilot.tscn").instantiate() as RinPilotVisual
 	_pivot.add_child(_visual)
 	_rod = BoneAttachment3D.new()
-	_rod.bone_name = "Hand.L"
+	_rod.bone_name = "Hand.L" if _visual.skeleton.find_bone("Hand.L") >= 0 else "Wrist.L"
 	_visual.skeleton.add_child(_rod)
 	var rod := MeshInstance3D.new()
 	var shape := BoxMesh.new()
@@ -40,8 +40,10 @@ func _ready() -> void:
 	rod.material_override = rod_material
 	_rod.add_child(rod)
 	# BoneAttachment owns its transform; put the grip offset on its child mesh.
-	rod.rotation.x = -1.2
-	rod.position = Basis(Vector3.RIGHT, -1.2) * Vector3(0, 0, 0.7)
+	var rest_correction := _visual.hand_rest_basis("L").inverse()
+	var skeleton_scale := _visual.skeleton.global_basis.get_scale()
+	rod.basis = rest_correction * Basis(Vector3.RIGHT, -1.2) * Basis.from_scale(Vector3.ONE / skeleton_scale)
+	rod.position = rest_correction * (Basis(Vector3.RIGHT, -1.2) * Vector3(0, 0, 0.7)) / skeleton_scale
 	_rod.visible = false
 	_pivot.rotation.y = 0.6
 	_camera = Camera3D.new()
@@ -52,7 +54,7 @@ func _ready() -> void:
 	var ui := CanvasLayer.new()
 	add_child(ui)
 	var label := Label.new()
-	label.text = "RIN • HUNYUAN PILOT\n3.000 tam giác • 20 xương • màu phẳng\n1/2/3: đứng/đi/bưng   5: ném cần\n← →: xoay   4: cận"
+	label.text = "RIN • PILOT 2\nRig và Walk gốc • màu và tóc Rin\n1/2/3: đứng/đi/bưng   5: ném cần\n← →: xoay   4: cận"
 	label.position = Vector2(24, 20)
 	label.add_theme_font_size_override("font_size", 20)
 	ui.add_child(label)

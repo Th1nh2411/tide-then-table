@@ -153,3 +153,35 @@ Rin pilot chuyển palette theo portrait approved, gồm da `#d79c6b`, áo `#eee
 tóc `#151d28`, kính `#090a14`, bạc `#cac0b7`. Chưa thay sprite/portrait gốc.
 Mèo chưa có rig đi bốn chân; mặt/ngón tay và vài chi tiết inference vẫn đơn giản.
 Catalog và scene review: `ASSETS.md`, `docs/3D_DEMO.md`.
+
+Rin hiện hành (lựa chọn người dùng 2026-10-29): dùng `rin_pilot2.glb` làm base
+thân/mặt/rig và Walk, chỉ chuyển palette và mesh tóc từ Rin trước. Base nguồn
+giữ nguyên; model game ở `assets/models/ready/rin/rin_pilot.glb`.
+
+Ngày 2026-10-29, đã chỉnh mắt và màu 11 nhân vật ngoài Rin cùng mèo: bỏ mắt hộp
+đen, dùng chi tiết mắt nhỏ bám mặt/xương Head; sửa palette theo portrait và
+concept. Mèo tiếp tục là mèo cam theo mục mô tả Mỡ. Không thay PNG approved,
+không sửa Rin. Review: `scenes/art_pilots/character_faces_review.tscn`.
+
+
+### Mắt/tóc theo bản Bảo và Vy người dùng tô — 2026-10-29
+
+Chốt hai mẫu tóc là **Bảo và Vy** do người dùng sửa trực tiếp. Giữ nguyên toàn bộ
+phân mảng material tóc/thân của hai bản này. Các nhân vật người còn lại tham khảo
+ranh giới tóc của hai mẫu, chỉ đổi material trên các tam giác gần vùng tóc; giữ
+silhouette, tóc buộc của Vy sau/Cô Năm, tóc bạc Ông Tám và tóc muối tiêu khách quen.
+
+Cả 11 người batch dùng primitive `Eye` đen low-poly từ Rin, căn từng bên theo da
+thật để tránh mắt chìm; giữ chân mày và kính. Thay quyết định lòng trắng/iris ở
+đợt trước. Rin/mèo/portrait không sửa. Tool mắt: `match_character_eyes_to_rin.py`;
+tóc: `follow_manual_hair.py`. Bản tô tay Bảo/Vy là nguồn ưu tiên; không dựng lại
+body bằng builder để thay các bản đó.
+
+
+### Ánh sáng quán và tương quan người/ghế — 2026-10-29
+
+Giữ nguyên tỷ lệ nhân vật/bàn/thuyền theo điều chỉnh cuối của người dùng;
+ghế nhựa runtime thu 15% (cao khoảng 0,44) để người trông lớn hơn so với ghế.
+Quán có sáu đèn rọi ấm, nền xanh xám nhẹ và ánh sáng phụ từ phố; giữ chi tiết
+màu sáng của bàn, có bóng thật dưới người và đồ vật. Forward+ thêm SSAO nhẹ
+ở điểm tiếp xúc. Palette trong GLB/portrait giữ nguyên.

@@ -46,7 +46,7 @@ pilot, not a manifold/physical boat simulation or final approved production asse
 
 - `scenes/art_pilots/boat_pilot.tscn`: bare visual wrapper, no lights, camera or UI;
   safe to instance in the gallery or sea.
-- `scenes/art_pilots/boat_pilot_preview.tscn`: standalone F6 inspection. 1 three-quarter,
+- (preview scene removed 2026-10-29; view in the sea scene.) 1 three-quarter,
   2 top, 3 side, 4 gameplay camera distance; left/right rotate.
 - `scenes/sea3d/sea_scene_3d.gd::_build_boat()`: only the default `thuyen_thung`
   hull/bench primitives are replaced. Existing BoatVisual, lamp, collider, controller, upgrade variants and casting

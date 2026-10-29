@@ -14,7 +14,7 @@ const SEAT_OFFSET := Vector3(0, 0, 1.15)
 
 @export var host: Node3D
 
-## One trip: bike + walker. phase: riding_in, walking_in, seated, walking_out, riding_out.
+## One trip: bike + walker. Includes sitting down and standing up at the real stool.
 var trips: Array[Dictionary] = []
 var _by_table: Dictionary = {}
 var _used_slots: Dictionary = {}
@@ -59,13 +59,23 @@ func _leave(table: int) -> void:
 	var phase: String = trip["phase"]
 	if trip["walker"] == null and phase == "seated":
 		return
-	if phase == "seated" or phase == "walking_in":
+	if phase in ["seated","seating"]:
 		var walker: Node3D = trip["walker"]
 		walker.visible = true
-		var seat: Vector3 = (host.get("TABLES") as Array)[table] + SEAT_OFFSET
-		walker.position = walker.position if phase == "walking_in" else seat
-		trip["walker"] = walker
-		trip["route"] = _walk_route(walker.position, _park_cell(trip))
+		var centre: Vector3 = (host.get("TABLES") as Array)[table]
+		var actor := walker.get_node("WalkerActor") as PersonRig3D
+		var progress := 1.0 if phase=="seated" else clampf((float(trip.get("seat_clock",0.0))-RestaurantSeating3D.APPROACH_SECONDS)/RestaurantSeating3D.SIT_SECONDS,0,1)
+		if phase=="seated":
+			walker.position = RestaurantSeating3D.seat(table,centre)
+			walker.rotation.y = RestaurantSeating3D.facing(table)
+		actor.sample_seating(progress)
+		trip["stand_from"] = walker.position
+		trip["stand_progress"] = progress
+		trip["seat_clock"] = 0.0
+		trip["phase"] = "standing"
+	elif phase=="walking_in":
+		var walker: Node3D = trip["walker"]
+		trip["route"] = _walk_route(walker.position,_park_cell(trip))
 		trip["phase"] = "walking_out"
 	elif phase == "riding_in":
 		_depart(trip)
@@ -84,16 +94,69 @@ func _tick(trip: Dictionary, delta: float) -> void:
 				_finish(trip)
 	elif phase == "walking_in" or phase == "walking_out":
 		var walker: Node3D = trip["walker"]
-		walker.position = _follow(walker, route, WALK_SPEED * delta, true)
-		walker.get_node("WalkerActor").call("set_walking", 1.0, Time.get_ticks_msec() * 0.001)
+		StaffPathing3D.follow(walker, route, WALK_SPEED, delta)
 		if route.size() <= 1:
 			if phase == "walking_in":
-				walker.visible = false
-				trip["phase"] = "seated"
+				trip["phase"] = "seating"
+				trip["seat_clock"] = 0.0
+				trip["seat_from"] = walker.position
+				trip["seat_angle"] = walker.rotation.y
 			else:
 				walker.queue_free()
 				trip["walker"] = null
 				_depart(trip)
+
+
+	elif phase=="seating":
+		_tick_seating(trip,delta)
+	elif phase=="standing":
+		_tick_standing(trip,delta)
+
+func _tick_seating(trip: Dictionary, delta: float) -> void:
+	var walker: Node3D = trip["walker"]
+	var actor := walker.get_node("WalkerActor") as PersonRig3D
+	var table: int = trip["table"]
+	var centre: Vector3 = (host.get("TABLES") as Array)[table]
+	var front := RestaurantSeating3D.front(table,centre)
+	trip["seat_clock"] = float(trip["seat_clock"])+delta
+	var clock: float = trip["seat_clock"]
+	if clock < RestaurantSeating3D.APPROACH_SECONDS:
+		var before := walker.global_position
+		var from: Vector3 = trip["seat_from"]
+		walker.position = from.lerp(front,smoothstep(0,1,clock/RestaurantSeating3D.APPROACH_SECONDS))
+		actor.drive_ground_motion(walker.global_position-before,delta,false)
+		return
+	var t := clampf((clock-RestaurantSeating3D.APPROACH_SECONDS)/RestaurantSeating3D.SIT_SECONDS,0,1)
+	walker.position = front.lerp(RestaurantSeating3D.seat(table,centre),smoothstep(0,1,t))
+	walker.rotation.y = lerp_angle(float(trip["seat_angle"]),RestaurantSeating3D.facing(table),smoothstep(0,1,minf(t*1.8,1)))
+	actor.sample_seating(t)
+	if t >= 1:
+		walker.visible = false
+		var guest := (host.get("guests") as Array)[table] as PersonRig3D
+		guest.position = RestaurantSeating3D.seat(table,centre)
+		guest.rotation.y = RestaurantSeating3D.facing(table)
+		guest.set_seated(true)
+		trip["phase"] = "seated"
+
+func _tick_standing(trip: Dictionary, delta: float) -> void:
+	var walker: Node3D = trip["walker"]
+	var actor := walker.get_node("WalkerActor") as PersonRig3D
+	var table: int = trip["table"]
+	var centre: Vector3 = (host.get("TABLES") as Array)[table]
+	trip["seat_clock"] = float(trip["seat_clock"])+delta
+	var t := clampf(float(trip["seat_clock"])/RestaurantSeating3D.STAND_SECONDS,0,1)
+	var from: Vector3 = trip["stand_from"]
+	walker.position = from.lerp(RestaurantSeating3D.front(table,centre),smoothstep(0,1,t))
+	if float(trip["stand_progress"])>=.999: actor.sample_seating(t,true)
+	else: actor.sample_seating(float(trip["stand_progress"])*(1.0-t))
+	if t >= 1:
+		actor.set_seated(false)
+		var approach := RestaurantSeating3D.approach(table,centre)
+		var route: Array[Vector3] = [walker.position,approach]
+		var outside := _walk_route(approach,_park_cell(trip))
+		for i in range(1,outside.size()): route.append(outside[i])
+		trip["route"] = route
+		trip["phase"] = "walking_out"
 
 
 func _start_walk_in(trip: Dictionary) -> void:
@@ -105,9 +168,14 @@ func _start_walk_in(trip: Dictionary) -> void:
 	if seated_guest.has_method("get_variant"):
 		walker.get_node("WalkerActor").call("set_variant", seated_guest.call("get_variant"))
 	walker.position = _park_cell(trip)
-	var seat: Vector3 = (host.get("TABLES") as Array)[int(trip["table"])] + SEAT_OFFSET
+	var table: int = trip["table"]
+	var seat := RestaurantSeating3D.approach(table,(host.get("TABLES") as Array)[table])
 	trip["walker"] = walker
 	trip["route"] = _walk_route(walker.position, seat)
+	var route: Array[Vector3] = trip["route"]
+	if route.size() > 1:
+		var direction := route[1]-walker.position
+		walker.rotation.y = atan2(direction.x,direction.z)
 	trip["phase"] = "walking_in"
 
 

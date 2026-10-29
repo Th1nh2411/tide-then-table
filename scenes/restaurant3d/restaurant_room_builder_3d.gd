@@ -81,26 +81,43 @@ static func build(host: Node3D) -> void:
 
 static func _lighting(host: Node3D) -> void:
 	var environment := WorldEnvironment.new()
+	environment.name = "RestaurantEnvironment"
 	var settings := Environment.new()
 	settings.background_mode = Environment.BG_COLOR
 	settings.background_color = Color("202c38")
 	settings.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	settings.ambient_light_color = Color("9aa8b4")
-	settings.ambient_light_energy = 0.65
+	settings.ambient_light_color = Color("819796")
+	settings.ambient_light_energy = 0.3
+	if RenderingServer.get_current_rendering_method() == "forward_plus":
+		settings.ssao_enabled = true
+		settings.ssao_radius = 0.35
+		settings.ssao_intensity = 0.9
 	environment.environment = settings
 	host.add_child(environment)
 	var sunlight := DirectionalLight3D.new()
+	sunlight.name = "StreetKeyLight"
 	host.add_child(sunlight)
 	sunlight.rotation_degrees = Vector3(-52, -30, 0)
-	sunlight.light_color = Color("ffd39b")
-	sunlight.light_energy = 1.1
+	sunlight.light_color = Color("ffe1b8")
+	sunlight.light_energy = 0.7
 	sunlight.shadow_enabled = true
-	var lamp := OmniLight3D.new()
-	host.add_child(lamp)
-	lamp.position = Vector3(3, 2.8, -3.2)
-	lamp.light_color = Color("ffc27a")
-	lamp.light_energy = 1.0
-	lamp.omni_range = 5.0
+	sunlight.shadow_blur = 2.0
+	sunlight.shadow_bias = 0.1
+	sunlight.shadow_normal_bias = 2.0
+	sunlight.directional_shadow_max_distance = 45.0
+	# Downward pools of warm light give tables, people and counters a lit and a shaded side.
+	RestaurantStringLights3D.build(host)
+	for lamp_pos: Vector3 in [Vector3(3, 3.2, -3.2), Vector3(10, 3.2, -3.5)]:
+		_shop_light(host, lamp_pos)
+	# Low-energy awning fill: it should not erase contact shadows under the furniture.
+	for x: float in [-16.0, -8.0, 0.0, 8.0, 16.0]:
+		_lamp(host, Vector3(x, 2.4, L.BACK_Z + 1.6), "ffd9a0", 0.22, 4.0, false)
+	var rim := DirectionalLight3D.new()
+	rim.name = "CoolStreetFill"
+	host.add_child(rim)
+	rim.rotation_degrees = Vector3(-30, 150, 0)
+	rim.light_color = Color("7f9fc4")
+	rim.light_energy = 0.25
 	var camera := Camera3D.new()
 	host.add_child(camera)
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -110,12 +127,45 @@ static func _lighting(host: Node3D) -> void:
 	camera.current = true
 	host.demo_camera = camera
 
+static func _shop_light(host: Node3D, pos: Vector3) -> void:
+	var lamp := SpotLight3D.new()
+	lamp.name = "WarmShopLight_%d" % host.get_child_count()
+	host.add_child(lamp)
+	lamp.position = pos
+	lamp.rotation_degrees.x = -90.0
+	lamp.light_color = Color("ffd3a0")
+	lamp.light_energy = 1.5 if RenderingServer.get_current_rendering_method() == "gl_compatibility" else 4.0
+	lamp.spot_range = 6.5
+	lamp.spot_angle = 52.0
+	lamp.spot_angle_attenuation = 0.6
+	lamp.shadow_enabled = true
+	lamp.shadow_bias = 0.1
+	lamp.shadow_normal_bias = 1.5
+	lamp.shadow_blur = 2.0
+	# Visible fixture above each light, with its emitting panel below the housing.
+	box(host, pos + Vector3(0, 0.12, 0), Vector3(0.72, 0.12, 0.24), "394a50")
+	var panel := box(host, pos + Vector3(0, 0.045, 0), Vector3(0.6, 0.025, 0.16), "f2d98a")
+	var material := panel.material_override as StandardMaterial3D
+	material.emission_enabled = true
+	material.emission = Color("ffd3a0")
+	material.emission_energy_multiplier = 0.8
+
+static func _lamp(host: Node3D, pos: Vector3, hex: String, energy: float, range_: float, shadow: bool) -> void:
+	var lamp := OmniLight3D.new()
+	host.add_child(lamp)
+	lamp.position = pos
+	lamp.light_color = Color(hex)
+	lamp.light_energy = energy
+	lamp.omni_range = range_
+	lamp.shadow_enabled = shadow
+
 ## Floor, back wall, awning, sign, menu board, curb and road.
 static func _shell(host: Node3D, depth: float, mid_z: float, width: float) -> void:
-	box(host, Vector3(0, -0.24, mid_z), Vector3(width, 0.4, depth), "394a50")
+	# Coplanar ground receives object shadows without self-shadow acne between tiles.
+	box(host, Vector3(0, -0.24, mid_z), Vector3(width, 0.4, depth), "394a50").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for x in range(int(width)):
 		for z in range(int(depth)):
-			box(host, Vector3(x - L.ROOM_X + 0.5, -0.02, z + L.BACK_Z + 0.5), Vector3(0.96, 0.05, 0.96), "8e8c79" if (x + z) % 3 == 0 else "797e73")
+			box(host, Vector3(x - L.ROOM_X + 0.5, -0.02, z + L.BACK_Z + 0.5), Vector3(0.96, 0.05, 0.96), "8e8c79" if (x + z) % 3 == 0 else "797e73").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	box(host, Vector3(0, L.WALL_H * 0.5, L.BACK_Z - 0.2), Vector3(width, L.WALL_H, 0.3), "b6a183", true)
 	box(host, Vector3(0, 0.4, L.BACK_Z - 0.02), Vector3(width, 0.8, 0.1), "577277")
 	box(host, Vector3(0, 3.7, L.BACK_Z), Vector3(9, 0.65, 0.14), "7a4841")
@@ -128,7 +178,7 @@ static func _shell(host: Node3D, depth: float, mid_z: float, width: float) -> vo
 	solid_block(host, L.BOARD_POSITION + Vector3(0, 0.9, 0), Vector3(1.5, 1.1, 0.12))
 	label(host, "THỰC ĐƠN", L.BOARD_POSITION + Vector3(0, 1.1, 0.1), 28, "f2d98a")
 	box(host, Vector3(0, -0.05, L.FRONT_Z + 0.1), Vector3(width, 0.2, 0.3), "e7d5b3", true)
-	box(host, Vector3(0, -0.2, L.FRONT_Z + 0.2 + L.ROAD_DEPTH * 0.5), Vector3(width, 0.2, L.ROAD_DEPTH), "202e37")
+	box(host, Vector3(0, -0.2, L.FRONT_Z + 0.2 + L.ROAD_DEPTH * 0.5), Vector3(width, 0.2, L.ROAD_DEPTH), "202e37").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for x in range(-18, 19, 6):
 		box(host, Vector3(x, -0.08, L.FRONT_Z + 0.2 + L.ROAD_DEPTH * 0.5), Vector3(2.0, 0.02, 0.15), "8e8c79")
 
@@ -153,22 +203,28 @@ static func _tables(host: Node3D) -> void:
 		var table: Node3D = TABLE_PILOT.instantiate()
 		host.add_child(table)
 		table.position = p
+		WorldPresentation3D.cast_shadows(table)
 		solid_block(host, p + Vector3(0, 0.8, 0), Vector3(1.5, 0.12, 1.2))
 		for side in [-1.0, 1.0]:
 			var stool_pos := p + Vector3(side * 1.02, 0, 0)
-			# Actual Hunyuan-derived stool, canonical .55 x .55 x .52 m.
-			# The collider below stays identical to preserve pathing/interactions.
+			# Low plastic stool: .47 m footprint and .44 m seat, proportional to people.
+			# Scale the collider with the visual so Rin cannot hit an invisible old edge.
 			var stool: Node3D = STOOL_PILOT.instantiate()
 			host.add_child(stool)
 			stool.position = stool_pos
+			stool.scale = Vector3.ONE * WorldPresentation3D.RESTAURANT_STOOL_SCALE
+			WorldPresentation3D.cast_shadows(stool)
 			stool.name = "PilotStool_%d_%s" % [i, "blue" if side < 0 else "red"]
 			if side > 0:
 				var red := mat("a53030")
 				for node: Node in stool.find_children("*", "MeshInstance3D", true, false):
 					(node as MeshInstance3D).material_override = red
-			solid_block(host, stool_pos + Vector3(0, 0.26, 0), Vector3(0.55, 0.52, 0.55))
+			var stool_size := Vector3(0.55, 0.52, 0.55) * WorldPresentation3D.RESTAURANT_STOOL_SCALE
+			solid_block(host, stool_pos + Vector3.UP * stool_size.y * 0.5, stool_size)
 		var guest := PersonRig3D.build(host, "guest", "7a4841" if i == 0 else "468232")
-		guest.position = p + Vector3(0, 0, 1.15)
+		guest.position = RestaurantSeating3D.seat(i,p)
+		guest.rotation.y = RestaurantSeating3D.facing(i)
+		guest.set_seated(true)
 		host.guests.append(guest)
 		guest.visible = false
 		host.order_labels.append(label(host, "", p + Vector3(0, 2.25, 0.6), 18, "f2d98a"))

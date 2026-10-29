@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dst7c3f4aucyo"]
+
+[ext_resource type="Script" path="res://scenes/art_pilots/rin_family_lineup.gd" id="1"]
+
+[node name="RinFamilyLineup" type="Node3D" unique_id=1769257367]
+script = ExtResource("1")

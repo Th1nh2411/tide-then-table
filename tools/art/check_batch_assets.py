@@ -42,18 +42,27 @@ def main():
                             assert weights.min() >= 0 and np.allclose(weights.sum(axis=1), 1, atol=.002)
                             assert joints.min() >= 0 and joints.max() < 20
             counts.append(triangles)
-        assert counts[0] == counts[1], asset + ': source triangle count changed'
+        assert counts[0] + meta.get('face_detail_triangles',0) == counts[1], asset + ': original body triangle count changed'
+        if 'face_refinement' in meta:
+            face = meta['face_refinement']
+            prefix = final.binary[:face['base_binary_length']]
+            import hashlib
+            assert hashlib.sha256(prefix).hexdigest() == face['base_binary_sha256'], asset + ': body/rig/animation binary changed'
         for material in final.doc['materials']:
             factor = material['pbrMetallicRoughness']['baseColorFactor']
             assert len(factor) == 4 and all(0 <= v <= 1 for v in factor)
         if source.parent.parent.name == 'characters':
             people += 1
             assert len(final.doc['skins'][0]['joints']) == 20
-            assert {a['name'] for a in final.doc['animations']} == {'Idle', 'Walk', 'Carry'}
+            names = {a['name'] for a in final.doc['animations']}
+            required = {'Idle', 'Walk', 'Carry'}
+            assert required <= names, asset + ': missing gameplay clips'
+            # Manual Blender exports may retain action copies with numeric suffixes.
+            assert all(n in required or (n.rsplit('.',1)[0] in required and n.rsplit('.',1)[-1].isdigit()) for n in names), asset + ': unexpected animation'
         total += counts[1]
         print(f'PASS {asset}: {counts[1]} triangles; source/output checksums, finite accessors, normals and materials')
     assert people == 11
-    print(f'ALL OK: {len(sources)} assets, {total} triangles, {people} weighted humanoids; source triangle counts preserved')
+    print(f'ALL OK: {len(sources)} assets, {total} triangles, {people} weighted humanoids; original body triangle counts preserved; documented face details allowed')
 
 
 if __name__ == '__main__':

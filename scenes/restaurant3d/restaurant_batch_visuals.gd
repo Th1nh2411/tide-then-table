@@ -12,6 +12,7 @@ static func add(parent: Node3D, id: String, at: Vector3) -> Node3D:
 	visual.name = "Batch_" + id
 	parent.add_child(visual)
 	visual.position = at
+	WorldPresentation3D.cast_shadows(visual)
 	return visual
 
 static func upgrade(parent: Node3D, id: String, choices: Array, at: Vector3) -> RestaurantBatchVisuals:
