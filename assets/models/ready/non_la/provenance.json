@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/small/non_la/non_la_reduced.glb",
+  "source_sha256": "60a8118b2fa1f49754d6102566e1920cb55849db069f58ae8080d1471df27fec",
+  "input": "assets/concepts/3d_queue/small/non_la.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 600,
+  "yaw_radians": 0,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "be9a44aed6137916c1560a5a9b088351bdf5072f825b33037c5ab8394f18fff7",
+  "triangles": 600,
+  "surfaces": 2,
+  "dimensions_m": [
+    0.6,
+    0.28,
+    0.6
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

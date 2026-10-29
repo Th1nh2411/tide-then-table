@@ -85,6 +85,7 @@ func _tick(trip: Dictionary, delta: float) -> void:
 	elif phase == "walking_in" or phase == "walking_out":
 		var walker: Node3D = trip["walker"]
 		walker.position = _follow(walker, route, WALK_SPEED * delta, true)
+		walker.get_node("WalkerActor").call("set_walking", 1.0, Time.get_ticks_msec() * 0.001)
 		if route.size() <= 1:
 			if phase == "walking_in":
 				walker.visible = false
@@ -100,6 +101,9 @@ func _start_walk_in(trip: Dictionary) -> void:
 	bike.rotation.y = PI  # nose to the road
 	var walker := _make_walker()
 	add_child(walker)
+	var seated_guest: Node3D = (host.get("guests") as Array)[int(trip["table"])]
+	if seated_guest.has_method("get_variant"):
+		walker.get_node("WalkerActor").call("set_variant", seated_guest.call("get_variant"))
 	walker.position = _park_cell(trip)
 	var seat: Vector3 = (host.get("TABLES") as Array)[int(trip["table"])] + SEAT_OFFSET
 	trip["walker"] = walker
@@ -147,35 +151,12 @@ func _follow(node: Node3D, route: Array[Vector3], distance: float, face: bool) -
 	return pos
 
 
-func _box(parent: Node3D, pos: Vector3, size: Vector3, hex: String) -> void:
-	var mesh := MeshInstance3D.new()
-	var shape := BoxMesh.new()
-	shape.size = size
-	mesh.mesh = shape
-	var material := StandardMaterial3D.new()
-	material.albedo_color = Color(hex)
-	mesh.material_override = material
-	mesh.position = pos
-	parent.add_child(mesh)
-
-
 func _make_bike() -> Node3D:
-	var bike := Node3D.new()
-	add_child(bike)
-	var color: String = ["a53030", "3c5e8b", "e7d5b3", "394a50", "de9e41"].pick_random()
-	_box(bike, Vector3(0, 0.45, 0), Vector3(0.38, 0.3, 1.2), color)
-	_box(bike, Vector3(0, 0.7, -0.15), Vector3(0.34, 0.1, 0.6), "202e37")
-	_box(bike, Vector3(0, 0.95, 0.5), Vector3(0.6, 0.06, 0.08), "202e37")
-	for z in [-0.5, 0.5]:
-		_box(bike, Vector3(0, 0.2, z), Vector3(0.14, 0.4, 0.4), "202e37")
-	return bike
+	return RestaurantBatchVisuals.add(self, "motorbike", Vector3.ZERO)
 
 
 func _make_walker() -> Node3D:
 	var person := Node3D.new()
-	_box(person, Vector3(0, 1.05, 0), Vector3(0.46, 0.65, 0.33), ["468232", "7a4841", "3c5e8b"].pick_random())
-	_box(person, Vector3(0, 1.72, 0), Vector3(0.39, 0.42, 0.37), "ad7757")
-	_box(person, Vector3(0, 1.97, 0), Vector3(0.48, 0.14, 0.44), "394a50")
-	for side in [-0.12, 0.12]:
-		_box(person, Vector3(side, 0.35, 0), Vector3(0.16, 0.7, 0.2), "202e37")
+	var actor := PersonRig3D.build(person, "guest")
+	actor.name = "WalkerActor"
 	return person

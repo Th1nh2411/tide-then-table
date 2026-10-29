@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://dm0c3t42k2vw3"]
-
-[ext_resource type="Script" path="res://scenes/art_preview/rin_portrait_study.gd" id="1"]
-
-[node name="RinPortraitStudy" type="Node3D" unique_id=1535668558]
-script = ExtResource("1")

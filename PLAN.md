@@ -493,7 +493,7 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng 
 - [x] Kiểm kê và archive các Rin study không được chọn; giữ concept Rin, Hunyuan baseline và quán mẫu màu ấm. Có manifest hash và snapshot tài liệu để khôi phục.
 - [x] Tool gen 3D chính (2026-10-28): Hunyuan3D-2mini-turbo chạy local CPU (`tools/art/hunyuan_local.ps1`, ~3,5 phút/asset nhờ FlashVDM, không quota, chạy batch); Space 2.1 (`hunyuan.ps1` / `hunyuan_job.py`) chỉ dự phòng. Đã so với TripoSR (kém hơn rõ) và 2.1 (gần bằng) trên ghế đẩu + Rin.
 - [ ] Pilot Rin: material phẳng, rig/Idle/Walk/Carry, preview nhiều góc và giữ API actor khi tích hợp. Sửa tô màu 2026-10-28 (`build_rin_pilot.py`): vòng gọng kính hai bên tô màu gọng (trước bị màu da), áo ba lỗ có nách khoét + dây vai (trước phủ kín vai như áo thun), viền lai quần; checker + `rin_pilot_check` PASS (lỗi "skin registered with a valid skeleton" trong scene kiểm có từ trước).
-- [ ] Pilot bàn + ghế đẩu: từng mesh rời, đúng kích thước và pivot, giữ collider/order/đĩa/label. Bàn đã gen bằng tool local (`assets/models/pilots/table/table.glb`, 1200 tam giác, checker PASS), chờ duyệt hình trong Godot trước khi thay bàn thủ tục.
+- [ ] Pilot bàn + ghế đẩu: từng mesh rời, đúng kích thước và pivot, giữ collider/order/đĩa/label. Bàn đã gen bằng tool local (`assets/models/ready/table/table.glb`, 1200 tam giác, checker PASS), chờ duyệt hình trong Godot trước khi thay bàn thủ tục.
 - [ ] Pilot thuyền thúng: thay hull visual, giữ đèn/controller/collider/nhân vật/cinematic.
 - [ ] Kiểm import/render/animation và regression gameplay liên quan; ghi kết quả thực tế trước khi mở rộng.
 - [ ] Mở rộng các nhân vật và prop khác sau khi ba pilot đạt chuẩn.

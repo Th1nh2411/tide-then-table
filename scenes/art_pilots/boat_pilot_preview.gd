@@ -38,7 +38,7 @@ func _ready() -> void:
 	ui.add_child(title)
 	reference = TextureRect.new()
 	reference.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	reference.texture = load("res://assets/models/pilots/thuyen_thung/input.png")
+	reference.texture = load("res://assets/models/ready/thuyen_thung/input.png")
 	reference.position = Vector2(24, 140)
 	reference.size = Vector2(260, 174)
 	ui.add_child(reference)

@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-29",
+  "source_mesh": "assets/models/batch/characters/vy/vy_reduced.glb",
+  "source_sha256": "fe0ceaa35e4b2ea5d649932baff5195c82bcfec0d1fd57dbe3b110a30742c6ad",
+  "source_method": "Hunyuan3D-2mini-turbo local inference; see original source provenance",
+  "image_reference": "assets/concepts/3d_queue/characters/vy.png",
+  "processing": "Uniform normalization; anatomical flat palette; weighted 20-bone skin and authored Idle/Walk/Carry animation. Source triangles preserved.",
+  "blender_used": false,
+  "external_base_geometry_used": false,
+  "output_sha256": "e57d727ab6d815c308caab52c00708e3eaadc57c446f6b0095eb1c8c69ea860d"
+}

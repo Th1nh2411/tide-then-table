@@ -35,7 +35,7 @@ func _ready() -> void:
 	add_child(floor)
 	_set = load("res://scenes/art_pilots/furniture_pilot.tscn").instantiate()
 	add_child(_set)
-	_single = load("res://assets/models/pilots/stool/stool.glb").instantiate()
+	_single = load("res://assets/models/ready/stool/stool.glb").instantiate()
 	add_child(_single)
 	_single.hide()
 	_camera = Camera3D.new()

@@ -1,0 +1,27 @@
+{
+  "id": "plate_bench",
+  "source": "assets/models/batch/props/plate_bench/plate_bench_reduced.glb",
+  "source_sha256": "bb38c0eecda84f911fbc8fccba1d7873fc6c8dad5321d2cf2426d5823768b7c8",
+  "source_provenance": "assets/models/batch/props/plate_bench/hunyuan_provenance.json",
+  "concept": "assets/concepts/3d_queue/props/plate_bench.png",
+  "builder": "tools/art/build_batch_restaurant.py",
+  "changes": [
+    "canonical metre scale",
+    "bottom-centred origin",
+    "footprint yaw normalization",
+    "flat face normals",
+    "palette materials by geometric region"
+  ],
+  "yaw_radians": 0.0,
+  "geometry_replaced": false,
+  "output_sha256": "cce652e7ce71a8eac682ac87bd26e0a13d589863996c45343bc59145081ad362",
+  "triangles": 1500,
+  "surfaces": 2,
+  "dimensions_m": [
+    1.1,
+    0.89,
+    0.75
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

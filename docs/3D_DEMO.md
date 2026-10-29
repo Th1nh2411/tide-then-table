@@ -67,7 +67,7 @@ Bot dịch chuyển nhanh giữa địa điểm và tạo kết quả minigame t
   chưa có đá ngầm ẩn và cổng sương/nghiền lưới như 2D.
 - StoryBridge3D chạy cutscene .tres với dàn cảnh 3D (CutsceneStage3D: marker,
   actor đi bộ, camera, emote, mưa, slow, remove); actor rin/bao/vy/co_nam/guest/cat dựng bằng `PersonRig3D` (cùng rig với
-  gameplay: đi bộ, cầm đĩa, giơ tay khi emote); nhân vật gameplay cùng loại bị
+  gameplay: đi bộ, cầm đĩa; emote hiện biểu tượng); nhân vật gameplay cùng loại bị
   ẩn trong cảnh và hiện lại khi hết; `tint` chưa có; biển chưa có rig người riêng; marker trong CutsceneMarkers3D, kiểm bằng story3d_stage_test.
 - Còn cần playtest bàn phím thực tế, cân chỉnh pacing và hoàn thiện art 3D.
 
@@ -76,10 +76,62 @@ Bộ sprite/portrait approved và scene tham khảo art gốc không bị thay t
 ## Art 3D hiện hành
 
 Flow đã chốt: gen-image → Hunyuan → giảm mesh/material/rig → Godot.
-Ba pilot đang triển khai: Rin, một bộ bàn/ghế và thuyền thúng; xem
-`docs/ART_PIPELINE.md` để biết tiến độ và cách chạy.
+Đã tích hợp Rin, bàn/ghế, thuyền thúng và đủ **45 model batch** (2026-10-29).
+Model nguồn nằm ở `assets/models/batch/`; model thành phẩm ở
+`assets/models/ready/<id>/<id>.glb`. Quán đổi cart/fridge theo nâng cấp; biển dùng
+ghe, bến, công trình và sự kiện mới; nhân vật giữ API PersonRig gameplay/cutscene.
+Chi tiết flow và cách rebuild: `docs/ART_PIPELINE.md`.
+
+Rin dùng palette portrait approved: da `#d79c6b`, áo ngà `#eee5d5`, tóc `#151d28`,
+kính `#090a14`, bạc `#cac0b7`. Không sửa sprite/portrait gốc.
+
+Mở scene và F6 để xem từng nhóm:
+
+- `scenes/art_pilots/rin_pilot_preview.tscn`: Rin cạnh portrait 2D.
+- `scenes/art_pilots/batch_characters_preview.tscn`: 11 người và mèo.
+- `scenes/art_preview/restaurant_batch_preview.tscn`: 20 prop quán/đồ nhỏ.
+- `scenes/art_preview/batch_sea_review.tscn`: 13 asset biển.
+
+Nhân vật người có skin 20 xương và Idle/Walk/Carry; chưa có rig mặt/ngón
+tay. Mèo giữ dáng ngồi từ inference, chỉ bob/sway, chưa có rig đi bốn chân.
+Các model dùng palette phẳng, chưa có texture chi tiết; kính/mặt còn đơn giản,
+fridge cấp 2 còn mặt trước kín từ geometry nguồn. Bản active trước sửa được
+sao lưu recoverable trong `build/batch_integration/backups/`.
 
 Shape Rin baseline còn giữ ở `scenes/art_preview/rin_hunyuan_study.tscn`:
 F6, ←/→ xoay, 4 cận, B đổi gốc/3k. Đây là shape chưa có texture/rig.
 Mẫu phối màu quán: `scenes/art_preview/psx_quan_preview.tscn`.
 Các preview Rin cũ đã archive, không còn là lựa chọn hiện hành.
+
+### Animation — cập nhật 2026-10-29
+
+Đã bỏ Raised khỏi Rin và 11 nhân vật batch; emote cutscene chỉ hiện biểu tượng.
+Giữ Idle, Walk, Carry. Ném cần đang dùng bone override trong CastCinematic3D,
+chưa có clip riêng cho chờ cá/kéo cá. Ưu tiên tiếp: Cast, FishingIdle, Reel.
+
+### Rin Walk — sửa từ Blender, 2026-10-29
+
+Đã export đè `assets/models/ready/rin/rin_pilot.glb` từ bản Blender người dùng
+đang chỉnh: giữ material/geometry, trả Skin.001 về #D79C6B; bỏ Raised khỏi export.
+Walk mới có chân trụ giữ đế ngang, chân bước nhấc lên, hông chuyển nhẹ và tay vung
+đối nhịp. Đỉnh ngoài mép dép trước đây bị gán Hips đã chuyển về Foot tương ứng.
+Nguồn chỉnh tiếp: `build/rin_export/rin_walk_fixed.blend` (local); script chỉnh
+Walk trong Blender: `tools/art/fix_rin_walk_blender.py`. Backup GLB nằm dưới
+`build/batch_integration/backups/`. Không chạy lại builder shape khi muốn giữ
+các chỉnh tay từ Blender; builder không chứa toàn bộ chỉnh sửa thủ công này.
+
+Nguồn Rin mới nhất: `/Users/nguyenthinh/WorkSpace/blender/rin.blend` do người dùng
+chỉnh màu; đã export mesh/material trực tiếp vào Rin pilot ngày 2026-10-29.
+Snapshot nguồn local: `build/rin_source_update/rin_source.blend`. Không ép lại
+palette khi export; giữ Walk đã sửa và loại Raised khỏi GLB runtime.
+
+### Clip câu cá — 2026-10-29
+
+Rin hiện có `Idle`, `Walk`, `Carry`, **`Cast`** (1,5 giây, không loop).
+Đã thêm Cast vào `/Users/nguyenthinh/WorkSpace/blender/rin.blend` và GLB runtime;
+source trước khi thêm được backup tại `build/rin_cast/source_before_cast.blend`.
+Mở `scenes/art_pilots/rin_pilot_preview.tscn`, F6 và nhấn **5** để xem ném cần.
+Trong game: tới đàn cá, tương tác để ném cần; camera cận Rin rồi theo phao vào
+minigame. Cinematic sample clip bằng clock, cần bám cổ tay, giữ skip và return.
+Nếu Blender đang mở bản cũ, mở lại rin.blend để thấy action `Rin_Cast` trong track
+`Cast` (cất riêng mọi chỉnh sửa chưa lưu trước). Chưa có FishingIdle/Reel riêng.

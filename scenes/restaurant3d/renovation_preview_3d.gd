@@ -56,9 +56,9 @@ func cancel() -> void:
 func apply() -> bool:
 	if not GameState.spend_money(total_cost()):
 		return false
+	_solidify()
 	for u: UpgradeData in preview:
 		GameState.upgrade_levels[u.id] = int(preview[u])
-	_solidify()
 	close()
 	finished.emit(true)
 	return true
@@ -110,9 +110,17 @@ func _draw_additions(parent: Node3D, ghost: bool) -> void:
 	if seats_u:
 		var have := _table_count(GameState.get_upgrade_level(seats_u.id), seats_u)
 		for i: int in range(have, _table_count(int(preview.get(seats_u, 0)), seats_u)):
-			_box(parent, tables[i] + Vector3(0, 0.8, 0), Vector3(1.5, 0.12, 1.2), color if ghost else Color("c7cfcc"))
+			var table: Node3D = RestaurantRoomBuilder3D.TABLE_PILOT.instantiate()
+			parent.add_child(table)
+			table.position = tables[i]
+			if ghost:
+				RestaurantBatchVisuals.tint(table, color)
 			for side in [-1.0, 1.0]:
-				_box(parent, tables[i] + Vector3(side * 1.02, 0.46, 0), Vector3(0.55, 0.12, 0.55), color if ghost else Color("3c5e8b"))
+				var stool: Node3D = RestaurantRoomBuilder3D.STOOL_PILOT.instantiate()
+				parent.add_child(stool)
+				stool.position = tables[i] + Vector3(side * 1.02, 0, 0)
+				if ghost:
+					RestaurantBatchVisuals.tint(stool, color)
 	var decor_u: UpgradeData = _find("decor")
 	if decor_u:
 		var now := GameState.get_upgrade_level(decor_u.id)
@@ -122,7 +130,22 @@ func _draw_additions(parent: Node3D, ghost: bool) -> void:
 				_box(parent, Vector3(x, 2.02, RestaurantScene3D.BACK_Z + 1.2), Vector3(0.33, 0.28, 0.33), color if ghost else Color("de9e41"))
 		if want > 1 and now <= 1:
 			for x in RestaurantScene3D.DECOR_PLANTERS:
-				_box(parent, Vector3(x, 0.87, RestaurantScene3D.PLANTER_Z), Vector3(0.85, 0.45, 0.85), color if ghost else Color("468232"))
+				var plant := RestaurantBatchVisuals.add(parent, "plant_pot", Vector3(x, 0, RestaurantScene3D.PLANTER_Z))
+				if ghost:
+					RestaurantBatchVisuals.tint(plant, color)
+
+	if ghost:
+		for id: String in ["kitchen", "fridge"]:
+			var u := _find(id)
+			if u == null or int(preview.get(u, 0)) == GameState.get_upgrade_level(id):
+				continue
+			var current := room.get_node_or_null("BatchUpgrade_" + id) as Node3D
+			if current:
+				current.visible = false
+			var choices := ["food_cart_0", "food_cart_1", "food_cart_2"] if id == "kitchen" else ["fridge_0", "fridge_1", "fridge_2"]
+			var at := RestaurantLayout3D.GRILL_POSITION if id == "kitchen" else MarketBag3D.FRIDGE_POSITION
+			var model := RestaurantBatchVisuals.add(parent, choices[clampi(int(preview[u]), 0, 2)], at)
+			RestaurantBatchVisuals.tint(model, color)
 
 
 func _table_count(level: int, u: UpgradeData) -> int:
@@ -145,6 +168,11 @@ func _solidify() -> void:
 
 
 func _clear_ghosts() -> void:
+	if is_instance_valid(room):
+		for id: String in ["kitchen", "fridge"]:
+			var current := room.get_node_or_null("BatchUpgrade_" + id) as Node3D
+			if current:
+				current.visible = true
 	if ghosts and is_instance_valid(ghosts):
 		ghosts.queue_free()
 	ghosts = null

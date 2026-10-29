@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-29",
+  "source_mesh": "assets/models/batch/characters/guest_rich/guest_rich_reduced.glb",
+  "source_sha256": "57994204a0083c24840f200af7d20af6deca75b50f0f35c6632a5c209a5eedca",
+  "source_method": "Hunyuan3D-2mini-turbo local inference; see original source provenance",
+  "image_reference": "assets/concepts/3d_queue/characters/guest_rich.png",
+  "processing": "Uniform normalization; anatomical flat palette; weighted 20-bone skin and authored Idle/Walk/Carry animation. Source triangles preserved.",
+  "blender_used": false,
+  "external_base_geometry_used": false,
+  "output_sha256": "0bc0c52de0c3502c193dc42655baf2af946828219240027158132e92a0e149fc"
+}

@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-29",
+  "source_mesh": "assets/models/batch/characters/co_nam/co_nam_reduced.glb",
+  "source_sha256": "f792828cc797cc858acdc1aedfffd1a7e7c464a70b4b615646f8c2bc18cbcb7b",
+  "source_method": "Hunyuan3D-2mini-turbo local inference; see original source provenance",
+  "image_reference": "assets/concepts/3d_queue/characters/co_nam.png",
+  "processing": "Uniform normalization; anatomical flat palette; weighted 20-bone skin and authored Idle/Walk/Carry animation. Source triangles preserved.",
+  "blender_used": false,
+  "external_base_geometry_used": false,
+  "output_sha256": "080b1b5d65847c5ab4b84c92962e6955f641d94bf74f225cd9cac13bad0784f9"
+}

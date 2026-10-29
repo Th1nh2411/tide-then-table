@@ -29,6 +29,7 @@ func _ready() -> void:
 			if absf(total - 1.0) > 0.002:
 				normalized = false
 	_check(triangles == 3000 and mesh.mesh.get_surface_count() == 7, "Hunyuan 3000 triangles preserved with seven material regions")
+	# Material colours are artist-editable; this check validates rig compatibility.
 	_check(normalized, "Skin weights are normalized")
 	visual.sample_motion("Walk", 0.0)
 	await get_tree().process_frame
@@ -46,6 +47,26 @@ func _ready() -> void:
 			if a[i].distance_to(b[i]) > 0.005:
 				moved += 1
 	_check(moved > 300 and finite, "Walk deforms real skin vertices without invalid coordinates")
+	var sandal_vertices := 0
+	var sandal_rigid := true
+	for surface: int in first.get_surface_count():
+		var material := mesh.mesh.surface_get_material(surface)
+		if not material or not material.resource_name.contains("Sandal"):
+			continue
+		var rest: PackedVector3Array = mesh.mesh.surface_get_arrays(surface)[Mesh.ARRAY_VERTEX]
+		var a: PackedVector3Array = first.surface_get_arrays(surface)[Mesh.ARRAY_VERTEX]
+		var b: PackedVector3Array = second.surface_get_arrays(surface)[Mesh.ARRAY_VERTEX]
+		for side: float in [-1.0, 1.0]:
+			var anchor := -1
+			for i in rest.size():
+				if rest[i].x * side <= 0.0:
+					continue
+				if anchor == -1:
+					anchor = i
+				sandal_vertices += 1
+				if absf(a[i].distance_to(a[anchor]) - b[i].distance_to(b[anchor])) > 0.001:
+					sandal_rigid = false
+	_check(sandal_vertices > 100 and sandal_rigid, "Sandal soles stay rigid during Walk without vertices stretching towards hips")
 	actor.set_carrying(true)
 	visual.sample_motion("Carry", 0.25)
 	await get_tree().process_frame
@@ -54,9 +75,7 @@ func _ready() -> void:
 		var hand := visual.hand_position(tag)
 		_check(absf(hand.y - 1.055) < 0.025 and absf(hand.z - 0.37) < 0.025, "Carry wrist " + tag + " matches the plate grip")
 	actor.set_carrying(false)
-	actor.set_raised(true)
-	_check(visual.animation.current_animation == "Raised", "Raised emote retains actor API")
-	actor.set_raised(false)
+	_check(not visual.animation.has_animation("Raised"), "Raised clip removed")
 	var rod := Node3D.new()
 	actor.arms[1].add_child(rod)
 	actor.arms[1].rotation.x = 0.2
@@ -71,8 +90,16 @@ func _ready() -> void:
 	var wrist := actor.to_global(after)
 	_check(before.distance_to(after) > 0.1, "Legacy cast arm rotation moves the skinned arm")
 	_check(attachment.distance_to(wrist) < 0.01, "Legacy rod grip follows the actual wrist")
+	_check(visual.animation.has_animation("Cast") and is_equal_approx(visual.animation.get_animation("Cast").length, 1.5), "Rin exports a real 1.5-second Cast clip")
+	actor.sample_cast(0.45)
+	var wind_up := visual.hand_position("L")
+	actor.sample_cast(0.9)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(visual.animation.assigned_animation == "Cast" and wind_up.distance_to(visual.hand_position("L")) > 0.2, "Cinematic Cast moves the wrist and survives legacy rod updates")
+	_check(actor.arms[1].to_global(Vector3(0, -0.6, 0)).distance_to(actor.to_global(visual.hand_position("L"))) < 0.01, "Authored Cast keeps the rod attached to the wrist")
 	var bao := PersonRig3D.build(self, "bao")
-	_check(bao.get_node_or_null("RinPilot") == null and bao.arms.size() == 2, "Other actors retain their existing renderer")
+	_check(bao.get_node_or_null("BatchPilot") is BatchCharacterVisual and bao.arms.size() == 2, "Bao uses weighted batch renderer with compatibility anchors")
 	actor.queue_free()
 	bao.queue_free()
 	await get_tree().process_frame

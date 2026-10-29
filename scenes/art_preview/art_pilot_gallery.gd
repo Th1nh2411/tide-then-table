@@ -8,7 +8,6 @@ var _boat: Node3D
 var _clock := 0.0
 var _view := 0
 var _carry := false
-var _raised := false
 var _capture := false
 
 
@@ -60,11 +59,11 @@ func _ready() -> void:
 	add_child(ui)
 	var heading := Label.new()
 	heading.position = Vector2(22, 16)
-	heading.text = "XÓM ĐÈN • ART PILOT\nWASD: đi Rin   1: đứng   2: bưng   3: giơ tay\n4/5/6: cận Rin/bàn ghế/thuyền   0: tổng   R: đặt lại"
+	heading.text = "XÓM ĐÈN • ART PILOT\nWASD: đi Rin   1: đứng   2: bưng\n4/5/6: cận Rin/bàn ghế/thuyền   0: tổng   R: đặt lại"
 	heading.add_theme_font_size_override("font_size", 18)
 	ui.add_child(heading)
 	var note := Label.new()
-	note.text = "Rin, ghế, thuyền: Hunyuan • bàn giữ mẫu hiện tại khi chờ quota"
+	note.text = "Rin, bàn, ghế, thuyền: Hunyuan • Rin dùng palette portrait 2D"
 	note.position = Vector2(22, 682)
 	note.add_theme_font_size_override("font_size", 16)
 	ui.add_child(note)
@@ -78,10 +77,6 @@ func _ready() -> void:
 		await get_tree().create_timer(0.2).timeout
 		await _shot("rin_carry")
 		_actor.set_carrying(false)
-		_actor.set_raised(true)
-		await get_tree().create_timer(0.2).timeout
-		await _shot("rin_raised")
-		_actor.set_raised(false)
 		_view = 5
 		_update_camera()
 		await _shot("furniture")
@@ -167,15 +162,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_update_camera()
 		KEY_1:
 			_carry = false
-			_raised = false
 			_actor.set_carrying(false)
-			_actor.set_raised(false)
 		KEY_2:
 			_carry = not _carry
 			_actor.set_carrying(_carry)
-		KEY_3:
-			_raised = not _raised
-			_actor.set_raised(_raised)
 		KEY_R:
 			_actor.position = Vector3(-2.1, 0, 0.45)
 			_actor.rotation.y = 0.25

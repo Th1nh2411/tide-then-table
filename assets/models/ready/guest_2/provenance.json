@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-29",
+  "source_mesh": "assets/models/batch/characters/guest_2/guest_2_reduced.glb",
+  "source_sha256": "ce97925c178fa09fa76a3c54b5e27b4af35d67ce5416abbbf7efdccbad60857b",
+  "source_method": "Hunyuan3D-2mini-turbo local inference; see original source provenance",
+  "image_reference": "assets/concepts/3d_queue/characters/guest_2.png",
+  "processing": "Uniform normalization; anatomical flat palette; weighted 20-bone skin and authored Idle/Walk/Carry animation. Source triangles preserved.",
+  "blender_used": false,
+  "external_base_geometry_used": false,
+  "output_sha256": "15d46c4401fe7268c7a88402d3a08cfcc045335a0cb3fdc3d94f7e0c3dce98c1"
+}

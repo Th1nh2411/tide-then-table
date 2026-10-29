@@ -13,7 +13,7 @@ xong, không dùng. Chỉ tạo hình khối: texture của
 Hunyuan cần CUDA, nên vẫn tô material phẳng như flow trên.
 
 ```
-powershell -File tools/art/hunyuan_local.ps1 -Image <png> -OutDir assets/models/pilots/<id> -Name <id> -Faces 2000
+powershell -File tools/art/hunyuan_local.ps1 -Image <png> -OutDir assets/models/ready/<id> -Name <id> -Faces 2000
 powershell -File tools/art/hunyuan_local.ps1 -InputDir <thư mục png> -OutDir <gốc>   # batch, mỗi ảnh -> <gốc>/<tên ảnh>/
 ```
 
@@ -68,7 +68,7 @@ Lịch sử tài liệu cũ: `docs/archive/ART_STUDIES_20261028.md`.
 
 | Pilot | Phạm vi | Tiêu chí |
 |---|---|---|
-| Rin | Hunyuan shape đã tạo, palette từ concept, rig/skin và Idle/Walk/Carry | Cao ~1.84 m; giữ API đi/bưng/giơ tay/cần câu; kiểm vai/gối và nhiều góc |
+| Rin | Hunyuan shape đã tạo, palette từ portrait approved, rig/skin và Idle/Walk/Carry | Cao ~1.84 m; giữ API đi/bưng/cần câu; kiểm vai/gối và nhiều góc |
 | Bàn + ghế đẩu | Gen từng vật riêng, Hunyuan, giảm mesh/material, ráp wrapper | Bàn 1.5×1.2 m cao .86 m; ghế .55×.55 m cao .52 m; giữ marker/collider/logic |
 | Thuyền thúng | Gen/Hunyuan hull, material gọn, thay visual | Đường kính ~2.4 m; giữ BoatVisual, đèn, actor, controller, collider và cinematic |
 
@@ -81,4 +81,33 @@ Không để license chặn demo theo chỉ đạo người dùng. Không phát 
 Mỗi pilot cần ảnh trước/ngang/sau, cỡ gameplay và kiểm import; nhân vật cần kiểm
 skin thực sự biến dạng theo animation. Kiểm regression quán/biển/cutscene theo
 phạm vi tích hợp, luôn dùng `-- --no-autosave` để giữ save thật.
-Sau ba pilot mới mở rộng Bảo/Vy/Cô Năm/khách và các nhóm prop khác theo ASSETS.md.
+Đã hoàn tất ba pilot và mở rộng đủ 45 model batch ngày 2026-10-29.
+
+## Batch thành phẩm và cách rebuild
+
+Nguồn `assets/models/batch/` không bị sửa. Output runtime ở
+`assets/models/ready/<id>/<id>.glb`, kèm provenance và checksum.
+Các bước dưới chỉ xử lý mesh inference có sẵn, không chạy lại Hunyuan và không
+cần Blender (Python có NumPy):
+
+```sh
+python3 tools/art/build_batch_characters.py
+python3 tools/art/build_batch_cat.py
+python3 tools/art/build_batch_restaurant.py
+python3 tools/art/build_batch_sea.py
+python3 tools/art/build_rin_pilot.py
+python3 tools/art/check_batch_assets.py
+bash tools/run_tests.sh
+```
+
+Builder sao lưu output thay đổi trước khi ghi. Backup đợt tích hợp và Rin palette:
+`build/batch_integration/backups/`, `build/art_pilots/rin/backups/` (local, ignored).
+Bốn scene study cũ chỉ còn stub tham chiếu script không tồn tại đã được cất tại
+`build/batch_integration/backups/stale_scene_stubs/` kèm manifest SHA-256.
+
+Đã kiểm đủ 45 GLB: 75,622 tam giác, không đổi số tam giác nguồn, accessor hữu hạn,
+normal đơn vị, checksum nguồn/output và skin weights chuẩn hóa. 11 người có skin
+20 xương; GPU check xác nhận vertex thực sự biến dạng khi đi/bưng.
+Rin dùng màu portrait 2D approved; preview đặt portrait cạnh model.
+Đã xem từng nhóm ở nhiều góc và cảnh chơi quán ba cấp nâng cấp, ghe và POI.
+Scene review và giới hạn hình học còn lại ghi trong `docs/3D_DEMO.md`.

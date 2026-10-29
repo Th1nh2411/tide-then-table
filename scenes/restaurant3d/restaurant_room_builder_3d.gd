@@ -5,7 +5,8 @@ extends RefCounted
 ## orders, dirty_tables, table_plates, ready_plates, bao_model, bao_label.
 
 const L = preload("res://scenes/restaurant3d/restaurant_layout_3d.gd")
-const STOOL_PILOT = preload("res://assets/models/pilots/stool/stool.glb")
+const STOOL_PILOT = preload("res://assets/models/ready/stool/stool.glb")
+const TABLE_PILOT = preload("res://assets/models/ready/table/table.glb")
 
 static func mat(hex: String) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
@@ -54,6 +55,9 @@ static func plate_model(parent: Node3D) -> Node3D:
 	box(root, Vector3.ZERO, Vector3(0.36, 0.035, 0.3), "e8d9b7")
 	for i: int in range(3):
 		box(root, Vector3(-0.1 + i * 0.1, 0.045, 0), Vector3(0.075, 0.05, 0.18), "c97649")
+	var beer := RestaurantBatchVisuals.add(root, "beer_tower", Vector3(0, 0.02, 0))
+	beer.name = "BeerTower"
+	beer.visible = false
 	return root
 
 static func build_cat(host: Node3D) -> PersonRig3D:
@@ -120,7 +124,8 @@ static func _shell(host: Node3D, depth: float, mid_z: float, width: float) -> vo
 		var color := "456c65" if n % 2 else "c6b89a"
 		box(host, Vector3(n - L.ROOM_X + 0.5, 2.55, L.BACK_Z + 0.9), Vector3(0.98, 0.09, 1.1), color)
 		box(host, Vector3(n - L.ROOM_X + 0.5, 2.4, L.BACK_Z + 1.46), Vector3(0.98, 0.24, 0.08), color)
-	box(host, L.BOARD_POSITION + Vector3(0, 0.9, 0), Vector3(1.5, 1.1, 0.12), "1c2a33", true)
+	RestaurantBatchVisuals.add(host, "menu_board", L.BOARD_POSITION)
+	solid_block(host, L.BOARD_POSITION + Vector3(0, 0.9, 0), Vector3(1.5, 1.1, 0.12))
 	label(host, "THỰC ĐƠN", L.BOARD_POSITION + Vector3(0, 1.1, 0.1), 28, "f2d98a")
 	box(host, Vector3(0, -0.05, L.FRONT_Z + 0.1), Vector3(width, 0.2, 0.3), "e7d5b3", true)
 	box(host, Vector3(0, -0.2, L.FRONT_Z + 0.2 + L.ROAD_DEPTH * 0.5), Vector3(width, 0.2, L.ROAD_DEPTH), "202e37")
@@ -129,6 +134,8 @@ static func _shell(host: Node3D, depth: float, mid_z: float, width: float) -> vo
 
 ## Lanterns and planters appear with the decor upgrade.
 static func _decor(host: Node3D) -> void:
+	for x: float in [-17.0, 17.0]:
+		RestaurantBatchVisuals.add(host, "sidewalk_tree", Vector3(x, 0, 9.25))
 	var decor_level := GameState.get_upgrade_level("decor")
 	if decor_level > 0:
 		for x in L.DECOR_LANTERNS:
@@ -136,18 +143,17 @@ static func _decor(host: Node3D) -> void:
 			box(host, Vector3(x, 2.02, L.BACK_Z + 1.2), Vector3(0.33, 0.28, 0.33), "de9e41")
 	if decor_level > 1:
 		for x in L.DECOR_PLANTERS:
-			box(host, Vector3(x, 0.36, L.PLANTER_Z), Vector3(0.6, 0.72, 0.6), "7a4841")
-			box(host, Vector3(x, 0.87, L.PLANTER_Z), Vector3(0.85, 0.45, 0.85), "468232")
+			RestaurantBatchVisuals.add(host, "plant_pot", Vector3(x, 0, L.PLANTER_Z))
 
 static func _tables(host: Node3D) -> void:
 	var seats: UpgradeData = host.seats_upgrade
 	var table_count := clampi(int(GameState.get_upgrade_value(seats)), 1, L.TABLES.size()) if seats else 4
 	for i in range(table_count):
 		var p: Vector3 = L.TABLES[i]
-		box(host, p + Vector3(0, 0.8, 0), Vector3(1.5, 0.12, 1.2), "c7cfcc", true)
-		for x in [-0.57, 0.57]:
-			for z in [-0.4, 0.4]:
-				box(host, p + Vector3(x, 0.4, z), Vector3(0.07, 0.8, 0.07), "577277")
+		var table: Node3D = TABLE_PILOT.instantiate()
+		host.add_child(table)
+		table.position = p
+		solid_block(host, p + Vector3(0, 0.8, 0), Vector3(1.5, 0.12, 1.2))
 		for side in [-1.0, 1.0]:
 			var stool_pos := p + Vector3(side * 1.02, 0, 0)
 			# Actual Hunyuan-derived stool, canonical .55 x .55 x .52 m.
@@ -179,27 +185,29 @@ static func _tables(host: Node3D) -> void:
 
 ## Grill, kitchen sign, Cô Năm's counter, Bảo, plate pass and beer tap.
 static func _kitchen(host: Node3D) -> void:
-	box(host, L.GRILL_POSITION + Vector3(0, 0.7, 0), Vector3(2.8, 1.3, 1.25), "577277", true)
-	box(host, L.GRILL_POSITION + Vector3(0, 1.42, 0), Vector3(3, 0.12, 1.4), "c7cfcc")
-	box(host, L.GRILL_POSITION + Vector3(-0.4, 1.52, 0), Vector3(1.2, 0.1, 0.65), "394a50")
-	for n in range(6):
-		box(host, L.GRILL_POSITION + Vector3(-0.88 + n * 0.18, 1.6, 0), Vector3(0.06, 0.05, 0.48), "de9e41")
+	RestaurantBatchVisuals.upgrade(host, "kitchen", ["food_cart_0", "food_cart_1", "food_cart_2"], L.GRILL_POSITION)
+	solid_block(host, L.GRILL_POSITION + Vector3(0, 0.7, 0), Vector3(2.8, 1.3, 1.25))
+	RestaurantBatchVisuals.add(host, "charcoal_grill", L.GRILL_POSITION + Vector3(-2.25, 0, 0))
 	box(host, Vector3(5.5, 0.7, 1.5), Vector3(1.2, 1.3, 0.1), "884b2b", true)
 	label(host, "BẾP   E\nBẢNG MÓN", Vector3(5.5, 0.8, 1.57), 16, "e7d5b3")
 	# Cô Năm keeps her grocery counter separate from the kitchen.
-	box(host, L.COUNTER_POSITION + Vector3(0, 0.75, 0), Vector3(3.6, 1.0, 0.8), "468232", true)
-	box(host, L.COUNTER_POSITION + Vector3(0, 1.3, 0), Vector3(3.8, 0.12, 1.0), "e7d5b3")
+	RestaurantBatchVisuals.add(host, "grocery_counter", L.COUNTER_POSITION)
+	solid_block(host, L.COUNTER_POSITION + Vector3(0, 0.75, 0), Vector3(3.6, 1.0, 0.8))
+	RestaurantBatchVisuals.add(host, "grocery_crate", L.COUNTER_POSITION + Vector3(-2.45, 0, 0))
+	RestaurantBatchVisuals.add(host, "crate", L.COUNTER_POSITION + Vector3(2.45, 0, 0))
+	RestaurantBatchVisuals.add(host, "bottle", L.COUNTER_POSITION + Vector3(1.2, 1.36, 0.12))
 	label(host, "TẠP HOÁ CÔ NĂM", L.COUNTER_POSITION + Vector3(0, 2.4, -0.45), 24, "f2d98a")
 	PersonRig3D.build(host, "co_nam").position = L.COUNTER_POSITION + Vector3(0, 0, -0.85)
 	# Bảo cooks independently, leaving grill and beer to Rin.
 	host.bao_model = PersonRig3D.build(host, "bao")
 	host.bao_model.position = L.GRILL_POSITION + Vector3(-0.7, 0, -1.3)
 	host.bao_label = label(host, "Bảo • bếp", L.GRILL_POSITION + Vector3(-0.7, 2.35, -1.3), 20, "f0d39b")
-	box(host, L.PASS_POSITION + Vector3(0, 0.83, 0), Vector3(1.1, 0.12, 0.75), "a27d4c", true)
-	for x: float in [-0.4, 0.4]:
-		box(host, L.PASS_POSITION + Vector3(x, 0.4, 0), Vector3(0.07, 0.8, 0.6), "685448")
+	RestaurantBatchVisuals.add(host, "plate_bench", L.PASS_POSITION)
+	solid_block(host, L.PASS_POSITION + Vector3(0, 0.83, 0), Vector3(1.1, 0.12, 0.75))
+	RestaurantBatchVisuals.add(host, "bin", L.PASS_POSITION + Vector3(-0.95, 0, 0))
 	label(host, "NHẬN MÓN • E", L.PASS_POSITION + Vector3(0, 1.5, 0), 18, "e5cf9d")
-	box(host, L.BEER_POSITION + Vector3(0, 0.85, 0), Vector3(0.5, 1.2, 0.5), "91a4a3", true)
+	RestaurantBatchVisuals.add(host, "beer_keg", L.BEER_POSITION)
+	solid_block(host, L.BEER_POSITION + Vector3(0, 0.85, 0), Vector3(0.5, 1.2, 0.5))
 	label(host, "RÓT BIA • E", L.BEER_POSITION + Vector3(0, 1.75, 0), 18, "e5cf9d")
 
 static func _player(host: Node3D) -> void:

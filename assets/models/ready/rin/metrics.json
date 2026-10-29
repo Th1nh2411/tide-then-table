@@ -1,0 +1,32 @@
+{
+  "triangles": 3000,
+  "source_vertices": 1492,
+  "mesh_count": 1,
+  "surfaces": 7,
+  "bones": 20,
+  "animations": [
+    "Idle",
+    "Walk",
+    "Carry",
+    "Cast"
+  ],
+  "height_m": 1.84,
+  "palette_srgb": {
+    "Skin": "d79c6b",
+    "Ivory": "eee5d5",
+    "Navy": "151d28",
+    "Hair": "151d28",
+    "Frame": "090a14",
+    "Sandal": "090a14",
+    "Silver": "cac0b7"
+  },
+  "material_faces": {
+    "Skin": 1503,
+    "Ivory": 353,
+    "Navy": 610,
+    "Hair": 205,
+    "Frame": 33,
+    "Sandal": 288,
+    "Silver": 8
+  }
+}

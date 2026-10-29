@@ -109,8 +109,8 @@ func _cylinder(parent: Node3D, pos: Vector3, radius: float, height: float, hex: 
 	node.position = pos
 	return node
 
-func _solid_box(pos: Vector3, size: Vector3, hex: String) -> void:
-	_box(self, pos, size, hex)
+func _solid_box(pos: Vector3, size: Vector3, hex: String, show_visual: bool = true) -> void:
+	_box(self, pos, size, hex).visible = show_visual
 	var body := StaticBody3D.new()
 	add_child(body)
 	body.position = pos
@@ -119,6 +119,16 @@ func _solid_box(pos: Vector3, size: Vector3, hex: String) -> void:
 	var collider := CollisionShape3D.new()
 	collider.shape = shape
 	body.add_child(collider)
+
+## Batch-derived visuals are separate from the existing gameplay colliders.
+func _batch_model(parent: Node3D, id: String, position_: Vector3 = Vector3.ZERO, scale_: Vector3 = Vector3.ONE) -> Node3D:
+	var path := "res://assets/models/ready/" + id + "/" + id + ".glb"
+	var visual: Node3D = load(path).instantiate()
+	visual.name = "Batch_" + id
+	parent.add_child(visual)
+	visual.position = position_
+	visual.scale = scale_
+	return visual
 
 func _label(text: String, pos: Vector3, size: int, hex: String) -> void:
 	var label := Label3D.new()
@@ -232,26 +242,25 @@ func _build_world() -> void:
 	var off := Vector3(START.x, 0.0, START.z - 5.0)
 	_solid_box(off + Vector3(0, 0.20, 11), Vector3(18, 0.42, 5), "394a50")
 	for z in range(9, 16, 2):
-		_solid_box(off + Vector3(0, 0.45, float(z)), Vector3(3.5, 0.35, 1.7), "7a4841")
-		for x in [-1.45, 1.45]:
-			_box(self, off + Vector3(x, 0.14, float(z)), Vector3(0.16, 0.42, 0.18), "402751")
-	_box(self, off + Vector3(-6.8, 1.5, 10), Vector3(1.0, 2.6, 1.0), "e7d5b3")
-	_box(self, off + Vector3(-6.8, 2.9, 10), Vector3(1.2, 0.26, 1.2), "a53030")
-	_box(self, off + Vector3(-6.8, 3.18, 10), Vector3(0.48, 0.25, 0.48), "f2d98a")
+		_solid_box(off + Vector3(0, 0.45, float(z)), Vector3(3.5, 0.35, 1.7), "7a4841", false)
+	# The inferred pier deck sits at the old collision top; posts extend underwater.
+	_batch_model(self, "dock", off + Vector3(0, -0.73, 12.0))
+	_batch_model(self, "lighthouse", off + Vector3(-6.8, 0.02, 10), Vector3(0.6, 0.95, 0.6))
 	_label("BẾN XÓM ĐÈN", off + Vector3(0, 1.45, 13.6), 30, "e7d5b3")
+	var rock_index := 0
 	for rock in SeaLayout3D.rocks():
 		var pos: Vector3 = rock["pos"]
 		var radius: float = rock["radius"]
-		_solid_box(pos + Vector3(0, 0.32, 0), Vector3(radius * 2.2, 0.62, radius * 1.6), "394a50")
-		_box(self, pos + Vector3(-radius * 0.2, 0.73, 0), Vector3(radius * 0.9, 0.45, radius * 0.7), "577277")
+		_solid_box(pos + Vector3(0, 0.32, 0), Vector3(radius * 2.2, 0.62, radius * 1.6), "394a50", false)
+		var rock_id := "rock_1" if rock_index % 2 == 0 else "rock_2"
+		var source_size := Vector3(2.5, 1.2, 2.2) if rock_index % 2 == 0 else Vector3(1.8, 1.5, 1.6)
+		_batch_model(self, rock_id, pos + Vector3(0, 0.02, 0), Vector3(radius * 2.2, 0.95, radius * 1.6) / source_size)
+		rock_index += 1
 		for i in range(5):
 			var angle := float(i) * TAU / 5.0
 			_box(self, pos + Vector3(cos(angle) * radius * 1.7, 0.11, sin(angle) * radius * 1.3), Vector3(0.52, 0.02, 0.08), "819796")
-	_solid_box(RAFT_POS + Vector3(0, 0.32, 0), Vector3(5.0, 0.55, 3.0), "7a4841")
-	for x in [-2.0, 0.0, 2.0]:
-		_box(self, RAFT_POS + Vector3(x, 0.65, 0), Vector3(1.65, 0.15, 2.3), "ad7757")
-	_box(self, RAFT_POS + Vector3(2.0, 1.5, -1), Vector3(0.15, 1.8, 0.15), "e7d5b3")
-	_box(self, RAFT_POS + Vector3(2.0, 2.5, -1), Vector3(0.45, 0.2, 0.45), "f2d98a")
+	_solid_box(RAFT_POS + Vector3(0, 0.32, 0), Vector3(5.0, 0.55, 3.0), "7a4841", false)
+	_batch_model(self, "lobster_raft", RAFT_POS + Vector3(0, -0.10, 0))
 	# Shoals are only hinted by bubbles on the water (BubbleSpot3D).
 	var bubble_mat := StandardMaterial3D.new()
 	bubble_mat.albedo_color = Color("c9f1f0")
@@ -268,20 +277,13 @@ func _build_world() -> void:
 
 func _build_pois() -> void:
 	# Reach points sit in open water. Buildings behind them carry the silhouette.
-	_box(self, SHRINE_POS + Vector3(-1.4, 0.25, -0.6), Vector3(2.0, 0.50, 1.5), "819796")
-	_box(self, SHRINE_POS + Vector3(-1.4, 0.75, -0.6), Vector3(1.1, 0.50, 0.9), "a53030")
-	_box(self, SHRINE_POS + Vector3(-1.4, 1.12, -0.6), Vector3(1.4, 0.18, 1.15), "7a4841")
-	_label("MIẾU CÁ ÔNG", SHRINE_POS + Vector3(-1.4, 1.7, -0.6), 21, "f2d98a")
-	_box(self, LIGHTHOUSE_POS + Vector3(-1.8, 0.26, -0.6), Vector3(2.9, 0.52, 2.4), "394a50")
-	_box(self, LIGHTHOUSE_POS + Vector3(-1.8, 1.55, -0.6), Vector3(0.75, 2.35, 0.75), "e7d5b3")
-	_box(self, LIGHTHOUSE_POS + Vector3(-1.8, 2.45, -0.6), Vector3(0.83, 0.32, 0.83), "a53030")
-	_box(self, LIGHTHOUSE_POS + Vector3(-1.8, 2.76, -0.6), Vector3(0.35, 0.27, 0.35), "f2d98a")
-	_label("ĐÁ CANH ĐÊM", LIGHTHOUSE_POS + Vector3(-1.8, 3.2, -0.6), 20, "e7d5b3")
-	_box(self, HUT_POS + Vector3(-1.4, 0.2, -0.5), Vector3(2.4, 0.40, 2.0), "577277")
-	_box(self, HUT_POS + Vector3(-1.4, 0.95, -0.5), Vector3(1.4, 1.1, 1.1), "884b2b")
-	_box(self, HUT_POS + Vector3(-1.4, 1.58, -0.5), Vector3(1.8, 0.18, 1.5), "be772b")
-	_label("GÒ VỎ ỐC", HUT_POS + Vector3(-1.4, 2.0, -0.5), 20, "f2d98a")
-	_label("BÈ TÔM HÙM ANH ÚT", RAFT_POS + Vector3(0, 1.9, 0), 20, "f2d98a")
+	_batch_model(self, "whale_shrine", SHRINE_POS + Vector3(-1.4, 0.02, -0.6))
+	_label("MIẾU CÁ ÔNG", SHRINE_POS + Vector3(-1.4, 2.0, -0.6), 21, "f2d98a")
+	_batch_model(self, "lighthouse", LIGHTHOUSE_POS + Vector3(-1.8, 0.02, -0.6))
+	_label("ĐÁ CANH ĐÊM", LIGHTHOUSE_POS + Vector3(-1.8, 3.5, -0.6), 20, "e7d5b3")
+	_batch_model(self, "old_man_hut", HUT_POS + Vector3(-1.4, 0.02, -0.5))
+	_label("GÒ VỎ ỐC", HUT_POS + Vector3(-1.4, 2.3, -0.5), 20, "f2d98a")
+	_label("BÈ TÔM HÙM ANH ÚT", RAFT_POS + Vector3(0, 2.8, 0), 20, "f2d98a")
 	if Story.is_fog_open():
 		for i in range(18):
 			var a := TAU * float(i) / 18.0
@@ -307,17 +309,16 @@ func _build_night_events() -> void:
 		node.position = pos
 		match kind:
 			NightEvents.Kind.STRANDED:
-				_box(node, Vector3(0, 0.32, 0), Vector3(1.0, 0.32, 1.6), "819796")
-				_box(node, Vector3(0.4, 0.75, 0), Vector3(0.2, 0.20, 0.2), "cf573c")
+				_batch_model(node, "ghe_cheo", Vector3(0, 0.06, 0), Vector3(0.72, 0.65, 0.65))
 			NightEvents.Kind.BOTTLE:
-				_box(node, Vector3(0, 0.17, 0), Vector3(0.46, 0.14, 0.22), "a8ca58")
+				var bottle := _batch_model(node, "bottle", Vector3(0, 0.17, 0))
+				bottle.rotation.z = PI / 2.0
 			NightEvents.Kind.JELLYFISH:
 				for n in range(7):
-					_box(node, Vector3(float(n % 3) * 0.65 - 0.65, 0.17, float(n / 3) * 0.58 - 0.5),
-						Vector3(0.25, 0.14, 0.25), "5ff2e0")
+					_batch_model(node, "jellyfish", Vector3(float(n % 3) * 0.65 - 0.65, -0.32, float(n / 3) * 0.58 - 0.5), Vector3.ONE * 0.65)
 			NightEvents.Kind.DOLPHINS:
 				for n in range(3):
-					_box(node, Vector3(float(n) * 0.7 - 0.7, 0.18, 0), Vector3(0.50, 0.13, 0.18), "a4dddb")
+					_batch_model(node, "dolphin", Vector3(float(n) * 0.7 - 0.7, 0.08, 0), Vector3.ONE * 0.45)
 		night_events.append({"kind": kind, "pos": pos, "node": node, "done": false,
 			"time": 0.0, "towing": false, "owner": "Chú Sáu"})
 
@@ -367,21 +368,16 @@ func _build_boat() -> void:
 		hull.position.y = 0.14
 		boat_visual.add_child(hull)
 	else:
-		_box(boat_visual, Vector3(0, 0.23, 0), Vector3(1.55, 0.28, 3.05), "402751")
-		_box(boat_visual, Vector3(0, 0.44, 0.15), Vector3(1.72, 0.27, 2.35), "7a4841")
-		_box(boat_visual, Vector3(0, 0.62, -1.08), Vector3(1.22, 0.17, 0.85), "ad7757")
-		_box(boat_visual, Vector3(0, 0.56, 0.15), Vector3(1.22, 0.10, 1.68), "c09473")
-		for x in [-0.73, 0.73]:
-			_box(boat_visual, Vector3(x, 0.72, 0.08), Vector3(0.11, 0.35, 2.45), "be772b")
-		for z in [-0.63, 0.18, 0.95]:
-			_box(boat_visual, Vector3(0, 0.66, z), Vector3(1.31, 0.06, 0.13), "884b2b")
+		_batch_model(boat_visual, "ghe_may" if boat_data.id == "ghe_may" else "ghe_cheo", Vector3(0, 0.12, 0))
 	# Bare visual instance avoids adding a second person_rin cutscene group.
 	var rider := preload("res://scenes/art_pilots/rin_pilot.tscn").instantiate()
 	boat_visual.add_child(rider)
 	rider.name = "RinOnBoat"
-	rider.position = Vector3(0, 0.20 if boat_data.id == "thuyen_thung" else 0.65, 0.30)
+	rider.position = Vector3(0, 0.20 if boat_data.id == "thuyen_thung" else 0.82 if boat_data.id == "ghe_may" else 0.39, 1.10 if boat_data.id == "ghe_may" else 0.30)
 	rider.scale = Vector3.ONE * 0.85
 	rider.rotation.y = PI
+	# Hat follows the visual actor and its hide/show lifecycle in the cast cinematic.
+	_batch_model(rider, "non_la", Vector3(0, 1.64, -0.01))
 	rin_figure = [rider]
 	_box(boat_visual, Vector3(0.58, 1.02, -0.85), Vector3(0.08, 0.82, 0.08), "e7d5b3")
 	_box(boat_visual, Vector3(0.58, 1.48, -0.85), Vector3(0.33, 0.22, 0.33), "f2d98a")
@@ -820,8 +816,7 @@ func _drop_net() -> void:
 	var buoy := Node3D.new()
 	add_child(buoy)
 	buoy.position = pos
-	_cylinder(buoy, Vector3(0, 0.25, 0), 0.20, 0.42, "e7d5b3")
-	_box(buoy, Vector3(0, 0.52, 0), Vector3(0.35, 0.17, 0.35), "de9e41")
+	_batch_model(buoy, "net_buoy", Vector3(0, 0.06, 0))
 	nets.append({"pos": pos, "zone": zone, "time": elapsed, "node": buoy})
 	var map_net := Node2D.new()
 	map_net.add_to_group("net_buoys")

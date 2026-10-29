@@ -21,7 +21,8 @@ func sync_staff() -> void:
 		(worker["node"] as Node3D).queue_free()
 	workers.clear()
 	for person in host.staff_roster.hired():
-		var node := PersonRig3D.build(host, "guest", person.body_color.to_html(false))
+		var variant: String = "vy_sau" if GameState.has_flag("vy_warmed") else "vy"
+		var node := PersonRig3D.build(host, variant if person.id == "vy" else "staff")
 		node.position = Vector3(3.3 + workers.size() * 0.7, 0, -0.5)
 		workers.append({"data": person, "node": node, "table": -1, "picked": false})
 	if host.shift_running:
@@ -43,6 +44,10 @@ func move_staff(delta: float) -> void:
 	for worker in workers:
 		var node: Node3D = worker["node"]
 		var table: int = worker["table"]
+		var data: StaffData = worker["data"]
+		if data.id == "vy":
+			node.set_variant("vy_sau" if GameState.has_flag("vy_warmed") else "vy")
+		node.set_carrying(bool(worker.get("picked", false)))
 		if table < 0:
 			var dirty: int = host.dirty_tables.find(true)
 			if dirty >= 0:

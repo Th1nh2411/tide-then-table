@@ -7,7 +7,7 @@ from datetime import datetime
 import hashlib,json,struct,shutil
 import numpy as np
 ROOT=Path(__file__).resolve().parents[2]
-OUT=ROOT/'assets/models/pilots/thuyen_thung'
+OUT=ROOT/'assets/models/ready/thuyen_thung'
 source=OUT/'thuyen_thung_reduced.glb'
 target=OUT/'thuyen_thung.glb'
 raw=source.read_bytes();size=struct.unpack_from('<I',raw,12)[0]

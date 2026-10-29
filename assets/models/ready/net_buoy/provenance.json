@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/small/net_buoy/net_buoy_reduced.glb",
+  "source_sha256": "8e3ef3107ff570ae7155a812e35b6654a05d78324af7234a68d503c2540fa29a",
+  "input": "assets/concepts/3d_queue/small/net_buoy.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 600,
+  "yaw_radians": 0,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "7adf1c9e55c43c5e32009c9a4ee52aa444c750cc8967e735a8a192d75844acf0",
+  "triangles": 600,
+  "surfaces": 4,
+  "dimensions_m": [
+    0.38,
+    0.7,
+    0.38
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

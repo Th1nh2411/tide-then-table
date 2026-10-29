@@ -1,0 +1,27 @@
+{
+  "id": "plastic_bag",
+  "source": "assets/models/batch/small/plastic_bag/plastic_bag_reduced.glb",
+  "source_sha256": "d34e2601f49bb3ceab5e3672d0b4c09b381bee6ff107fa8b0ae81665ff10a289",
+  "source_provenance": "assets/models/batch/small/plastic_bag/hunyuan_provenance.json",
+  "concept": "assets/concepts/3d_queue/small/plastic_bag.png",
+  "builder": "tools/art/build_batch_restaurant.py",
+  "changes": [
+    "canonical metre scale",
+    "bottom-centred origin",
+    "footprint yaw normalization",
+    "flat face normals",
+    "palette materials by geometric region"
+  ],
+  "yaw_radians": 0.0,
+  "geometry_replaced": false,
+  "output_sha256": "ac8c37f63a6a6d1eeb5514b3859931e3a5084dc092f7d70da7360f0d054ddb4c",
+  "triangles": 600,
+  "surfaces": 2,
+  "dimensions_m": [
+    0.28,
+    0.38,
+    0.18
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

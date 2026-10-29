@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-29",
+  "source_mesh": "assets/models/batch/characters/ong_tam/ong_tam_reduced.glb",
+  "source_sha256": "d6cd1031194cf4818d759803c0d46d7ee1bc730c2fe1f12dd3217a4e8c7e939f",
+  "source_method": "Hunyuan3D-2mini-turbo local inference; see original source provenance",
+  "image_reference": "assets/concepts/3d_queue/characters/ong_tam.png",
+  "processing": "Uniform normalization; anatomical flat palette; weighted 20-bone skin and authored Idle/Walk/Carry animation. Source triangles preserved.",
+  "blender_used": false,
+  "external_base_geometry_used": false,
+  "output_sha256": "0b16cbd42275de2f067cb89b10ab6cf43a6ace30a8d1cea111df81752f8537b5"
+}

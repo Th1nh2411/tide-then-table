@@ -27,10 +27,16 @@ func _ready() -> void:
 	overlay._minigame.result_seconds = 0.01
 	sea._try_fish()
 	check(sea.fishing and sea.cinematic.playing and not overlay.active, "cast cinematic starts and locks input before the minigame")
+	var actor: PersonRig3D = sea.cinematic.get("_rig")
+	var visual := actor.get_node("RinPilot") as RinPilotVisual
+	check(visual.animation.assigned_animation == "Cast", "Gameplay cinematic samples the exported Cast animation")
 	var frames := 0
 	while not overlay.active and frames < 600:
 		await get_tree().process_frame
 		frames += 1
+		if frames == 25 and OS.get_cmdline_user_args().has("--capture-cast"):
+			await RenderingServer.frame_post_draw
+			get_viewport().get_texture().get_image().save_png("res://build/rin_cast/gameplay.png")
 	check(overlay.active and not sea.cinematic.playing and frames < 400, "cast cinematic completes and hands control to the minigame")
 	check(overlay._minigame._game is FishFightGame and (overlay._minigame._game as FishFightGame).school_size == 4,
 		"minigame shows exactly the shoal's fish")

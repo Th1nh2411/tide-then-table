@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-29",
+  "source_mesh": "assets/models/batch/characters/bao/bao_reduced.glb",
+  "source_sha256": "3a260004fd5b61a50ccbd9a2375d2ad37d1651f4dce0d1a8147e9853c7f2f29b",
+  "source_method": "Hunyuan3D-2mini-turbo local inference; see original source provenance",
+  "image_reference": "assets/concepts/3d_queue/characters/bao.png",
+  "processing": "Uniform normalization; anatomical flat palette; weighted 20-bone skin and authored Idle/Walk/Carry animation. Source triangles preserved.",
+  "blender_used": false,
+  "external_base_geometry_used": false,
+  "output_sha256": "4362f639e31942699a663ea39d6ed33ebab17bcfa0bf1c7acebe336b1b02a7aa"
+}

@@ -1,30 +1,34 @@
 class_name PersonRig3D
 extends Node3D
-## Shared gameplay/cutscene actor API. Rin uses the weighted Hunyuan pilot;
-## other actors retain the original block rig and cat remains separate.
+## Shared gameplay/cutscene actor API backed by weighted inferred character meshes.
 
 const SKIN := "ad7757"
 const DARK := "202e37"
-## kind -> {shirt, hat, glasses, apron}. Guests pass their own shirt colour.
+## Supported story/gameplay actor IDs; palette now comes from the finished model.
 const LOOKS := {
 	"rin": {"shirt": "e9dfc5", "hat": DARK, "glasses": true},
 	"bao": {"shirt": "c97649", "hat": "394a50", "apron": true},
 	"vy": {"shirt": "d9648a", "hat": "394a50"},
 	"co_nam": {"shirt": "468232", "hat": "394a50", "bun": true},
+	"vy_sau": {}, "ong_tam": {}, "guest_1": {}, "guest_2": {}, "guest_3": {},
+	"guest_rich": {}, "guest_regular": {}, "staff": {},
 	"guest": {"shirt": "7a4841", "hat": "394a50"},
 }
 
+static var _guest_sequence: int = 0
+var current_variant: String = ""
+var _cat_visual: Node3D
 var kind: String = ""
 var legs: Array[Node3D] = []
 var arms: Array[Node3D] = []
 var plate: Node3D
 var carrying := false
 var _pilot: RinPilotVisual
-var _raised := false
 var _walk_speed := 0.0
+var _casting_clip := false
 
 
-## Builds a rig of `kind` under `parent`. `shirt` overrides the look's shirt hex.
+## Builds a rig of `kind` under `parent`; legacy shirt argument remains accepted.
 static func build(parent: Node3D, kind_: String, shirt: String = "") -> PersonRig3D:
 	var rig := PersonRig3D.new()
 	rig.kind = kind_
@@ -32,11 +36,16 @@ static func build(parent: Node3D, kind_: String, shirt: String = "") -> PersonRi
 	if kind_ == "cat":
 		rig._build_cat()
 		return rig
-	var look: Dictionary = LOOKS.get(kind_, LOOKS["guest"])
 	if kind_ == "rin":
+		rig.current_variant = "rin"
 		rig._build_rin_pilot()
 	else:
-		rig._build_person(look, shirt if shirt != "" else str(look["shirt"]))
+		var variant := kind_
+		if kind_ == "guest":
+			variant = "guest_%d" % ((_guest_sequence % 3) + 1)
+			_guest_sequence += 1
+		rig.current_variant = variant if variant in LOOKS else "guest_1"
+		rig._build_rin_pilot()
 	if kind_ != "guest":
 		rig.add_to_group("person_" + kind_)
 	return rig
@@ -49,6 +58,9 @@ func set_walking(speed: float, clock: float) -> void:
 		_update_pilot_motion()
 		return
 	if kind == "cat":
+		if _cat_visual:
+			_cat_visual.position.y = absf(sin(clock * 9.0)) * 0.025 * speed
+			_cat_visual.rotation.z = sin(clock * 9.0) * 0.025 * speed
 		return
 	var beat := floorf(clock * 8.0) / 8.0
 	position.y = absf(sin(beat * 11.0)) * 0.04 * speed
@@ -72,19 +84,14 @@ func set_carrying(on: bool) -> void:
 			arm.rotation.x = 0.0
 
 
-## Arms up for an emote; pass false to lower them.
-func set_raised(on: bool) -> void:
-	if _pilot:
-		_raised = on
-		_update_pilot_motion()
-		return
-	if not carrying:
-		for arm in arms:
-			arm.rotation.x = -2.4 if on else 0.0
-
-
 func _build_rin_pilot() -> void:
-	_pilot = load("res://scenes/art_pilots/rin_pilot.tscn").instantiate() as RinPilotVisual
+	if current_variant == "rin":
+		_pilot = load("res://scenes/art_pilots/rin_pilot.tscn").instantiate() as RinPilotVisual
+	else:
+		var visual := BatchCharacterVisual.new()
+		visual.asset_id = current_variant
+		visual.name = "BatchPilot"
+		_pilot = visual
 	add_child(_pilot)
 	# Preserve the old arms[] attachment contract. A casting rod still uses its
 	# original local (0,-0.6,0) grip, but anchors now follow the actual skinned wrist.
@@ -100,6 +107,9 @@ func _build_rin_pilot() -> void:
 	plate = Node3D.new()
 	add_child(plate)
 	plate.position = Vector3(0, 1.0, 0.47)
+	if current_variant != "rin" and _pilot and _pilot.skeleton:
+		var hips := _pilot.skeleton.get_bone_global_rest(_pilot.skeleton.find_bone("Hips")).origin.y
+		plate.position *= hips / 0.92
 	plate.visible = false
 	_box(plate, Vector3.ZERO, Vector3(0.36, 0.035, 0.3), "e8d9b7")
 	for i in range(3):
@@ -107,11 +117,16 @@ func _build_rin_pilot() -> void:
 	_sync_pilot_anchors()
 
 func _update_pilot_motion() -> void:
-	var clip := "Carry" if carrying else "Raised" if _raised else "Walk" if _walk_speed > 0.03 else "Idle"
+	if _casting_clip:
+		return
+	var clip := "Carry" if carrying else "Walk" if _walk_speed > 0.03 else "Idle"
 	_pilot.set_motion(clip, clampf(_walk_speed, 0.35, 1.5) if clip == "Walk" else 1.0)
 
 func _process(_delta: float) -> void:
 	if not _pilot or not _pilot.skeleton:
+		return
+	if _casting_clip:
+		_sync_pilot_anchors()
 		return
 	var casting := false
 	for i in range(arms.size()):
@@ -122,10 +137,18 @@ func _process(_delta: float) -> void:
 		_pilot.clear_cast()
 	_sync_pilot_anchors()
 
+## Sample the authored clip using the cinematic clock, including skip speed-up.
+func sample_cast(seconds: float) -> void:
+	_casting_clip = true
+	_pilot.sample_motion("Cast", seconds)
+	_sync_pilot_anchors()
+
 func _sync_pilot_anchors() -> void:
 	if not _pilot or not _pilot.skeleton:
 		return
 	for i in range(arms.size()):
+		if _casting_clip:
+			arms[i].basis = _pilot.hand_basis("R" if i == 0 else "L")
 		var wrist := _pilot.hand_position("R" if i == 0 else "L")
 		arms[i].position = wrist - arms[i].basis * Vector3(0, -0.6, 0)
 
@@ -145,41 +168,22 @@ func _box(parent: Node3D, pos: Vector3, size: Vector3, hex: String) -> MeshInsta
 	return mesh
 
 
-func _build_person(look: Dictionary, shirt: String) -> void:
-	_box(self, Vector3(0, 1.05, 0), Vector3(0.46, 0.65, 0.33), shirt)
-	_box(self, Vector3(0, 1.72, 0), Vector3(0.39, 0.42, 0.37), SKIN)
-	_box(self, Vector3(0, 1.97, 0), Vector3(0.48, 0.14, 0.44), str(look["hat"]))
-	for side in [-1.0, 1.0]:
-		var leg := Node3D.new()
-		add_child(leg)
-		leg.position = Vector3(side * 0.13, 0.66, 0)
-		_box(leg, Vector3(0, -0.27, 0), Vector3(0.15, 0.55, 0.18), SKIN)
-		var arm := Node3D.new()
-		add_child(arm)
-		arm.position = Vector3(side * 0.31, 1.35, 0)
-		_box(arm, Vector3(0, -0.3, 0), Vector3(0.12, 0.61, 0.14), SKIN)
-		legs.append(leg)
-		arms.append(arm)
-	if look.get("glasses", false):
-		for x in [-0.11, 0.11]:
-			_box(self, Vector3(x, 1.76, 0.19), Vector3(0.17, 0.11, 0.035), DARK)
-	if look.get("apron", false):
-		_box(self, Vector3(0, 0.98, 0.18), Vector3(0.34, 0.6, 0.04), "e9dfc5")
-	if look.get("bun", false):
-		_box(self, Vector3(0, 1.94, -0.18), Vector3(0.30, 0.17, 0.24), DARK)
-	plate = Node3D.new()
-	add_child(plate)
-	plate.position = Vector3(0, 1.0, 0.47)
-	plate.visible = false
-	_box(plate, Vector3.ZERO, Vector3(0.36, 0.035, 0.3), "e8d9b7")
-	for i in range(3):
-		_box(plate, Vector3(-0.1 + i * 0.1, 0.045, 0), Vector3(0.075, 0.05, 0.18), "c97649")
+func get_variant() -> String:
+	return current_variant
 
+func set_variant(id: String) -> void:
+	if id == current_variant or not (id in LOOKS) or id in ["rin", "guest"]:
+		return
+	if _pilot is BatchCharacterVisual:
+		current_variant = id
+		(_pilot as BatchCharacterVisual).load_variant(id)
+		var hips := _pilot.skeleton.get_bone_global_rest(_pilot.skeleton.find_bone("Hips")).origin.y
+		plate.position = Vector3(0, 1.0, 0.47) * hips / 0.92
+		_update_pilot_motion()
+		_sync_pilot_anchors()
 
 func _build_cat() -> void:
-	_box(self, Vector3(0, 0.22, 0), Vector3(0.72, 0.42, 0.48), "de9e41")
-	_box(self, Vector3(-0.32, 0.34, 0.16), Vector3(0.38, 0.36, 0.36), "e8c170")
-	for x in [-0.44, -0.19]:
-		_box(self, Vector3(x, 0.58, 0.16), Vector3(0.12, 0.22, 0.12), "de9e41")
-	_box(self, Vector3(0.48, 0.41, -0.12), Vector3(0.10, 0.57, 0.12), "de9e41")
+	current_variant = "cat"
+	_cat_visual = load("res://assets/models/ready/cat/cat.glb").instantiate()
+	add_child(_cat_visual)
 	add_to_group("person_cat")

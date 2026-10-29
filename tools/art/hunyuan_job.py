@@ -5,7 +5,7 @@ On Windows: tools/art/hunyuan.ps1.
 
 Run in an isolated client environment, for example:
 uvx --from gradio-client==1.3.0 python tools/art/hunyuan_job.py \
-    --image assets/concepts/example.png --out-dir assets/models/pilots/example \
+    --image assets/concepts/example.png --out-dir assets/models/ready/example \
     --name example --faces 2000
 
 Uploads the specified image to the public Tencent demo. No paid provider or

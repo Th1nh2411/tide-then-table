@@ -219,13 +219,8 @@ func _emote(actor_: Node3D, text: String, seconds: float) -> void:
 	label.position = Vector3(0, 2.0, 0)
 	label.process_mode = Node.PROCESS_MODE_ALWAYS
 	actor_.add_child(label)
-	var rig := actor_ as PersonRig3D
-	if rig and text == "!":
-		rig.set_raised(true)
 	get_tree().create_timer(maxf(seconds, 0.1), true).timeout.connect(func() -> void:
-		label.queue_free()
-		if is_instance_valid(rig):
-			rig.set_raised(false))
+		label.queue_free())
 
 
 func _idle(actor_: Node3D) -> void:
@@ -248,7 +243,7 @@ func _take_over(actor_: Node3D, actor_kind: String) -> void:
 
 func _make_actor(actor_kind: String) -> Node3D:
 	if actor_kind in PersonRig3D.LOOKS or actor_kind == "cat":
-		var rig := PersonRig3D.build(_rig, "guest" if actor_kind == "guest_regular" else actor_kind)
+		var rig := PersonRig3D.build(_rig, actor_kind)
 		rig.remove_from_group("person_" + actor_kind)
 		rig.process_mode = Node.PROCESS_MODE_ALWAYS
 		return rig

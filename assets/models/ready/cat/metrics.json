@@ -1,0 +1,12 @@
+{
+  "output_sha256": "625cac1d07cac19b7066ba17a24f7d813ff51048a9b871a3e4dc08986a34b48b",
+  "triangles": 1500,
+  "surfaces": 3,
+  "dimensions_m": [
+    0.43461027512905387,
+    0.58,
+    0.4477942920418835
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

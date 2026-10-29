@@ -235,7 +235,7 @@ quay sang phải** (game xoay theo hướng lái), cỡ như bảng mục 3; `ri
 Chưa nạp ảnh (vẫn vẽ bằng code): xe máy, dây đèn, cây xanh, đường phố xa, nước biển, đá, địa điểm ngoài
 biển, sương mù, UI, minigame. Cần cái nào trước thì báo để nối thêm.
 
-## Art 3D — catalog hiện hành, 2026-10-28
+## Art 3D — catalog hiện hành, 2026-10-29
 
 Flow đã chọn và checklist: `docs/ART_PIPELINE.md`; hướng hình ảnh: `ART_PLAN.md`.
 
@@ -245,11 +245,32 @@ Flow đã chọn và checklist: `docs/ART_PIPELINE.md`; hướng hình ảnh: `A
 | `assets/models/characters/rin_hunyuan_shape/input_front.png` | 505×941, crop input | Nguồn lần inference đầu |
 | `assets/models/characters/rin_hunyuan_shape/rin_hunyuan_shape.glb` | 78,972 tam giác; GLB gốc từ Space Tencent | Source phục vụ pilot Rin |
 | `assets/models/characters/rin_hunyuan_shape/rin_hunyuan_3k_lit.glb` | 3,000 tam giác, đã thêm normals; chưa material/rig | Shape baseline, F6 `rin_hunyuan_study.tscn` |
-| Rin pilot có màu/rig | Hunyuan shape → material → skin/Idle/Walk/Carry | Đang triển khai |
-| Bàn và ghế đẩu pilot | Tạo từng vật rời để ráp đúng vị trí tương tác | Đang triển khai |
-| Thuyền thúng pilot | Hunyuan shape → giảm mesh → material | Đang triển khai |
-| 45 asset còn lại (11 nhân vật, 24 đồ lớn/thuyền/công trình, 10 đồ nhỏ) | Prompt ảnh đầu vào: `assets/concepts/3d_queue/PROMPTS.md`; ảnh bỏ vào `characters/`, `props/`, `small/` rồi chạy batch `hunyuan_local.ps1` | Chờ gen ảnh |
+| `assets/models/ready/rin/rin_pilot.glb` | 3,000 tam giác; 20 xương; Idle/Walk/Carry; palette portrait 2D approved | Active quán/biển/cutscene |
+| Bàn và ghế đẩu pilot | Hunyuan local; bàn 1,200 tam giác, ghế 600; từng vật rời | Active quán |
+| Thuyền thúng pilot | Hunyuan shape; 2,400 tam giác, material phẳng | Active biển |
+| 45 asset batch (11 nhân vật, 24 đồ lớn/thuyền/công trình, 10 đồ nhỏ) | Nguồn `assets/models/batch/`; thành phẩm `assets/models/ready/<id>/<id>.glb`; tổng 75,622 tam giác | Đã chuẩn hóa/tô màu và tích hợp game |
 
 Những Rin study Blender/base humanoid/mesh tự dựng bằng script đã được chuyển
 khỏi catalog và filesystem Godot. Bản lưu có manifest SHA-256 dưới `.art_backups/`,
 chi tiết đường dẫn ở `docs/ART_PIPELINE.md`. Không thay sprite/portrait approved.
+
+Các ID thành phẩm (giữ tên chính xác):
+
+| Nhóm tích hợp | ID trong `assets/models/ready/` |
+|---|---|
+| Nhân vật/cutscene/khách/nhân viên | `bao`, `vy`, `vy_sau`, `co_nam`, `ong_tam`, `guest_1`, `guest_2`, `guest_3`, `guest_rich`, `guest_regular`, `staff`, `cat` |
+| Quán/nâng cấp/tạp hóa/giao thông | `food_cart_0`, `food_cart_1`, `food_cart_2`, `charcoal_grill`, `beer_keg`, `plate_bench`, `fridge_0`, `fridge_1`, `fridge_2`, `menu_board`, `grocery_counter`, `motorbike`, `sidewalk_tree`, `bin`, `plant_pot`, `beer_tower`, `grocery_crate`, `plastic_bag`, `crate`, `bottle` |
+| Biển/POI/sự kiện/phụ kiện Rin | `ghe_cheo`, `ghe_may`, `lighthouse`, `whale_shrine`, `old_man_hut`, `lobster_raft`, `dock`, `rock_1`, `rock_2`, `dolphin`, `non_la`, `net_buoy`, `jellyfish` |
+
+Mỗi người batch giữ 3,000 tam giác và có skin 20 xương; mèo là mesh ngồi tĩnh
+có bob/sway. Các GLB giữ geometry inference, palette phẳng theo concept và có
+provenance/checksum. Nguồn batch không bị ghi đè; bản active trước sửa
+được lưu recoverable trong `build/batch_integration/backups/`.
+
+Rin cập nhật từ Blender ngày 2026-10-29: giữ màu chỉnh tay, Skin.001 về `#D79C6B`,
+Walk sửa trọng số dép và nhịp bước. Nguồn chỉnh tiếp local:
+`build/rin_export/rin_walk_fixed.blend`; GLB runtime vẫn ở đường dẫn pilot trên.
+
+Rin có thêm clip `Cast` 1,5 giây; preview phím 5 và cinematic dùng clip này.
+Các nhân vật batch khác giữ Idle/Walk/Carry. Nguồn có Cast: `rin.blend` ở đường
+dẫn Blender nêu trên; snapshot local `build/rin_cast/source_with_cast.blend`.

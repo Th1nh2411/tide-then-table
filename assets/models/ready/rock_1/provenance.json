@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/props/rock_1/rock_1_reduced.glb",
+  "source_sha256": "95763bc5c99b8349d0b60ca440aaa9a1c6abe70fbd4d08609fb831b112da69fe",
+  "input": "assets/concepts/3d_queue/props/rock_1.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 1500,
+  "yaw_radians": 0,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "e3e680e190d42b5944c7407c4fcfdb592f1d2a91885bf55a2a465a6a9744398d",
+  "triangles": 1500,
+  "surfaces": 3,
+  "dimensions_m": [
+    2.5,
+    1.2,
+    2.2
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

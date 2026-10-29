@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/props/dock/dock_reduced.glb",
+  "source_sha256": "acf4ada272a8bd8fbb7c4568907cdb504ba06f03ecaace084697244e33fec963",
+  "input": "assets/concepts/3d_queue/props/dock.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 1500,
+  "yaw_radians": -1.6432058997933336,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "5209b478b52d28af0e197e44488183764384da391ad522f5132237a51cf65c48",
+  "triangles": 1500,
+  "surfaces": 4,
+  "dimensions_m": [
+    3.5,
+    2.6,
+    7.7
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

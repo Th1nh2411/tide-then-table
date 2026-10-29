@@ -1,0 +1,27 @@
+{
+  "id": "motorbike",
+  "source": "assets/models/batch/props/motorbike/motorbike_reduced.glb",
+  "source_sha256": "b187faf3fa2f00b5caa0d9f53251439cab5e408f42f27ee12a34cc7b9f731054",
+  "source_provenance": "assets/models/batch/props/motorbike/hunyuan_provenance.json",
+  "concept": "assets/concepts/3d_queue/props/motorbike.png",
+  "builder": "tools/art/build_batch_restaurant.py",
+  "changes": [
+    "canonical metre scale",
+    "bottom-centred origin",
+    "footprint yaw normalization",
+    "flat face normals",
+    "palette materials by geometric region"
+  ],
+  "yaw_radians": 1.806415775814131,
+  "geometry_replaced": false,
+  "output_sha256": "17abdb456b264d4e3719b94d32439b1a82ed084d2809b88e7c08236b353024f4",
+  "triangles": 1500,
+  "surfaces": 4,
+  "dimensions_m": [
+    0.7,
+    1.0,
+    1.85
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

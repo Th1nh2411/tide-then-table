@@ -1,0 +1,8 @@
+{
+  "source_mesh": "assets/models/batch/props/cat/cat_reduced.glb",
+  "source_sha256": "bca45e8dbf02271871ab4f098f56017f69e088c82d77f3bd27f82e4e99921b92",
+  "source_method": "Hunyuan3D-2mini-turbo local inference",
+  "processing": "Uniform 0.58m height; flat orange/cream palette; original inferred geometry. Rigid seated visual, no skeletal locomotion.",
+  "blender_used": false,
+  "output_sha256": "625cac1d07cac19b7066ba17a24f7d813ff51048a9b871a3e4dc08986a34b48b"
+}

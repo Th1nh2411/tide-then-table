@@ -29,6 +29,7 @@ func spawn_order() -> void:
 		host.orders[table] = {"dish": regular_dish, "items": reserved, "freshness": 100.0,
 			"patience": 38.0 * host.tuning.regular_patience_scale, "initial_patience": 38.0 * host.tuning.regular_patience_scale, "visit": visit,
 			"cooked": false, "staff_claimed": false, "multiplier": 1.0, "rich": false}
+		host.guests[table].call("set_variant", "guest_regular")
 		host.guests[table].visible = true
 		host.order_labels[table].text = "%s\n%s" % [visit["order"]["who"], regular_dish.display_name]
 		host._show_note("%s tới nhận món đặt ở bàn %d." % [visit["order"]["who"], table + 1])
@@ -50,6 +51,7 @@ func spawn_order() -> void:
 	host.orders[table] = {"dish": dish, "items": items, "freshness": freshness, "patience": patience, "initial_patience": patience,
 		"visit": {}, "cooked": false, "staff_claimed": false, "multiplier": 1.0, "rich": rich,
 		"party": PartyOrders3D.start(host.tuning, host.plan, host.menu, host.market_stock)}
+	host.guests[table].call("set_variant", "guest_rich" if rich else "guest_%d" % (1 + table % 3))
 	host.guests[table].visible = true
 	host.order_labels[table].text = ("KHÁCH SANG\n" if rich else "") + host.orders[table]["party"].label(dish)
 	host._show_note("Bàn %d gọi %s." % [table + 1, dish.display_name])
@@ -188,3 +190,10 @@ func sync_food_visuals() -> void:
 		var order: Dictionary = host.orders[i]
 		host.ready_plates[i].visible = not order.is_empty() and bool(order.get("cooked", false)) and str(order.get("phase", "waiting")) == "waiting" and host.carrying_table != i and not bool(order.get("staff_claimed", false))
 		host.table_plates[i].visible = host.dirty_tables[i] or (not order.is_empty() and str(order.get("phase", "waiting")) == "eating")
+
+		var displayed_dish: DishData = order.get("dish")
+		var is_beer := displayed_dish != null and displayed_dish.id == "bia_con_meo"
+		for plate: Node3D in [host.ready_plates[i], host.table_plates[i]]:
+			for part: Node in plate.get_children():
+				if part is Node3D:
+					part.visible = is_beer if part.name == "BeerTower" else not is_beer

@@ -1,0 +1,27 @@
+{
+  "id": "food_cart_0",
+  "source": "assets/models/batch/props/food_cart_0/food_cart_0_reduced.glb",
+  "source_sha256": "ed8cb1de9ce25a789d8a713b1f5aead4804de2c2b9988c809604bf5483323f6a",
+  "source_provenance": "assets/models/batch/props/food_cart_0/hunyuan_provenance.json",
+  "concept": "assets/concepts/3d_queue/props/food_cart_0.png",
+  "builder": "tools/art/build_batch_restaurant.py",
+  "changes": [
+    "canonical metre scale",
+    "bottom-centred origin",
+    "footprint yaw normalization",
+    "flat face normals",
+    "palette materials by geometric region"
+  ],
+  "yaw_radians": 0.0,
+  "geometry_replaced": false,
+  "output_sha256": "52fb8f975dbb2e23f54bcf1a089dad02a212afc6ebfb1621eec4db795ae4b307",
+  "triangles": 1500,
+  "surfaces": 5,
+  "dimensions_m": [
+    2.8,
+    1.6,
+    1.25
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

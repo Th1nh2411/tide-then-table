@@ -1,0 +1,27 @@
+{
+  "id": "plant_pot",
+  "source": "assets/models/batch/small/plant_pot/plant_pot_reduced.glb",
+  "source_sha256": "f9c3eb86bfd281c4fb44bed5842d111faea77e754fbf24a01efc68849fb59a20",
+  "source_provenance": "assets/models/batch/small/plant_pot/hunyuan_provenance.json",
+  "concept": "assets/concepts/3d_queue/small/plant_pot.png",
+  "builder": "tools/art/build_batch_restaurant.py",
+  "changes": [
+    "canonical metre scale",
+    "bottom-centred origin",
+    "footprint yaw normalization",
+    "flat face normals",
+    "palette materials by geometric region"
+  ],
+  "yaw_radians": 0.0,
+  "geometry_replaced": false,
+  "output_sha256": "61fee22dcd90ebd17c694862a6656e2af69e73af3c5a196dae8baf7918b0e3b3",
+  "triangles": 600,
+  "surfaces": 3,
+  "dimensions_m": [
+    0.75,
+    0.95,
+    0.75
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

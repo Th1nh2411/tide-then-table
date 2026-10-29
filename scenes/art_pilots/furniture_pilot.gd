@@ -1,20 +1,16 @@
 extends Node3D
-## Bare gallery wrapper. Only stools are Hunyuan-derived; the table is the
-## existing procedural visual while table inference is blocked by Space quota.
+## Gallery wrapper for the finished Hunyuan table and stools.
 
 const ROOM = preload("res://scenes/restaurant3d/restaurant_room_builder_3d.gd")
-const STOOL = preload("res://assets/models/pilots/stool/stool.glb")
+const STOOL = preload("res://assets/models/ready/stool/stool.glb")
+const TABLE = preload("res://assets/models/ready/table/table.glb")
 
 func _ready() -> void:
-	set_meta("table_status", "blocked_by_quota_existing_visual")
+	set_meta("table_status", "hunyuan_generated_1200_triangles")
 	set_meta("stool_status", "hunyuan_generated_600_triangles")
-	var table := Node3D.new()
-	table.name = "ExistingProceduralTable_PendingHunyuan"
+	var table: Node3D = TABLE.instantiate()
+	table.name = "HunyuanTable"
 	add_child(table)
-	ROOM.box(table, Vector3(0, 0.8, 0), Vector3(1.5, 0.12, 1.2), "c7cfcc")
-	for x: float in [-0.57, 0.57]:
-		for z: float in [-0.4, 0.4]:
-			ROOM.box(table, Vector3(x, 0.4, z), Vector3(0.07, 0.8, 0.07), "577277")
 	for side: float in [-1.0, 1.0]:
 		var stool: Node3D = STOOL.instantiate()
 		stool.name = "HunyuanStoolBlue" if side < 0 else "HunyuanStoolRed"

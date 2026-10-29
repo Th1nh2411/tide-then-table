@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/props/whale_shrine/whale_shrine_reduced.glb",
+  "source_sha256": "2428a29bde5d00aa6814e7f23bfa323397b53b9258f553b38eb0e39443acf302",
+  "input": "assets/concepts/3d_queue/props/whale_shrine.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 1500,
+  "yaw_radians": 0,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "785d4aaa2d839e278b071f9decb8bd01b022397946c17fd766fa1dde0f097aa5",
+  "triangles": 1500,
+  "surfaces": 4,
+  "dimensions_m": [
+    2.8,
+    1.7,
+    2.2
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

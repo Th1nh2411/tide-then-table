@@ -142,3 +142,14 @@ Tiến độ 2026-10-25: đã thêm mặt tiền cửa hàng, bảng menu, quầ
 - Các hướng thử cũ đã chuyển sang archive recoverable; không còn là candidate
   cần duyệt. Lịch sử ở `docs/archive/ART_STUDIES_20261028.md`.
 - Quy trình, tiêu chí và checklist hiện hành: `docs/ART_PIPELINE.md`.
+
+### Batch đã áp dụng — 2026-10-29
+
+Đã xử lý đủ 45 output Hunyuan theo flow trên và áp dụng vào quán/biển/cutscene.
+`assets/models/batch/` giữ output nguồn; `assets/models/ready/` là model thành
+phẩm. Giữ số tam giác nguồn, chuẩn đơn vị mét/origin/normals, thêm material phẳng;
+11 nhân vật người có skin 20 xương và ba animation. Không dùng Blender.
+Rin pilot chuyển palette theo portrait approved, gồm da `#d79c6b`, áo `#eee5d5`,
+tóc `#151d28`, kính `#090a14`, bạc `#cac0b7`. Chưa thay sprite/portrait gốc.
+Mèo chưa có rig đi bốn chân; mặt/ngón tay và vài chi tiết inference vẫn đơn giản.
+Catalog và scene review: `ASSETS.md`, `docs/3D_DEMO.md`.

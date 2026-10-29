@@ -7,10 +7,12 @@ const FRIDGE_POSITION := Vector3(-1.5, 0, -7.2)
 const REACH := 2.0
 
 var bag := MarketStock.new({})
+var visual: Node3D
 
 
 func add(dish: DishData, bulk: bool) -> void:
 	bag.add(dish, dish.buy_units(bulk))
+	_sync_bag()
 
 
 func has_goods() -> bool:
@@ -23,12 +25,17 @@ func near_fridge(at: Vector3) -> bool:
 
 ## Bag -> fridge stock; returns how many units moved.
 func store(stock: MarketStock, dishes: Array[DishData]) -> int:
-	return bag.move_into(stock, dishes)
+	var moved := bag.move_into(stock, dishes)
+	_sync_bag()
+	return moved
 
 
 func build_fridge(parent: Node3D) -> void:
-	var body := _box(parent, FRIDGE_POSITION + Vector3(0, 0.95, 0), Vector3(0.9, 1.9, 0.8), Color("c7cfcc"))
-	_box(body, Vector3(0.3, 0.1, 0.42), Vector3(0.06, 0.6, 0.04), Color("394a50"))
+	RestaurantBatchVisuals.upgrade(parent, "fridge", ["fridge_0", "fridge_1", "fridge_2"], FRIDGE_POSITION)
+	var actor: Node3D = parent.get("body")
+	if actor:
+		visual = RestaurantBatchVisuals.add(actor, "plastic_bag", Vector3(0.34, 0.63, 0.08))
+		_sync_bag()
 	var label := Label3D.new()
 	label.text = "TỦ LẠNH • E"
 	label.font_size = 20
@@ -38,14 +45,6 @@ func build_fridge(parent: Node3D) -> void:
 	label.position = FRIDGE_POSITION + Vector3(0, 2.2, 0.4)
 
 
-func _box(parent: Node3D, pos: Vector3, size: Vector3, color: Color) -> MeshInstance3D:
-	var mesh := MeshInstance3D.new()
-	var shape := BoxMesh.new()
-	shape.size = size
-	mesh.mesh = shape
-	var material := StandardMaterial3D.new()
-	material.albedo_color = color
-	mesh.material_override = material
-	parent.add_child(mesh)
-	mesh.position = pos
-	return mesh
+func _sync_bag() -> void:
+	if is_instance_valid(visual):
+		visual.visible = has_goods()

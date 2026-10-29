@@ -191,7 +191,7 @@ def check_asset(name, relative, meta_name, expected_triangles, expected_size, mi
             assert max(skin['joints']) < len(d['nodes'])
             matrices = glb.read(skin['inverseBindMatrices']).reshape(-1, 4, 4)
             assert len(matrices) == len(skin['joints']) and np.all(np.abs(np.linalg.det(matrices)) > 1e-6)
-        assert {a['name'] for a in d['animations']} == {'Idle', 'Walk', 'Carry', 'Raised'}
+        assert {a['name'] for a in d['animations']} == {'Idle', 'Walk', 'Carry', 'Cast'}
         for animation in d['animations']:
             for sampler in animation['samplers']:
                 times = glb.read(sampler['input']).reshape(-1)
@@ -241,10 +241,10 @@ def main():
     if not args.skip_archive:
         jobs.insert(0, ('archive', check_archive))
     jobs += [
-        ('stool', lambda: check_asset('stool', 'assets/models/pilots/stool/stool.glb', 'provenance.json', 600, (.55, .52, .55), 0, 'tools/art/build_furniture_pilot.py', 'SPECS')),
-        ('table', lambda: check_asset('table', 'assets/models/pilots/table/table.glb', 'provenance.json', 1200, (1.5, .86, 1.2), 0, 'tools/art/build_furniture_pilot.py', 'SPECS')),
-        ('thuyen_thung', lambda: check_asset('thuyen_thung', 'assets/models/pilots/thuyen_thung/thuyen_thung.glb', 'prepared_provenance.json', 2400, (2.4, .535, 2.3960044), .025, 'tools/art/build_boat_pilot.py', 'PALETTE')),
-        ('rin', lambda: check_asset('rin', 'assets/models/pilots/rin/rin_pilot.glb', 'provenance.json', 3000, None, 0, 'tools/art/build_rin_pilot.py', 'PALETTE')),
+        ('stool', lambda: check_asset('stool', 'assets/models/ready/stool/stool.glb', 'provenance.json', 600, (.55, .52, .55), 0, 'tools/art/build_furniture_pilot.py', 'SPECS')),
+        ('table', lambda: check_asset('table', 'assets/models/ready/table/table.glb', 'provenance.json', 1200, (1.5, .86, 1.2), 0, 'tools/art/build_furniture_pilot.py', 'SPECS')),
+        ('thuyen_thung', lambda: check_asset('thuyen_thung', 'assets/models/ready/thuyen_thung/thuyen_thung.glb', 'prepared_provenance.json', 2400, (2.4, .535, 2.3960044), .025, 'tools/art/build_boat_pilot.py', 'PALETTE')),
+        ('rin', lambda: check_asset('rin', 'assets/models/ready/rin/rin_pilot.glb', 'provenance.json', 3000, None, 0, 'tools/art/build_rin_pilot.py', 'PALETTE')),
     ]
     failures = 0
     print('QA snapshot UTC:', datetime.now(timezone.utc).isoformat())

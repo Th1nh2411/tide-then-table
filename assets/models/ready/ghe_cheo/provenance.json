@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/props/ghe_cheo/ghe_cheo_reduced.glb",
+  "source_sha256": "e53a36bc3659c0e18f627c6fed04a350a5dd68b2a3ed99bb5093c54d1f874494",
+  "input": "assets/concepts/3d_queue/props/ghe_cheo.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 1500,
+  "yaw_radians": 1.58513559185844,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "563ec991f0f55d8968a576328e120ba5f24d75c62f06a84820ea87bb67451f1f",
+  "triangles": 1500,
+  "surfaces": 4,
+  "dimensions_m": [
+    1.72,
+    0.72,
+    3.05
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

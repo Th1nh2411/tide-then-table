@@ -85,7 +85,11 @@ func play(target: Vector3) -> void:
 	_splashed = false
 	_build_props()
 	_cam_home = camera.global_transform
-	_cam_from = _cam_home
+	# Cut close enough to read Rin's cast before following the bobber underwater.
+	var actor_focus := _rig.global_position + Vector3.UP * 1.0
+	var actor_view := _rig.global_position + _rig.global_basis.orthonormalized() * Vector3(3.0, 1.8, 4.0)
+	_cam_from = Transform3D(Basis.IDENTITY, actor_view).looking_at(actor_focus, Vector3.UP)
+	camera.global_transform = _cam_from
 	var look_from: Vector3 = target + Vector3(0, 3.2, 3.8)
 	_cam_to = Transform3D(Basis.IDENTITY, look_from).looking_at(target, Vector3.UP)
 	_tween = create_tween()
@@ -126,14 +130,7 @@ func play_return() -> void:
 func _apply(t: float) -> void:
 	if not is_instance_valid(_rig):
 		return
-	var arm: Node3D = _rig.arms[1]
-	# Wind up back, then whip forward; the rod follows the arm.
-	if t < 0.3:
-		arm.rotation.x = lerpf(0.0, 1.3, ease(t / 0.3, 0.5))
-	elif t < 0.5:
-		arm.rotation.x = lerpf(1.3, -1.8, ease((t - 0.3) / 0.2, 2.0))
-	else:
-		arm.rotation.x = lerpf(-1.8, -1.4, clampf((t - 0.5) / 0.3, 0.0, 1.0))
+	_rig.sample_cast(t * DURATION)
 	if t >= 0.45 and not _released:
 		_released = true
 		_tip_at_release = _tip.global_position
@@ -176,6 +173,9 @@ func _build_props() -> void:
 		node.visible = false
 	_rig = PersonRig3D.build(boat_visual, "rin")
 	_rig.position = Vector3(0, 0.62, 0.3)
+	if not hidden_figure.is_empty() and is_instance_valid(hidden_figure[0]):
+		_rig.position = hidden_figure[0].position
+		_rig.scale = hidden_figure[0].scale
 	var local: Vector3 = boat_visual.to_local(_target)
 	_rig.rotation.y = atan2(local.x, local.z)
 	var arm: Node3D = _rig.arms[1]
@@ -187,6 +187,7 @@ func _build_props() -> void:
 	_tip = Node3D.new()
 	_rod.add_child(_tip)
 	_tip.position = Vector3(0, 0, 1.5)
+	_rig.sample_cast(0.0)
 	_bobber = _add_box(sea, Vector3.ZERO, Vector3(0.14, 0.14, 0.14), "cf573c")
 	_bobber.visible = false
 	_line = _add_box(sea, Vector3.ZERO, Vector3(0.015, 0.015, 0.1), "e7d5b3")

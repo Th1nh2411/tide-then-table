@@ -9,12 +9,12 @@ var _motion: String = "Idle"
 var _casting: bool = false
 
 func _ready() -> void:
-	model = load("res://assets/models/pilots/rin/rin_pilot.glb").instantiate()
+	model = load("res://assets/models/ready/rin/rin_pilot.glb").instantiate()
 	add_child(model)
 	skeleton = model.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
 	animation = model.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
 	for clip: String in animation.get_animation_list():
-		animation.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
+		animation.get_animation(clip).loop_mode = Animation.LOOP_NONE if clip == "Cast" else Animation.LOOP_LINEAR
 	animation.play("Idle")
 	animation.advance(0.0)
 
@@ -37,6 +37,10 @@ func hand_position(tag: String) -> Vector3:
 	var index := skeleton.find_bone("Hand." + tag)
 	var transform := skeleton.get_bone_global_pose(index)
 	return to_local(skeleton.to_global(transform.origin))
+
+func hand_basis(tag: String) -> Basis:
+	var index := skeleton.find_bone("Hand." + tag)
+	return (global_transform.affine_inverse() * skeleton.global_transform * skeleton.get_bone_global_pose(index)).basis.orthonormalized()
 
 func set_cast_arm(index: int, angle: float) -> void:
 	_casting = true

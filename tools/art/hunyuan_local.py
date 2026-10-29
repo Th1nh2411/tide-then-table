@@ -3,7 +3,7 @@
 Main tool; tools/art/hunyuan_job.py (public 2.1 Space) is the fallback. Run through
 tools/art/hunyuan_local.ps1, which picks the Hunyuan3D-2 venv and local weights:
     powershell -File tools/art/hunyuan_local.ps1 -Image assets/concepts/x.png \
-        -OutDir assets/models/pilots/x -Name x -Faces 2000
+        -OutDir assets/models/ready/x -Name x -Faces 2000
 Several images (or -InputDir) = batch: each goes to <OutDir>/<image stem>/.
 ~3.5 min per asset on CPU (octree 128, FlashVDM). No texture or rig is generated.
 """

@@ -9,8 +9,8 @@ from PIL import Image
 
 ROOT=Path(__file__).resolve().parents[2]
 SOURCE=ROOT/'assets/models/characters/rin_hunyuan_shape/rin_hunyuan_3k_lit.glb'
-IMAGE=ROOT/'assets/models/characters/rin_hunyuan_shape/input_front.png'
-OUT=ROOT/'assets/models/pilots/rin'
+IMAGE=ROOT/'assets/sprites/portraits/rin/base.png'
+OUT=ROOT/'assets/models/ready/rin'
 REVIEW=ROOT/'build/art_pilots/rin'
 OUT.mkdir(parents=True,exist_ok=True);REVIEW.mkdir(parents=True,exist_ok=True)
 for p in [OUT/'rin_pilot.glb',OUT/'metrics.json',OUT/'provenance.json']:
@@ -28,9 +28,11 @@ points=read(primitive['attributes']['POSITION']).astype(float)
 faces=read(primitive['indices']).reshape(-1,3).astype(int)
 mn,mx=points.min(0),points.max(0);scale=1.84/(mx[1]-mn[1])
 points[:,0]-=(mn[0]+mx[0])/2;points[:,2]-=(mn[2]+mx[2])/2;points[:,1]-=mn[1];points*=scale
-pixels=np.asarray(Image.open(IMAGE).convert('RGB'),dtype=float)
+# The approved PNG is read only as a palette reference, never rewritten.
+palette_reference_sha256=hashlib.sha256(IMAGE.read_bytes()).hexdigest()
 
-PALETTE={'Skin':'ca956b','Ivory':'e8dfca','Navy':'303b4d','Hair':'202a3a','Frame':'1d2530','Sandal':'35363b','Silver':'bcc2bb'}
+# Base colours sampled from the approved 2D portrait; lighting supplies shading.
+PALETTE={'Skin':'d79c6b','Ivory':'eee5d5','Navy':'151d28','Hair':'151d28','Frame':'090a14','Sandal':'090a14','Silver':'cac0b7'}
 def rgb(hex):return np.array([int(hex[i:i+2],16) for i in (0,2,4)],float)
 colors={name:rgb(color) for name,color in PALETTE.items()}
 def linear(c):return c/12.92 if c<=.04045 else ((c+.055)/1.055)**2.4
@@ -38,12 +40,6 @@ materials=[]
 for name,color in colors.items():
  materials.append({'name':'RinPilot_'+name,'doubleSided':False,'pbrMetallicRoughness':{'baseColorFactor':[linear(float(c)/255) for c in color]+[1],'metallicFactor':.45 if name=='Silver' else 0,'roughnessFactor':.88}})
 mat_ids={name:i for i,name in enumerate(colors)}
-def projected(x,y):
- u=int(np.clip(31+(x/.93742776+.5)*(466-31),0,pixels.shape[1]-1));v=int(np.clip(895-y/1.84*(895-26),0,pixels.shape[0]-1))
- sample=np.median(pixels[max(0,v-1):v+2,max(0,u-1):u+2].reshape(-1,3),axis=0)
- # Saturation-less studio backdrop must not become a spurious cloth patch.
- if 60<sample.mean()<170 and max(sample)-min(sample)<25:return None
- return min(colors,key=lambda key:float(np.linalg.norm(sample-colors[key])))
 def region(p,n):
  x,y,z=p;ax=abs(x)
  # A-pose forearms sit outside the shorts. The threshold expands downward so
@@ -66,7 +62,11 @@ def region(p,n):
   return 'Ivory'
  if y<1.57:return 'Skin'
  # Glasses: Hunyuan modelled the lens rim as a thin loop standing off the cheek.
- if 1.605<y<1.675 and .035<ax<.095 and z>.074:return 'Frame'
+ # Thin rectangular rims, not a filled band over the cheek/eye planes.
+ if 1.615<y<1.68 and z>.085:
+  dx=abs(ax-.061);dy=abs(y-1.646)
+  if dx<.039 and dy<.024 and (dx>.028 or dy>.014):return 'Frame'
+  if ax<.029 and 1.643<y<1.654 and z>.103:return 'Frame'
  # Geometry-guided hair avoids projecting background pixels onto
  # the inferred side/rear surfaces or creating scattered dark face triangles.
  if z<-.015 and y>1.59:return 'Hair'
@@ -107,6 +107,8 @@ def torso_weights(y):
  t=smooth(1.43,1.54,y);return {'Chest':1-t,'Neck':t}
 def vertex_weights(p):
  x,y,z=p;sign=1 if x>=0 else -1;tag='L' if sign==1 else 'R';ax=abs(x)
+ # Wide sandal edges must follow the foot, including x outside the leg mask.
+ if y<.10:return {'Foot.'+tag:1}
  if y>=1.56:return {'Head':1}
  if y>=1.48 and ax<.14:
   t=smooth(1.48,1.56,y);return {'Neck':1-t,'Head':t}
@@ -160,9 +162,9 @@ def pose(clip,phase):
    q['Shin.'+tag]=quat((1,0,0),max(0,-swing)*.48)
    q['Foot.'+tag]=quat((1,0,0),-max(0,-swing)*.20)
    q['UpperArm.'+tag]=mul(quat((1,0,0),.19*swing),base)
-  if clip in ('Carry','Raised'):
-   target=(sign*.18,1.055,.37) if clip=='Carry' else (sign*.24,1.93,.10)
-   q['UpperArm.'+tag],q['Forearm.'+tag],q['Hand.'+tag]=arm_ik(tag,target,clip=='Raised')
+  if clip=='Carry':
+   target=(sign*.18,1.055,.37)
+   q['UpperArm.'+tag],q['Forearm.'+tag],q['Hand.'+tag]=arm_ik(tag,target,False)
  return q
 
 binary=bytearray();views=[];accessors=[]
@@ -199,7 +201,7 @@ for _,p,_ in bones:
 skin={'name':'RinPilotSkin','joints':list(range(len(bones))),'skeleton':0,'inverseBindMatrices':acc(inverse,5126,'MAT4')}
 nodes.append({'name':'RinPilotMesh','mesh':0,'skin':0})
 animations=[]
-for clip,duration in [('Idle',2),('Walk',1.0),('Carry',2),('Raised',2)]:
+for clip,duration in [('Idle',2),('Walk',1.0),('Carry',2)]:
  times=np.linspace(0,duration,61 if clip!='Walk' else 31);a_time=acc(times,5126,'SCALAR',True);poses=[pose(clip,float(t/duration*math.tau)) for t in times];samplers=[];channels=[]
  for name,_,_ in bones:
   data=[];previous=None
@@ -213,9 +215,10 @@ result={'asset':{'version':'2.0','generator':'Hunyuan3D-2.1 shape; RinPilot mate
 j=json.dumps(result,separators=(',',':')).encode();j+=b' '*((-len(j))%4);binary.extend(b'\0'*((-len(binary))%4));length=12+8+len(j)+8+len(binary)
 data=struct.pack('<III',0x46546c67,2,length)+struct.pack('<II',len(j),0x4e4f534a)+j+struct.pack('<II',len(binary),0x004e4942)+binary
 (OUT/'rin_pilot.glb').write_bytes(data)
-metrics={'triangles':len(faces),'source_vertices':len(points),'mesh_count':1,'surfaces':len(primitives),'bones':len(bones),'animations':[a['name'] for a in animations],'height_m':1.84,'material_faces':{m:face_labels.count(m) for m in colors}}
+metrics={'triangles':len(faces),'source_vertices':len(points),'mesh_count':1,'surfaces':len(primitives),'bones':len(bones),'animations':[a['name'] for a in animations],'height_m':1.84,'palette_srgb':PALETTE,'material_faces':{m:face_labels.count(m) for m in colors}}
 (OUT/'metrics.json').write_text(json.dumps(metrics,indent=2)+'\n')
-provenance={'date':'2026-10-28','source_mesh':SOURCE.relative_to(ROOT).as_posix(),'source_sha256':hashlib.sha256(r).hexdigest(),'source_method':'Actual Tencent Hunyuan3D-2.1 inference, reduced by official Space to 3000 triangles','image_reference':IMAGE.relative_to(ROOT).as_posix(),'concept':'assets/concepts/rin/lowpoly_turnaround_v1.png','processing':'Uniform normalization to 1.84m; flat palette per anatomical region/front image; 20-bone weighted skin and authored Idle/Walk/Carry/Raised clips; all source triangles preserved','blender_used':False,'external_base_geometry_used':False,'license':'Tencent Hunyuan 3D 2.1 Community License; source notice preserved','output_sha256':hashlib.sha256(data).hexdigest()}
+provenance={'date':'2026-10-29','source_mesh':SOURCE.relative_to(ROOT).as_posix(),'source_sha256':hashlib.sha256(r).hexdigest(),'source_method':'Actual Tencent Hunyuan3D-2.1 inference, reduced by official Space to 3000 triangles','image_reference':IMAGE.relative_to(ROOT).as_posix(),'palette_reference_sha256':palette_reference_sha256,'palette_srgb':PALETTE,'concept':'assets/concepts/rin/lowpoly_turnaround_v1.png','processing':'Uniform normalization to 1.84m; approved 2D portrait palette per anatomical region; 20-bone weighted skin and authored Idle/Walk/Carry clips; all source triangles preserved','blender_used':False,'external_base_geometry_used':False,'license':'Tencent Hunyuan 3D 2.1 Community License; source notice preserved','output_sha256':hashlib.sha256(data).hexdigest()}
 (OUT/'provenance.json').write_text(json.dumps(provenance,indent=2)+'\n')
-shutil.copy2(ROOT/'assets/models/characters/rin_hunyuan_shape/LICENSE-HUNYUAN.txt',OUT/'LICENSE-HUNYUAN.txt')
+notice=ROOT/'assets/models/characters/rin_hunyuan_shape/LICENSE-HUNYUAN.txt'
+if notice.exists():shutil.copy2(notice,OUT/notice.name)
 print('RIN_PILOT_OK',json.dumps(metrics))

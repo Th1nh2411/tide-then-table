@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/props/old_man_hut/old_man_hut_reduced.glb",
+  "source_sha256": "871fe065c3d4b8fb7188439cd37b609cf5aee16d6384681caff1b26c37fbc042",
+  "input": "assets/concepts/3d_queue/props/old_man_hut.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 1500,
+  "yaw_radians": 0,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "e1b32cc9dbf1a0a051dfb4580fe1ecddf3869be4419f773d7c39b8c4946e539e",
+  "triangles": 1500,
+  "surfaces": 4,
+  "dimensions_m": [
+    2.7,
+    1.9999999999999998,
+    2.3
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

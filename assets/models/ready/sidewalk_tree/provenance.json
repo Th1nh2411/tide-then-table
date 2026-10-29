@@ -1,0 +1,27 @@
+{
+  "id": "sidewalk_tree",
+  "source": "assets/models/batch/props/sidewalk_tree/sidewalk_tree_reduced.glb",
+  "source_sha256": "4fb72bcbc10c0e677c7a888204ae0196bf3cdf7caeca6027266b960bd306560e",
+  "source_provenance": "assets/models/batch/props/sidewalk_tree/hunyuan_provenance.json",
+  "concept": "assets/concepts/3d_queue/props/sidewalk_tree.png",
+  "builder": "tools/art/build_batch_restaurant.py",
+  "changes": [
+    "canonical metre scale",
+    "bottom-centred origin",
+    "footprint yaw normalization",
+    "flat face normals",
+    "palette materials by geometric region"
+  ],
+  "yaw_radians": 0.0,
+  "geometry_replaced": false,
+  "output_sha256": "0c2a14eaed7f629a500b8a3689a83f8b5fbedf2ebdeba984a06d4511aa3fb97a",
+  "triangles": 1500,
+  "surfaces": 4,
+  "dimensions_m": [
+    1.7,
+    4.0,
+    1.6
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

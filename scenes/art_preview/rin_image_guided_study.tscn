@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://1kp0srp4ysse"]
-
-[ext_resource type="Script" path="res://scenes/art_preview/rin_image_guided_study.gd" id="1"]
-
-[node name="RinImageGuidedStudy" type="Node3D" unique_id=2126111379]
-script = ExtResource("1")

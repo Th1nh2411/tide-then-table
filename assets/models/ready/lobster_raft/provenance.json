@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/props/lobster_raft/lobster_raft_reduced.glb",
+  "source_sha256": "f8e88344692fc1ae1ad4cbf276bfe4a9329333af76c30491719ac6c8c73bf317",
+  "input": "assets/concepts/3d_queue/props/lobster_raft.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 1500,
+  "yaw_radians": 0,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "e65a9c8d478344d8dd99975d0f7b311781f1bba15fa3613f5e03d30335ed8e95",
+  "triangles": 1500,
+  "surfaces": 5,
+  "dimensions_m": [
+    5.0,
+    2.5,
+    3.0
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

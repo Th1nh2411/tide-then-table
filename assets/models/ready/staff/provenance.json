@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-29",
+  "source_mesh": "assets/models/batch/characters/staff/staff_reduced.glb",
+  "source_sha256": "de9d0622a51f4e37877269e97a69be25ef21588f3f5b6a51389b61f38343a9f0",
+  "source_method": "Hunyuan3D-2mini-turbo local inference; see original source provenance",
+  "image_reference": "assets/concepts/3d_queue/characters/staff.png",
+  "processing": "Uniform normalization; anatomical flat palette; weighted 20-bone skin and authored Idle/Walk/Carry animation. Source triangles preserved.",
+  "blender_used": false,
+  "external_base_geometry_used": false,
+  "output_sha256": "cb5163e6f7ba9665175ed813c5b2bf36e548ec12e9fca54e614264955169d42a"
+}

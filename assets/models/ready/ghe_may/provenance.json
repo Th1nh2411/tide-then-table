@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/props/ghe_may/ghe_may_reduced.glb",
+  "source_sha256": "665829792c1cd15666eed15db3452cb621f10ad8a6deb6808fee8bf78e81459c",
+  "input": "assets/concepts/3d_queue/props/ghe_may.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 1500,
+  "yaw_radians": 1.5710833619386309,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "4c5b24dd2c57c701c27a7cea5b297441b7fa719b845fde852097eae2331e56d8",
+  "triangles": 1500,
+  "surfaces": 6,
+  "dimensions_m": [
+    1.72,
+    1.6500000000000001,
+    3.05
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

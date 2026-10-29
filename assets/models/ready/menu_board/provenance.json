@@ -1,0 +1,27 @@
+{
+  "id": "menu_board",
+  "source": "assets/models/batch/props/menu_board/menu_board_reduced.glb",
+  "source_sha256": "9d65e292b4e03f43366fcf10b82226e03b8721ab42747cc40fbf25196017ea95",
+  "source_provenance": "assets/models/batch/props/menu_board/hunyuan_provenance.json",
+  "concept": "assets/concepts/3d_queue/props/menu_board.png",
+  "builder": "tools/art/build_batch_restaurant.py",
+  "changes": [
+    "canonical metre scale",
+    "bottom-centred origin",
+    "footprint yaw normalization",
+    "flat face normals",
+    "palette materials by geometric region"
+  ],
+  "yaw_radians": 0.0,
+  "geometry_replaced": false,
+  "output_sha256": "e8a9571a0ee3701fda87810b4670030e00f81366342538c5ab8375dd3360f655",
+  "triangles": 1500,
+  "surfaces": 2,
+  "dimensions_m": [
+    1.5,
+    1.45,
+    0.18
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

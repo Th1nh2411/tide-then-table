@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/small/jellyfish/jellyfish_reduced.glb",
+  "source_sha256": "c38592c78984f05420e8602822444aa3d8b6c518e6536d73512cc89356afae1f",
+  "input": "assets/concepts/3d_queue/small/jellyfish.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 600,
+  "yaw_radians": 0,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "018884f72fd3eff2e53c6fcb369d4426a7f023e8d8d9aa1db345f5eb754d89af",
+  "triangles": 600,
+  "surfaces": 3,
+  "dimensions_m": [
+    0.42000000000000004,
+    0.72,
+    0.42
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

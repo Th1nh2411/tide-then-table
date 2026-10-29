@@ -1,0 +1,27 @@
+{
+  "id": "beer_keg",
+  "source": "assets/models/batch/props/beer_keg/beer_keg_reduced.glb",
+  "source_sha256": "6ac6687e1fd9d558b0b9e1b7434fd94f6c0df8996647272e3b17c6ec2f3e3997",
+  "source_provenance": "assets/models/batch/props/beer_keg/hunyuan_provenance.json",
+  "concept": "assets/concepts/3d_queue/props/beer_keg.png",
+  "builder": "tools/art/build_batch_restaurant.py",
+  "changes": [
+    "canonical metre scale",
+    "bottom-centred origin",
+    "footprint yaw normalization",
+    "flat face normals",
+    "palette materials by geometric region"
+  ],
+  "yaw_radians": 0.0,
+  "geometry_replaced": false,
+  "output_sha256": "01da045d0d2874e11d790fe308182fb5686c478222373226b830c481d66c9784",
+  "triangles": 1500,
+  "surfaces": 4,
+  "dimensions_m": [
+    0.6,
+    1.45,
+    0.6
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

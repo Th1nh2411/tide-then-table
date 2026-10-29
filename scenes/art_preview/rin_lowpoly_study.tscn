@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://d2u3y8qq5mkiy"]
-
-[ext_resource type="Script" path="res://scenes/art_preview/rin_lowpoly_study.gd" id="1"]
-
-[node name="RinLowpolyStudy" type="Node3D" unique_id=1342878448]
-script = ExtResource("1")

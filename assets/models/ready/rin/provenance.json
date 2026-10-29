@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-29",
+  "source_mesh": "assets/models/characters/rin_hunyuan_shape/rin_hunyuan_3k_lit.glb",
+  "source_sha256": "93f6c01ecb2952af2dd2911f5e19ed1a8e0365bbd2e6698afd300f983b8fbe7c",
+  "source_method": "Actual Tencent Hunyuan3D-2.1 inference, reduced by official Space to 3000 triangles",
+  "image_reference": "assets/sprites/portraits/rin/base.png",
+  "palette_reference_sha256": "cb0d2190c7c8a056485609aac608a257c73435342c8a2bcf1fdc6bf9b1b238ac",
+  "palette_srgb": {
+    "Skin": "d79c6b",
+    "Ivory": "eee5d5",
+    "Navy": "151d28",
+    "Hair": "151d28",
+    "Frame": "090a14",
+    "Sandal": "090a14",
+    "Silver": "cac0b7"
+  },
+  "concept": "assets/concepts/rin/lowpoly_turnaround_v1.png",
+  "processing": "Hunyuan source with user-edited mesh/materials exported from rin.blend; repaired Walk and foot weights; Idle/Walk/Carry/Cast",
+  "blender_used": true,
+  "external_base_geometry_used": false,
+  "license": "Tencent Hunyuan 3D 2.1 Community License; source notice preserved",
+  "output_sha256": "5bc8857bdde3c9e1b47a6fd7429ffb8ca1644aba7baa9613d64fca72ee050932",
+  "artist_edit": {
+    "source_blend": "/Users/nguyenthinh/WorkSpace/blender/rin.blend",
+    "source_blend_sha256": "e3b3f96d5406990e3639bf0b01fb583ed1baf353d0d7f009e8b11639d11319db",
+    "source_snapshot": "build/rin_cast/source_with_cast.blend",
+    "changes": [
+      "Exported user-edited rin.blend mesh and materials without palette override",
+      "Kept repaired Walk, Idle and Carry; excluded obsolete Raised",
+      "Added authored 1.5s Cast with two-handed wind-up and follow-through; linked to cinematic and preview"
+    ],
+    "date": "2026-10-29"
+  }
+}

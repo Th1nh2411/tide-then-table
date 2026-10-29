@@ -1,0 +1,21 @@
+{
+  "triangles": 3000,
+  "source_vertices": 1498,
+  "mesh_count": 1,
+  "surfaces": 6,
+  "bones": 20,
+  "animations": [
+    "Idle",
+    "Walk",
+    "Carry"
+  ],
+  "height_m": 1.68,
+  "material_faces": {
+    "Skin": 769,
+    "Shirt": 608,
+    "Apron": 638,
+    "Bottom": 509,
+    "Hair": 235,
+    "Shoes": 241
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "source": "assets/models/batch/props/dolphin/dolphin_reduced.glb",
+  "source_sha256": "f6b6125e7af1a77e01de2017f8ff52b1b45d77898ccc58078b38e4ecc4a37bb9",
+  "input": "assets/concepts/3d_queue/props/dolphin.png",
+  "pipeline": "Hunyuan local batch \u2192 affine dimensions/orientation \u2192 flat palette/normals",
+  "source_triangles": 1500,
+  "yaw_radians": -1.5882444487422303,
+  "geometry_replaced": false,
+  "blender_used": false,
+  "output_sha256": "0f0353f339ee2f5ab8ed03e82e90a90b42a4b94208c28a626b25919d3bc9a7c9",
+  "triangles": 1500,
+  "surfaces": 3,
+  "dimensions_m": [
+    0.55,
+    0.62,
+    2.2
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

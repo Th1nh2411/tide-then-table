@@ -1,0 +1,27 @@
+{
+  "id": "grocery_counter",
+  "source": "assets/models/batch/props/grocery_counter/grocery_counter_reduced.glb",
+  "source_sha256": "913f181ac744fb0388b327e34a2a18a32840e79d4871566a19aff25095937379",
+  "source_provenance": "assets/models/batch/props/grocery_counter/hunyuan_provenance.json",
+  "concept": "assets/concepts/3d_queue/props/grocery_counter.png",
+  "builder": "tools/art/build_batch_restaurant.py",
+  "changes": [
+    "canonical metre scale",
+    "bottom-centred origin",
+    "footprint yaw normalization",
+    "flat face normals",
+    "palette materials by geometric region"
+  ],
+  "yaw_radians": 0.0,
+  "geometry_replaced": false,
+  "output_sha256": "36a12125f87284cd934e26c5ba40465fe96a2e0952ade684a1b3c02a38a69675",
+  "triangles": 1500,
+  "surfaces": 6,
+  "dimensions_m": [
+    3.8,
+    1.36,
+    1.0
+  ],
+  "min_y": 0.0,
+  "removed_degenerate_triangles": 0
+}

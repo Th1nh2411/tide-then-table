@@ -2,7 +2,7 @@
 
 Mỗi asset: gen **một** ảnh bằng prompt bên dưới (copy nguyên khối), lưu PNG đúng tên vào đúng
 thư mục con, rồi chạy batch qua đêm. Prompt viết tiếng Anh cho model ảnh; giọng giống các
-prompt đã dùng cho Rin / ghế / bàn / thuyền thúng (`assets/models/pilots/*/prompt.txt`).
+prompt đã dùng cho Rin / ghế / bàn / thuyền thúng (`assets/models/ready/*/prompt.txt`).
 
 ```
 assets/concepts/3d_queue/
