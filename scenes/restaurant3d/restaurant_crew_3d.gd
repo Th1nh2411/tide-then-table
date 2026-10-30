@@ -5,6 +5,9 @@ extends RefCounted
 
 const L = preload("res://scenes/restaurant3d/restaurant_layout_3d.gd")
 
+## StaffData.walk_speed is in 2D pixels/s; this maps it to a walking pace in
+## metres (Vy 80 -> ~1.1 m/s, fastest 115 -> ~1.6 m/s).
+const STAFF_UNITS_PER_METRE := 70.0
 var host: Node3D
 var workers: Array[Dictionary] = []
 var bao_table: int = -1
@@ -66,7 +69,7 @@ func move_staff(delta: float) -> void:
 		var picked: bool = bool(worker.get("picked", false))
 		var target: Vector3 = L.TABLES[table] + L.TABLE_SERVICE_OFFSET if picked else L.PASS_POSITION + Vector3(0, 0, 1.0)
 		var person: StaffData = worker["data"]
-		StaffPathing3D.move(node, L.TABLES, target, person.walk_speed / 23.0, delta)
+		StaffPathing3D.move(node, L.TABLES, target, person.walk_speed / STAFF_UNITS_PER_METRE, delta)
 		if node.position.distance_to(target) < 0.05:
 			if not picked:
 				worker["picked"] = true

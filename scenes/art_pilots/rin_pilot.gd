@@ -6,7 +6,7 @@ var model: Node3D
 var skeleton: Skeleton3D
 var animation: AnimationPlayer
 ## Clips that end on their last pose instead of looping.
-const ONE_SHOT := ["Cast", "Faint", "CharacterArmature|Death"]
+const ONE_SHOT := ["Cast", "Faint", "CharacterArmature|Death", "CharacterArmature|Roll"]
 
 var _motion: String = "Idle"
 var _casting: bool = false

@@ -29,6 +29,7 @@ var _casting_clip := false
 var _distance_driven := false
 var _ground_frame := -1
 var _seated := false
+var _once_left := 0.0
 
 
 ## Builds a rig of `kind` under `parent`; legacy shirt argument remains accepted.
@@ -164,6 +165,11 @@ func _update_pilot_motion() -> void:
 func _process(_delta: float) -> void:
 	if not _pilot or not _pilot.skeleton:
 		return
+	if _once_left > 0.0:
+		_once_left -= _delta
+		if _once_left <= 0.0:
+			_casting_clip = false
+			_pilot.animation.speed_scale = 1.0
 	if _casting_clip or _seated:
 		_sync_pilot_anchors()
 		return
@@ -177,6 +183,16 @@ func _process(_delta: float) -> void:
 	if not casting:
 		_pilot.clear_cast()
 	_sync_pilot_anchors()
+
+## Plays `clip` once over `seconds` (e.g. a dash roll), then walking takes over again.
+func play_once(clip: String, seconds: float) -> void:
+	if not _pilot or not _pilot.animation.has_animation(clip):
+		return
+	_casting_clip = true
+	_once_left = seconds
+	_pilot.animation.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_IDLE
+	_pilot.animation.play(clip, 0.06)
+	_pilot.animation.speed_scale = _pilot.animation.get_animation(clip).length / maxf(seconds, 0.05)
 
 ## Plays an authored one-shot clip (Faint...); walking / idle stop driving the pose.
 ## `at_end` jumps straight to its last pose (skipped cutscenes).

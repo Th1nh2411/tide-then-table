@@ -32,8 +32,10 @@ func _run() -> void:
 	room._tick_bao(0.0)
 	room._tick_bao(10.0)
 	assert(room.orders[table]["cooked"], "3D Bảo did not cook regular meal")
-	room._move_staff(10.0)
-	room._move_staff(10.0)
+	for step in 6:
+		room._move_staff(10.0)
+		if room.orders[table].get("phase", "") == "eating":
+			break
 	assert(room.orders[table].get("phase", "") == "eating", "3D regular did not receive cooked plate")
 	room._finish_meal(table)
 	room.player.position = room.TABLES[table] + Vector3(0, 0, 1.2)
@@ -60,8 +62,11 @@ func _run() -> void:
 	assert(room.orders[market_table]["cooked"], "3D Bảo did not cook grocery meal")
 	room._dispatch_ready()
 	assert(room.staff_workers[0]["table"] == market_table, "3D staff did not claim cooked plate")
-	room._move_staff(10.0)
-	room._move_staff(10.0)
+	# Staff walk at a walking pace now: step until delivered (max 60 s).
+	for step in 6:
+		room._move_staff(10.0)
+		if room.orders[market_table].get("phase", "") == "eating":
+			break
 	assert(room.orders[market_table].get("phase", "") == "eating")
 	room._finish_meal(market_table)
 	assert(room.served == 2, "3D staff did not deliver grocery dish")

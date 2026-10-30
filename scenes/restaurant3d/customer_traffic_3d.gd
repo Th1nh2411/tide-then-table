@@ -9,7 +9,8 @@ const LANE_Z := 9.8
 const SLOT_XS: Array[float] = [-8.0, -4.0, 0.0, 4.0, 8.0, 12.0]
 const EDGE_X := 26.0
 const BIKE_SPEED := 5.0
-const WALK_SPEED := 2.2
+## Guests stroll at about their Walk clip pace (~1.0 m/s).
+const WALK_SPEED := 1.1
 const SEAT_OFFSET := Vector3(0, 0, 1.15)
 
 @export var host: Node3D

@@ -45,6 +45,14 @@ const MEAL_SECONDS := 5.0
 @export var fish_catalog: FishCatalog
 @export var staff_catalog: StaffCatalog
 
+## Rin's ground speeds (m/s). Near the Walk clip's own pace (~1.3) so steps
+## match the ground; above ~2.25 the Run clip takes over (dash only).
+@export var walk_speed: float = 1.8
+@export var carry_speed: float = 1.6
+## Shift = a quick roll: seconds, ground speed (m/s), cooldown.
+@export var roll_seconds: float = 0.6
+@export var roll_speed: float = 4.0
+@export var roll_cooldown: float = 0.8
 var plan: MenuPlan
 var market_stock: MarketStock
 var bag := MarketBag3D.new()
@@ -301,14 +309,18 @@ func _physics_process(delta: float) -> void:
 	var direction: Vector3 = (right.normalized() * axes.x + forward.normalized() * axes.y).limit_length(1.0)
 	_dash_cooldown = maxf(_dash_cooldown - delta * rin_scale, 0.0)
 	if Input.is_action_just_pressed("dash") and _dash_cooldown <= 0.0 and direction.length_squared() > 0.01:
-		_dash_left = 0.14
-		_dash_cooldown = 0.45
+		_dash_left = roll_seconds
+		_dash_cooldown = roll_seconds + roll_cooldown
 		_dash_direction = direction.normalized()
+		player.rotation.y = atan2(_dash_direction.x, _dash_direction.z)
+		body.play_once("CharacterArmature|Roll", roll_seconds)
 	if _dash_left > 0.0:
 		_dash_left = maxf(_dash_left - delta * rin_scale, 0.0)
-		player.velocity = _dash_direction * 11.0 * rin_scale
+		# Fast through the tumble, easing off as he gets up.
+		var t := _dash_left / maxf(roll_seconds, 0.01)
+		player.velocity = _dash_direction * roll_speed * lerpf(0.5, 1.2, t) * rin_scale
 	else:
-		var speed := 2.3 if carrying_table >= 0 else 3.0
+		var speed := carry_speed if carrying_table >= 0 else walk_speed
 		var desired := direction * speed * rin_scale
 		# Dash ends at walking/running speed, rather than coasting several extra metres.
 		player.velocity = player.velocity.limit_length(speed*rin_scale)

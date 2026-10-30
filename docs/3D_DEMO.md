@@ -581,3 +581,12 @@ chờ → bàn kê; món nướng chờ → lò; bia chờ → thùng bia; bàn 
 lên món → bảng thực đơn. Chỉnh độ sáng/nhịp ở `strength` / `period`.
 Bóng tiếp đất mềm (`ContactShadow3D`) dưới người, mèo, bàn ghế, thuyền.
 
+
+### Đi bộ, tốc độ, lăn khi lướt — 2026-10-30
+
+Rin đi bằng clip Walk (1,8 m/s, bưng món 1,6 m/s; `walk_speed` / `carry_speed`
+trong `restaurant_scene_3d.gd`), clip chạy theo quãng đường thật nên chân khớp
+nền. Shift = lăn (`CharacterArmature|Roll`, 0,6 s, ~2 m; `roll_seconds` /
+`roll_speed` / `roll_cooldown`). Khách đi 1,1 m/s (`CustomerTraffic3D.WALK_SPEED`),
+nhân viên ~0,9–1,6 m/s (`RestaurantCrew3D.STAFF_UNITS_PER_METRE`).
+
