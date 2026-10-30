@@ -1,0 +1,4 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://scenes/art_pilots/world_composition_review.gd" id="1"]
+[node name="WorldCompositionReview" type="Node"]
+script = ExtResource("1")

@@ -7,6 +7,8 @@ const ENDING_SCENE := "res://scenes/ending/ending_scene.tscn"
 const FISHING_OVERLAY := "res://scenes/fishing3d/fishing_overlay_3d.tscn"
 const ROD_UPGRADE := preload("res://data/upgrades/rod_upgrade.tres")
 const LAMP_UPGRADE := preload("res://data/upgrades/lamp_upgrade.tres")
+const CAMERA_OFFSET := Vector3(0,6.2,8.4)
+const CAMERA_LOOK_AHEAD := 1.8
 const OIL_BURN_PER_SECOND: float = 100.0 / 240.0
 
 @export var fish_catalog: FishCatalog
@@ -197,8 +199,8 @@ func _ready() -> void:
 	cinematic.boat_visual = boat_visual
 	cinematic.hidden_figure = rin_figure
 	add_child(cinematic)
-	camera.position = boat.position + Vector3(0, 7.3, 10.0)
-	camera.look_at(boat.position + Vector3(0, 0.7, -2.0))
+	camera.position = boat.position + CAMERA_OFFSET
+	camera.look_at(boat.position + Vector3(0, .65, -CAMERA_LOOK_AHEAD))
 	_build_navigation()
 	DayClock.start_night()
 	DailyTrend.ensure()
@@ -264,8 +266,8 @@ func _build_world() -> void:
 	_batch_model(self, "dock", off + Vector3(0, -0.73, 12.0))
 	_glow(off + Vector3(-3.5, 2.4, 11.0), "ffc27a", 1.6, 9.0, true)
 	_glow(off + Vector3(4.5, 2.4, 11.0), "ffc27a", 1.2, 8.0, false)
-	_batch_model(self, "lighthouse", off + Vector3(-6.8, 0.02, 10), Vector3(0.6, 0.95, 0.6))
-	_label("BẾN XÓM ĐÈN", off + Vector3(0, 1.45, 13.6), 30, "e7d5b3")
+	_batch_model(self, "lighthouse", off + Vector3(-7.8, 0.02, 11.3), Vector3(0.6, 0.95, 0.6))
+	_label("BẾN XÓM ĐÈN", off + Vector3(-2.2, 1.6, 13.1), 30, "e7d5b3")
 	var rock_index := 0
 	for rock in SeaLayout3D.rocks():
 		var pos: Vector3 = rock["pos"]
@@ -528,9 +530,9 @@ func _physics_process(delta: float) -> void:
 		wake_marks[i].visible = boat.velocity.length() > 0.8
 		wake_marks[i].position = boat.position + behind * (1.65 + float(i) * 0.6) + Vector3(0, 0.13, 0)
 		wake_marks[i].rotation.y = boat.rotation.y
-	var camera_target := boat.position + Vector3(0, 7.3, 10.0).rotated(Vector3.UP, boat.rotation.y)
-	camera.position = camera.position.lerp(camera_target, minf(delta * 3.2, 1.0))
-	camera.look_at(boat.position + forward * 2.0 + Vector3.UP * 0.6)
+	var camera_target := boat.position + CAMERA_OFFSET.rotated(Vector3.UP, boat.rotation.y)
+	camera.position = camera.position.lerp(camera_target, 1.0-exp(-3.8*delta))
+	camera.look_at(boat.position + forward * CAMERA_LOOK_AHEAD + Vector3.UP * .65)
 	var oil_scale := weather.oil_burn_scale if weather else 1.0
 	if not _at_dock():
 		_spend_oil(delta * OIL_BURN_PER_SECOND * oil_scale)
