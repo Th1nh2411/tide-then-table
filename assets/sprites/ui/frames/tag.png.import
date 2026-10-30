@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bpmk814efoc78"
-path="res://.godot/imported/rank_sticker.png-262fa1f4487cffaf3bad8f7269991c63.ctex"
+uid="uid://bbwdir386e4aj"
+path="res://.godot/imported/tag.png-91a744c69564fafbd2a91a81f3752954.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ui/frames/rank_sticker.png"
-dest_files=["res://.godot/imported/rank_sticker.png-262fa1f4487cffaf3bad8f7269991c63.ctex"]
+source_file="res://assets/sprites/ui/frames/tag.png"
+dest_files=["res://.godot/imported/tag.png-91a744c69564fafbd2a91a81f3752954.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cmlmgp0cj6onr"
-path="res://.godot/imported/social_card.png-acd1e0952e0ac58dc56ab24b4aa21480.ctex"
+uid="uid://cmi7g5qqoea6v"
+path="res://.godot/imported/dex.svg-abb2c53bf355dc6e00b505defc5a1232.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ui/frames/social_card.png"
-dest_files=["res://.godot/imported/social_card.png-acd1e0952e0ac58dc56ab24b4aa21480.ctex"]
+source_file="res://assets/icons/dex.svg"
+dest_files=["res://.godot/imported/dex.svg-abb2c53bf355dc6e00b505defc5a1232.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

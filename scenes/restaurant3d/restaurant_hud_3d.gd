@@ -1,8 +1,10 @@
 class_name RestaurantHud3D
 extends CanvasLayer
-## 3D restaurant HUD like the 2D one: day / clock / money bar, shift counters,
-## order tickets, and pinned buttons (Thực đơn, Sửa quán, Đóng sớm, Ra khơi).
-## Reads the scene each frame; the scene only listens to the button signals.
+## 3D restaurant HUD, icon first: a wooden plank (day, clock, phase sticker,
+## money counting), a yellow paper tag with the shift's tallies (served, left,
+## takings, market, stars), the order slips on a ticket rail (OrderTicket3D),
+## and pinned buttons (Thực đơn, Sửa quán, Đóng sớm, Ra khơi). Words live in
+## tooltips. Reads the scene each frame; the scene only listens to the signals.
 
 signal menu_requested
 signal renovate_requested
@@ -10,55 +12,103 @@ signal close_requested
 signal sail_requested
 
 const CONFIRM_SECONDS := 3.0
+## Ticket rail: between the left plank and the right buttons.
+const RAIL := Rect2(232, 0, 290, 56)
+const PHASES := {
+	# id: [icon, plate, glyph, words]
+	"plan": ["menu", Color("f2d98a"), Color("090a14"), "Lên thực đơn"],
+	"open": ["shop", Color("e0302b"), Color("e6f6ff"), "Đang bán"],
+	"closing": ["clock", Color("de9e41"), Color("090a14"), "Sắp đóng cửa"],
+	"over": ["moon", Color("253a5e"), Color("f2d98a"), "Đã đóng cửa"],
+}
 
 var room: Node3D
-var bar: Label
-var counters: Label
-var ticket_row: HBoxContainer
+var plank: PanelContainer
+var tally: PanelContainer
+## The rail holding the order slips (kept under its old name).
+var ticket_row: TicketRail3D
 var menu_button: Button
 var renovate_button: Button
 var close_button: Button
 var sail_button: Button
+var _day: Label
+var _time: Label
+var _money: Label
+var _phase: TextureRect
+var _phase_id := ""
+var _served: Label
+var _lost: Label
+var _earned: Label
+var _market: Label
+var _stars: Array[TextureRect] = []
 var _confirm_left: float = 0.0
 
 
-func setup(room_node: Node3D, theme: Theme, style: StyleBoxFlat) -> void:
+func setup(room_node: Node3D, theme: Theme, _style: StyleBoxFlat = null) -> void:
 	room = room_node
-	bar = _label(Vector2(12, 6), Color("f2d98a"), style)
-	counters = _label(Vector2(12, 28), Color("e7d5b3"), style)
-	ticket_row = HBoxContainer.new()
-	ticket_row.position = Vector2(12, 50)
-	ticket_row.add_theme_constant_override("separation", 3)
-	ticket_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_build_plank()
+	_build_tally()
+	ticket_row = TicketRail3D.new()
+	ticket_row.position = RAIL.position
+	ticket_row.size = RAIL.size
 	add_child(ticket_row)
-	menu_button = _button("Thực đơn", Vector2(528, 6), theme)
+	menu_button = _button("Thực đơn", "menu", Vector2(528, 6), theme)
 	menu_button.pressed.connect(func() -> void: menu_requested.emit())
-	renovate_button = _button("Sửa quán", Vector2(528, 30), theme)
+	renovate_button = _button("Sửa quán", "hammer", Vector2(528, 30), theme)
 	renovate_button.pressed.connect(func() -> void: renovate_requested.emit())
-	close_button = _button("Đóng sớm", Vector2(528, 6), theme)
+	close_button = _button("Đóng sớm", "moon", Vector2(528, 6), theme)
 	close_button.pressed.connect(_on_close_pressed)
-	sail_button = _button("Ra khơi  →", Vector2(520, 290), theme)
+	sail_button = _button("Ra khơi", "boat", Vector2(520, 290), theme)
+	sail_button.theme_type_variation = &"SignButton"
 	sail_button.pressed.connect(func() -> void: sail_requested.emit())
-	sail_button.custom_minimum_size = Vector2(114, 32)
+	sail_button.custom_minimum_size = Vector2(110, 30)
 
 
-func _label(pos: Vector2, color: Color, style: StyleBoxFlat) -> Label:
-	var label := Label.new()
-	label.position = pos
-	label.add_theme_font_size_override("font_size", 11)
-	label.add_theme_stylebox_override("normal", style)
-	label.add_theme_color_override("font_color", color)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(label)
-	return label
+func _build_plank() -> void:
+	var parts := HudChips.plank(&"WoodPanel", 7)
+	plank = parts[0]
+	plank.position = Vector2(6, 4)
+	add_child(plank)
+	var row: HBoxContainer = parts[1]
+	_day = HudChips.stat(row, "calendar", UiIcons.CREAM, "Ngày", 12)
+	_time = HudChips.stat(row, "clock", Color("a4dddb"), "Giờ", 12)
+	_phase = UiIcons.make("menu", 14, UiIcons.INK, Color("f2d98a"))
+	_phase.mouse_filter = Control.MOUSE_FILTER_PASS
+	row.add_child(_phase)
+	_money = HudChips.stat(row, "money", UiIcons.GOLD, "Tiền", 13)
+	_money.add_theme_color_override("font_color", UiIcons.GOLD)
 
 
-func _button(words: String, pos: Vector2, theme: Theme) -> Button:
+func _build_tally() -> void:
+	var parts := HudChips.plank(&"TagPanel", 6)
+	tally = parts[0]
+	tally.position = Vector2(12, 30)
+	add_child(tally)
+	UiFx.tilt(tally, -1.2)
+	var row: HBoxContainer = parts[1]
+	_served = HudChips.stat(row, "guest", Color("4f8fba"), "Khách đã phục vụ", 11, true, 11)
+	_lost = HudChips.stat(row, "leave", Color("cf573c"), "Khách bỏ về", 11, true, 11)
+	_earned = HudChips.stat(row, "money", Color("de9e41"), "Thu trong ca", 11, true, 11)
+	_market = HudChips.stat(row, "cart", Color("577277"), "Tiền chợ", 11, true, 11)
+	var stars := HBoxContainer.new()
+	stars.add_theme_constant_override("separation", 0)
+	stars.tooltip_text = "Đánh giá"
+	stars.mouse_filter = Control.MOUSE_FILTER_PASS
+	row.add_child(stars)
+	for i in DayRating.MAX_STARS:
+		var star := UiIcons.make("star", 9, Color("a53030"))
+		stars.add_child(star)
+		_stars.append(star)
+
+
+func _button(words: String, icon: String, pos: Vector2, theme: Theme) -> Button:
 	var button := Button.new()
 	button.text = words
 	button.theme = theme
 	button.position = pos
 	button.focus_mode = Control.FOCUS_NONE
+	button.add_theme_font_size_override("font_size", 11)
+	UiIcons.dress(button, icon, 12)
 	add_child(button)
 	return button
 
@@ -71,6 +121,7 @@ func _on_close_pressed() -> void:
 	else:
 		_confirm_left = CONFIRM_SECONDS
 		close_button.text = "Chắc chưa?"
+		UiFx.shake(close_button, 2.0)
 
 
 func _process(delta: float) -> void:
@@ -82,11 +133,21 @@ func _process(delta: float) -> void:
 			close_button.text = "Đóng sớm"
 	var running: bool = room.shift_running
 	var over: bool = room.shift_over
-	var state := "ĐÃ ĐÓNG CỬA" if over else ("ĐANG BÁN" if running else "LÊN THỰC ĐƠN")
+	var phase := "over" if over else ("open" if running else "plan")
 	if running and room.seconds_left <= 0.0:
-		state = "SẮP ĐÓNG"
-	bar.text = "NGÀY %d · %s · %s · %dk" % [GameState.day, DayClock.get_time_text(), state, GameState.money]
-	counters.text = "Phục vụ %d · Bỏ về %d · Thu %dk · Chợ %dk · %d sao" % [room.served, room.lost, room.earned, room.market_spent, GameState.last_rating]
+		phase = "closing"
+	_set_phase(phase)
+	_day.text = str(GameState.day)
+	_time.text = DayClock.get_time_text()
+	HudChips.show_number(_money, GameState.money, "%dk")
+	tally.visible = running or over
+	HudChips.show_number(_served, room.served)
+	HudChips.show_number(_lost, room.lost)
+	HudChips.show_number(_earned, room.earned, "%dk")
+	HudChips.show_number(_market, room.market_spent, "%dk")
+	_lost.add_theme_color_override("font_color", Color("a53030") if room.lost > 0 else HudChips.INK)
+	for i in _stars.size():
+		_stars[i].modulate.a = 1.0 if i < GameState.last_rating else 0.25
 	var modal: bool = room.modal_open()
 	menu_button.visible = not running and not over and not modal
 	renovate_button.visible = not running and not modal
@@ -96,25 +157,19 @@ func _process(delta: float) -> void:
 	if not close_button.visible:
 		_confirm_left = 0.0
 		close_button.text = "Đóng sớm"
-	_refresh_tickets()
+	var orders: Array[Dictionary] = []
+	if running:
+		orders = room.orders
+	ticket_row.refresh(orders)
 
 
-func _refresh_tickets() -> void:
-	for old in ticket_row.get_children():
-		old.queue_free()
-	if not room.shift_running:
+func _set_phase(phase: String) -> void:
+	if phase == _phase_id:
 		return
-	for i: int in range(room.orders.size()):
-		var order: Dictionary = room.orders[i]
-		if order.is_empty():
-			continue
-		var dish: DishData = order["dish"]
-		var phase := str(order.get("phase", "waiting"))
-		var tag := "đang ăn" if phase == "eating" else ("xong" if bool(order.get("cooked", false)) else "%ds" % int(float(order["patience"])))
-		var ticket := Label.new()
-		ticket.text = "B%d %s · %s" % [i + 1, dish.display_name, tag]
-		ticket.add_theme_font_size_override("font_size", 10)
-		var urgent: bool = phase != "eating" and float(order["patience"]) < 15.0
-		ticket.add_theme_color_override("font_color", Color("ff9a8a") if urgent else Color("e9dfc5"))
-		ticket.add_theme_stylebox_override("normal", room._panel_style())
-		ticket_row.add_child(ticket)
+	var first := _phase_id == ""
+	_phase_id = phase
+	var spec: Array = PHASES[phase]
+	_phase.texture = UiIcons.sticker(str(spec[0]), 14, spec[2], spec[1])
+	_phase.tooltip_text = str(spec[3])
+	if not first:
+		UiFx.pop_in(_phase)

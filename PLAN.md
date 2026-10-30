@@ -537,4 +537,8 @@ Hướng dẫn chạy, kiểm tra và danh sách còn thiếu: `docs/3D_DEMO.md`
   `data/social/`), follower + 4 hạng quán (thưởng, khách tới nhanh hơn chút), xếp hạng doanh
   thu tuần với 3 quán đối thủ (`RivalRanking`, có Ốc Thâm Lam), tab "Review" trong điện
   thoại, thông báo bài mới lúc hết ca; `GameState.social` có lưu. Art: `docs/ui_art_needed_social.md`.
+- 2026-10-30: HUD quán/biển 3D theo icon (ván gỗ + thẻ giấy + đồng hồ đo, phiếu order
+  treo dây, thẻ thử thách ghim, toast sticker, ghi chú nhiệm vụ không đè HUD), lời Rin/NEO
+  trên dải giấy ở biển, điện thoại có khung máy + tab icon, hoá đơn hết ca in từng dòng +
+  biểu đồ 7 ngày + con dấu sao. Art: `docs/ui_art_needed_hud.md`; test `receipt_test`.
 - Chưa xong: preview bếp/thùng đá, playtest tay, pacing (bot 3D có >20.000k ở ngày 4 — cần xem lại kinh tế), art 3D (mèo đi bốn chân).

@@ -12,7 +12,7 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 
 func screen_point(pos: Vector3) -> Vector2:
-	var area := Rect2(Vector2(24, 110), get_viewport_rect().size - Vector2(48, 160))
+	var area := Rect2(Vector2(24, 110), get_viewport_rect().size - Vector2(48, 182))  # clear of the HUD + speech strip
 	var screen := camera.unproject_position(pos + Vector3.UP * 0.4)
 	var center := area.get_center()
 	var direction := screen - center
@@ -54,6 +54,6 @@ func _draw() -> void:
 		if edge:
 			label += " %dm" % roundi(boat.position.distance_to(pos))
 		var text_size := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 9)
-		var text_pos := (at + Vector2(10, -9)).clamp(Vector2(4, 102), get_viewport_rect().size - text_size - Vector2(4, 40))
+		var text_pos := (at + Vector2(10, -9)).clamp(Vector2(4, 102), get_viewport_rect().size - text_size - Vector2(4, 66))
 		draw_string_outline(font, text_pos, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, 3, Color("172038"))
 		draw_string(font, text_pos, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, color)

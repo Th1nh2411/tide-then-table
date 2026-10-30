@@ -1,8 +1,9 @@
 class_name SeaHud3D
 extends RefCounted
-## Text HUD, shared UI (pause, hold, phone, POI dialog, quest tracker),
-## edge navigation and first-time guides of the 3D sea.
-## Host (SeaScene3D) fields written: header, help, message, new_catch_card,
+## HUD (SeaHudView3D: icon chips, key caps, speech strip), shared UI (pause,
+## hold, phone, POI dialog, quest note), edge navigation and first-time
+## guides of the 3D sea.
+## Host (SeaScene3D) fields written: hud_view, message, new_catch_card,
 ## hold_ui, poi_dialog, phone_app, navigation.
 
 const PLACE_NAMES := {"shrine": "Miếu Cá Ông", "lighthouse": "Hải đăng Đá Canh Đêm",
@@ -11,25 +12,12 @@ const PLACE_NAMES := {"shrine": "Miếu Cá Ông", "lighthouse": "Hải đăng �
 static func build_hud(sea: SeaScene3D) -> void:
 	var layer := CanvasLayer.new()
 	sea.add_child(layer)
-	sea.header = Label.new()
-	sea.header.position = Vector2(14, 10)
-	sea.header.add_theme_font_size_override("font_size", 11)
-	sea.header.add_theme_color_override("font_color", Color("e7d5b3"))
-	layer.add_child(sea.header)
-	sea.help = Label.new()
-	sea.help.position = Vector2(14, 326)
-	sea.help.text = "W/S ga · A/D lái · E tương tác · Q lưới · Tab khoang · J điện thoại · M bản đồ\nBến: R về nhà · F sửa thuyền · Esc tạm dừng"
-	sea.help.add_theme_font_size_override("font_size", 9)
-	sea.help.add_theme_color_override("font_color", Color("a4dddb"))
-	layer.add_child(sea.help)
+	sea.hud_view = SeaHudView3D.new()
+	layer.add_child(sea.hud_view)
+	# The current Rin / NEO line (SeaScene3D._say queue); the view shows it on
+	# its speech strip.
 	sea.message = Label.new()
-	# Bottom-left above the key help, clear of the quest box.
-	sea.message.position = Vector2(14, 290)
-	sea.message.size = Vector2(440, 32)
-	sea.message.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-	sea.message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	sea.message.add_theme_font_size_override("font_size", 11)
-	sea.message.add_theme_color_override("font_color", Color("f2d98a"))
+	sea.message.visible = false
 	layer.add_child(sea.message)
 
 static func build_shared_ui(sea: SeaScene3D) -> void:
@@ -38,7 +26,8 @@ static func build_shared_ui(sea: SeaScene3D) -> void:
 	sea.add_child(sea.new_catch_card)
 	var tracker := QuestTracker.new()
 	tracker.catalog = sea.fish_catalog
-	tracker.origin = Vector2(6, 82)
+	tracker.origin = Vector2(8, 62)
+	tracker.hidden_when = func() -> bool: return sea.fishing or (sea.hold_ui != null and sea.hold_ui.visible)
 	sea.add_child(tracker)
 	var pause := load("res://scenes/ui/pause_menu.tscn") as PackedScene
 	if pause:
@@ -58,16 +47,8 @@ static func build_shared_ui(sea: SeaScene3D) -> void:
 		sea.add_child(sea.phone_app)
 
 static func update(sea: SeaScene3D) -> void:
-	var prompt := "E dỡ cá • R về nhà" if sea._at_dock() else "E câu tại phao sáng"
-	var poi := sea._nearest_poi()
-	if poi != "":
-		if poi.begins_with("event_"):
-			var event := sea.night_events[int(poi.substr(6))]
-			prompt = "E vớt chai thư" if int(event["kind"]) == NightEvents.Kind.BOTTLE else "E hỏi ghe chết máy"
-		else:
-			prompt = "E ghé " + str(PLACE_NAMES.get(poi, poi))
-	sea.header.text = "%s · %s · %dk · Dầu %d%% · Thân thuyền %d%%\nCá %d · Lưới %d/2 · %s" % [sea.boat_data.display_name, DayClock.get_time_text(), GameState.money, roundi(sea.oil / sea.oil_capacity * 100.0), roundi(GameState.boat_hp), sea.hold.items.size(), sea.nets.size(), prompt]
 	sea._next_line()
+	sea.hud_view.refresh(sea)
 
 static func build_navigation(sea: SeaScene3D) -> void:
 	var layer := CanvasLayer.new()

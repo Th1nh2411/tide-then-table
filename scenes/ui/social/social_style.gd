@@ -4,8 +4,10 @@ extends RefCounted
 ## social app on Rin's phone, palette "Xóm Đèn" only, pixel-crisp frames
 ## (2 px dark outline, 1 px light bevel, hard (2,2) shadow, stepped corners).
 ## Frames are nine-patches: final art res://assets/sprites/ui/frames/<name>.png
-## (via Art) if present, else generated here. Kept in one place so the
-## project-wide theme variations can replace it later.
+## (via Art) if present; ids that have a project theme material use it
+## (THEME_MATCH: paper card = "PaperPanel", red sticker = "BadgeLabel"
+## stamp), the app-only ones (blue header, tabs, notification strip, avatar
+## ring) are generated here.
 
 const INK := Color("090a14")        # Xam 1
 const NIGHT := Color("151d28")      # Xam 2
@@ -31,6 +33,11 @@ const FRAMES := {
 	"social_tab_on": [GOLD, LIGHT, true, Color(0, 0, 0, 0)],
 	"social_tab_off": [Color("73bed3"), Color("a4dddb"), false, Color(0, 0, 0, 0)],
 }
+## Frame id -> [theme type, stylebox name] in assets/ui/game_theme.tres.
+const THEME_MATCH := {
+	"social_card": ["PaperPanel", "panel"],
+	"rank_sticker": ["BadgeLabel", "normal"],
+}
 const SIZE := 16
 const OUTLINE := 2
 const SHADOW := 2
@@ -40,6 +47,9 @@ static var _textures: Dictionary = {}
 
 ## Nine-patch StyleBox for a frame id (see FRAMES), `pad` = content margin.
 static func frame(id: String, pad: int = 4) -> StyleBoxTexture:
+	var themed := _themed(id, pad)
+	if themed:
+		return themed
 	var box := StyleBoxTexture.new()
 	box.texture = frame_texture(id)
 	var shadow: bool = FRAMES.get(id, FRAMES["social_card"])[2]
@@ -53,6 +63,23 @@ static func frame(id: String, pad: int = 4) -> StyleBoxTexture:
 	box.content_margin_right = pad + (SHADOW if shadow else 0)
 	box.content_margin_bottom = pad + (SHADOW if shadow else 0)
 	box.content_margin_left = pad + (3 if id == "social_notif" else 0)
+	return box
+
+
+## The project theme's material for `id` (no own art dropped in), else null.
+static func _themed(id: String, pad: int) -> StyleBoxTexture:
+	if not THEME_MATCH.has(id) or Art.texture("ui/frames/" + id) != null:
+		return null
+	var spec: Array = THEME_MATCH[id]
+	var theme := ThemeDB.get_project_theme()
+	if theme == null or not theme.has_stylebox(str(spec[1]), str(spec[0])):
+		return null
+	var box := theme.get_stylebox(str(spec[1]), str(spec[0])).duplicate() as StyleBoxTexture
+	if box == null:
+		return null
+	box.set_content_margin_all(pad)
+	box.content_margin_right = pad + SHADOW
+	box.content_margin_bottom = pad + SHADOW
 	return box
 
 

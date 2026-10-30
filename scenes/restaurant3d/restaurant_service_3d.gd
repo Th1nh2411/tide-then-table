@@ -195,7 +195,9 @@ func end_shift() -> void:
 		host.social.close_shift()
 	var goal_lines := RestaurantGoals3D.summary_lines(host.shift_results)
 	host.panels.show_summary("HẾT CA • XÓM ĐÈN\nPhục vụ: %d  |  Bỏ về: %d\nThu: %dk  |  Chợ: %dk  |  Lương: %dk\nDư: %d phần  |  Đánh giá: %d sao" % [host.served, host.lost, host.earned, host.market_spent, host.wages_paid, leftover, stars]
-		+ ("\n" + goal_lines if goal_lines != "" else ""))
+		+ ("\n" + goal_lines if goal_lines != "" else ""),
+		{"day": GameState.day, "served": host.served, "lost": host.lost, "earned": host.earned, "market": host.market_spent,
+			"wages": host.wages_paid, "leftover": leftover, "stars": stars}, host.shift_results)
 
 ## Average freshness (0-100) of a plate's seafood (100 when none).
 static func _items_freshness(items: Array[InventoryItem]) -> float:

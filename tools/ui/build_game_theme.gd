@@ -16,7 +16,8 @@ extends SceneTree
 ##     (hand-painted plank), "SignPanel" (red shop sign + tube light: main /
 ##     pause menu), "CardboardPanel" (Cô Năm's boxes), "PhoneScreen" (phone
 ##     bezel), "StripPanel" (paper strip: speech note), "RowPanel" = paper
-##     note, "CardPanel" = paper.
+##     note, "CardPanel" = paper, "ReceiptPanel" (thermal receipt, torn
+##     edges: shift summary), "TagPanel" (small yellow paper tag: HUD chips).
 ##   Buttons: default = wood plank; "SignButton" / "AccentButton" (red sign,
 ##     main call to action), "PaperButton" (price tag), "ChalkButton" (chalk
 ##     outline), "ChipButton" (small tab: wood, paper when toggled),
@@ -67,10 +68,11 @@ func _panels() -> void:
 		_theme.set_stylebox("panel", type, frame("board", 10))
 	var materials := {"PaperPanel": "paper", "ChalkPanel": "chalk", "WoodPanel": "wood",
 		"SignPanel": "sign", "CardboardPanel": "cardboard", "PhoneScreen": "phone",
-		"StripPanel": "strip", "RowPanel": "paper", "CardPanel": "paper"}
+		"StripPanel": "strip", "RowPanel": "paper", "CardPanel": "paper",
+		"ReceiptPanel": "receipt", "TagPanel": "tag"}
 	for variation: String in materials:
 		_theme.set_type_variation(variation, "PanelContainer")
-		var pad := 12 if materials[variation] in ["chalk", "phone"] else 8
+		var pad := 12 if materials[variation] == "chalk" else (16 if materials[variation] == "phone" else (4 if variation == "TagPanel" else 8))
 		_theme.set_stylebox("panel", variation, frame(str(materials[variation]), pad))
 	_theme.set_stylebox("panel", "TooltipPanel", frame("paper", 6))
 
