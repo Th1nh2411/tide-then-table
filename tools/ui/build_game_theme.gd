@@ -17,7 +17,11 @@ extends SceneTree
 ##     pause menu), "CardboardPanel" (Cô Năm's boxes), "PhoneScreen" (phone
 ##     bezel), "StripPanel" (paper strip: speech note), "RowPanel" = paper
 ##     note, "CardPanel" = paper, "ReceiptPanel" (thermal receipt, torn
-##     edges: shift summary), "TagPanel" (small yellow paper tag: HUD chips).
+##     edges: shift summary), "TagPanel" (small yellow paper tag: HUD chips),
+##     "JournalPanel" (torn parchment: narration), "CratePanel" (wooden fish
+##     hold), "NotebookPanel" (ruled notebook page: rest card),
+##     "ClippingPanel" (newspaper clipping: ending), "AppCardPanel" (flat
+##     phone app card). Extra materials: tools/ui/ui_extra_frames.gd.
 ##   Buttons: default = wood plank; "SignButton" / "AccentButton" (red sign,
 ##     main call to action), "PaperButton" (price tag), "ChalkButton" (chalk
 ##     outline), "ChipButton" (small tab: wood, paper when toggled),
@@ -69,10 +73,12 @@ func _panels() -> void:
 	var materials := {"PaperPanel": "paper", "ChalkPanel": "chalk", "WoodPanel": "wood",
 		"SignPanel": "sign", "CardboardPanel": "cardboard", "PhoneScreen": "phone",
 		"StripPanel": "strip", "RowPanel": "paper", "CardPanel": "paper",
-		"ReceiptPanel": "receipt", "TagPanel": "tag"}
+		"ReceiptPanel": "receipt", "TagPanel": "tag", "JournalPanel": "journal",
+		"CratePanel": "crate", "NotebookPanel": "notebook", "ClippingPanel": "clipping",
+		"AppCardPanel": "app_card"}
 	for variation: String in materials:
 		_theme.set_type_variation(variation, "PanelContainer")
-		var pad := 12 if materials[variation] == "chalk" else (16 if materials[variation] == "phone" else (4 if variation == "TagPanel" else 8))
+		var pad := 12 if materials[variation] in ["chalk", "crate", "notebook"] else (16 if materials[variation] == "phone" else (4 if variation in ["TagPanel", "AppCardPanel"] else 8))
 		_theme.set_stylebox("panel", variation, frame(str(materials[variation]), pad))
 	_theme.set_stylebox("panel", "TooltipPanel", frame("paper", 6))
 
@@ -162,7 +168,7 @@ func _bars() -> void:
 ## Nine-patch from frames/<name>.png; `pad` = content margin inside the art,
 ## `shift` moves the content (pressed buttons sink by 2 px).
 func frame(name: String, pad: int, shift: int = 0, pad_y: int = -1) -> StyleBoxTexture:
-	var spec: Array = Painter.FRAMES[name]
+	var spec: Array = Painter.spec(name)
 	var margin := int(spec[1])
 	var box := StyleBoxTexture.new()
 	box.texture = load(FRAMES_DIR + name + ".png")

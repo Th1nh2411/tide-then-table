@@ -9,6 +9,7 @@ signal fish_hooked(size_scale: float)
 
 enum YankResult { GREEN, YELLOW, RED }
 
+const INK := Color("090a14")
 @export_group("Free hook")
 @export var school_size: int = 6
 @export var boat_speed: float = 1.2
@@ -350,10 +351,11 @@ func _draw() -> void:
 		draw_arc(hook_pos, 8.0, -PI * 0.5, -PI * 0.5 + TAU * bite_progress(), 20,
 			Color(0.35, 1.0, 0.55), 2.0)
 	_draw_wheel(Vector2(arena.end.x + 38.0, arena.position.y + 52.0))
-	_draw_bar(Rect2(origin.x, arena.end.y + 8.0, 145.0, 7.0), progress, _tint(fish.color), "Kéo")
-	_draw_bar(Rect2(origin.x + 158.0, arena.end.y + 8.0, 145.0, 7.0), tension, Color(1.0, 0.55, 0.2), "Dây")
+	draw_rect(arena.grow(2.0), INK, false, 2.0)  # pixel frame of the water window
+	_draw_bar(Rect2(origin.x, arena.end.y + 8.0, 145.0, 7.0), progress, _tint(fish.color), "rod")
+	_draw_bar(Rect2(origin.x + 158.0, arena.end.y + 8.0, 145.0, 7.0), tension, Color("de9e41"), "hook")
 	_draw_balance(Rect2(origin.x, arena.end.y + 28.0, 145.0, 7.0))
-	_draw_bar(Rect2(origin.x + 158.0, arena.end.y + 28.0, 145.0, 7.0), stun, Color(0.75, 0.4, 1.0), "Choáng")
+	_draw_bar(Rect2(origin.x + 158.0, arena.end.y + 28.0, 145.0, 7.0), stun, Color("c65197"), "wave")
 
 
 func _draw_fishing_line(boat_pos: Vector2, hook_pos: Vector2) -> void:
@@ -406,26 +408,40 @@ func _draw_wheel(center: Vector2) -> void:
 	draw_circle(center, radius - 6.0, Color(0.07, 0.09, 0.14))
 	draw_line(center, center + Vector2.RIGHT.rotated(_pointer_angle) * (radius + 2.0), Color.WHITE, 2.0, true)
 	draw_circle(center, 3.0, Color.WHITE)
-	draw_string(ThemeDB.fallback_font, center + Vector2(-12, 4), "%d%%" % roundi(green * 100.0),
-		HORIZONTAL_ALIGNMENT_CENTER, 24.0, 9, Color.WHITE)
-	draw_string(ThemeDB.fallback_font, center + Vector2(-16, radius + 14), "E: TẤT TAY",
-		HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(1.0, 0.9, 0.55))
+	var font := get_theme_font(&"font", &"TitleLabel")
+	draw_string_outline(font, center + Vector2(-12, 4), "%d%%" % roundi(green * 100.0),
+		HORIZONTAL_ALIGNMENT_CENTER, 24.0, 9, 3, INK)
+	draw_string(font, center + Vector2(-12, 4), "%d%%" % roundi(green * 100.0),
+		HORIZONTAL_ALIGNMENT_CENTER, 24.0, 9, Color("ebede9"))
+	# "E" key cap under the wheel: spin it all-in.
+	var cap := Rect2(center + Vector2(-6, radius + 5), Vector2(12, 11))
+	var key_box := get_theme_stylebox(&"normal", &"KeyLabel")
+	if key_box:
+		draw_style_box(key_box, cap)
+	draw_string(font, cap.position + Vector2(3, 9), "E", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("e7d5b3"))
 
 
 func _draw_balance(rect: Rect2) -> void:
-	draw_string(ThemeDB.fallback_font, rect.position + Vector2(0, -2), "Nghiêng", HORIZONTAL_ALIGNMENT_LEFT, -1, 9)
-	var track := Rect2(rect.position + Vector2(34, 0), Vector2(rect.size.x - 34, rect.size.y))
-	draw_rect(track, Color(0.12, 0.12, 0.18))
+	var track := _bar_track(rect, "boat")
 	var center_x := track.position.x + track.size.x * 0.5
 	draw_line(Vector2(center_x, track.position.y), Vector2(center_x, track.end.y), Color.WHITE, 1.0)
 	draw_circle(Vector2(center_x + balance * track.size.x * 0.47, track.position.y + track.size.y * 0.5), 3.0,
-		Color(0.3, 1.0, 0.65) if absf(balance) < 0.8 else Color(1.0, 0.25, 0.2))
-	draw_rect(track, Color(1, 1, 1, 0.45), false, 1.0)
+		Color("a8ca58") if absf(balance) < 0.8 else Color("e0302b"))
 
 
-func _draw_bar(rect: Rect2, value: float, color: Color, label: String) -> void:
-	draw_string(ThemeDB.fallback_font, rect.position + Vector2(0, -2), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 9)
-	var track := Rect2(rect.position + Vector2(34, 0), Vector2(rect.size.x - 34, rect.size.y))
-	draw_rect(track, Color(0.1, 0.1, 0.15))
-	draw_rect(Rect2(track.position, Vector2(track.size.x * clampf(value, 0.0, 1.0), track.size.y)), color)
-	draw_rect(track, Color(1, 1, 1, 0.45), false, 1.0)
+## Icon sticker on the left, then an ink-outlined dark track; returns the track.
+func _bar_track(rect: Rect2, icon_id: String) -> Rect2:
+	var icon := UiIcons.sticker(icon_id, 12, Color("e7d5b3"))
+	if icon:
+		draw_texture_rect(icon, Rect2(rect.position + Vector2(4, rect.size.y * 0.5 - 6), Vector2(12, 12)), false)
+	var track := Rect2(rect.position + Vector2(20, 0), Vector2(rect.size.x - 20, rect.size.y))
+	draw_rect(track.grow(1.0), INK)
+	draw_rect(track, Color("151d28"))
+	return track
+
+
+func _draw_bar(rect: Rect2, value: float, color: Color, icon_id: String) -> void:
+	var track := _bar_track(rect, icon_id)
+	var fill := Rect2(track.position, Vector2(roundf(track.size.x * clampf(value, 0.0, 1.0)), track.size.y))
+	draw_rect(fill, color)
+	draw_rect(Rect2(fill.position, Vector2(fill.size.x, 1)), color.lightened(0.3))

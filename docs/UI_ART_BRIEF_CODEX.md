@@ -12,6 +12,7 @@ Không file nào có thì game vẫn chạy bằng placeholder.
 | `docs/ui_art_needed_goals.md` | thử thách ngày, thành tựu (icon + huy hiệu) |
 | `docs/ui_art_needed_social.md` | Xóm Đèn Review: khung app, avatar, huy hiệu hạng quán, logo quán đối thủ |
 | `docs/ui_art_needed_hud.md` | HUD quán + biển, phiếu gọi món, điện thoại, hoá đơn cuối ca |
+| `docs/ui_art_needed_misc.md` | lời dẫn truyện, khoang thuyền, gợi ý lần đầu, các tab điện thoại, thẻ cá mới, thẻ buổi sáng, địa điểm, kết thúc, khung nấu/câu |
 
 Cùng một đường dẫn có thể xuất hiện ở nhiều danh sách (vd. `icons/money.png`):
 **vẽ một lần**, đọc mô tả ở mọi chỗ để hình hợp cả các chỗ dùng.

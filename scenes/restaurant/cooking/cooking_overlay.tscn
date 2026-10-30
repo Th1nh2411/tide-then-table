@@ -7,12 +7,12 @@ layer = 10
 script = ExtResource("1_cooking")
 
 [node name="Panel" type="PanelContainer" parent="."]
-self_modulate = Color(1, 1, 1, 0.85)
 offset_left = 6.0
 offset_top = 46.0
 offset_right = 236.0
 offset_bottom = 150.0
 mouse_filter = 2
+theme_type_variation = &"WoodPanel"
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
 layout_mode = 2
@@ -28,13 +28,16 @@ theme_override_constants/separation = 2
 [node name="TitleLabel" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 10
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 11
 text = "Nấu: ..."
 horizontal_alignment = 1
 
 [node name="HintLabel" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.0353, 0.0392, 0.0784, 1)
+theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 8
 text = "hint"
 horizontal_alignment = 1
@@ -47,6 +50,8 @@ size_flags_vertical = 3
 [node name="StatusLabel" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.0353, 0.0392, 0.0784, 1)
+theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 9
 text = "status"
 horizontal_alignment = 1
@@ -54,4 +59,7 @@ horizontal_alignment = 1
 [node name="ResultLabel" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"BadgeLabel"
+theme_override_font_sizes/font_size = 11
 horizontal_alignment = 1

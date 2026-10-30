@@ -4,6 +4,8 @@ extends CanvasLayer
 ## stays visible — no pop-up over the screen). Picks the minigame by the
 ## dish's cook_type (drinks: BeerPourGame), shows the result briefly, then
 ## reports the multiplier.
+## Look: a wooden plank by the grill ("WoodPanel"), the dish name in Paytone
+## after a grill / beer sticker, the result as a red stamp that slams down.
 
 signal finished(dish: DishData, result: CookingGameBase.Result, multiplier: float)
 ## The beer went over the rim (the kitchen takes the wasted beer away).
@@ -61,11 +63,15 @@ func start(dish: DishData) -> void:
 		_panel_anchor = Vector2(panel.position.x + panel.size.x * 0.5, panel.position.y + panel.size.y)
 	_game_holder.add_child(_game)
 	_fit_panel.call_deferred()
-	_title_label.text = ("Rót: %s" if dish.instant_serve else "Nấu: %s") % dish.display_name
+	_title_label.text = dish.display_name
+	_title_label.tooltip_text = "Rót bia" if dish.instant_serve else "Nấu"
+	_title_icon(dish)
 	_hint_label.text = _game.get_hint()
 	_hint_label.visible = Guide.once("game_" + str(_game.get_script().get_global_name()))  # first time each
 	_result_label.text = ""
+	_result_label.visible = false
 	show()
+	UiFx.settle($Panel as Control, Vector2(0, 16), 0.0, 4.0)
 
 
 ## Wider games (the grill with its picture) grow the panel to both sides,
@@ -74,6 +80,26 @@ func _fit_panel() -> void:
 	var panel := $Panel as Control
 	panel.reset_size()
 	panel.position = Vector2(_panel_anchor.x - panel.size.x * 0.5, _panel_anchor.y - panel.size.y)
+
+
+## Grill / beer sticker before the dish name (one per overlay, reused).
+func _title_icon(dish: DishData) -> void:
+	var id := "beer" if dish.instant_serve else "grill"
+	var row := _title_label.get_parent()
+	var icon := row.get_node_or_null("TitleIcon") as TextureRect
+	if icon == null:
+		_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		var head := HBoxContainer.new()
+		head.alignment = BoxContainer.ALIGNMENT_CENTER
+		head.add_theme_constant_override("separation", 4)
+		row.add_child(head)
+		row.move_child(head, _title_label.get_index())
+		icon = UiIcons.make(id, 12, UiIcons.GOLD)
+		icon.name = "TitleIcon"
+		row.add_child(icon)
+		icon.reparent(head)
+		_title_label.reparent(head)
+	icon.texture = UiIcons.sticker(id, 12, UiIcons.GOLD)
 
 
 func _cooking_game(dish: DishData) -> CookingGameBase:
@@ -112,7 +138,10 @@ func _on_game_completed(result: CookingGameBase.Result) -> void:
 	Sfx.hold("sizzle", false)
 	Sfx.hold("pour", false)
 	Sfx.play({CookingGameBase.Result.PERFECT: "catch", CookingGameBase.Result.OK: "ok"}.get(result, "miss"))
-	_result_label.text = "%s  x%.1f" % [names[result], multiplier]
+	_result_label.text = "%s x%.1f" % [names[result], multiplier]
+	_result_label.visible = true
+	UiFx.tilt(_result_label, -4.0)
+	UiFx.stamp(_result_label, $Panel as Control)
 	await get_tree().create_timer(result_seconds).timeout
 	_game.queue_free()
 	_game = null

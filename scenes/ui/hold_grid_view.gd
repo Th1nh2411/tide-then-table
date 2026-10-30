@@ -5,7 +5,8 @@ extends Control
 ## Selling (`selling` true, at the lobster raft): the discard zone becomes a
 ## green "Bán" zone; dropping a fish there or right-clicking it sells it
 ## (`item_sold`; the caller pays).
-## All game rules live in GridInventory; this only draws and forwards moves.
+## All game rules live in GridInventory; this only draws (HoldGridPainter:
+## wet wooden slots, chalk tray, bin / coin plates) and forwards moves.
 
 signal pending_changed
 signal item_discarded(item: InventoryItem)
@@ -14,12 +15,8 @@ signal item_sold(item: InventoryItem)
 @export var cell_size: int = 20
 @export var tray_cells: Vector2i = Vector2i(3, 3)
 @export var gap: int = 16
-@export var cell_color: Color = Color(0.2, 0.15, 0.1)
-@export var line_color: Color = Color(1, 1, 1, 0.15)
-@export var valid_color: Color = Color(0.4, 1.0, 0.5)
-@export var invalid_color: Color = Color(1.0, 0.35, 0.3)
-@export var trash_color: Color = Color(0.5, 0.15, 0.15)
-@export var sell_color: Color = Color(0.15, 0.45, 0.2)
+@export var valid_color: Color = Color("a8ca58")
+@export var invalid_color: Color = Color("cf573c")
 
 ## Sell mode: what one fish fetches (InventoryItem -> int); empty = not selling.
 var sell_price: Callable
@@ -35,6 +32,7 @@ var _drag_origin_rotated: bool
 ## Which cell of the item's bounding box the mouse is holding.
 var _grab_offset: Vector2i = Vector2i.ZERO
 var _mouse: Vector2 = Vector2.ZERO
+var _time: float = 0.0
 
 
 func set_hold(new_hold: GridInventory) -> void:
@@ -66,21 +64,24 @@ func cancel_drag() -> void:
 	queue_redraw()
 
 
-## Name and quality of the item under the mouse, for the info line.
-func get_hover_text() -> String:
+## The item under the mouse (or being dragged), else null.
+func hover_item() -> InventoryItem:
 	if hold == null:
-		return ""
+		return null
 	var item := _dragged
-	if item == null and hold and _grid_rect().has_point(_mouse):
+	if item == null and _grid_rect().has_point(_mouse):
 		item = hold.get_item_at(_mouse_cell())
 	if item == null and pending and _tray_rect().has_point(_mouse):
 		item = pending
+	return item
+
+
+## Name and weight of the item under the mouse, for the info tag.
+func get_hover_text() -> String:
+	var item := hover_item()
 	if item == null:
 		return ""
-	var text := "%s %s · chất lượng %.1f" % [item.fish.display_name, item.fish.weight_text(item.size), item.quality]
-	if is_selling():
-		text += " · bán %dk" % int(sell_price.call(item))
-	return text
+	return "%s %s" % [item.fish.display_name, item.fish.weight_text(item.size)]
 
 
 func is_selling() -> bool:
@@ -92,7 +93,10 @@ func zone_center() -> Vector2:
 	return get_global_rect().position + _trash_rect().get_center()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_time += delta
+	if pending:
+		queue_redraw()  # the tray sparkle bobs
 	if _dragged and Input.is_action_just_pressed("rotate_item"):
 		_dragged.rotated = not _dragged.rotated
 		# The old grab cell may not exist after rotating; hold by the corner.
@@ -188,28 +192,17 @@ func _trash_rect() -> Rect2:
 func _draw() -> void:
 	if hold == null:
 		return
-	var font := ThemeDB.fallback_font
-	for y in hold.size.y:
-		for x in hold.size.x:
-			var cell_rect := Rect2(Vector2(x, y) * cell_size, Vector2.ONE * cell_size)
-			draw_rect(cell_rect, cell_color)
-			draw_rect(cell_rect, line_color, false, 1.0)
+	HoldGridPainter.cells(self, hold.size, cell_size)
 	for item in hold.items:
 		_draw_item(item, Vector2(item.grid_pos * cell_size), 1.0)
-
 	var tray := _tray_rect()
-	draw_rect(tray, Color(0, 0, 0, 0.35))
-	draw_string(font, tray.position + Vector2(2, -3), "Cá mới", HORIZONTAL_ALIGNMENT_LEFT, -1, 10)
+	HoldGridPainter.tray(self, tray, pending != null, _time)
 	if pending and _dragged != pending:
 		_draw_item(pending, tray.position, 1.0)
-
 	var trash := _trash_rect()
-	draw_rect(trash, sell_color if is_selling() else trash_color)
-	var zone_text := "Bỏ"
-	if is_selling():
-		zone_text = "Bán %dk" % int(sell_price.call(_dragged)) if _dragged else "Bán"
-	draw_string(font, trash.position + Vector2(0, trash.size.y * 0.5 + 4), zone_text,
-		HORIZONTAL_ALIGNMENT_CENTER, trash.size.x, 12)
+	var price := int(sell_price.call(_dragged)) if is_selling() and _dragged else -1
+	var hot := _dragged != null and trash.has_point(_mouse)
+	HoldGridPainter.zone(self, trash, is_selling(), price, hot)
 
 	if _dragged:
 		_draw_dragged()
@@ -254,10 +247,7 @@ func _draw_item(item: InventoryItem, origin: Vector2, alpha: float, outline: Col
 		if outline.a > 0.0:
 			draw_rect(rect, outline, false, 2.0)
 	if item.is_new:
-		var tag := Rect2(origin + Vector2(2, cell_size - 10), Vector2(20, 8))
-		draw_rect(tag, Color(1.0, 0.85, 0.3, alpha))
-		draw_string(ThemeDB.fallback_font, tag.position + Vector2(1, 7), "NEW", HORIZONTAL_ALIGNMENT_LEFT, -1, 7,
-			Color(0.2, 0.1, 0.0, alpha))
+		HoldGridPainter.new_tag(self, origin, cell_size, alpha)
 	# White dot marks a perfect-quality catch.
 	if item.quality >= 1.0:
-		draw_circle(origin + Vector2(5, 5), 2.0, Color(1, 1, 1, alpha))
+		draw_rect(Rect2(origin + Vector2(3, 3), Vector2(3, 3)), Color(Color("ebede9"), alpha))

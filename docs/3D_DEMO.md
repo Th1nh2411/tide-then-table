@@ -590,3 +590,15 @@ nền. Shift = lăn (`CharacterArmature|Roll`, 0,6 s, ~2 m; `roll_seconds` /
 `roll_speed` / `roll_cooldown`). Khách đi 1,1 m/s (`CustomerTraffic3D.WALK_SPEED`),
 nhân viên ~0,9–1,6 m/s (`RestaurantCrew3D.STAFF_UNITS_PER_METRE`).
 
+
+
+### Các màn còn lại theo chất liệu — 2026-10-30
+
+Lời dẫn truyện là dải giấy da xé dán băng keo; lời thoại có bảng tên giấy vàng.
+Khoang (Tab) là thùng gỗ ướt: biển gỗ góc trên ghi % đầy (bán: tên bè), nút X,
+khay "cá mới" viền phấn, ô Bỏ / Bán là đĩa có icon (+ giá khi kéo cá), thẻ giấy
+tên + ký cá, dấu đỏ "ĐẦY! +2". Gợi ý lần đầu là thẻ giấy ghim, lắc nhẹ. Thẻ cá
+mới: ảnh dán + sticker NEW! đập xuống. Màn sáng: trang vở. Địa điểm: tờ giấy
+ghim, câu trả lời là thẻ giá có phím số + icon. Kết thúc: mẩu báo + dấu "CÒN
+TIẾP". Điện thoại: các tab là thẻ app có ảnh/icon (Dex là lưới ảnh cá).
+Art cần vẽ: `docs/ui_art_needed_misc.md`.

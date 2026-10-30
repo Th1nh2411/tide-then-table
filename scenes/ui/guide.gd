@@ -7,6 +7,9 @@ extends CanvasLayer
 ## the rules were added. Subclasses add rules in `_add_rules()`.
 ## Hidden while the game is paused, except rules made for paused screens
 ## (the hold window). Text stays short: the full guide is HelpPanel.
+## Look: a stepped pixel ring (ink + gold) on the target, a red arrow, and
+## the words on a small yellow paper tag ("TagPanel") pinned with a push
+## pin (stickers/pin.png), bobbing gently.
 
 const FLAG_PREFIX := "tip_"
 
@@ -19,7 +22,9 @@ class Rule:
 	var done: Callable  # () -> bool: the player did it (empty = time out only)
 	var while_paused: bool = false
 
-@export var color: Color = Color(1.0, 0.85, 0.3)
+@export var color: Color = Color("f2d98a")
+@export var arrow_color: Color = Color("e0302b")
+@export var ink_color: Color = Color("090a14")
 ## Seconds a pointer stays at most; one that disappears after this long
 ## counts as seen too (no nagging).
 @export var max_seconds: float = 14.0
@@ -128,21 +133,35 @@ func _finish(seen: bool) -> void:
 func _draw_pointer() -> void:
 	if _current == null:
 		return
-	var at: Vector2 = _current.target.call()
-	var pulse := 0.5 + 0.5 * sin(_time * 6.0)
-	_canvas.draw_arc(at, 10.0 + pulse * 3.0, 0.0, TAU, 24, Color(color, 0.5 + 0.5 * pulse), 2.0)
-	var tip := at + Vector2(0, -14 - absf(sin(_time * 5.0)) * 5.0)
-	_canvas.draw_colored_polygon(PackedVector2Array([tip, tip + Vector2(-6, -8), tip + Vector2(6, -8)]), color)
-	var font := ThemeDB.fallback_font
+	var at: Vector2 = (_current.target.call() as Vector2).round()
+	# Ring: steps between two sizes (no smooth glow), ink under gold.
+	var radius := 11.0 if fmod(_time, 0.9) < 0.45 else 13.0
+	_canvas.draw_arc(at, radius, 0.0, TAU, 20, ink_color, 4.0, false)
+	_canvas.draw_arc(at, radius, 0.0, TAU, 20, color, 2.0, false)
+	var bob := roundf(absf(sin(_time * 4.0)) * 4.0)
+	var tip := at + Vector2(0, -radius - 3.0 - bob)
+	var arrow := PackedVector2Array([tip, tip + Vector2(-6, -8), tip + Vector2(6, -8)])
+	var outline := PackedVector2Array([tip + Vector2(0, 2), tip + Vector2(-8, -9), tip + Vector2(8, -9)])
+	_canvas.draw_colored_polygon(outline, ink_color)
+	_canvas.draw_colored_polygon(arrow, arrow_color)
+	# Words on a pinned paper tag, swaying a little.
+	var font := _canvas.get_theme_font(&"font", &"BoldLabel")
 	var size := font.get_string_size(_current.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
-	var box := Rect2(tip + Vector2(-size.x * 0.5 - 4, -22 - size.y * 0.5), size + Vector2(8, 6))
-	# Keep the label on screen.
+	var box := Rect2((tip + Vector2(-size.x * 0.5 - 6, -16 - size.y - 4)).round(), (size + Vector2(12, 8)).round())
 	var screen := _canvas.get_viewport_rect().size
-	box.position = box.position.clamp(Vector2(2, 2), screen - box.size - Vector2(2, 2))
-	_canvas.draw_rect(box, Color(0.08, 0.08, 0.1, 0.9))
-	_canvas.draw_rect(box, color, false, 1.0)
-	_canvas.draw_string(font, box.position + Vector2(4, size.y), _current.text, HORIZONTAL_ALIGNMENT_LEFT, -1,
-		font_size, Color.WHITE)
+	box.position = box.position.clamp(Vector2(4, 6), screen - box.size - Vector2(4, 4))
+	var sway := sin(_time * 2.2) * 0.03
+	_canvas.draw_set_transform(box.get_center(), sway)
+	var local := Rect2(-box.size * 0.5, box.size)
+	var tag := _canvas.get_theme_stylebox(&"panel", &"TagPanel")
+	if tag:
+		_canvas.draw_style_box(tag, local)
+	else:
+		_canvas.draw_rect(local, color)
+	_canvas.draw_string(font, local.position + Vector2(6, 4 + size.y * 0.8), _current.text,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, ink_color)
+	UiStickers.draw(_canvas, "pin", Vector2(0, local.position.y + 1))
+	_canvas.draw_set_transform(Vector2.ZERO)
 
 
 ## Screen position of a world node (works with or without a camera).

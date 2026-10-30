@@ -28,6 +28,7 @@ const LA1 := Color("25562e")
 const BIEN1 := Color("172038")
 const GOLD := Color("f2d98a")
 const SHADOW := Color(0.035, 0.04, 0.08, 0.6)
+const Extra := preload("res://tools/ui/ui_extra_frames.gd")
 
 ## name -> [size, margin]; the builder reads margins from here too.
 const FRAMES: Dictionary = {
@@ -44,14 +45,20 @@ const FRAMES: Dictionary = {
 var _rng := RandomNumberGenerator.new()
 
 
+## [size, margin] of a frame name (base or extra materials).
+static func spec(name: String) -> Array:
+	return FRAMES[name] if FRAMES.has(name) else Extra.FRAMES[name]
+
+
 func paint_all(dir: String) -> int:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
-	var written := 0
-	for name: String in FRAMES:
+	var written := Extra.paint_stickers()
+	var all := FRAMES.merged(Extra.FRAMES)
+	for name: String in all:
 		var path := dir + name + ".png"
 		if FileAccess.file_exists(path):
 			continue
-		var spec: Array = FRAMES[name]
+		var spec: Array = all[name]
 		var image := paint(name, int(spec[0]))
 		image.save_png(ProjectSettings.globalize_path(path))
 		written += 1
@@ -90,7 +97,8 @@ func paint(name: String, s: int) -> Image:
 		"keycap": _box(img, XAM3, XAM5, XAM1, XAM3, 0.0, 1)
 		"stamp": _box(img, DO2, Color("cf573c"), DO1, DO1, 0.0, 1)
 		_:
-			_button(img, name)
+			if not Extra.paint(self, img, name):
+				_button(img, name)
 	return img
 
 

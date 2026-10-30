@@ -541,4 +541,12 @@ Hướng dẫn chạy, kiểm tra và danh sách còn thiếu: `docs/3D_DEMO.md`
   treo dây, thẻ thử thách ghim, toast sticker, ghi chú nhiệm vụ không đè HUD), lời Rin/NEO
   trên dải giấy ở biển, điện thoại có khung máy + tab icon, hoá đơn hết ca in từng dòng +
   biểu đồ 7 ngày + con dấu sao. Art: `docs/ui_art_needed_hud.md`; test `receipt_test`.
+- 2026-10-30: các màn còn lại theo chất liệu: lời dẫn = dải giấy da xé dán băng keo, khoang =
+  thùng gỗ ướt (biển gỗ % đầy, khay phấn, đĩa thùng rác / đồng xu + giá), gợi ý lần đầu = thẻ
+  giấy ghim, thẻ cá mới = ảnh dán + sticker NEW! đập, sáng = trang vở (ngày, giờ về, ảnh cá
+  xN, đơn ✓/✗, giấy nhớ thời tiết), địa điểm = tờ giấy ghim + phím số + icon, kết thúc = mẩu
+  báo "TIN XÓM ĐÈN" + dấu CÒN TIẾP, khung nấu = ván gỗ + dấu kết quả, khung câu = thùng gỗ +
+  thanh có icon; điện thoại: Kho/Menu/Dex/Thuyền/Sổ sách/Nâng cấp/Nhân viên thành thẻ app
+  (ảnh cá, xu, thanh, biểu đồ; Dex lưới ảnh, "?" cho loài chưa gặp, dấu NEW + tiếng chụp).
+  Art: `docs/ui_art_needed_misc.md`. Chưa: bản đồ điện thoại (vẫn chữ font mặc định).
 - Chưa xong: preview bếp/thùng đá, playtest tay, pacing (bot 3D có >20.000k ở ngày 4 — cần xem lại kinh tế), art 3D (mèo đi bốn chân).

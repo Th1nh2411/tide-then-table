@@ -1,7 +1,8 @@
 extends Control
 ## MVP ending: white screen, Rin's lines appear one by one, then "Còn tiếp...";
 ## the lines then give way to a short card about the run (EndingStats) and a
-## thank-you for playtesters. Any key / click after that returns to the main menu.
+## thank-you for playtesters, as a taped newspaper clipping (RunClipping)
+## with a "CÒN TIẾP" stamp. Any key / click after that returns to the main menu.
 
 const MAIN_MENU_PATH: String = "res://scenes/main_menu/main_menu.tscn"
 
@@ -28,7 +29,17 @@ var _can_leave: bool = false
 func _ready() -> void:
 	Sfx.ambience("")
 	_to_be_continued.modulate.a = 0.0
+	_to_be_continued.theme_type_variation = &"HeadingLabel"
 	_hint_label.modulate.a = 0.0
+	_hint_label.theme_type_variation = &"KeyLabel"
+	_hint_label.text = "Space"
+	_hint_label.tooltip_text = "Bấm phím bất kỳ để về màn hình chính"
+	var home := UiIcons.make("house", 12, Color("394a50"))
+	_hint_label.add_sibling(home)
+	home.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	home.modulate.a = 0.0
+	_hint_label.set_meta("home", home)
+	_hint_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_play()
 
 
@@ -38,7 +49,7 @@ func _play() -> void:
 		var label := Label.new()
 		label.text = "Rin: " + text
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label.add_theme_color_override("font_color", Color(0.15, 0.2, 0.25))
+		label.theme_type_variation = &"InkLabel"
 		label.modulate.a = 0.0
 		_lines_box.add_child(label)
 		await _fade_in(label)
@@ -46,6 +57,7 @@ func _play() -> void:
 	await _fade_in(_to_be_continued)
 	await get_tree().create_timer(seconds_between_lines).timeout
 	await _show_run_card()
+	_fade_in(_hint_label.get_meta("home") as CanvasItem)
 	await _fade_in(_hint_label)
 	_can_leave = true
 
@@ -57,26 +69,15 @@ func _show_run_card() -> void:
 	await tween.finished
 	for child in _lines_box.get_children():
 		child.queue_free()
+	_to_be_continued.hide()  # the clipping's stamp says it now
 	_lines_box.modulate.a = 1.0
 	var total := fish_catalog.fish.size() if fish_catalog else 0
-	var card: Array[Label] = []
-	for text in EndingStats.lines(total):
-		card.append(_card_label(text, Color(0.15, 0.2, 0.25), 14))
-	card.append(_card_label(thanks_text, Color(0.1, 0.35, 0.4), 11))
-	for label in card:
-		_lines_box.add_child(label)
-	for label in card:
-		await _fade_in(label)
-
-
-func _card_label(text: String, color: Color, font_size: int) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_color_override("font_color", color)
-	label.add_theme_font_size_override("font_size", font_size)
-	label.modulate.a = 0.0
-	return label
+	var clipping := RunClipping.new()
+	clipping.setup(EndingStats.values(total), thanks_text)
+	clipping.tooltip_text = "\n".join(EndingStats.lines(total))
+	_lines_box.add_child(clipping)
+	await get_tree().process_frame
+	await clipping.reveal()
 
 
 func _fade_in(node: CanvasItem) -> void:

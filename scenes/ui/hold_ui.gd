@@ -9,6 +9,10 @@ extends CanvasLayer
 ## - Sell mode (at the lobster raft): game is paused; drag fish onto "Bán" or
 ##   right-click them to sell one by one, or "Bán hết" (`sold` per fish).
 ## Runs with PROCESS_MODE_ALWAYS (set in the scene) so it works while paused.
+## Look: a wooden fish crate ("CratePanel") with wet slots, a small wooden
+## sign (crate icon + how full, or the buyer) hanging over its top-left edge,
+## an icon close button on the top-right corner, a paper tag with the fish
+## under the mouse (+ coin chip when selling) and a red "ĐẦY!" stamp.
 
 signal closed
 ## A fish sold in sell mode (money already paid).
@@ -23,26 +27,60 @@ var _buyer: String = ""
 var _sold_count: int = 0
 var _sold_money: int = 0
 var _sell_all_button: Button
+var _sign_icon: TextureRect
+var _price_chip: HBoxContainer
+var _shown_hover: String = "-"
 
 @onready var _view: HoldGridView = %HoldGridView
 @onready var _title_label: Label = %TitleLabel
 @onready var _info_label: Label = %InfoLabel
 @onready var _hint_label: Label = %HintLabel
 @onready var _close_button: Button = %CloseButton
+@onready var _panel: PanelContainer = %Panel
+@onready var _sign: PanelContainer = %Sign
+@onready var _info_tag: PanelContainer = %InfoTag
 
 
 func _ready() -> void:
 	hide()
 	_close_button.pressed.connect(close)
+	UiIcons.dress(_close_button, "close", 12)
+	_close_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	UiFx.hover_lift(_close_button, 0.08)
 	_view.pending_changed.connect(_on_pending_changed)
 	_view.item_sold.connect(_on_item_sold)
+	_sign_icon = UiIcons.make("crate", 12, UiIcons.GOLD)
+	%SignRow.add_child(_sign_icon)
+	%SignRow.move_child(_sign_icon, 0)
+	_price_chip = UiIcons.pair("money", "", 10, UiIcons.GOLD, &"PriceLabel", 10)
+	%InfoRow.add_child(_price_chip)
 	_sell_all_button = Button.new()
+	_sell_all_button.theme_type_variation = &"SignButton"
 	_sell_all_button.focus_mode = Control.FOCUS_NONE
+	_sell_all_button.tooltip_text = "Bán hết khoang"
+	_sell_all_button.add_theme_font_size_override("font_size", 10)
+	UiIcons.dress(_sell_all_button, "money", 12, UiIcons.GOLD)
 	_sell_all_button.pressed.connect(_sell_all)
-	_sell_all_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_close_button.add_sibling(_sell_all_button)
-	_close_button.get_parent().move_child(_sell_all_button, _close_button.get_index())
+	%Footer.add_child(_sell_all_button)
 	_sell_all_button.hide()
+	_panel.resized.connect(_place_decor)
+	visibility_changed.connect(func() -> void:
+		if visible:
+			_open_fx.call_deferred())
+	UiFx.tilt(_sign, -3.0)
+
+
+func _open_fx() -> void:
+	_place_decor()
+	UiFx.pop_in(_panel)
+	UiFx.settle(_sign, Vector2(0, -10), 0.1, -10.0)
+
+
+## Sign over the crate's top-left edge, close button on its top-right corner.
+func _place_decor() -> void:
+	_sign.reset_size()
+	_sign.position = _panel.position + Vector2(-8, -_sign.size.y + 10)
+	_close_button.position = _panel.position + Vector2(_panel.size.x - _close_button.size.x + 4, -10)
 
 
 func setup(hold: GridInventory) -> void:
@@ -50,6 +88,8 @@ func setup(hold: GridInventory) -> void:
 	if not is_node_ready():
 		await ready
 	_view.set_hold(hold)
+	if not hold.changed.is_connected(_refresh_texts):
+		hold.changed.connect(_refresh_texts)
 	_refresh_texts()
 
 
@@ -130,16 +170,31 @@ func _pause() -> void:
 
 
 func _process(_delta: float) -> void:
-	if visible:
-		_info_label.text = _view.get_hover_text()
-		if _view.is_selling():
-			var value := 0
-			for item in _view.hold.items:
-				value += int(_view.sell_price.call(item))
-			_sell_all_button.text = "Bán hết khoang: %dk" % value
-			_sell_all_button.disabled = _view.hold.items.is_empty()
-			if _info_label.text.is_empty() and _sold_count > 0:
-				_info_label.text = "Đã bán %d con: +%dk" % [_sold_count, _sold_money]
+	if not visible:
+		return
+	var text := _view.get_hover_text()
+	var item := _view.hover_item()
+	var price := int(_view.sell_price.call(item)) if _view.is_selling() and item else -1
+	if _view.is_selling():
+		var value := 0
+		for fish in _view.hold.items:
+			value += int(_view.sell_price.call(fish))
+		_sell_all_button.text = "%dk" % value
+		_sell_all_button.disabled = _view.hold.items.is_empty()
+		if text.is_empty() and _sold_count > 0:
+			text = "%d con" % _sold_count  # sold so far
+			price = _sold_money
+	var key := "%s|%d" % [text, price]
+	if key == _shown_hover:
+		return
+	_shown_hover = key
+	_info_label.text = text
+	_info_label.visible = text != ""
+	_price_chip.visible = price >= 0
+	(_price_chip.get_node("Text") as Label).text = "%dk" % price
+	_info_tag.visible = text != "" or price >= 0
+	if _info_tag.visible:
+		UiFx.bounce(_info_tag, 0.06)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -175,17 +230,25 @@ func _sell_all() -> void:
 		_on_item_sold(item)
 
 
+## Sign, stamp and close icon for the current mode (pictures, few words).
 func _refresh_texts() -> void:
-	_title_label.text = "Khoang thuyền (%dx%d)" % [_view.hold.size.x, _view.hold.size.y] if _view.hold else "Khoang thuyền"
+	var hold := _view.hold
+	var fill := roundi(hold.fill_fraction() * 100.0) if hold else 0
+	_sign.tooltip_text = "Khoang thuyền %dx%d" % [hold.size.x, hold.size.y] if hold else "Khoang thuyền"
+	_title_label.text = "%d%%" % fill
+	_sign_icon.texture = UiIcons.sticker("crate", 12, UiIcons.GOLD)
+	_hint_label.hide()
 	if _view.is_selling():
-		_title_label.text = "Bán cho %s" % _buyer
-		_hint_label.text = "Kéo cá vào ô \"Bán\" hoặc chuột phải để bán từng con"
-		_close_button.text = "Xong"
+		_title_label.text = _buyer.get_slice("(", 0).strip_edges()
+		_sign_icon.texture = UiIcons.sticker("money", 12, UiIcons.GOLD)
+		_close_button.icon = UiIcons.sticker("check", 12, UiIcons.CREAM)
+		_close_button.tooltip_text = "Xong"
 		return
+	_close_button.icon = UiIcons.sticker("close", 12, UiIcons.CREAM)
 	if _view.pending:
-		var waiting := " (còn %d con chờ)" % _queue.size() if not _queue.is_empty() else ""
-		_hint_label.text = "Khoang đầy!%s" % waiting
-		_close_button.text = "Bỏ cá mới & đóng"
+		var waiting := " +%d" % _queue.size() if not _queue.is_empty() else ""
+		_hint_label.text = "ĐẦY!%s" % waiting
+		_hint_label.show()
+		_close_button.tooltip_text = "Bỏ cá mới & đóng"
 	else:
-		_hint_label.text = ""  # SeaGuide points at things the first time
-		_close_button.text = "Đóng"
+		_close_button.tooltip_text = "Đóng (Tab)"

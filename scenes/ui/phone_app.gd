@@ -49,6 +49,7 @@ var _achievements: PhoneAchievements
 var _review: PhoneReview
 var _repair: RepairButton
 var _big_map: MapOverlay
+var _cards: PhoneCards
 ## Set by the sea scene: () -> bool (at the dock) and () -> int (repair).
 var repair_allowed: Callable
 var repair_action: Callable
@@ -97,6 +98,12 @@ func _ready() -> void:
 	_repair.repaired.connect(func(_spent: int, _fully: bool) -> void: _show_tab(_tab))
 	_big_map = MapOverlay.new()
 	add_child(_big_map)
+	# Icon-first screens for the text tabs; ContentLabel keeps the full text.
+	_cards = PhoneCards.new()
+	_cards.size_flags_vertical = _shop.size_flags_vertical
+	_cards.custom_minimum_size = _shop.custom_minimum_size
+	_scroll.add_sibling(_cards)
+	_key_hint($Phone/Margin/VBox/Hint as Label)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -167,7 +174,10 @@ func _show_tab(index: int) -> void:
 	_staff.visible = index == STAFF_TAB
 	_achievements.visible = index == ACHIEVEMENTS_TAB
 	_review.visible = index == REVIEW_TAB
-	_scroll.visible = index not in [MAP_TAB, SHOP_TAB, STAFF_TAB, ACHIEVEMENTS_TAB, REVIEW_TAB]
+	_scroll.visible = false  # text kept on ContentLabel; PhoneCards draws it
+	_cards.visible = index not in [MAP_TAB, SHOP_TAB, STAFF_TAB, ACHIEVEMENTS_TAB, REVIEW_TAB]
+	if _cards.visible:
+		_cards.show_tab(index, self)
 	if index == SHOP_TAB:
 		_shop.refresh()
 	if index == STAFF_TAB:
@@ -181,6 +191,7 @@ func _show_tab(index: int) -> void:
 	_repair.refresh()
 	_repair.visible = _repair.visible and index == BOAT_TAB
 	_content_label.text = _tab_text(index)
+	_cards.tooltip_text = _content_label.text
 	var weather: WeatherData = weather_catalog.find(GameState.weather_id) if weather_catalog else null
 	_log_label.text = "\n".join(PhoneReports.log_lines(_fridge_loss(), weather))
 
@@ -201,6 +212,29 @@ func _tab_text(index: int) -> String:
 			return PhoneReports.boat_report(boat, float(GameState.get_upgrade_value(lamp_upgrade)), upgrades)
 		_:
 			return PhoneReports.ledger_report()
+
+
+## Bottom hint as tiny key caps: [J] [Esc] close, [A] [D] tabs.
+func _key_hint(hint: Label) -> void:
+	hint.text = ""
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 3)
+	hint.add_child(row)
+	row.set_anchors_preset(Control.PRESET_FULL_RECT)
+	for part: Array in [["J", ""], ["Esc", "close"], ["A", ""], ["D", "phone"]]:
+		var key := Label.new()
+		key.theme_type_variation = &"KeyLabel"
+		key.text = str(part[0])
+		key.add_theme_font_size_override("font_size", 7)
+		row.add_child(key)
+		if str(part[1]) != "":
+			row.add_child(UiIcons.make(str(part[1]), 10, Color("819796")))
+	hint.custom_minimum_size.y = 14
+
+
+func fridge_loss() -> float:
+	return _fridge_loss()
 
 
 func _fridge_loss() -> float:

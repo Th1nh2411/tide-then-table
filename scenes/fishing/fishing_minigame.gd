@@ -49,6 +49,7 @@ func _ready() -> void:
 	hide()
 	# No keyboard focus: Space is `cast` and must never "click" this button.
 	_hold_button.focus_mode = Control.FOCUS_NONE
+	UiIcons.dress(_hold_button, "crate", 12, UiIcons.GOLD)
 	_hold_button.pressed.connect(hold_requested.emit)
 	# The fish on the line sits right of the minigame, big.
 	var row := HBoxContainer.new()

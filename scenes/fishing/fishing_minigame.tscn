@@ -18,13 +18,14 @@ offset_right = 180.0
 offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"CratePanel"
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 0
 
 [node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
 layout_mode = 2
@@ -33,13 +34,16 @@ theme_override_constants/separation = 4
 [node name="TitleLabel" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 13
 text = "Câu: ..."
 horizontal_alignment = 1
 
 [node name="HintLabel" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 10
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 9
 text = "hint"
 horizontal_alignment = 1
 autowrap_mode = 3
@@ -52,13 +56,15 @@ size_flags_vertical = 3
 [node name="StatusLabel" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+theme_type_variation = &"BoldLabel"
+theme_override_font_sizes/font_size = 10
 text = "status"
 horizontal_alignment = 1
 
 [node name="ResultLabel" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"TitleLabel"
 horizontal_alignment = 1
 
 [node name="HoldButton" type="Button" parent="Panel/Margin/VBox"]
@@ -66,4 +72,5 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8
 theme_override_font_sizes/font_size = 10
-text = "Khoang [Tab]"
+tooltip_text = "Khoang (Tab)"
+text = "Tab"

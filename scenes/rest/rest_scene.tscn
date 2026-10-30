@@ -25,7 +25,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.95, 0.72, 0.6, 1)
+color = Color(0.9098, 0.7569, 0.4392, 1)
 
 [node name="Sea" type="ColorRect" parent="."]
 layout_mode = 1
@@ -37,84 +37,118 @@ offset_top = -110.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
-color = Color(0.35, 0.5, 0.7, 1)
+color = Color(0.3098, 0.5608, 0.7294, 1)
 
 [node name="Sun" type="ColorRect" parent="."]
 layout_mode = 0
-offset_left = 300.0
-offset_top = 230.0
-offset_right = 340.0
+offset_left = 470.0
+offset_top = 234.0
+offset_right = 510.0
 offset_bottom = 250.0
 mouse_filter = 2
-color = Color(1, 0.9, 0.55, 1)
+color = Color(0.949, 0.851, 0.5412, 1)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = -40.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="CenterContainer"]
+unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"NotebookPanel"
 
 [node name="Margin" type="MarginContainer" parent="CenterContainer/Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 0
 
 [node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel/Margin"]
+custom_minimum_size = Vector2(330, 0)
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="CenterContainer/Panel/Margin/VBox"]
-layout_mode = 2
-text = "Bình minh"
-horizontal_alignment = 1
-
-[node name="ReturnLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox"]
+[node name="Header" type="HBoxContainer" parent="CenterContainer/Panel/Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "Rin cập bến."
-horizontal_alignment = 1
-autowrap_mode = 3
+theme_override_constants/separation = 8
+
+[node name="DayLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"BadgeLabel"
+theme_override_font_sizes/font_size = 12
+text = "Ngày 1"
+
+[node name="ReturnRow" type="HBoxContainer" parent="CenterContainer/Panel/Margin/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="ReturnLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox/Header/ReturnRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"TitleLabel"
+theme_override_colors/font_color = Color(0.0353, 0.0392, 0.0784, 1)
+theme_override_constants/outline_size = 0
+theme_override_font_sizes/font_size = 13
+text = "05:00"
+
+[node name="Spacer" type="Control" parent="CenterContainer/Panel/Margin/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SleepLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Biển lặng"
+
+[node name="CatchRow" type="HFlowContainer" parent="CenterContainer/Panel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 4
 
 [node name="CatchLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 11
+theme_type_variation = &"InkLabel"
+theme_override_font_sizes/font_size = 10
 text = "Mẻ đêm nay"
-horizontal_alignment = 1
 autowrap_mode = 3
+
+[node name="Orders" type="VBoxContainer" parent="CenterContainer/Panel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
 
 [node name="OrderLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(340, 0)
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.95, 1, 1)
-theme_override_font_sizes/font_size = 11
-text = "Giao cá"
-horizontal_alignment = 1
+theme_type_variation = &"InkLabel"
+theme_override_font_sizes/font_size = 9
+text = "Ghi chú"
 autowrap_mode = 3
 
-[node name="SleepLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(340, 0)
+[node name="Footer" type="HBoxContainer" parent="CenterContainer/Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.8, 0.9, 1)
-theme_override_font_sizes/font_size = 10
-text = "Rin về nhà ngủ."
-horizontal_alignment = 1
-autowrap_mode = 3
 
-[node name="WakeButton" type="Button" parent="CenterContainer/Panel/Margin/VBox"]
+[node name="Spacer" type="Control" parent="CenterContainer/Panel/Margin/VBox/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="WakeButton" type="Button" parent="CenterContainer/Panel/Margin/VBox/Footer"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 4
-text = "Dậy mở quán (15:00)"
+tooltip_text = "Dậy mở quán"
+theme_type_variation = &"SignButton"
+text = "15:00"
