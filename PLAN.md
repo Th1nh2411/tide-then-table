@@ -492,11 +492,12 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng 
 - [x] Chốt low-poly stylized và flow gen-image → Hunyuan → giảm mesh/material/rig → Godot.
 - [x] Kiểm kê và archive các Rin study không được chọn; giữ concept Rin, Hunyuan baseline và quán mẫu màu ấm. Có manifest hash và snapshot tài liệu để khôi phục.
 - [x] Tool gen 3D chính (2026-10-28): Hunyuan3D-2mini-turbo chạy local CPU (`tools/art/hunyuan_local.ps1`, ~3,5 phút/asset nhờ FlashVDM, không quota, chạy batch); Space 2.1 (`hunyuan.ps1` / `hunyuan_job.py`) chỉ dự phòng. Đã so với TripoSR (kém hơn rõ) và 2.1 (gần bằng) trên ghế đẩu + Rin.
-- [ ] Pilot Rin: material phẳng, rig/Idle/Walk/Carry, preview nhiều góc và giữ API actor khi tích hợp. Sửa tô màu 2026-10-28 (`build_rin_pilot.py`): vòng gọng kính hai bên tô màu gọng (trước bị màu da), áo ba lỗ có nách khoét + dây vai (trước phủ kín vai như áo thun), viền lai quần; checker + `rin_pilot_check` PASS (lỗi "skin registered with a valid skeleton" trong scene kiểm có từ trước).
-- [ ] Pilot bàn + ghế đẩu: từng mesh rời, đúng kích thước và pivot, giữ collider/order/đĩa/label. Bàn đã gen bằng tool local (`assets/models/ready/table/table.glb`, 1200 tam giác, checker PASS), chờ duyệt hình trong Godot trước khi thay bàn thủ tục.
-- [ ] Pilot thuyền thúng: thay hull visual, giữ đèn/controller/collider/nhân vật/cinematic.
-- [ ] Kiểm import/render/animation và regression gameplay liên quan; ghi kết quả thực tế trước khi mở rộng.
-- [ ] Mở rộng các nhân vật và prop khác sau khi ba pilot đạt chuẩn.
+- [x] Pilot Rin: base `rin_pilot2` (rig 62 xương, 24 clip) + tóc/kính/palette portrait, Carry/CarryWalk/Cast riêng (2026-10-29).
+- [x] Pilot bàn + ghế đẩu: đã thay bàn thủ tục; ghế runtime thu 15%; bàn xoay dọc (2026-10-30).
+- [x] Pilot thuyền thúng: thay hull visual, giữ đèn/controller/collider/cinematic.
+- [x] Kiểm import/render/animation và regression gameplay (`tools/run_tests.sh` ALL OK).
+- [x] Mở rộng: đủ 45 model batch; 11 người có rig 20 xương, Walk theo dáng Rin, mắt theo Rin.
+- [ ] Còn thô: mèo chưa đi bốn chân, tủ lạnh cấp 2 mặt trước kín, chưa rig mặt/ngón tay.
 
 Không để license chặn demo theo chỉ đạo người dùng; vẫn giữ attribution/provenance.
 Quy trình/tiêu chí: `docs/ART_PIPELINE.md`; hướng hình ảnh: `ART_PLAN.md`;
