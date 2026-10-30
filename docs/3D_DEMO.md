@@ -62,12 +62,17 @@ Bot dịch chuyển nhanh giữa địa điểm và tạo kết quả minigame t
 - Biển 3D đã dùng đúng bố cục 2D (`SeaLayout3D`, 160x107 đơn vị, 12 px/đơn vị:
   vùng gần bờ/rạn/khơi/sương, bến, miếu, chòi, hải đăng, bè, xoáy, đá) và sinh
   đàn cá mỗi đêm bằng `SeaShoals3D` (số đàn theo vùng, độ sâu, cá nổi bật, bóng
-  lớn, giới hạn `max_depth`). Bản đồ điện thoại và ghim dùng tọa độ 2D. Còn lại:
-  chưa có đá ngầm ẩn và cổng sương/nghiền lưới như 2D.
+  lớn, giới hạn `max_depth`). Bản đồ điện thoại và ghim dùng tọa độ 2D.
+  12 đá ngầm như 2D (`SubmergedRock3D`): luôn có collider, đá + bọt chỉ hiện
+  trong tầm đèn (co lại khi cạn dầu). Sương mở thì có mây trôi (`SeaFog3D`).
+  Đầu đêm có các câu như 2D (cá hư, NEO chào, món hot, sương), câu được cá thu
+  phát sáng thì NEO báo `[WARN]`; thoại xếp hàng, mỗi câu chờ câu trước. F2 mở sương.
 - StoryBridge3D chạy cutscene .tres với dàn cảnh 3D (CutsceneStage3D: marker,
   actor đi bộ, camera, emote, mưa, slow, remove); actor rin/bao/vy/co_nam/guest/cat dựng bằng `PersonRig3D` (cùng rig với
   gameplay: đi bộ, cầm đĩa; emote hiện biểu tượng); nhân vật gameplay cùng loại bị
-  ẩn trong cảnh và hiện lại khi hết; `tint` chưa có; biển chưa có rig người riêng; marker trong CutsceneMarkers3D, kiểm bằng story3d_stage_test.
+  ẩn trong cảnh và hiện lại khi hết (Rin cưỡi thuyền ở biển cũng thuộc `person_rin`,
+  diễn viên đứng đúng độ cao sàn thuyền); `tint dawn` nhuộm thế giới 3D (không nhuộm UI);
+  `rin_faint` là model Rin chạy clip `Faint`; marker trong CutsceneMarkers3D, kiểm bằng story3d_stage_test.
 - Còn cần playtest bàn phím thực tế, cân chỉnh pacing và hoàn thiện art 3D.
 
 Bộ sprite/portrait approved và scene tham khảo art gốc không bị thay trong đợt này.
@@ -444,3 +449,19 @@ Bảng thực đơn ngoài quán nay hiển thị ảnh và tên món đã chọ
 `MenuPlan.changed` khi thêm/xóa/hết món; SubViewport chỉ vẽ lại khi thực đơn đổi.
 Giữ nguyên GLB bảng và sprite gốc. Đã kiểm tra đồng bộ thêm/xóa món, texture,
 flow quán và ảnh camera thật: `build/menu_board/{close,gameplay}.png`.
+
+
+### Biển 3D tách file, đá ngầm, sương, cảnh ngất — 2026-10-30
+
+`sea_scene_3d.gd` (1112 → ~470 dòng) chỉ còn điều phối; phần dựng cảnh ở
+`SeaWorldBuilder3D`, địa điểm/sự kiện đêm ở `SeaPlaces3D`, câu/lưới/khoang ở
+`SeaCatch3D`, HUD/chỉ dẫn ở `SeaHud3D`. Scene giữ các hàm cũ (`_try_fish`,
+`_visit_poi`...) làm lớp bọc để test/bot không đổi. Thoại biển chuyển xuống góc
+dưới trái, tự xuống dòng. Rin ở biển không đội nón.
+
+Cảnh `wave_faint` (và nhánh dự phòng của `fog_omen`): Rin ngất bằng chính model
+Rin, clip `Faint` trong `rin_pilot.glb` tạo bởi `tools/art/make_rin_faint.py`
+(chạy bằng `/usr/bin/python3`, cần numpy). Clip dựa trên `Death` của pilot2 nhưng
+khuỵu gối, ngả ra sau, hông giữ tại chỗ (chân trượt ra trước) để nằm gọn trong
+thúng, không bật nhảy; `Faint`, `Death`, `Cast` không loop. Lệnh `tint dawn` của
+cutscene 3D đã có hiệu lực. Test: `sea3d_hazards_test` (13), `story3d_stage_test`.

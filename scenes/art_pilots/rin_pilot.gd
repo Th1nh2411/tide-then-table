@@ -5,6 +5,9 @@ extends Node3D
 var model: Node3D
 var skeleton: Skeleton3D
 var animation: AnimationPlayer
+## Clips that end on their last pose instead of looping.
+const ONE_SHOT := ["Cast", "Faint", "CharacterArmature|Death"]
+
 var _motion: String = "Idle"
 var _casting: bool = false
 var _foot_plant: GroundFootPlant3D
@@ -22,7 +25,7 @@ func _ready() -> void:
 		if not animation.has_animation(clip) and animation.has_animation(native):
 			animation.get_animation_library("").add_animation(clip, animation.get_animation(native).duplicate())
 	for clip: String in animation.get_animation_list():
-		animation.get_animation(clip).loop_mode = Animation.LOOP_NONE if clip == "Cast" else Animation.LOOP_LINEAR
+		animation.get_animation(clip).loop_mode = Animation.LOOP_NONE if clip in ONE_SHOT else Animation.LOOP_LINEAR
 	animation.play("Idle")
 	animation.advance(0.0)
 	skeleton.force_update_all_bone_transforms()

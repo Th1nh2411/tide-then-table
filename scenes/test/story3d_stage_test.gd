@@ -1,6 +1,6 @@
 extends Node
 ## Every marker the cutscenes use exists in the 3D marker sets, and a staged
-## cutscene (spawn, move, camera, emote, rain, slow, remove) runs in 3D.
+## cutscene (spawn, move, camera, emote, rain, slow, remove, tint) runs in 3D.
 
 var _failed: bool = false
 
@@ -77,3 +77,29 @@ func _stage_run() -> void:
 	_check("actor removed", stage.actor("Rin") == null or stage.actor("Rin").is_queued_for_deletion())
 	_check("gameplay rin restored in place", real.visible and real.position.is_equal_approx(Vector3(1.5, 0, 2.0)))
 	_check("camera restored", get_viewport().get_camera_3d() == camera and camera.global_position.is_equal_approx(before))
+	var tinted := Cutscene.new()
+	tinted.id = "tint3d_test"
+	tinted.script_text = "tint dawn\npause 0.05"
+	bridge.play(tinted)
+	for i in 40:
+		if bridge._tint.color.is_equal_approx(StoryBridge3D.TINTS["dawn"]):
+			break
+		await get_tree().create_timer(0.05, true).timeout
+	_check("tint dawn colours the 3D world", bridge._tint.color.is_equal_approx(StoryBridge3D.TINTS["dawn"]))
+	for i in 40:
+		if not bridge.playing:
+			break
+		await get_tree().create_timer(0.05, true).timeout
+	_check("tint cleared after the cutscene", bridge._tint.color == Color.WHITE)
+	var faint := Cutscene.new()
+	faint.id = "faint3d_test"
+	faint.script_text = "spawn Lying rin_faint rin_spot\npause 0.3"
+	bridge.play(faint)
+	await get_tree().create_timer(0.1, true).timeout
+	var lying := bridge._stage.actor("Lying") as PersonRig3D
+	_check("rin_faint is Rin's own model", lying != null and lying._pilot != null)
+	_check("rin_faint plays the Faint clip", lying != null and lying._pilot.animation.current_animation == "Faint")
+	for i in 40:
+		if not bridge.playing:
+			break
+		await get_tree().create_timer(0.05, true).timeout

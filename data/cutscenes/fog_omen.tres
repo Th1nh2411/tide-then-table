@@ -35,6 +35,7 @@ slow 0.35 1.0
 narrate \"[ERR] bio-signature mismatch: user\"
 remove Rin
 spawn Lying rin_faint rin_stop
+pause 1.2
 fade_out 1.5
 slow 1 0
 narrate \"...\"

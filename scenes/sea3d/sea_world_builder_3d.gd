@@ -228,15 +228,14 @@ static func build_boat(sea: SeaScene3D) -> void:
 		sea.boat_visual.add_child(hull)
 	else:
 		batch_model(sea.boat_visual, "ghe_may" if boat_id == "ghe_may" else "ghe_cheo", Vector3(0, 0.12, 0))
-	# Bare visual instance avoids adding a second person_rin cutscene group.
+	# Bare visual instance (not a PersonRig3D); in person_rin so a cutscene Rin hides it.
 	var rider := preload("res://scenes/art_pilots/rin_pilot.tscn").instantiate()
 	sea.boat_visual.add_child(rider)
+	rider.add_to_group("person_rin")
 	rider.name = "RinOnBoat"
 	rider.position = Vector3(0, 0.20 if boat_id == "thuyen_thung" else 0.82 if boat_id == "ghe_may" else 0.39, 1.10 if boat_id == "ghe_may" else 0.30)
 	rider.scale = Vector3.ONE * 0.85
 	rider.rotation.y = PI
-	# Hat follows the visual actor and its hide/show lifecycle in the cast cinematic.
-	batch_model(rider, "non_la", Vector3(0, 1.64, -0.01))
 	sea.rin_figure = [rider]
 	box(sea.boat_visual, Vector3(0.58, 1.02, -0.85), Vector3(0.08, 0.82, 0.08), "e7d5b3")
 	box(sea.boat_visual, Vector3(0.58, 1.48, -0.85), Vector3(0.33, 0.22, 0.33), "f2d98a")

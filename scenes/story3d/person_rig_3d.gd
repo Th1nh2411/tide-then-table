@@ -175,6 +175,17 @@ func _process(_delta: float) -> void:
 		_pilot.clear_cast()
 	_sync_pilot_anchors()
 
+## Plays an authored one-shot clip (Faint...); walking / idle stop driving the pose.
+## `at_end` jumps straight to its last pose (skipped cutscenes).
+func play_clip(clip: String, at_end := false) -> void:
+	if not _pilot or not _pilot.animation.has_animation(clip):
+		return
+	_casting_clip = true
+	if at_end:
+		_pilot.sample_motion(clip, _pilot.animation.get_animation(clip).length)
+	else:
+		_pilot.set_motion(clip)
+
 ## Sample the authored clip using the cinematic clock, including skip speed-up.
 func sample_cast(seconds: float) -> void:
 	_casting_clip = true

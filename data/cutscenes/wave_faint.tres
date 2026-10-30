@@ -33,6 +33,8 @@ speak \"Rin (buon)\" \"Cái gì... vậy...\"
 remove Rin
 remove Spark
 spawn Lying rin_faint @boat
+face Lying right
+pause 1.2
 fade_out 1.5
 slow 1 0
 narrate \"...\"

@@ -13,11 +13,15 @@ var _was_paused := false
 var _dialogue: DialogueBox
 var _name_prompt: CutsceneNamePrompt
 var _fade: ColorRect
+## Multiplies the 3D world only (layer -1 sits under every UI layer).
+var _tint: ColorRect
 var _moods: Dictionary = {}
 var _stage: CutsceneStage3D
 ## Marker set for the staging commands (CutsceneMarkers3D.PIXELS key).
 var stage_kind: String = ""
 
+## The 3D night is lit dark already, so only dawn needs a colour (DayTint.dawn_color).
+const TINTS := {"dawn": Color(1.0, 0.78, 0.7), "day": Color.WHITE, "night": Color.WHITE}
 const EMOTE_MOODS := {"!": "ngac_nhien", "?": "boi_roi", "...": "buon", "heart": "vui", "note": "vui"}
 
 func _ready() -> void:
@@ -30,6 +34,17 @@ func _ready() -> void:
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fade.set_anchors_preset(Control.PRESET_FULL_RECT)
 	fade_layer.add_child(_fade)
+	var tint_layer := CanvasLayer.new()
+	tint_layer.layer = -1
+	add_child(tint_layer)
+	_tint = ColorRect.new()
+	_tint.color = Color.WHITE
+	_tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tint.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var mul := CanvasItemMaterial.new()
+	mul.blend_mode = CanvasItemMaterial.BLEND_MODE_MUL
+	_tint.material = mul
+	tint_layer.add_child(_tint)
 	_dialogue = DialogueBox.new()
 	add_child(_dialogue)
 	_dialogue.skipped.connect(func() -> void: _skipping = true)
@@ -69,6 +84,7 @@ func play(cutscene: Cutscene) -> void:
 	_dialogue.hold_pause = false
 	_dialogue.hide()
 	_fade.color.a = 0.0
+	_tint.color = Color.WHITE
 	get_tree().paused = _was_paused
 	playing = false
 	finished.emit(cutscene)
@@ -131,7 +147,9 @@ func _execute(command: Dictionary) -> String:
 		"camera", "spawn", "remove", "move_to", "face", "rain", "slow":
 			if _stage:
 				await _stage.run(command["cmd"], args, _skipping)
-		"tint", "label":
+		"tint":
+			await _tint_to(TINTS.get(args[0] if not args.is_empty() else "night", Color.WHITE))
+		"label":
 			pass
 		_:
 			push_warning("StoryBridge3D: unknown command '%s' at line %d" % [command["cmd"], command["line"]])
@@ -165,4 +183,13 @@ func _fade_to(alpha: float, seconds: float) -> void:
 	var tween := create_tween()
 	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(_fade, "color:a", alpha, seconds)
+	await tween.finished
+
+func _tint_to(color: Color) -> void:
+	if _skipping:
+		_tint.color = color
+		return
+	var tween := create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.tween_property(_tint, "color", color, 0.8)
 	await tween.finished

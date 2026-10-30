@@ -118,12 +118,14 @@ func run(cmd: String, args: PackedStringArray, skipping: bool) -> bool:
 			var seconds := _num(args, 1, 1.0)
 			await _move_camera(marker(args[0]), seconds, _num(args, 2, _zoom), skipping)
 		"spawn":
-			var actor := _make_actor(args[1])
+			var actor := _make_actor(args[1], skipping)
 			actor.scale = Vector3.ONE * _num(args, 3, 1.0)
 			if actor.get_parent() == null:
 				_rig.add_child(actor)
 			actor.global_position = marker(args[2])
 			_take_over(actor, args[1])
+			if args[1] == "rin_faint" and _gameplay.has("rin"):
+				_stand_in(actor, _gameplay["rin"])
 			_actors[args[0]] = actor
 		"move_to":
 			var actor := _actors.get(args[0]) as Node3D
@@ -217,8 +219,11 @@ func _emote(actor_: Node3D, text: String, seconds: float) -> void:
 	label.position = Vector3(0, 2.0, 0)
 	label.process_mode = Node.PROCESS_MODE_ALWAYS
 	actor_.add_child(label)
-	get_tree().create_timer(maxf(seconds, 0.1), true).timeout.connect(func() -> void:
-		label.queue_free())
+	# Tween lives on the label, so it dies quietly if the actor is removed first.
+	var tween := label.create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.tween_interval(maxf(seconds, 0.1))
+	tween.tween_callback(label.queue_free)
 
 
 func _idle(actor_: Node3D) -> void:
@@ -236,10 +241,25 @@ func _take_over(actor_: Node3D, actor_kind: String) -> void:
 		return
 	real.visible = false
 	_gameplay[actor_kind] = real
+	_stand_in(actor_, real)
+
+
+## Puts a cutscene actor where the gameplay one stands: facing, height (a boat
+## deck) and scale.
+func _stand_in(actor_: Node3D, real: Node3D) -> void:
 	actor_.global_rotation.y = real.global_rotation.y
+	actor_.global_position.y = real.global_position.y
+	actor_.scale *= real.global_basis.get_scale().x
 
 
-func _make_actor(actor_kind: String) -> Node3D:
+func _make_actor(actor_kind: String, skipping := false) -> Node3D:
+	if actor_kind == "rin_faint":
+		# Rin's own model collapsing (Faint clip), not a stand-in shape.
+		var fainting := PersonRig3D.build(_rig, "rin")
+		fainting.remove_from_group("person_rin")
+		fainting.process_mode = Node.PROCESS_MODE_ALWAYS
+		fainting.play_clip("Faint", skipping)
+		return fainting
 	if actor_kind in PersonRig3D.LOOKS or actor_kind == "cat":
 		var rig := PersonRig3D.build(_rig, actor_kind)
 		rig.remove_from_group("person_" + actor_kind)
@@ -278,7 +298,7 @@ func _make_actor(actor_kind: String) -> Node3D:
 			(shape as CapsuleMesh).radius = 0.3
 			(shape as CapsuleMesh).height = 1.4
 			mesh.position.y = 0.7
-	if actor_kind in ["rin_bed", "rin_faint"]:
+	if actor_kind == "rin_bed":
 		material.albedo_color = KIND_COLORS["rin"]
 		mesh.rotation_degrees.x = 90.0
 		mesh.position.y = 0.3
