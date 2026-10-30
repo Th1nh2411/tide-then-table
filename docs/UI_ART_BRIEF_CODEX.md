@@ -35,6 +35,9 @@ Cùng một đường dẫn có thể xuất hiện ở nhiều danh sách (vd. 
 - Khung (frames) là **nine-patch**: giữ nguyên kích thước và độ dày mép của
   placeholder hiện có trong `assets/sprites/ui/frames/` (mỗi danh sách ghi rõ
   margin); phần giữa phải lặp/kéo giãn được.
+- **Chữ vẽ trong art dùng tiếng Anh**, ngắn, in hoa (vd. con dấu "SOLD", sticker "NEW!"),
+  không vẽ chữ tiếng Việt vào PNG UI. Chữ tiếng Việt cho người chơi do code vẽ bằng font của game.
+  Ngoại lệ: biển hiệu trong thế giới game (biển quán, bảng sạp) vẫn giữ tiếng Việt.
 - Trạng thái (khoá xám, mở vàng, disabled...) phần lớn do code tô; chỉ vẽ thêm
   khi danh sách ghi rõ.
 

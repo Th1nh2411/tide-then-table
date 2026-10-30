@@ -15,6 +15,10 @@ These rules apply to all raster artwork below `assets/sprites/`, including gamep
 - Back up every active file before replacement. Keep generated source files separate from final game-ready files.
 - Before completion, verify dimensions, alpha, palette size, filename, orientation, and appearance at 100% scale.
 
+## Text in artwork
+
+- Any words painted into an asset are short English (e.g. a stamp says "SOLD", a burst says "NEW!"). Never paint Vietnamese words into a PNG; Vietnamese player text is drawn by code with the game fonts. Exception: signs in the game world (shop signs, stall boards) keep Vietnamese, as in ASSETS.md.
+
 ## AI image workflow
 
 - Generate each distinct asset separately. Do not ask the image model to create a multi-asset sheet and then treat inconsistent crops as final assets.

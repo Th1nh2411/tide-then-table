@@ -31,7 +31,7 @@ order, máy tính tiền, con dấu...) đọc art qua `Art` nếu có file.
 |---|---|---|---|---|
 | assets/sprites/ui/frames/ticket.png | 28x42 | Phiếu order trên dây (`OrderTicket3D`, vẽ phần giấy; số bàn, hình món, thanh kiên nhẫn, sticker vẽ đè lên) | Phiếu giấy kem Đất đá 6, mép dưới xé răng cưa, bóng cứng, kẹp sắt ở trên do code vẽ | đã vẽ |
 | assets/sprites/ui/frames/receipt_register.png | 196x22 | Thân máy tính tiền dưới hoá đơn (`ShiftReceipt3D`) | Hộp sắt Xám 4 viền mực, khe giấy đen dài ngang, 3 phím nhỏ bên trái; chừa chỗ nút ✓ đỏ bên phải (x 158-186) | đã vẽ |
-| assets/sprites/ui/stamp_rating.png | 86x40 | Con dấu sao trên hoá đơn (`RatingStamp`); 5 ngôi sao vẫn do code vẽ ở hàng y 22-34 | Khung con dấu cao su đỏ Đỏ 2 (2 viền), chữ "ĐÃ BÁN" Paytone ở trên, mực loang lổ vài chấm; để trống hàng sao | đã vẽ |
+| assets/sprites/ui/stamp_rating.png | 86x40 | Con dấu sao trên hoá đơn (`RatingStamp`); 5 ngôi sao vẫn do code vẽ ở hàng y 22-34 | Khung con dấu cao su đỏ Đỏ 2 (2 viền), chữ "SOLD" Paytone ở trên (chữ trong art dùng tiếng Anh), mực loang lổ vài chấm; để trống hàng sao | đã vẽ |
 | assets/sprites/ui/frames/phone_status.png | 26x8 | Thanh trạng thái điện thoại (sóng + pin) | 3 vạch sóng trắng tăng dần + pin trắng, mức pin Xanh ngọc | đã vẽ |
 | assets/sprites/ui/frames/meter_<style>.png | 28x6 | (tuỳ chọn) nền đồng hồ đo `MeterBar` (dầu, thân thuyền, khoang, thử thách) — khi đặt `art` | Khe tối viền mực 1 px; phần đổ màu vẫn vẽ bằng code | đã vẽ |
 | assets/sprites/ui/neo.png | 16x16 / 22x22 | Hình NEO trong dải lời thoại (đặt trên ô màn tối) | (đã có trong danh sách cũ) | đã vẽ |

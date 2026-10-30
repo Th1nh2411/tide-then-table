@@ -1,6 +1,6 @@
 class_name RatingStamp
 extends Control
-## Red rubber stamp with the day's stars ("ĐÃ BÁN" + 5 stars, the earned ones
+## Red rubber stamp with the day's stars ("SOLD" + 5 stars, the earned ones
 ## inked in), a little uneven like real ink. Final art: ui/stamp_rating
 ## (empty stamp, stars drawn on top) via Art. Slam it with UiFx.stamp().
 
@@ -8,7 +8,7 @@ const RED := Color("a53030")
 const PAPER := Color("e7d5b3")
 const MAX_STARS := 5
 
-@export var words: String = "ĐÃ BÁN"
+@export var words: String = "SOLD"  # words painted in art are English
 var stars: int = 0
 
 
