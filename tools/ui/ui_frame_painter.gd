@@ -32,12 +32,13 @@ const SHADOW := Color(0.035, 0.04, 0.08, 0.6)
 ## name -> [size, margin]; the builder reads margins from here too.
 const FRAMES: Dictionary = {
 	"board": [48, 8], "paper": [48, 8], "chalk": [64, 10], "wood": [48, 8],
-	"sign": [32, 8], "cardboard": [48, 8], "phone": [32, 10], "strip": [48, 8],
+	"sign": [32, 8], "cardboard": [48, 8], "phone": [40, 14], "strip": [48, 8],
 	"btn_wood": [32, 6], "btn_wood_hover": [32, 6], "btn_wood_pressed": [32, 6], "btn_wood_disabled": [32, 6],
 	"btn_sign": [32, 6], "btn_sign_hover": [32, 6], "btn_sign_pressed": [32, 6], "btn_sign_disabled": [32, 6],
 	"btn_paper": [32, 6], "btn_paper_hover": [32, 6], "btn_paper_pressed": [32, 6], "btn_paper_disabled": [32, 6],
 	"btn_chalk": [32, 6], "btn_chalk_hover": [32, 6],
 	"keycap": [12, 4], "stamp": [12, 4],
+	"receipt": [48, 8], "tag": [24, 6],
 }
 
 var _rng := RandomNumberGenerator.new()
@@ -65,6 +66,10 @@ func paint(name: String, s: int) -> Image:
 		"board": _box(img, XAM2, XAM4, XAM1, XAM3, 0.025)
 		"paper": _box(img, DAT6, XAM8, DAT5, DAT5, 0.05)
 		"strip": _box(img, DAT6, XAM8, DAT5, DAT5, 0.03)
+		"receipt":
+			_box(img, XAM8, Color.WHITE, XAM7, XAM7, 0.03, 1)
+			_zigzag(img)
+		"tag": _box(img, NAU5, Color("f2d98a"), NAU4, NAU4, 0.04)  # HUD paper tag
 		"wood":
 			_box(img, DAT3, DAT4, DAT2, DAT2, 0.0)
 			_grain_rows(img, DAT2, range(6, size - 6, 7))
@@ -78,8 +83,10 @@ func paint(name: String, s: int) -> Image:
 			_box(img, DAT2, DAT3, Color("4d2b32"), Color("4d2b32"), 0.0)
 			_fill_inner(img, 6, LA1, Color(XAM7, 0.35), 0.012)
 		"phone":
-			_box(img, XAM2, XAM4, XAM1, XAM3, 0.0)
-			_fill_inner(img, 6, BIEN1, BIEN1, 0.0)
+			# Thick dark bezel with a lighter rim, the screen inset 10 px.
+			_box(img, XAM2, XAM5, XAM1, XAM3, 0.0)
+			_inset_rect(img, 3, XAM3)
+			_fill_inner(img, 10, BIEN1, BIEN1, 0.0)
 		"keycap": _box(img, XAM3, XAM5, XAM1, XAM3, 0.0, 1)
 		"stamp": _box(img, DO2, Color("cf573c"), DO1, DO1, 0.0, 1)
 		_:
@@ -139,6 +146,17 @@ func _box(img: Image, fill: Color, light: Color, dark: Color, grain: Color, grai
 			for x in range(a + 1, b):
 				if _rng.randf() < grain_rate:
 					img.set_pixelv(o + Vector2i(x, y), grain)
+
+
+## Torn (zigzag) top and bottom edges: thermal receipt paper.
+func _zigzag(img: Image) -> void:
+	var s := img.get_width()
+	for x in s:
+		var tooth := x % 4 if x % 4 < 2 else 4 - x % 4
+		for y in range(0, 2 - tooth + 1):
+			img.set_pixel(x, y, Color(0, 0, 0, 0))
+		for y in range(s - 2 - (2 - tooth) - 1, s):
+			img.set_pixel(x, y, Color(0, 0, 0, 0))
 
 
 func _grain_rows(img: Image, color: Color, rows: Array) -> void:

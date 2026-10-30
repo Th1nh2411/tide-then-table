@@ -22,10 +22,10 @@ có bóng); `social_notif` lề trái 5 px. Phần giữa được **lát (tile)
 
 | File | Kích thước | Dùng ở đâu | Mô tả | Trạng thái |
 | --- | --- | --- | --- | --- |
-| `assets/sprites/ui/frames/social_card.png` | 16x16 | Thẻ bài đăng trong tab Review, khung biểu đồ ngày | Giấy kem, viền đen 2 px, gờ sáng 1 px trên/trái, bóng cứng (2,2), góc bậc 1 px, vài hạt giấy | 1 |
+| `assets/sprites/ui/frames/social_card.png` (tuỳ chọn: chưa có thì dùng giấy `paper.png` của theme, `PaperPanel`) | 16x16 | Thẻ bài đăng trong tab Review, khung biểu đồ ngày | Giấy kem, viền đen 2 px, gờ sáng 1 px trên/trái, bóng cứng (2,2), góc bậc 1 px, vài hạt giấy | 1 |
 | `assets/sprites/ui/frames/social_notif.png` | 16x16 | Thông báo bài mới lúc hết ca | Như `social_card` + dải màu app (Xanh biển 4) 3 px bên trái | 1 |
 | `assets/sprites/ui/frames/social_header.png` | 16x16 | Thanh tiêu đề app (follower, hạng quán, nút tab) | Xanh biển 4 phẳng, viền đen 2 px, gờ Xanh biển 5, không bóng | 1 |
-| `assets/sprites/ui/frames/rank_sticker.png` | 16x16 | Sticker "#3" (nghiêng -7°), sticker "+12 follower" lúc hết ca | Sticker đỏ biển hiệu, gờ Đỏ 3, viền đen, bóng cứng; có thể thêm mép bóc nhẹ một góc | 1 |
+| `assets/sprites/ui/frames/rank_sticker.png` (tuỳ chọn: chưa có thì dùng con dấu đỏ `stamp.png` của theme, `BadgeLabel`) | 16x16 | Sticker "#3" (nghiêng -7°), sticker "+12 follower" lúc hết ca | Sticker đỏ biển hiệu, gờ Đỏ 3, viền đen, bóng cứng; có thể thêm mép bóc nhẹ một góc | 1 |
 | `assets/sprites/ui/frames/avatar_frame.png` | 16x16 | Khung đĩa món trong thẻ bài | Ô vuông trắng Xám 8, viền đen 2 px, không bóng | 1 |
 | `assets/sprites/ui/frames/social_tab_on.png` | 16x16 | Nút tab đang chọn (Bài đăng / Xếp hạng) | Nút vàng nón lá, viền đen, bóng cứng | đang chọn |
 | `assets/sprites/ui/frames/social_tab_off.png` | 16x16 | Nút tab chưa chọn | Nút Xanh biển 5, viền đen, không bóng (như đã nhấn xuống) | thường |

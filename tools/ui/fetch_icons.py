@@ -8,6 +8,7 @@ Keep ICONS in sync with UiIcons.IDS (scenes/ui/ui_icons.gd) and CREDITS.md.
 """
 import os
 import re
+import sys
 import urllib.request
 
 BASE = "https://raw.githubusercontent.com/game-icons/icons/master/"
@@ -71,12 +72,29 @@ ICONS = {
     "info": "delapouite/info",
     "auto": "delapouite/perspective-dice-six-faces-random",
     "growth": "delapouite/growth",
+    # HUD / phone / receipt (2026-10-30)
+    "net": "lorc/fishing-net",
+    "oil": "lorc/drop",
+    "map": "lorc/treasure-map",
+    "ledger": "delapouite/notebook",
+    "dex": "lorc/book-cover",
+    "staff": "delapouite/cook",
+    "review": "delapouite/chat-bubble",
+    "podium": "delapouite/podium",
+    "leave": "delapouite/walk",
+    "crate": "delapouite/wooden-crate",
+    "hook": "lorc/fishing-hook",
+    "wallet": "delapouite/wallet",
+    "follower": "delapouite/thumb-up",
 }
 
 
 def main() -> None:
     os.makedirs(OUT, exist_ok=True)
+    only = set(sys.argv[1:])  # optional: fetch just these ids
     for icon_id, path in ICONS.items():
+        if only and icon_id not in only:
+            continue
         with urllib.request.urlopen(BASE + path + ".svg", timeout=30) as response:
             svg = response.read().decode("utf-8")
         svg = svg.replace('<path d="M0 0h512v512H0z"/>', "")

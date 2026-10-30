@@ -2,7 +2,8 @@ class_name GoalIcons
 extends RefCounted
 ## Icons for challenges / achievements. Final art is dropped in by file name
 ## (assets/sprites/ui/icons/<id>.png, like `Art`); until then a placeholder
-## from tiny ASCII bitmaps ("#" = colour, "o" = dark outline). The one entry
+## from the shared UiIcons set when it has the id (pixel sticker), else from
+## tiny ASCII bitmaps ("#" = colour, "o" = dark outline). The one entry
 ## point is `icon(id)`.
 ## Ids: money, clock, star, guest, fire, beer, fish, chili, check, lock,
 ## trophy, heart, tip; social (Xóm Đèn Review): feed, podium, follower,
@@ -16,6 +17,15 @@ const COLORS := {
 	"tip": Color("9be38a"),
 	"feed": Color("ebede9"), "podium": Color("f2d98a"), "follower": Color("73bed3"),
 	"tier_0": Color("ad7757"), "tier_1": Color("73bed3"), "tier_2": Color("de9e41"), "tier_3": Color("e0302b"),
+}
+## GoalIcons id -> UiIcons id when the names differ.
+const UI_IDS := {"chili": "hot"}
+## Palette colours for the shared stickers.
+const STICKER_COLORS := {
+	"money": Color("f2d98a"), "clock": Color("a4dddb"), "star": Color("f2d98a"), "guest": Color("73bed3"),
+	"fire": Color("de9e41"), "beer": Color("e8c170"), "fish": Color("73bed3"), "chili": Color("cf573c"),
+	"check": Color("a8ca58"), "lock": Color("819796"), "trophy": Color("f2d98a"), "podium": Color("f2d98a"),
+	"follower": Color("73bed3"),
 }
 ## Shop front with an awning: the follower tier badge (tinted per tier).
 const SHOP_SHAPE := ["oooooooooooo", "o#o#o#o#o#oo", "oooooooooooo", ".o########o.", ".o#oo##oo#o.",
@@ -68,6 +78,12 @@ static func icon(id: String) -> Texture2D:
 		return art
 	if _cache.has(id):
 		return _cache[id]
+	# The shared UI set has it: same pixel sticker look as the rest of the UI.
+	var shared: String = UI_IDS.get(id, id)
+	if UiIcons.texture(shared) != null:
+		var sticker := UiIcons.sticker(shared, 16, STICKER_COLORS.get(id, UiIcons.GOLD))
+		_cache[id] = sticker
+		return sticker
 	var shape: Array = SHAPES.get(id, SHAPES["star"])
 	var color: Color = COLORS.get(id, COLORS["star"])
 	var image := Image.create(12, 12, false, Image.FORMAT_RGBA8)

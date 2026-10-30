@@ -21,3 +21,7 @@ The black background square was removed so the glyphs can be tinted in game.
 - **Sbed**: wrench, cancel (close)
 - **Carl Olsen**: flame (fire)
 - **Guard13007**: play-button (play), pause-button (pause)
+- HUD / phone / receipt set: **Delapouite**: notebook (ledger), cook (staff),
+  chat-bubble (review), podium, walk (leave), wooden-crate (crate), wallet,
+  thumb-up (follower); **Lorc**: fishing-net (net), drop (oil),
+  treasure-map (map), book-cover (dex), fishing-hook (hook)

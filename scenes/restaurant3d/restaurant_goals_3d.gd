@@ -28,7 +28,8 @@ func build() -> void:
 	host.add_child(layer)
 	card = ChallengeCard3D.new()
 	card.hidden_when = func() -> bool: return host.story_bridge == null or host.story_bridge.playing \
-		or host.planning_panel.visible or host.panels.market_panel.visible or host.is_renovating()
+		or host.planning_panel.visible or host.panels.market_panel.visible or host.is_renovating() \
+		or host.panels.summary_visible()
 	layer.add_child(card)
 	toast = AchievementToast.new()
 	host.add_child(toast)

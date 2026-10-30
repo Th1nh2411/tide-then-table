@@ -548,3 +548,23 @@ bằng `theme_type_variation` (`PaperPanel`, `ChalkPanel`, `WoodPanel`, `SignPan
 art thật `assets/sprites/ui/icons/<id>.png` tự thay), chấm `PipBar`, biểu đồ `MiniChart`.
 Hiệu ứng `UiFx`: pop, nghiêng/lắc khi rê chuột, giấy trượt vào, đóng dấu.
 Danh sách art cần vẽ: `docs/ui_art_needed_menus.md`.
+
+## HUD, điện thoại, hoá đơn hết ca (2026-10-30)
+
+Cùng phong cách "đồ thật ngoài phố", gần như không chữ (chữ nằm trong tooltip):
+- Quán: ván gỗ trên-trái (lịch + ngày, đồng hồ, sticker trạng thái ca, xu + tiền
+  đếm lên), thẻ giấy vàng dưới nó (khách, bỏ về, thu, chợ, sao) khi đang/đã bán;
+  phiếu order giấy treo trên dây ở giữa (`TicketRail3D` + `OrderTicket3D`: số bàn,
+  hình món, thanh kiên nhẫn xanh→đỏ, lửa = Rin nướng, bia, ✓ xong, mờ khi đang ăn,
+  rung khi khách sắp bỏ về); thẻ thử thách = tờ giấy ghim lệch dưới các nút; toast
+  thành tựu = sticker giấy ở trên giữa (không đè HUD); ghi chú nhiệm vụ = mẩu giấy
+  ghim dưới HUD, ẩn khi mở bảng/hoá đơn.
+- Biển: ván gỗ (thuyền, giờ, tiền; đồng hồ dầu đèn, thân thuyền, khoang + số cá,
+  2 lưới), phím E/R = phím bấm + icon ở góc dưới phải, lời Rin/NEO trên dải giấy
+  (`SpeechStrip`, NEO dùng VT323 + hình hologram), đêm đầu có thẻ phím góc phải
+  (dòng phím dài cũ đã bỏ, có trong Hướng dẫn).
+- Điện thoại: khung máy thật (viền dày, camera, thanh trạng thái giờ/sóng/pin),
+  10 tab thành icon ở thanh dưới (tooltip = tên).
+- Hết ca: hoá đơn in từng dòng từ máy tính tiền (`ShiftReceipt3D` +
+  `ShiftReceiptRows`), tiền đếm lên, biểu đồ 7 ngày, rồi con dấu sao đỏ đập xuống.
+Art cần vẽ: `docs/ui_art_needed_hud.md`. Test: `receipt_test`.

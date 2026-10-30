@@ -1,10 +1,15 @@
 class_name AchievementToast
 extends CanvasLayer
-## New-achievement toast: slides down at the top centre — trophy icon, the
-## badge's icon, its short title (TitleLabel) and "+50k" with a coin.
+## New-achievement toast: a paper sticker slapped on at the top, between the
+## HUD's left plank and its right buttons (`centre_x`) — the badge on a red
+## plate, its short title (Paytone ink) and "+50k" in red ink with a coin.
 ## Queued, one at a time, hides by itself. `push()` from its owner.
 
 const HOLD_SECONDS := 2.6
+
+## Horizontal centre and top of the toast (clear of the top HUD).
+@export var centre_x: float = 376.0
+@export var top: float = 6.0
 
 var _queue: Array[Dictionary] = []
 var _panel: PanelContainer
@@ -20,35 +25,23 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_panel = PanelContainer.new()
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.13, 0.1, 0.08, 0.94)
-	style.border_color = Color("f2d98a")
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(4)
-	style.set_content_margin_all(5)
-	style.shadow_color = Color(0, 0, 0, 0.45)
-	style.shadow_size = 4
-	_panel.add_theme_stylebox_override("panel", style)
+	_panel.theme_type_variation = &"PaperPanel"
 	add_child(_panel)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 5)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_panel.add_child(row)
-	row.add_child(GoalIcons.rect("trophy", 32))
-	_badge = GoalIcons.rect("star", 24)
+	row.add_child(UiIcons.make("trophy", 18, UiIcons.GOLD, Color("a53030")))
+	_badge = GoalIcons.rect("star", 20)
 	_badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_badge)
-	_name = Label.new()
-	_name.theme_type_variation = &"TitleLabel"
-	_name.add_theme_font_size_override("font_size", 13)
-	_name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_name = HudChips.number(13, true)
 	row.add_child(_name)
-	_coin = GoalIcons.rect("money", 16)
-	_coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_coin = UiIcons.make("money", 12, UiIcons.GOLD)
 	row.add_child(_coin)
 	_reward = Label.new()
-	_reward.add_theme_font_size_override("font_size", 10)
-	_reward.add_theme_color_override("font_color", Color("f2d98a"))
+	_reward.theme_type_variation = &"PriceLabel"
+	_reward.add_theme_font_size_override("font_size", 13)
 	_reward.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_reward)
 	_panel.hide()
@@ -81,9 +74,9 @@ func _next() -> void:
 	_panel.modulate.a = 1.0
 	_panel.show()
 	_panel.reset_size()
-	var width: float = get_viewport().get_visible_rect().size.x
-	_panel.position = Vector2(roundf((width - _panel.size.x) * 0.5), 10.0)
-	UiFx.slide_in(_panel, Vector2(0, -36))
+	_panel.position = Vector2(roundf(centre_x - _panel.size.x * 0.5), top)
+	UiFx.tilt(_panel, -2.0)
+	UiFx.settle(_panel, Vector2(0, -30), 0.0, 9.0)
 	UiFx.bounce(_badge, 0.3)
 	Sfx.play("coins")
 	var out := _panel.create_tween()

@@ -146,7 +146,9 @@ func _ready() -> void:
 	add_child(cat_dialogue)
 	var tracker := QuestTracker.new()
 	tracker.catalog = fish_catalog
-	tracker.origin = Vector2(6, 46)
+	tracker.origin = Vector2(6, 56)
+	tracker.hidden_when = func() -> bool: return modal_open() or panels.summary_visible() \
+		or (story_bridge != null and story_bridge.playing)
 	add_child(tracker)
 	wave_power = WavePower.new()
 	wave_power.seconds = 4.0

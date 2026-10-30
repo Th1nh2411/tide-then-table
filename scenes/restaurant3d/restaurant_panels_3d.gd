@@ -7,13 +7,11 @@ extends RefCounted
 var host: Node3D
 var planning: MenuPanel3D
 var market_panel: PanelContainer
+## Full summary text (the receipt's tooltip; kept for tests / logs).
 var summary_text: Label
+var receipt: ShiftReceipt3D
 var _market: MarketPanel3D
-var _summary_panel: PanelContainer
-var _note_strip: PanelContainer
-var _note_speaker: Label
-var _note: Label
-var _note_clock: float = 0.0
+var _note: SpeechStrip
 var _prompt: PanelContainer
 var _prompt_text: Label
 
@@ -55,25 +53,9 @@ func build() -> void:
 			planning.open())
 	market_panel = _market
 	layer.add_child(_market)
-	_summary_panel = PanelContainer.new()
-	_summary_panel.theme_type_variation = &"PaperPanel"  # receipt
-	_summary_panel.theme = ui_theme()
-	_summary_panel.position = Vector2(135, 80)
-	_summary_panel.custom_minimum_size = Vector2(370, 110)
-	layer.add_child(_summary_panel)
-	var summary_box := VBoxContainer.new()
-	summary_box.add_theme_constant_override("separation", 6)
-	_summary_panel.add_child(summary_box)
-	summary_text = Label.new()
-	summary_text.theme_type_variation = &"InkLabel"
-	summary_box.add_child(summary_text)
-	var close_summary := Button.new()
-	close_summary.text = "Đóng"
-	close_summary.theme_type_variation = &"AccentButton"
-	close_summary.size_flags_horizontal = Control.SIZE_SHRINK_END
-	close_summary.pressed.connect(_summary_panel.hide)
-	summary_box.add_child(close_summary)
-	_summary_panel.hide()
+	receipt = ShiftReceipt3D.new()
+	layer.add_child(receipt)
+	summary_text = receipt.summary_text
 	_prompt = PanelContainer.new()
 	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_prompt.theme = ui_theme()
@@ -86,73 +68,36 @@ func build() -> void:
 	_prompt.hide()
 
 
-## Bottom speech strip: "Bảo: ..." puts the speaker's name in gold.
+## Bottom speech strip: "Bảo: ..." puts the speaker's name in red ink.
 func _build_note(layer: CanvasLayer) -> void:
-	_note_strip = PanelContainer.new()
-	_note_strip.theme_type_variation = &"StripPanel"
-	_note_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_note_strip.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	_note_strip.offset_left = 12
-	_note_strip.offset_right = -12
-	_note_strip.offset_top = -30
-	_note_strip.offset_bottom = -8
-	_note_strip.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	layer.add_child(_note_strip)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 6)
-	_note_strip.add_child(row)
-	_note_speaker = Label.new()
-	_note_speaker.theme_type_variation = &"HeadingLabel"
-	_note_speaker.add_theme_font_size_override("font_size", 12)
-	_note_speaker.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	row.add_child(_note_speaker)
-	_note = Label.new()
-	_note.theme_type_variation = &"InkLabel"
-	_note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_note.custom_minimum_size.x = 520  # autowrap needs a width or it measures tall
-	_note.add_theme_font_size_override("font_size", 11)
-	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	row.add_child(_note)
-	_note_strip.hide()
+	_note = SpeechStrip.new()
+	_note.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	_note.offset_left = 12
+	_note.offset_right = -12
+	_note.offset_top = -30
+	_note.offset_bottom = -8
+	_note.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	layer.add_child(_note)
 
 
 func summary_visible() -> bool:
-	return _summary_panel != null and _summary_panel.visible
+	return receipt != null and receipt.visible
 
 
 func say(words: String) -> void:
-	var speaker := words.get_slice(":", 0)
-	var spoken := speaker != words and speaker.length() <= 10
-	_note_speaker.visible = spoken
-	_note_speaker.text = speaker if spoken else ""
-	_note.text = words.substr(speaker.length() + 1).strip_edges() if spoken else words
-	_note_clock = 4.0
-	var fresh := not _note_strip.visible or _note_strip.modulate.a < 1.0
-	_note_strip.show()
-	_note_strip.modulate.a = 1.0
-	if fresh:
-		UiFx.tilt(_note_strip, -0.4)
-		UiFx.settle(_note_strip, Vector2(0, 18), 0.0, -1.5)
-	else:
-		UiFx.flash(_note, Color(1.4, 1.3, 1.0))
+	_note.say(words, 4.0)
 
 
-func tick(delta: float) -> void:
-	if _note_clock > 0.0:
-		_note_clock -= delta
-		if _note_clock <= 0.0:
-			var fade := _note_strip.create_tween()
-			fade.tween_property(_note_strip, "modulate:a", 0.0, 0.3)
-			fade.tween_callback(func() -> void:
-				if _note_clock <= 0.0:
-					_note.text = ""
-					_note_strip.hide())
+## Kept for the scene's frame loop; the strip times itself out.
+func tick(_delta: float) -> void:
+	pass
 
 
-func show_summary(words: String) -> void:
-	summary_text.text = words
-	_summary_panel.show()
-	UiFx.pop_in(_summary_panel)
+## Prints the shift receipt. `figures` / `results`: see ShiftReceiptRows.
+func show_summary(words: String, figures: Dictionary = {}, results: Dictionary = {}) -> void:
+	var stars: int = int(figures.get("stars", GameState.last_rating))
+	receipt.open(words, ShiftReceiptRows.build(figures, results), ShiftReceiptRows.chart(GameState.day_history),
+		ShiftReceiptRows.chart_days(GameState.day_history), stars)
 
 
 ## Action hint over the thing E acts on; hidden while something else owns the screen.

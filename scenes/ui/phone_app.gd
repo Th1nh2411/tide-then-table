@@ -9,9 +9,14 @@ extends CanvasLayer
 ## The boat tab has the repair button (at sea: only at the dock). `open_map`
 ## (M) opens the big map (MapOverlay) instead of the phone.
 ## Put it LAST in the scene tree so it gets J/Esc before other overlays.
+## Look: a real phone (theme "PhoneScreen": bezel, camera dot, status bar
+## with the app name, time, signal, battery) and an icon tab bar at the
+## bottom (tooltips carry the names; PhoneFrame draws the hardware bits).
 
 const APP_TITLE: String = "Rin's Catch v0.3.1"
 const TAB_NAMES: Array[String] = ["Kho", "Menu", "Bản đồ", "Dex", "Thuyền", "Sổ sách", "Nâng cấp", "Nhân viên", "Thành tựu", "Review"]
+## One UiIcons id per tab (same order as TAB_NAMES).
+const TAB_ICONS: Array[String] = ["crate", "menu", "map", "dex", "boat", "ledger", "upgrade", "staff", "trophy", "review"]
 const MAP_TAB: int = 2
 const SHOP_TAB: int = 6
 ## Hidden until StaffCatalog.unlock_day (fish orders live in the QuestTracker).
@@ -49,6 +54,7 @@ var repair_allowed: Callable
 var repair_action: Callable
 
 @onready var _title_label: Label = %AppTitle
+@onready var _status_time: Label = %StatusTime
 @onready var _tabs_row: HBoxContainer = %TabsRow
 @onready var _content_label: Label = %ContentLabel
 @onready var _scroll: ScrollContainer = %Scroll
@@ -61,18 +67,12 @@ func _ready() -> void:
 	hide()
 	# Pixel terminal look (VT323, "NeoLabel"): an app a developer made for himself.
 	# VT323 runs small, so its sizes are scaled up from the scene's.
-	for label: Label in [_content_label, _log_label, _title_label]:
+	for label: Label in [_content_label, _log_label, _title_label, _status_time]:
 		label.theme_type_variation = &"NeoLabel"
 		label.add_theme_font_size_override("font_size", roundi(label.get_theme_font_size("font_size") * NEO_FONT_SCALE))
+	PhoneFrame.dress($Phone as Control, %StatusBar as HBoxContainer)
 	for i in TAB_NAMES.size():
-		var button := Button.new()
-		button.text = TAB_NAMES[i]
-		button.toggle_mode = true
-		button.focus_mode = Control.FOCUS_NONE
-		button.add_theme_font_size_override("font_size", font_size)
-		button.pressed.connect(_show_tab.bind(i))
-		_tabs_row.add_child(button)
-		_tab_buttons.append(button)
+		_tab_buttons.append(PhoneFrame.tab_button(TAB_ICONS[i], TAB_NAMES[i], _tabs_row, _show_tab.bind(i)))
 	_shop.setup(upgrades)
 	_staff = PhoneStaff.new()
 	_staff.size_flags_vertical = _shop.size_flags_vertical
@@ -92,15 +92,7 @@ func _ready() -> void:
 	_repair.focus_mode = Control.FOCUS_NONE
 	_repair.add_theme_font_size_override("font_size", font_size)
 	_repair.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	var style := StyleBoxFlat.new()  # stands out from the console text
-	style.bg_color = Color(0.25, 0.18, 0.08)
-	style.border_color = Color(1.0, 0.75, 0.3)
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(3)
-	style.set_content_margin_all(4)
-	_repair.add_theme_stylebox_override("normal", style)
-	_repair.add_theme_stylebox_override("hover", style)
-	_repair.add_theme_color_override("font_color", Color(1.0, 0.85, 0.45))
+	_repair.theme_type_variation = &"SignButton"  # stands out from the console text
 	_scroll.add_sibling(_repair)
 	_repair.repaired.connect(func(_spent: int, _fully: bool) -> void: _show_tab(_tab))
 	_big_map = MapOverlay.new()
@@ -168,7 +160,8 @@ func _show_tab(index: int) -> void:
 	_tab = index
 	for i in _tab_buttons.size():
 		_tab_buttons[i].button_pressed = i == index
-	_title_label.text = "%s   %s" % [APP_TITLE, DayClock.get_time_text()]
+	_title_label.text = "%s › %s" % [APP_TITLE, TAB_NAMES[index]]
+	_status_time.text = DayClock.get_time_text()
 	_map.visible = index == MAP_TAB
 	_shop.visible = index == SHOP_TAB
 	_staff.visible = index == STAFF_TAB

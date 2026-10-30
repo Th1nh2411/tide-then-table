@@ -1,0 +1,174 @@
+class_name SeaHudView3D
+extends Control
+## The 3D sea's HUD, icon first (words in tooltips): a weathered plank top-left
+## with the boat, clock and money, then meters for lamp oil, hull and the
+## hold (fish count), and the two nets (dimmed while out in the water); the
+## E / R action as key caps + an icon bottom-right; Rin / NEO's lines on the
+## paper SpeechStrip bottom-left; on the first night a small key card.
+## SeaHud3D.update calls `refresh` every frame.
+
+const PLACE_ICONS := {"shrine": "sparkles", "lighthouse": "lamp", "hut": "house", "raft": "shrimp"}
+const NETS := 2
+const SCREEN := Vector2(640, 360)
+
+var speech: SpeechStrip
+var _money: Label
+var _time: Label
+var _boat: Control
+var _oil: MeterBar
+var _hull: MeterBar
+var _hold: MeterBar
+var _fish: Label
+var _nets: Array[TextureRect] = []
+var _prompt: HBoxContainer
+var _prompt_key := ""
+var _keys: PanelContainer
+
+
+func _ready() -> void:
+	size = SCREEN
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_build_plank()
+	_prompt = HBoxContainer.new()
+	_prompt.add_theme_constant_override("separation", 4)
+	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_prompt)
+	speech = SpeechStrip.new()
+	speech.default_speaker = "Rin"
+	speech.text_width = 330.0
+	add_child(speech)
+	speech.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	speech.offset_left = 12
+	speech.offset_top = -30
+	speech.offset_bottom = -8
+	speech.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_keys = _key_card()
+	add_child(_keys)
+
+
+func _build_plank() -> void:
+	var parts := HudChips.plank(&"WoodPanel", 6)
+	var panel: PanelContainer = parts[0]
+	panel.position = Vector2(6, 4)
+	add_child(panel)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 3)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	(parts[1] as HBoxContainer).add_child(column)
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override("separation", 7)
+	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(top)
+	_boat = UiIcons.make("boat", 14, UiIcons.CREAM, Color("3c5e8b"))
+	_boat.mouse_filter = Control.MOUSE_FILTER_PASS
+	top.add_child(_boat)
+	_time = HudChips.stat(top, "clock", Color("a4dddb"), "Giờ", 12)
+	_money = HudChips.stat(top, "money", UiIcons.GOLD, "Tiền", 13)
+	_money.add_theme_color_override("font_color", UiIcons.GOLD)
+	var gauges := HBoxContainer.new()
+	gauges.add_theme_constant_override("separation", 6)
+	gauges.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(gauges)
+	_oil = HudChips.meter(gauges, "lamp", UiIcons.GOLD, "Dầu đèn", Color("de9e41"), 26)
+	_hull = HudChips.meter(gauges, "wrench", Color("c7cfcc"), "Thân thuyền", Color("a8ca58"), 22)
+	_hull.low = 0.3
+	_hull.segments = 4
+	_hold = HudChips.meter(gauges, "fish", Color("73bed3"), "Khoang cá", Color("73bed3"), 22)
+	_hold.low = 0.0
+	_fish = HudChips.number(10)
+	(_hold.get_parent() as HBoxContainer).add_child(_fish)
+	var nets := HBoxContainer.new()
+	nets.add_theme_constant_override("separation", 0)
+	nets.tooltip_text = "Lưới (Q)"
+	nets.mouse_filter = Control.MOUSE_FILTER_PASS
+	gauges.add_child(nets)
+	for i in NETS:
+		var net := UiIcons.make("net", 11, UiIcons.CREAM)
+		nets.add_child(net)
+		_nets.append(net)
+
+
+## First night only: which key does what, as key caps + icons.
+func _key_card() -> PanelContainer:
+	var card := PanelContainer.new()
+	card.theme_type_variation = &"PaperPanel"
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 2)
+	card.add_child(column)
+	for entry: Array in [["WASD", "boat"], ["E", "hook"], ["Q", "net"], ["Tab", "crate"], ["J", "phone"], ["M", "map"], ["Esc", "pause"]]:
+		var row := _key_row(str(entry[0]), str(entry[1]), Color("3c5e8b"))
+		column.add_child(row)
+	card.position = Vector2(SCREEN.x - 70.0, 6.0)
+	card.custom_minimum_size.x = 62
+	UiFx.tilt(card, 1.2)
+	return card
+
+
+func _key_row(key: String, icon: String, color: Color) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 3)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var cap := Label.new()
+	cap.text = key
+	cap.theme_type_variation = &"KeyLabel"
+	cap.add_theme_font_size_override("font_size", 9)
+	cap.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(cap)
+	row.add_child(UiIcons.make(icon, 12, color))
+	return row
+
+
+func refresh(sea: SeaScene3D) -> void:
+	_boat.tooltip_text = sea.boat_data.display_name
+	_time.text = DayClock.get_time_text()
+	HudChips.show_number(_money, GameState.money, "%dk")
+	_oil.set_value(sea.oil / maxf(sea.oil_capacity, 1.0))
+	_hull.set_value(GameState.boat_hp / 100.0)
+	var fill := sea.hold.fill_fraction()
+	_hold.set_value(fill)
+	_hold.color = Color("cf573c") if fill >= 0.8 else Color("73bed3")
+	HudChips.show_number(_fish, sea.hold.items.size())
+	for i in _nets.size():
+		_nets[i].modulate.a = 1.0 if i < NETS - sea.nets.size() else 0.3
+	_keys.visible = GameState.is_first_day() and not sea.fishing
+	_set_prompt(_prompt_spec(sea))
+	if sea.message.text != speech.current:
+		if sea.message.text == "":
+			speech.clear()
+		else:
+			speech.say(sea.message.text, 0.0)
+
+
+## [[key, icon], ...] + optional place name.
+func _prompt_spec(sea: SeaScene3D) -> Array:
+	if sea._at_dock():
+		return [[["E", "crate"], ["R", "house"]], ""]
+	var poi := sea._nearest_poi()
+	if poi.begins_with("event_"):
+		var event := sea.night_events[int(poi.substr(6))]
+		return [[["E", "sparkles" if int(event["kind"]) == NightEvents.Kind.BOTTLE else "boat"]], ""]
+	if poi != "":
+		return [[["E", str(PLACE_ICONS.get(poi, "info"))]], str(SeaHud3D.PLACE_NAMES.get(poi, poi))]
+	return [[["E", "hook"]], ""]
+
+
+func _set_prompt(spec: Array) -> void:
+	var key := str(spec)
+	if key == _prompt_key:
+		return
+	_prompt_key = key
+	for child in _prompt.get_children():
+		_prompt.remove_child(child)
+		child.queue_free()
+	for pair: Array in spec[0]:
+		_prompt.add_child(_key_row(str(pair[0]), str(pair[1]), UiIcons.CREAM))
+	var place := str(spec[1])
+	if place != "":
+		var place_label := HudChips.number(11)
+		place_label.text = place
+		_prompt.add_child(place_label)
+	_prompt.reset_size()
+	var width := _prompt.get_combined_minimum_size().x
+	_prompt.position = Vector2(SCREEN.x - width - 12.0, SCREEN.y - 26.0)
+	UiFx.pop_in(_prompt)
