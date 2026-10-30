@@ -34,7 +34,7 @@ func _ready() -> void:
 	_rows.add_theme_constant_override("separation", 2)
 	_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_rows)
-	var head := GoalIcons.rect("trophy", 10)
+	var head := GoalIcons.rect("trophy", 16)
 	head.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	head.tooltip_text = "Thử thách hôm nay"
 	head.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -94,7 +94,7 @@ func _make_row(icon_id: String, words: String) -> Dictionary:
 	row.tooltip_text = words
 	row.mouse_filter = Control.MOUSE_FILTER_PASS
 	_rows.add_child(row)
-	var icon := GoalIcons.rect(icon_id, 12)
+	var icon := GoalIcons.rect(icon_id, 16)
 	row.add_child(icon)
 	var bar := ProgressBar.new()
 	bar.show_percentage = false
@@ -117,7 +117,7 @@ func _make_row(icon_id: String, words: String) -> Dictionary:
 	count.add_theme_color_override("font_color", TEXT)
 	count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(count)
-	var check := GoalIcons.rect("check", 9)
+	var check := GoalIcons.rect("check", 8)
 	check.modulate.a = 0.0
 	row.add_child(check)
 	return {"row": row, "icon": icon, "bar": bar, "count": count, "check": check, "progress": 0, "done": false}

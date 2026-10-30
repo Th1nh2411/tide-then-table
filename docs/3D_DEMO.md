@@ -44,8 +44,9 @@ vào biển 3D; Tiếp tục dùng điểm resume trong save hiện tại.
   nướng, bia từ ngày bán bia, HOT khi món HOT có trên thực đơn). Id lưu ở story
   flags `challenge_day` / `challenge_ids`. Thẻ nhỏ góc phải trên (`ChallengeCard3D`),
   gần như không chữ: mỗi dòng icon + thanh tiến độ + "2/5" + dấu tick khi xong, câu đầy
-  đủ ở tooltip. Icon tạm: `GoalIcons.icon(id)` (pixel ASCII, id: money, clock, star,
-  guest, fire, beer, fish, chili, check, lock, trophy, heart, tip) — sẽ đổi sang `UiIcons`.
+  đủ ở tooltip. Icon: `GoalIcons.icon(id)` đọc `assets/sprites/ui/icons/<id>.png`
+  (16x16) nếu có, không thì placeholder; huy hiệu `ui/badges/<id>.png` (24x24).
+  Danh sách art cần vẽ: `docs/ui_art_needed_goals.md`.
   NEO báo một lần ("NEO: Thử thách xong: ... +30k"),
   thưởng trả lúc hết ca (một lần/ngày). Thêm mẫu = .tres mới + nối vào catalog.
 - **Thành tựu:** `data/achievements/` (11 cái), so với `GameState.stats` (đếm cả

@@ -17,6 +17,7 @@ func _ready() -> void:
 	_test_settle_once()
 	_test_achievements()
 	_test_stats_save()
+	_test_icon_art()
 	GameState.reset()
 	print("challenges_test: %s" % ("ALL PASS" if _failures == 0 else "%d FAIL" % _failures))
 	get_tree().quit()
@@ -181,6 +182,27 @@ func _test_stats_save() -> void:
 	_check("stats save round trip", same and int(sold.get("tom_luoc", 0)) == 1 and sold.get("tom_luoc") is int)
 	_check("bad stats ignored", LifetimeStats.from_save("x").is_empty()
 		and LifetimeStats.from_save({"served_total": "a", "dishes_sold": 3}).is_empty())
+
+
+## Final art dropped in by file name replaces the placeholder.
+func _test_icon_art() -> void:
+	_check("placeholder icon without art", GoalIcons.icon("heart") != null)
+	var old_root := Art.root
+	Art.root = "user://goal_icons_test/"
+	DirAccess.make_dir_recursive_absolute(Art.root + "ui/icons")
+	DirAccess.make_dir_recursive_absolute(Art.root + "ui/badges")
+	var image := Image.create(16, 16, false, Image.FORMAT_RGBA8)
+	image.save_png(Art.root + "ui/icons/heart.png")
+	var badge := Image.create(24, 24, false, Image.FORMAT_RGBA8)
+	badge.save_png(Art.root + "ui/badges/five_star.png")
+	Art.clear_cache()
+	_check("icon PNG replaces placeholder", GoalIcons.icon("heart").get_width() == 16)
+	_check("badge PNG used, else its icon", GoalIcons.badge("five_star", "star").get_width() == 24
+		and GoalIcons.badge("grill_20", "fire") == GoalIcons.icon("fire"))
+	DirAccess.remove_absolute(Art.root + "ui/icons/heart.png")
+	DirAccess.remove_absolute(Art.root + "ui/badges/five_star.png")
+	Art.root = old_root
+	Art.clear_cache()
 
 
 func _check(label: String, ok: bool) -> void:

@@ -25,7 +25,7 @@ func _ready() -> void:
 	_box.add_theme_constant_override("separation", 4)
 	add_child(_box)
 	var head := HBoxContainer.new()
-	head.add_child(GoalIcons.rect("trophy", 14))
+	head.add_child(GoalIcons.rect("trophy", 16))
 	_count = _label("", 9, GOLD)
 	head.add_child(_count)
 	_box.add_child(head)
@@ -69,16 +69,16 @@ func _tile(achievement: AchievementData) -> Control:
 	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tile.add_child(column)
 	var art := Control.new()
-	art.custom_minimum_size = Vector2(22, 22)
+	art.custom_minimum_size = Vector2(24, 24)
 	art.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(art)
-	var icon := GoalIcons.rect(achievement.icon, 22)
+	var icon := GoalIcons.show(GoalIcons.badge(achievement.id, achievement.icon), 24)
 	icon.modulate = Color.WHITE if unlocked else Color(0.35, 0.38, 0.42)
 	art.add_child(icon)
 	if not unlocked:
-		var lock := GoalIcons.rect("lock", 10)
-		lock.position = Vector2(14, 13)
+		var lock := GoalIcons.rect("lock", 8)
+		lock.position = Vector2(16, 16)
 		art.add_child(lock)
 	var name_label := _label(achievement.title, font_size, GOLD if unlocked else DIM)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

@@ -1,8 +1,9 @@
 class_name GoalIcons
 extends RefCounted
-## Placeholder pixel icons for challenges / achievements, built from tiny
-## ASCII bitmaps ("#" = colour, "o" = dark outline). The one entry point is
-## `icon(id)`; swap its body for the shared icon set (UiIcons) later.
+## Icons for challenges / achievements. Final art is dropped in by file name
+## (assets/sprites/ui/icons/<id>.png, like `Art`); until then a placeholder
+## from tiny ASCII bitmaps ("#" = colour, "o" = dark outline). The one entry
+## point is `icon(id)`.
 ## Ids: money, clock, star, guest, fire, beer, fish, chili, check, lock,
 ## trophy, heart, tip.
 
@@ -45,8 +46,13 @@ const SHAPES := {
 static var _cache: Dictionary = {}
 
 
-## Square icon texture for `id` (unknown ids get the star).
+## Square icon texture for `id`: the final art
+## res://assets/sprites/ui/icons/<id>.png if it exists (via Art), else the
+## placeholder (unknown ids get the star). List: docs/ui_art_needed_goals.md.
 static func icon(id: String) -> Texture2D:
+	var art := Art.texture("ui/icons/" + id)
+	if art:
+		return art
 	if _cache.has(id):
 		return _cache[id]
 	var shape: Array = SHAPES.get(id, SHAPES["star"])
@@ -64,10 +70,22 @@ static func icon(id: String) -> Texture2D:
 	return texture
 
 
+## Achievement badge: assets/sprites/ui/badges/<achievement_id>.png (24x24,
+## full colour; locked = greyed in code) if it exists, else its icon.
+static func badge(achievement_id: String, icon_id: String) -> Texture2D:
+	var art := Art.texture("ui/badges/" + achievement_id)
+	return art if art else icon(icon_id)
+
+
 ## TextureRect showing `id` at `px` pixels, nearest filtering.
 static func rect(id: String, px: float) -> TextureRect:
+	return show(icon(id), px)
+
+
+## TextureRect for any texture at `px` pixels, nearest filtering.
+static func show(texture: Texture2D, px: float) -> TextureRect:
 	var view := TextureRect.new()
-	view.texture = icon(id)
+	view.texture = texture
 	view.custom_minimum_size = Vector2(px, px)
 	view.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	view.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

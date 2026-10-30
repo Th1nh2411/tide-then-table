@@ -100,7 +100,7 @@ func finish_shift(stars: int) -> Dictionary:
 		unlocked.append({"id": achievement.id, "title": achievement.title, "desc": achievement.desc,
 			"icon": achievement.icon, "reward": achievement.reward_k})
 		if toast:
-			toast.push(achievement.title, achievement.icon, achievement.reward_k)
+			toast.push(achievement.title, GoalIcons.badge(achievement.id, achievement.icon), achievement.reward_k)
 	return {"day": GameState.day, "stars": stars, "served": shift.parties_served(), "lost": shift.lost,
 		"earned": shift.earned, "challenges": challenges, "achievements": unlocked, "bonus": bonus}
 

@@ -34,8 +34,8 @@ func _ready() -> void:
 	row.add_theme_constant_override("separation", 5)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_panel.add_child(row)
-	row.add_child(GoalIcons.rect("trophy", 24))
-	_badge = GoalIcons.rect("star", 16)
+	row.add_child(GoalIcons.rect("trophy", 32))
+	_badge = GoalIcons.rect("star", 24)
 	_badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_badge)
 	_name = Label.new()
@@ -43,7 +43,7 @@ func _ready() -> void:
 	_name.add_theme_font_size_override("font_size", 13)
 	_name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_name)
-	_coin = GoalIcons.rect("money", 10)
+	_coin = GoalIcons.rect("money", 16)
 	_coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_coin)
 	_reward = Label.new()
@@ -55,8 +55,8 @@ func _ready() -> void:
 
 
 ## Queue one toast.
-func push(title: String, icon_id: String, reward_k: int) -> void:
-	_queue.append({"title": title, "icon": icon_id, "reward": reward_k})
+func push(title: String, badge: Texture2D, reward_k: int) -> void:
+	_queue.append({"title": title, "badge": badge, "reward": reward_k})
 	if not _busy:
 		_next()
 
@@ -73,7 +73,7 @@ func _next() -> void:
 	_busy = true
 	var entry: Dictionary = _queue.pop_front()
 	_name.text = str(entry["title"])
-	_badge.texture = GoalIcons.icon(str(entry["icon"]))
+	_badge.texture = entry["badge"]
 	var reward: int = int(entry["reward"])
 	_reward.text = "+%dk" % reward
 	_reward.visible = reward > 0
