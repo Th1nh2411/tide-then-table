@@ -17,6 +17,8 @@ const SHOP_TAB: int = 6
 ## Hidden until StaffCatalog.unlock_day (fish orders live in the QuestTracker).
 const STAFF_TAB: int = 7
 const BOAT_TAB: int = 4
+## VT323 glyphs are small for their size; multiply sizes by this.
+const NEO_FONT_SCALE: float = 1.5
 
 @export var fish_catalog: FishCatalog
 @export var menu: DishCatalog
@@ -33,7 +35,6 @@ const BOAT_TAB: int = 4
 var _tab: int = 0
 var _opened_pause: bool = false
 var _tab_buttons: Array[Button] = []
-var _mono: SystemFont
 var _staff: PhoneStaff
 var _repair: RepairButton
 var _big_map: MapOverlay
@@ -52,11 +53,11 @@ var repair_action: Callable
 
 func _ready() -> void:
 	hide()
-	# Monospace look: "an app a developer made for themselves".
-	_mono = SystemFont.new()
-	_mono.font_names = PackedStringArray(["Menlo", "Consolas", "DejaVu Sans Mono", "Courier New", "monospace"])
+	# Pixel terminal look (VT323, "NeoLabel"): an app a developer made for himself.
+	# VT323 runs small, so its sizes are scaled up from the scene's.
 	for label: Label in [_content_label, _log_label, _title_label]:
-		label.add_theme_font_override("font", _mono)
+		label.theme_type_variation = &"NeoLabel"
+		label.add_theme_font_size_override("font_size", roundi(label.get_theme_font_size("font_size") * NEO_FONT_SCALE))
 	for i in TAB_NAMES.size():
 		var button := Button.new()
 		button.text = TAB_NAMES[i]

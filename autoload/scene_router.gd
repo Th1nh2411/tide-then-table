@@ -16,6 +16,8 @@ func _ready() -> void:
 	layer = 100
 	# Keep fading even if the game tree is paused.
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# Every button in the game squashes when pressed.
+	UiFx.hook_buttons(get_tree())
 
 	_fade_rect = ColorRect.new()
 	_fade_rect.color = Color.BLACK
