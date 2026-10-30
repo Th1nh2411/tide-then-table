@@ -102,6 +102,8 @@ var shift_log := ShiftLog.new()
 ## Set at closing by RestaurantGoals3D.finish_shift (challenges, achievements).
 var shift_results: Dictionary = {}
 var goals: RestaurantGoals3D
+## Xóm Đèn Review posts, followers and the weekly ranking at closing.
+var social: RestaurantSocial3D
 
 func _pick_tuning() -> ServiceTuning:
 	var current: ServiceTuning = TUNINGS[0]
@@ -114,7 +116,8 @@ func _next_spawn_interval() -> float:
 	var decor_level := GameState.get_upgrade_level("decor")
 	var decor_scale: float = tuning.decor_interval_scale[clampi(decor_level, 0, tuning.decor_interval_scale.size() - 1)]
 	var rating_scale: float = tuning.interval_scale_by_rating[clampi(GameState.last_rating, 0, tuning.interval_scale_by_rating.size() - 1)]
-	return rng.randf_range(tuning.min_spawn_interval, tuning.max_spawn_interval) * decor_scale * rating_scale
+	return rng.randf_range(tuning.min_spawn_interval, tuning.max_spawn_interval) * decor_scale * rating_scale \
+		* RestaurantSocial3D.spawn_scale()
 
 func _ready() -> void:
 	rng.randomize()
@@ -191,6 +194,8 @@ func _build_ui() -> void:
 	hud.sail_requested.connect(_sail)
 	goals = RestaurantGoals3D.new(self)
 	goals.build()
+	social = RestaurantSocial3D.new(self)
+	social.build()
 	add_child(load("res://scenes/ui/pause_menu.tscn").instantiate())
 	add_child(load("res://scenes/ui/phone_app.tscn").instantiate())
 	bag.build_fridge(self)

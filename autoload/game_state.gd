@@ -77,6 +77,8 @@ var play_seconds: float = 0.0
 ## Lifetime restaurant counters (LifetimeStats keys + "dishes_sold"), for
 ## achievements and the shift scoreboard. Saved.
 var stats: Dictionary = {}
+## "Xóm Đèn Review" social state (XomDenReview): followers, tier, last posts. Saved.
+var social: Dictionary = {}
 ## History entries kept (older ones are dropped).
 const MAX_HISTORY: int = 14
 
@@ -107,6 +109,7 @@ func reset() -> void:
 	trip_notes.clear()
 	play_seconds = 0.0
 	stats = {}
+	social = {}
 
 
 func _ready() -> void:

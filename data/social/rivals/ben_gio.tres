@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RivalData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/rival_data.gd" id="1_rival"]
+
+[resource]
+script = ExtResource("1_rival")
+id = "ben_gio"
+display_name = "Lẩu Bến Gió"
+color = Color(0.341, 0.447, 0.467, 1)
+base_k = 380
+growth_k = 60
+wobble_k = 50
+phase = 2.1
+beat_reward_k = 60

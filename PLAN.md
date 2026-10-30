@@ -532,4 +532,8 @@ Hướng dẫn chạy, kiểm tra và danh sách còn thiếu: `docs/3D_DEMO.md`
   `data/challenges/`, thẻ HUD + NEO báo, thưởng cuối ca), 11 thành tựu (`Achievements`,
   `data/achievements/`, toast + tab "Thành tựu" trong điện thoại), `GameState.stats` đếm cả
   đời (có lưu), `ShiftLog` + `host.shift_results` làm dữ liệu cho bảng điểm/mạng xã hội sau.
+- 2026-10-30: "Xóm Đèn Review" (kiểu Cooksta): hết ca 2-4 khách đăng bài (`XomDenReview`,
+  `data/social/`), follower + 4 hạng quán (thưởng, khách tới nhanh hơn chút), xếp hạng doanh
+  thu tuần với 3 quán đối thủ (`RivalRanking`, có Ốc Thâm Lam), tab "Review" trong điện
+  thoại, thông báo bài mới lúc hết ca; `GameState.social` có lưu. Art: `docs/ui_art_needed_social.md`.
 - Chưa xong: preview bếp/thùng đá, playtest tay, pacing (bot 3D có >20.000k ở ngày 4 — cần xem lại kinh tế), art 3D (mèo đi bốn chân).

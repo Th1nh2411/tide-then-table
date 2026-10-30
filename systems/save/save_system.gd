@@ -92,6 +92,7 @@ static func to_dict() -> Dictionary:
 		"resume_at": GameState.resume_at,
 		"play_seconds": GameState.play_seconds,
 		"stats": GameState.stats.duplicate(true),
+		"social": GameState.social.duplicate(true),
 		"map_pins": GameState.map_pins.map(func(pin: Vector2) -> Array: return [pin.x, pin.y]),
 	}
 
@@ -181,6 +182,7 @@ static func apply_dict(data: Dictionary) -> void:
 				GameState.orders.append(order)
 
 	GameState.stats = LifetimeStats.from_save(data.get("stats"))
+	GameState.social = XomDenReview.from_save(data.get("social"))
 
 	var resume: Variant = data.get("resume_at")
 	if resume is String and RESUME_POINTS.has(resume):

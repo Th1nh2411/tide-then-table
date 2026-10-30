@@ -57,6 +57,35 @@ vào biển 3D; Tiếp tục dùng điểm resume trong save hiện tại.
   từng món/bàn/khách bỏ về; `host.shift_results` sau khi đóng ca có `challenges`,
   `achievements`, `bonus`; tổng kết hiện thêm vài dòng tóm tắt.
 
+## Xóm Đèn Review và bảng xếp hạng
+
+- **Bài đăng:** hết ca, `XomDenReview` (systems/social/) cho 2-4 khách đăng bài:
+  ảnh đại diện + tên (`data/social/review_pool.tres`), ảnh món đã ăn, sao (theo
+  phần kiên nhẫn còn lại, -1 nếu món ôi < 50, +1 nếu là món HOT), một câu ngắn
+  (≤ 6 chữ) theo tâm trạng vui / thường / bực, lượt thích. Luôn có bàn tốt nhất và,
+  nếu có khách bỏ về, một bài bực. Cùng seed → cùng bài.
+- **Follower + hạng quán:** cộng/trừ theo sao của ngày, lượt thích, món HOT, thử
+  thách xong, khách bỏ về (`data/social/social_tuning.tres`). 4 hạng: Quán vỉa hè →
+  Quán quen (40) → Quán có tiếng (120) → Quán nổi tiếng (300); lên hạng = thưởng một
+  lần + toast + NEO, khách tới nhanh hơn chút (`tier_spawn_scale`, hook
+  `RestaurantSocial3D.spawn_scale()` trong `_next_spawn_interval`). Hạng không tụt.
+  Lưu ở `GameState.social` (followers, tier, 20 bài mới nhất).
+- **Xếp hạng tuần:** `RivalRanking` so tổng 7 ngày của quán Rin (`day_history`) với
+  3 quán đối thủ bịa (`data/social/rivals/`: Ốc Thâm Lam — của tập đoàn Thâm Lam,
+  Lẩu Bến Gió, Nướng Chú Hên; doanh thu theo đường cong cố định tăng dần). Lần đầu
+  vượt một quán: flag `rival_beat_<id>`, thưởng, NEO báo.
+- **Điện thoại, tab "Review":** app phẳng (`PhoneReview`): thanh tiêu đề xanh với số
+  follower, huy hiệu hạng + thanh tới hạng sau, hai nút icon (bài đăng / xếp hạng).
+  Bài đăng = thẻ giấy (trượt vào lần lượt); xếp hạng = sticker đỏ "#3", cột ngang
+  của 4 quán (Rin màu đỏ biển hiệu), biểu đồ tiền mỗi ngày của Rin.
+- **Lúc hết ca:** góc phải hiện sticker "+12" follower và tối đa 3 bài mới như thông
+  báo điện thoại (trượt vào, nghiêng rồi đứng lại, tim bay), tự ẩn, không chặn gì.
+  Dữ liệu cho bảng điểm: `host.shift_results["social"]` (`followers_before/after`,
+  `tier_before/after`, `reward`, `posts`) và `["rank"]` (`rank_before/after`,
+  `beaten`, `reward`, `board`).
+- Kiểu dáng gom ở `SocialStyle` (khung nine-patch `assets/sprites/ui/frames/`,
+  placeholder đã sinh sẵn). Art cần vẽ: `docs/ui_art_needed_social.md`.
+
 ## Kiểm tra đã có
 
 - `tools/run_tests.sh`: logic 2D hiện có, các regression 3D và smoke scene.
@@ -75,6 +104,9 @@ vào biển 3D; Tiếp tục dùng điểm resume trong save hiện tại.
   ShiftLog → thử thách/thống kê/thành tựu lúc đóng ca.
 - `scenes/test/challenges_test.tscn`: roll thử thách cố định theo ngày và chỉ mẫu làm
   được, tiến độ từ ShiftLog, thưởng trả một lần, thành tựu mở một lần, lưu/tải stats.
+- `scenes/test/social_test.tscn`: bài đăng cố định theo seed, sao/tâm trạng/câu ngắn,
+  công thức follower, hạng + thưởng một lần, thứ tự bảng xếp hạng + thưởng vượt quán,
+  lưu/tải, tab Review và khoảnh khắc hết ca dựng được.
 
 Các lệnh kiểm tra luôn chạy `-- --no-autosave`; save roundtrip dùng file tạm.
 Bot dịch chuyển nhanh giữa địa điểm và tạo kết quả minigame thành công có chủ

@@ -58,6 +58,10 @@ func _ready() -> void:
 			var badges: PhoneAchievements = _phone._achievements
 			_check("achievements tab shows badge tiles", badges.visible and not _phone.get_node("%Scroll").visible
 				and badges.tile_count() == badges.catalog.achievements.size())
+		elif tab == PhoneApp.REVIEW_TAB:
+			var review: PhoneReview = _phone._review
+			_check("review tab shows the feed", review.visible and not _phone.get_node("%Scroll").visible
+				and review.card_count() >= 1)
 		elif tab == PhoneApp.SHOP_TAB:
 			var shop: PhoneShop = _phone.get_node("%Shop")
 			_check("shop tab lists upgrades", shop.visible and shop._rows.size() == shop.upgrades.size()

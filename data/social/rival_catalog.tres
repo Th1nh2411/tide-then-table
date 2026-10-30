@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RivalCatalog" format=3]
+
+[ext_resource type="Script" path="res://data/resources/rival_catalog.gd" id="1_cat"]
+[ext_resource type="Script" path="res://data/resources/rival_data.gd" id="1_data"]
+[ext_resource type="Resource" path="res://data/social/rivals/chu_hen.tres" id="2_chu_hen"]
+[ext_resource type="Resource" path="res://data/social/rivals/ben_gio.tres" id="3_ben_gio"]
+[ext_resource type="Resource" path="res://data/social/rivals/tham_lam.tres" id="4_tham_lam"]
+
+[resource]
+script = ExtResource("1_cat")
+rivals = Array[ExtResource("1_data")]([ExtResource("2_chu_hen"), ExtResource("3_ben_gio"), ExtResource("4_tham_lam")])
+week_days = 7

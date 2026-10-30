@@ -84,7 +84,8 @@ func finish_meal(table: int) -> void:
 		price = roundi(float(price) * host.tuning.rich_price_scale)
 	if dish.is_market_dish():
 		price = roundi(float(price) * KitchenLogic.freshness_multiplier(float(order["freshness"])))
-	host.shift_log.record_dish(dish, price, DailyTrend.is_hot(dish))
+	var fresh: float = float(order["freshness"]) if dish.is_market_dish() else _items_freshness(ingredients)
+	host.shift_log.record_dish(dish, price, DailyTrend.is_hot(dish), fresh)
 	var party: PartyOrders3D = order.get("party")
 	if party:
 		party.bill += price
@@ -98,7 +99,7 @@ func finish_meal(table: int) -> void:
 	var tip: int = roundi(price * (host.tuning.tip_ratio + host.staff_roster.tip_bonus())) if visit.is_empty() and patience_ratio > host.tuning.tip_patience_threshold else 0
 	GameState.add_money(price + tip)
 	host.earned += price + tip
-	host.shift_log.record_party(price, tip, patience_ratio, not visit.is_empty())
+	host.shift_log.record_party(price, tip, patience_ratio, not visit.is_empty(), dish.id, fresh)
 	if not visit.is_empty():
 		FishOrders.complete(visit["order"])
 		GameState.set_flag("regular_served_once")
@@ -116,6 +117,7 @@ func finish_meal(table: int) -> void:
 
 func lose_order(table: int) -> void:
 	var already_cooked: bool = bool(host.orders[table].get("cooked", false))
+	var wanted: DishData = host.orders[table].get("dish")
 	var left_party: PartyOrders3D = host.orders[table].get("party")
 	var part_paid: int = 0
 	if left_party:
@@ -141,7 +143,7 @@ func lose_order(table: int) -> void:
 	host.guests[table].visible = false
 	host.order_labels[table].text = ""
 	host.lost += 1
-	host.shift_log.record_lost(part_paid)
+	host.shift_log.record_lost(part_paid, wanted.id if wanted else "")
 	host._show_note("Khách bàn %d đợi lâu quá nên bỏ về." % (table + 1))
 	host._dispatch_ready()
 
@@ -189,9 +191,20 @@ func end_shift() -> void:
 	host.shift_results = host.goals.finish_shift(stars)
 	var bonus: int = int(host.shift_results.get("bonus", 0))
 	GameState.add_day_record({"day": GameState.day, "earned": host.earned, "market": host.market_spent, "rating": stars, "served": host.served, "left": host.lost, "wages": host.wages_paid, "bonus": bonus})
+	if host.social:
+		host.social.close_shift()
 	var goal_lines := RestaurantGoals3D.summary_lines(host.shift_results)
 	host.panels.show_summary("HẾT CA • XÓM ĐÈN\nPhục vụ: %d  |  Bỏ về: %d\nThu: %dk  |  Chợ: %dk  |  Lương: %dk\nDư: %d phần  |  Đánh giá: %d sao" % [host.served, host.lost, host.earned, host.market_spent, host.wages_paid, leftover, stars]
 		+ ("\n" + goal_lines if goal_lines != "" else ""))
+
+## Average freshness (0-100) of a plate's seafood (100 when none).
+static func _items_freshness(items: Array[InventoryItem]) -> float:
+	if items.is_empty():
+		return 100.0
+	var total := 0.0
+	for item in items:
+		total += item.freshness
+	return total / items.size()
 
 func sync_food_visuals() -> void:
 	for i: int in range(host.orders.size()):

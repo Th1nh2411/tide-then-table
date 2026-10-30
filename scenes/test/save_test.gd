@@ -47,6 +47,8 @@ func _test_round_trip() -> void:
 	GameState.orders.append({"who": "Chú Ba", "fish": "cua", "min_kg": 0.5, "reward": 120, "due_day": 7})
 	GameState.add_day_record({"day": 5, "earned": 300, "market": 20, "rating": 4})
 	GameState.stats = {"served_total": 12, "earned_total": 640, "dishes_sold": {"tom_luoc": 3}}
+	GameState.social = {"followers": 52, "tier": 1, "posts": [{"day": 5, "author": "be_na", "name": "Bé Na",
+		"dish": "tom_luoc", "stars": 5, "mood": "happy", "caption": "Sẽ quay lại!", "likes": 31, "hot": false, "tip": true}]}
 	_check("save writes file", SaveSystem.save_game(TEST_PATH) and SaveSystem.has_save(TEST_PATH))
 	GameState.reset()
 	_check("load ok", SaveSystem.load_game(TEST_PATH))
@@ -72,6 +74,10 @@ func _test_round_trip() -> void:
 	_check("lifetime stats (ints after JSON)", GameState.stats.get("served_total") is int
 		and int(GameState.stats["served_total"]) == 12 and int(GameState.stats.get("earned_total", 0)) == 640
 		and sold.get("tom_luoc") is int and int(sold["tom_luoc"]) == 3)
+	var post: Dictionary = XomDenReview.posts()[0] if XomDenReview.posts().size() == 1 else {}
+	_check("social: followers, tier, posts (ints after JSON)", GameState.social.get("followers") is int
+		and XomDenReview.followers() == 52 and XomDenReview.tier() == 1 and post.get("likes") is int
+		and int(post.get("likes", 0)) == 31 and post.get("tip") == true)
 	_check("map pins", GameState.map_pins.size() == 1 and GameState.map_pins[0].is_equal_approx(Vector2(120.5, 640)))
 	_check("orders", GameState.orders.size() == 1 and int(GameState.orders[0]["reward"]) == 120)
 	_check("size record", is_equal_approx(GameState.best_size(_fish("cua")), 1.4))

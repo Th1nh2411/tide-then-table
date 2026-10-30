@@ -5,7 +5,8 @@ extends RefCounted
 ## from tiny ASCII bitmaps ("#" = colour, "o" = dark outline). The one entry
 ## point is `icon(id)`.
 ## Ids: money, clock, star, guest, fire, beer, fish, chili, check, lock,
-## trophy, heart, tip.
+## trophy, heart, tip; social (Xóm Đèn Review): feed, podium, follower,
+## tier_0..tier_3 (shop-front badges, one colour per follower tier).
 
 const COLORS := {
 	"money": Color("f2c94c"), "clock": Color("8fd3ff"), "star": Color("ffd84a"),
@@ -13,7 +14,12 @@ const COLORS := {
 	"fish": Color("7fc8e0"), "chili": Color("e8413a"), "check": Color("7be07b"),
 	"lock": Color("a0a8b0"), "trophy": Color("f2d98a"), "heart": Color("ff6b8a"),
 	"tip": Color("9be38a"),
+	"feed": Color("ebede9"), "podium": Color("f2d98a"), "follower": Color("73bed3"),
+	"tier_0": Color("ad7757"), "tier_1": Color("73bed3"), "tier_2": Color("de9e41"), "tier_3": Color("e0302b"),
 }
+## Shop front with an awning: the follower tier badge (tinted per tier).
+const SHOP_SHAPE := ["oooooooooooo", "o#o#o#o#o#oo", "oooooooooooo", ".o########o.", ".o#oo##oo#o.",
+	".o#oo##oo#o.", ".o########o.", ".o##oooo##o.", ".o##o..o##o.", ".o##o..o##o.", "oooooooooooo", "............"]
 const SHAPES := {
 	"money": ["...oooooo...", "..o######o..", ".o##oooo##o.", "o##o####o##o", "o###oo###o#o", "o####oo####o",
 		"o#o###o###o.", "o##o####o##o", ".o##oooo##o.", "..o######o..", "...oooooo...", "............"],
@@ -41,6 +47,13 @@ const SHAPES := {
 		".o#######o..", "..o#####o...", "...o###o....", "....o#o.....", ".....o......", "............"],
 	"tip": ["...oooooo...", "..o######o..", ".o###oo###o.", "o###o##o###o", "o####oo####o", "o###o##o###o",
 		".o###oo###o.", "..o######o..", "...oooooo...", ".....o#o....", "....o###o...", ".....ooo...."],
+	"feed": ["oooooooooooo", "o##########o", "o#oo#######o", "o#oo#oooo##o", "o##########o", "oooooooooooo",
+		"o##########o", "o#oo#######o", "o#oo#oooo##o", "o##########o", "oooooooooooo", "............"],
+	"podium": [".....oo.....", "....o##o....", "....o##o....", "oooo####oooo", "o##o####o##o", "o##o####o##o",
+		"o##o####o##o", "o##o####o##o", "o##o####o##o", "o##o####o##o", "oooooooooooo", "............"],
+	"follower": ["...oooo.....", "..o####o....", "..o####o....", "..o####o....", "...oooo.oo.o", ".oo####o##o#",
+		"o#######o###", "o#######o###", "o########o#o", "o#########o.", "oooooooooooo", "............"],
+	"tier_0": SHOP_SHAPE, "tier_1": SHOP_SHAPE, "tier_2": SHOP_SHAPE, "tier_3": SHOP_SHAPE,
 }
 
 static var _cache: Dictionary = {}

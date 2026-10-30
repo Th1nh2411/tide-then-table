@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ReviewPool" format=3]
+
+[ext_resource type="Script" path="res://data/resources/review_pool.gd" id="1_pool"]
+
+[resource]
+script = ExtResource("1_pool")
+author_ids = Array[String](["be_na", "tu_map", "chi_hai", "kenzie", "ut_bong", "ba_xe_om", "mimi", "chu_sau", "thanh_food", "nhoc_ca"])
+author_names = Array[String](["Bé Na", "Tư Mập", "Chị Hai Ốc", "Kenzie Ăn Đêm", "Út Bông", "Ba Xe Ôm", "Mimi Review", "Chú Sáu Lưới", "Thành Food", "Nhóc Cá Khô"])
+happy_captions = Array[String](["Ngon xỉu luôn!", "Đỉnh của chóp!", "Hải sản tươi rói!", "Sẽ quay lại!", "Đậm đà, đáng tiền!", "Ăn khuya là phải đây!", "Ngon hơn nhà hàng!", "Thơm nức cả xóm!"])
+neutral_captions = Array[String](["Cũng được, giá ổn.", "Tạm ổn nha.", "Hơi lâu, mà ngon.", "Bình thường thôi.", "Ăn được, thử lại."])
+angry_captions = Array[String](["Chờ lâu quá...", "Đói muốn xỉu luôn...", "Gọi mãi không ra món.", "Bỏ về, buồn ghê.", "Không quay lại nữa."])
+hot_captions = Array[String](["Món hot đúng đỉnh!", "Trend hôm nay chuẩn!", "Ai cũng gọi món này!"])
+tip_captions = Array[String](["Nhanh gọn, boa liền!", "Phục vụ nhanh ghê!", "Anh chủ dễ thương ghê!"])
+special_caption_chance = 0.6

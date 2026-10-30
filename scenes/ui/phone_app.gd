@@ -11,7 +11,7 @@ extends CanvasLayer
 ## Put it LAST in the scene tree so it gets J/Esc before other overlays.
 
 const APP_TITLE: String = "Rin's Catch v0.3.1"
-const TAB_NAMES: Array[String] = ["Kho", "Menu", "Bản đồ", "Dex", "Thuyền", "Sổ sách", "Nâng cấp", "Nhân viên", "Thành tựu"]
+const TAB_NAMES: Array[String] = ["Kho", "Menu", "Bản đồ", "Dex", "Thuyền", "Sổ sách", "Nâng cấp", "Nhân viên", "Thành tựu", "Review"]
 const MAP_TAB: int = 2
 const SHOP_TAB: int = 6
 ## Hidden until StaffCatalog.unlock_day (fish orders live in the QuestTracker).
@@ -19,6 +19,8 @@ const STAFF_TAB: int = 7
 const BOAT_TAB: int = 4
 ## Lifetime achievements (PhoneAchievements).
 const ACHIEVEMENTS_TAB: int = 8
+## "Xóm Đèn Review": posts, followers, weekly ranking (PhoneReview).
+const REVIEW_TAB: int = 9
 ## VT323 glyphs are small for their size; multiply sizes by this.
 const NEO_FONT_SCALE: float = 1.5
 
@@ -39,6 +41,7 @@ var _opened_pause: bool = false
 var _tab_buttons: Array[Button] = []
 var _staff: PhoneStaff
 var _achievements: PhoneAchievements
+var _review: PhoneReview
 var _repair: RepairButton
 var _big_map: MapOverlay
 ## Set by the sea scene: () -> bool (at the dock) and () -> int (repair).
@@ -80,6 +83,10 @@ func _ready() -> void:
 	_achievements.size_flags_vertical = _shop.size_flags_vertical
 	_achievements.custom_minimum_size = _shop.custom_minimum_size
 	_staff.add_sibling(_achievements)
+	_review = PhoneReview.new()
+	_review.size_flags_vertical = _shop.size_flags_vertical
+	_review.custom_minimum_size = _shop.custom_minimum_size
+	_achievements.add_sibling(_review)
 	_repair = RepairButton.new()
 	_repair.boat_upgrade = boat_upgrade
 	_repair.focus_mode = Control.FOCUS_NONE
@@ -166,13 +173,16 @@ func _show_tab(index: int) -> void:
 	_shop.visible = index == SHOP_TAB
 	_staff.visible = index == STAFF_TAB
 	_achievements.visible = index == ACHIEVEMENTS_TAB
-	_scroll.visible = index not in [MAP_TAB, SHOP_TAB, STAFF_TAB, ACHIEVEMENTS_TAB]
+	_review.visible = index == REVIEW_TAB
+	_scroll.visible = index not in [MAP_TAB, SHOP_TAB, STAFF_TAB, ACHIEVEMENTS_TAB, REVIEW_TAB]
 	if index == SHOP_TAB:
 		_shop.refresh()
 	if index == STAFF_TAB:
 		_staff.refresh()
 	if index == ACHIEVEMENTS_TAB:
 		_achievements.refresh()
+	if index == REVIEW_TAB:
+		_review.refresh()
 	_repair.allowed = repair_allowed
 	_repair.action = repair_action
 	_repair.refresh()
@@ -188,7 +198,7 @@ func _tab_text(index: int) -> String:
 			return PhoneReports.storage_report(_fridge_loss())
 		1:
 			return PhoneReports.menu_report(menu, _fish_names())
-		MAP_TAB, SHOP_TAB, STAFF_TAB, ACHIEVEMENTS_TAB:
+		MAP_TAB, SHOP_TAB, STAFF_TAB, ACHIEVEMENTS_TAB, REVIEW_TAB:
 			return ""
 		3:
 			# Seed changes with the day so the glitch "moves" between visits.
