@@ -364,3 +364,83 @@ mọi trượt ở mọi tình huống đổi hướng.
 
 PASS flow quán, traffic/pathing, story bridge, staging/camera và cinematic ném
 cần. Log tại `build/ground_motion/{check,flow,traffic,story,stage,cast,review}.log`.
+
+
+### Camera gần hơn và bố cục chơi — 2026-10-30
+
+Quán dùng `RestaurantCamera3D`: orthographic size **12** thay vì 14, giữ một
+vùng chết nhỏ quanh Rin, bám mềm và giới hạn focus trong phạm vi quán. Camera
+ngừng cập nhật khi camera cutscene đang hoạt động. Không đổi scale nhân vật,
+bàn, ghế hoặc thuyền. Có thể chỉnh `VIEW_SIZE`, `OFFSET` và dead zone trong
+`scenes/restaurant3d/restaurant_camera_3d.gd`.
+
+Biển: offset theo thuyền **(0,6.2,8.4)** thay vì (0,7.3,10), FOV **56°** thay
+vì 58°. Dùng cùng cấu hình lúc khởi tạo và khi lái; bám camera theo hàm mũ để
+không phụ thuộc FPS. Giữ toàn bộ tọa độ POI, đá/collider, bản đồ và vùng câu.
+Đã kiểm khung hình cho cả thúng và ghe máy, cùng chuyển tiếp cinematic câu.
+
+Bố cục: bảng thực đơn ở (0.4,0,4.8) gần lối vào, bảng bếp ở (5.8,0,-1.7).
+Collider và footprint A* cùng đọc vị trí mới. Bảo chuyển sang mép trái xe bếp,
+Cô Năm sang mép trái quầy để nhìn rõ người; không đổi vùng tương tác bếp/quầy.
+Hải đăng trang trí và biển tên ở bến dời lệch sang bên để nhường trục nhìn thuyền.
+Phần đèn của agent khác được giữ nguyên.
+
+Hoàn tất kiểm phần khách ngồi: SitDown → SitIdle → StandUp tại đúng ghế;
+đổi walker sang guest ngồi trong cùng frame để không nháy mất model. Hủy lượt
+trong lúc ngồi xuống vẫn đứng/rời đi và trả chỗ đậu xe. Clip tạo runtime, GLB
+nguồn giữ nguyên. `restaurant_seating_check.tscn` kiểm cả chuỗi đến/rời/hủy.
+
+Ảnh camera gameplay: `build/world_composition/restaurant_{spawn,dining,kitchen,counter}.png`,
+`seating_close.png`, `sea_0.png`, `sea_2.png`. Scene chụp:
+`scenes/art_pilots/world_composition_review.tscn` (dùng `--no-autosave`). Backup:
+`build/world_composition/source_before/`.
+
+PASS `world_composition_check` (khung người/ghế/chân, mép phòng, nhường camera,
+nav footprint và hai cỡ thuyền), `restaurant_seating_check`, flow quán, traffic,
+sea smoke, staging/camera và cast cinematic. Log tại `build/world_composition/`.
+
+
+### Bàn ăn xoay dọc — 2026-10-30
+
+Toàn bộ bàn ăn xoay 90° quanh Y, trục dài theo Z. Ghế, hướng ngồi/đứng lên và
+đường tiếp cận quay cùng cụm bàn; giữ nguyên tâm các bàn và hệ đèn. Collider
+mặt bàn đổi footprint sang 1,2 × 1,5; footprint A* cả bàn/ghế sang 1,2 × 2,6.
+Nhân viên phục vụ/dọn từ cạnh X dương (offset 1,15), tránh đi vào ghế ở hai đầu.
+Preview nâng cấp bàn cũng dùng cùng hướng và scale ghế 0,85.
+
+Cấu hình chung ở `RestaurantLayout3D.TABLE_YAW`, `TABLE_COLLISION_SIZE`,
+`TABLE_NAV_SIZE`, `TABLE_SERVICE_OFFSET`, helper `table_offset()`.
+Backup: `build/tables_vertical/source_before/`; so hình `before.png`/`after.png`.
+PASS flow phục vụ/renovation, traffic/pathing và chuỗi khách ngồi/rời/hủy.
+
+
+### Quán nhỏ trước tủ, thuê gian bên cạnh và hai khách qua chiều rộng — 2026-10-30
+
+Bốn bàn đầu được gom trước xe/tủ quán, hai cột X=1 / 4,6 và hai hàng Z=0 / 3,6.
+Bàn giữ trục dài theo Z; hai ghế đặt ở X ±0,95 để hai khách ngồi đối diện **qua
+chiều rộng**, thay vì ngồi hai đầu. Mỗi bàn có hai model khách; cả hai đi từ xe
+vào đúng ghế, ngồi/đứng lên và đi ra. Vẫn dùng một order/bill của bàn theo logic
+phục vụ hiện có. Điểm phục vụ ở cạnh trước Z+1,25; A* và collider theo footprint mới.
+
+Nâng cấp `seats` nay hiển thị **Mặt bằng**, giữ nguyên ID/save, mức giá 450/1.200
+và tiến trình 4 → 6 → 8 bàn. Quán ban đầu có rào thấp chặn gian chưa thuê, phần
+sàn đó chưa lát/không đi vào được. Lối đi công cộng phía đường vẫn mở để khách
+đậu xe và vào quán. Mỗi lần mua nâng cấp mở thêm gian phía trái (thêm 2 bàn),
+dịch ranh giới, mở sàn và cập nhật A*; bàn mới hoạt động ngay sau xác nhận.
+Hủy preview không mở đất hay trừ tiền. Preview tô cả diện tích thuê mới và bàn mới.
+
+Dây đèn hiện có được dịch theo cụm bàn; nhân viên về chờ ở lối chuẩn bị bên trái,
+bảng thực đơn chuyển ra cạnh lối vào để không chồng ghế. Cấu hình ở
+`RestaurantLayout3D`; ranh giới/sàn ở `RestaurantLease3D`. Không đổi mesh GLB.
+
+PASS `restaurant_lease_check`: quyền thuê, hủy/xác nhận, tiền, collider, nav cache,
+khả năng phục vụ mới và reload 6/8 bàn; `restaurant_seating_check` kiểm cả đôi khách;
+flow quán, traffic, ground motion và camera/khung hình cũng qua. Ảnh 4/6/8 bàn:
+`build/leased_layout/level_{0,1,2}.png`. Backup và log trong `build/leased_layout/`
+và `build/seats_across_width/`. Mục này thay bố cục ghế ở hai đầu bàn của đợt trước.
+
+Bảng thực đơn ngoài quán nay hiển thị ảnh và tên món đã chọn, cùng món bán kèm
+đã mở khóa trong ngày. `WorldMenuBoard3D` dùng lại sprite món của UI, cập nhật qua
+`MenuPlan.changed` khi thêm/xóa/hết món; SubViewport chỉ vẽ lại khi thực đơn đổi.
+Giữ nguyên GLB bảng và sprite gốc. Đã kiểm tra đồng bộ thêm/xóa món, texture,
+flow quán và ảnh camera thật: `build/menu_board/{close,gameplay}.png`.

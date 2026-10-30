@@ -15,6 +15,7 @@ var panel: PanelContainer
 var rows: VBoxContainer
 var confirm: Button
 var layer: CanvasLayer
+var last_seat_change := false
 
 
 func setup(room_node: Node3D, table_spots: Array[Vector3], list: Array[UpgradeData], ui_theme: Theme) -> void:
@@ -56,9 +57,16 @@ func cancel() -> void:
 func apply() -> bool:
 	if not GameState.spend_money(total_cost()):
 		return false
+	last_seat_change = false
 	_solidify()
 	for u: UpgradeData in preview:
+		if u.id == "seats" and int(preview[u]) > GameState.get_upgrade_level(u.id): last_seat_change = true
 		GameState.upgrade_levels[u.id] = int(preview[u])
+	var service_room := room as RestaurantScene3D
+	if service_room and last_seat_change:
+		RestaurantRoomBuilder3D.add_tables(service_room,service_room.guests.size())
+	var lease := room.get_node_or_null("RestaurantLease") as RestaurantLease3D
+	if lease: lease.refresh()
 	close()
 	finished.emit(true)
 	return true
@@ -107,18 +115,27 @@ func _refresh() -> void:
 func _draw_additions(parent: Node3D, ghost: bool) -> void:
 	var color := Color(0.3, 1.0, 0.45, 0.55) if ghost else Color.WHITE
 	var seats_u: UpgradeData = _find("seats")
-	if seats_u:
+	if seats_u and (ghost or not (room is RestaurantScene3D)):
+		if ghost: RestaurantLease3D.preview(parent,GameState.get_upgrade_level("seats"),int(preview.get(seats_u,0)))
 		var have := _table_count(GameState.get_upgrade_level(seats_u.id), seats_u)
 		for i: int in range(have, _table_count(int(preview.get(seats_u, 0)), seats_u)):
 			var table: Node3D = RestaurantRoomBuilder3D.TABLE_PILOT.instantiate()
 			parent.add_child(table)
 			table.position = tables[i]
+			table.rotation.y = RestaurantLayout3D.TABLE_YAW
+			if not ghost:
+				RestaurantRoomBuilder3D.solid_block(parent,tables[i]+Vector3.UP*.8,RestaurantLayout3D.TABLE_COLLISION_SIZE)
 			if ghost:
 				RestaurantBatchVisuals.tint(table, color)
 			for side in [-1.0, 1.0]:
 				var stool: Node3D = RestaurantRoomBuilder3D.STOOL_PILOT.instantiate()
 				parent.add_child(stool)
-				stool.position = tables[i] + Vector3(side * 1.02, 0, 0)
+				stool.position = tables[i] + RestaurantLayout3D.chair_offset(side)
+				stool.rotation.y = RestaurantLayout3D.TABLE_YAW
+				stool.scale = Vector3.ONE*WorldPresentation3D.RESTAURANT_STOOL_SCALE
+				if not ghost:
+					var stool_size := Vector3(.55,.52,.55)*WorldPresentation3D.RESTAURANT_STOOL_SCALE
+					RestaurantRoomBuilder3D.solid_block(parent,stool.position+Vector3.UP*stool_size.y*.5,stool_size)
 				if ghost:
 					RestaurantBatchVisuals.tint(stool, color)
 	var decor_u: UpgradeData = _find("decor")

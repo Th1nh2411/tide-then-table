@@ -10,8 +10,8 @@ func _ok(cond: bool, label: String) -> void:
 func _run() -> void:
 	var tables: Array = load("res://scenes/restaurant3d/restaurant_scene_3d.gd").TABLES
 	var grid := FloorGrid3D.get_shared(tables)
-	var from := Vector3(-5.5, 0, -3.7)
-	var to := Vector3(-5.5, 0, -0.3)
+	var from := RestaurantLayout3D.TABLES[0]+Vector3(0,0,-1.7)
+	var to := RestaurantLayout3D.TABLES[0]+Vector3(0,0,1.7)
 	var path := grid.path(from, to)
 	var length := 0.0
 	var clear := true

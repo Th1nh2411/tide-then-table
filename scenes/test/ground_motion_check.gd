@@ -66,8 +66,8 @@ func _run() -> void:
 	check(absf(phase(30)-phase(120)) < .0001,"Same distance produces the same walk phase at 30/120 fps")
 	var tables: Array = RestaurantLayout3D.TABLES
 	var actor := PersonRig3D.build(self,"vy")
-	actor.position = Vector3(-5.5,0,-3.7)
-	var target := Vector3(-5.5,0,-.3)
+	actor.position = RestaurantLayout3D.TABLES[0]+Vector3(0,0,-1.7)
+	var target := RestaurantLayout3D.TABLES[0]+Vector3(0,0,1.7)
 	var clear := true
 	var turns := true
 	var max_speed := 0.0

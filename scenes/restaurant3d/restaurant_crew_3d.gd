@@ -23,7 +23,7 @@ func sync_staff() -> void:
 	for person in host.staff_roster.hired():
 		var variant: String = "vy_sau" if GameState.has_flag("vy_warmed") else "vy"
 		var node := PersonRig3D.build(host, variant if person.id == "vy" else "staff")
-		node.position = Vector3(3.3 + workers.size() * 0.7, 0, -0.5)
+		node.position = L.staff_home(workers.size())
 		workers.append({"data": person, "node": node, "table": -1, "picked": false})
 	if host.shift_running:
 		dispatch_ready()
@@ -51,12 +51,12 @@ func move_staff(delta: float) -> void:
 		if table < 0:
 			var dirty: int = host.dirty_tables.find(true)
 			if dirty >= 0:
-				var clean_target: Vector3 = L.TABLES[dirty] + Vector3(0, 0, 1.1)
+				var clean_target: Vector3 = L.TABLES[dirty] + L.TABLE_SERVICE_OFFSET
 				StaffPathing3D.move(node, L.TABLES, clean_target, 3.0, delta)
 				if node.position.distance_to(clean_target) < 0.06:
 					host._clean_table(dirty)
 				continue
-			var home := Vector3(3.3 + workers.find(worker) * 0.7, 0, -0.5)
+			var home := L.staff_home(workers.find(worker))
 			StaffPathing3D.move(node, L.TABLES, home, 2.5, delta)
 			continue
 		if host.orders[table].is_empty():
@@ -64,7 +64,7 @@ func move_staff(delta: float) -> void:
 			worker["table"] = -1
 			continue
 		var picked: bool = bool(worker.get("picked", false))
-		var target: Vector3 = L.TABLES[table] + Vector3(0, 0, 1.2) if picked else L.PASS_POSITION + Vector3(0, 0, 1.0)
+		var target: Vector3 = L.TABLES[table] + L.TABLE_SERVICE_OFFSET if picked else L.PASS_POSITION + Vector3(0, 0, 1.0)
 		var person: StaffData = worker["data"]
 		StaffPathing3D.move(node, L.TABLES, target, person.walk_speed / 23.0, delta)
 		if node.position.distance_to(target) < 0.05:

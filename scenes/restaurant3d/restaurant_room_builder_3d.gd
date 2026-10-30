@@ -62,7 +62,7 @@ static func plate_model(parent: Node3D) -> Node3D:
 
 static func build_cat(host: Node3D) -> PersonRig3D:
 	var cat := PersonRig3D.build(host, "cat")
-	cat.position = Vector3(-3.3, 0, -6.6)
+	cat.position = Vector3(-2.0, 0, -6.2)
 	return cat
 
 static func build(host: Node3D) -> void:
@@ -71,6 +71,7 @@ static func build(host: Node3D) -> void:
 	var mid_z := (L.FRONT_Z + L.BACK_Z) * 0.5
 	var width := L.ROOM_X * 2.0
 	_shell(host, depth, mid_z, width)
+	RestaurantLease3D.build(host)
 	_decor(host)
 	_tables(host)
 	_kitchen(host)
@@ -107,6 +108,8 @@ static func _lighting(host: Node3D) -> void:
 	sunlight.directional_shadow_max_distance = 45.0
 	# Downward pools of warm light give tables, people and counters a lit and a shaded side.
 	RestaurantStringLights3D.build(host)
+	# Keep the existing light rig, positioned over the compact cart-front dining area.
+	(host.get_node("DiningStringLights") as Node3D).position.x = 10.3
 	for lamp_pos: Vector3 in [Vector3(3, 3.2, -3.2), Vector3(10, 3.2, -3.5)]:
 		_shop_light(host, lamp_pos)
 	# Low-energy awning fill: it should not erase contact shadows under the furniture.
@@ -118,12 +121,8 @@ static func _lighting(host: Node3D) -> void:
 	rim.rotation_degrees = Vector3(-30, 150, 0)
 	rim.light_color = Color("7f9fc4")
 	rim.light_energy = 0.25
-	var camera := Camera3D.new()
+	var camera := RestaurantCamera3D.new()
 	host.add_child(camera)
-	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 14.0
-	camera.position = Vector3(4.5, 12, 15)
-	camera.look_at(Vector3(0, 0, -0.5))
 	camera.current = true
 	host.demo_camera = camera
 
@@ -165,18 +164,23 @@ static func _shell(host: Node3D, depth: float, mid_z: float, width: float) -> vo
 	box(host, Vector3(0, -0.24, mid_z), Vector3(width, 0.4, depth), "394a50").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for x in range(int(width)):
 		for z in range(int(depth)):
-			box(host, Vector3(x - L.ROOM_X + 0.5, -0.02, z + L.BACK_Z + 0.5), Vector3(0.96, 0.05, 0.96), "8e8c79" if (x + z) % 3 == 0 else "797e73").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			var tile := box(host, Vector3(x - L.ROOM_X + 0.5, -0.02, z + L.BACK_Z + 0.5), Vector3(0.96, 0.05, 0.96), "8e8c79" if (x + z) % 3 == 0 else "797e73")
+			tile.name = "LeaseTile_%d_%d" % [x,z]
+			tile.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	box(host, Vector3(0, L.WALL_H * 0.5, L.BACK_Z - 0.2), Vector3(width, L.WALL_H, 0.3), "b6a183", true)
 	box(host, Vector3(0, 0.4, L.BACK_Z - 0.02), Vector3(width, 0.8, 0.1), "577277")
-	box(host, Vector3(0, 3.7, L.BACK_Z), Vector3(9, 0.65, 0.14), "7a4841")
-	label(host, "HẢI SẢN XÓM ĐÈN", Vector3(0, 3.7, L.BACK_Z + 0.1), 52, "f2d98a")
+	box(host, Vector3(L.GRILL_POSITION.x, 3.7, L.BACK_Z), Vector3(9, 0.65, 0.14), "7a4841")
+	label(host, "HẢI SẢN XÓM ĐÈN", Vector3(L.GRILL_POSITION.x, 3.7, L.BACK_Z + 0.1), 52, "f2d98a")
 	for n in range(int(width)):
 		var color := "456c65" if n % 2 else "c6b89a"
 		box(host, Vector3(n - L.ROOM_X + 0.5, 2.55, L.BACK_Z + 0.9), Vector3(0.98, 0.09, 1.1), color)
 		box(host, Vector3(n - L.ROOM_X + 0.5, 2.4, L.BACK_Z + 1.46), Vector3(0.98, 0.24, 0.08), color)
 	RestaurantBatchVisuals.add(host, "menu_board", L.BOARD_POSITION)
 	solid_block(host, L.BOARD_POSITION + Vector3(0, 0.9, 0), Vector3(1.5, 1.1, 0.12))
-	label(host, "THỰC ĐƠN", L.BOARD_POSITION + Vector3(0, 1.1, 0.1), 28, "f2d98a")
+	var menu_display := WorldMenuBoard3D.new()
+	menu_display.name = "WorldMenuBoard"
+	host.add_child(menu_display)
+	menu_display.position = L.BOARD_POSITION
 	box(host, Vector3(0, -0.05, L.FRONT_Z + 0.1), Vector3(width, 0.2, 0.3), "e7d5b3", true)
 	box(host, Vector3(0, -0.2, L.FRONT_Z + 0.2 + L.ROAD_DEPTH * 0.5), Vector3(width, 0.2, L.ROAD_DEPTH), "202e37").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for x in range(-18, 19, 6):
@@ -195,23 +199,29 @@ static func _decor(host: Node3D) -> void:
 		for x in L.DECOR_PLANTERS:
 			RestaurantBatchVisuals.add(host, "plant_pot", Vector3(x, 0, L.PLANTER_Z))
 
-static func _tables(host: Node3D) -> void:
+static func add_tables(host: Node3D, start_index: int) -> void:
+	_tables(host,start_index)
+
+static func _tables(host: Node3D, start_index := 0) -> void:
 	var seats: UpgradeData = host.seats_upgrade
 	var table_count := clampi(int(GameState.get_upgrade_value(seats)), 1, L.TABLES.size()) if seats else 4
-	for i in range(table_count):
+	for i in range(start_index,table_count):
 		var p: Vector3 = L.TABLES[i]
 		var table: Node3D = TABLE_PILOT.instantiate()
+		table.name = "DiningTable_%d" % i
 		host.add_child(table)
 		table.position = p
+		table.rotation.y = L.TABLE_YAW
 		WorldPresentation3D.cast_shadows(table)
-		solid_block(host, p + Vector3(0, 0.8, 0), Vector3(1.5, 0.12, 1.2))
+		solid_block(host, p + Vector3(0, 0.8, 0), L.TABLE_COLLISION_SIZE)
 		for side in [-1.0, 1.0]:
-			var stool_pos := p + Vector3(side * 1.02, 0, 0)
+			var stool_pos := p + L.chair_offset(side)
 			# Low plastic stool: .47 m footprint and .44 m seat, proportional to people.
 			# Scale the collider with the visual so Rin cannot hit an invisible old edge.
 			var stool: Node3D = STOOL_PILOT.instantiate()
 			host.add_child(stool)
 			stool.position = stool_pos
+			stool.rotation.y = L.TABLE_YAW
 			stool.scale = Vector3.ONE * WorldPresentation3D.RESTAURANT_STOOL_SCALE
 			WorldPresentation3D.cast_shadows(stool)
 			stool.name = "PilotStool_%d_%s" % [i, "blue" if side < 0 else "red"]
@@ -227,6 +237,14 @@ static func _tables(host: Node3D) -> void:
 		guest.set_seated(true)
 		host.guests.append(guest)
 		guest.visible = false
+		var partner := PersonRig3D.build(guest,"guest")
+		partner.name = "SeatingPartner"
+		partner.set_variant("guest_2" if i%2==0 else "guest_1")
+		partner.global_position = host.to_global(RestaurantSeating3D.seat(i,p,true))
+		partner.rotation.y = PI
+		partner.sample_seating(1)
+		partner.set_seated(true)
+		guest.set_meta("seating_partner",partner)
 		host.order_labels.append(label(host, "", p + Vector3(0, 2.25, 0.6), 18, "f2d98a"))
 		host.orders.append({})
 		host.dirty_tables.append(false)
@@ -244,8 +262,8 @@ static func _kitchen(host: Node3D) -> void:
 	RestaurantBatchVisuals.upgrade(host, "kitchen", ["food_cart_0", "food_cart_1", "food_cart_2"], L.GRILL_POSITION)
 	solid_block(host, L.GRILL_POSITION + Vector3(0, 0.7, 0), Vector3(2.8, 1.3, 1.25))
 	RestaurantBatchVisuals.add(host, "charcoal_grill", L.GRILL_POSITION + Vector3(-2.25, 0, 0))
-	box(host, Vector3(5.5, 0.7, 1.5), Vector3(1.2, 1.3, 0.1), "884b2b", true)
-	label(host, "BẾP   E\nBẢNG MÓN", Vector3(5.5, 0.8, 1.57), 16, "e7d5b3")
+	box(host, L.KITCHEN_BOARD_POSITION + Vector3(0, 0.7, 0), Vector3(1.2, 1.3, 0.1), "884b2b", true)
+	label(host, "BẾP\nBẢNG MÓN", L.KITCHEN_BOARD_POSITION + Vector3(0, 0.8, 0.07), 16, "e7d5b3")
 	# Cô Năm keeps her grocery counter separate from the kitchen.
 	RestaurantBatchVisuals.add(host, "grocery_counter", L.COUNTER_POSITION)
 	solid_block(host, L.COUNTER_POSITION + Vector3(0, 0.75, 0), Vector3(3.6, 1.0, 0.8))
@@ -253,11 +271,11 @@ static func _kitchen(host: Node3D) -> void:
 	RestaurantBatchVisuals.add(host, "crate", L.COUNTER_POSITION + Vector3(2.45, 0, 0))
 	RestaurantBatchVisuals.add(host, "bottle", L.COUNTER_POSITION + Vector3(1.2, 1.36, 0.12))
 	label(host, "TẠP HOÁ CÔ NĂM", L.COUNTER_POSITION + Vector3(0, 2.4, -0.45), 24, "f2d98a")
-	PersonRig3D.build(host, "co_nam").position = L.COUNTER_POSITION + Vector3(0, 0, -0.85)
+	PersonRig3D.build(host, "co_nam").position = L.COUNTER_POSITION + Vector3(-2.1, 0, -0.85)
 	# Bảo cooks independently, leaving grill and beer to Rin.
 	host.bao_model = PersonRig3D.build(host, "bao")
-	host.bao_model.position = L.GRILL_POSITION + Vector3(-0.7, 0, -1.3)
-	host.bao_label = label(host, "Bảo • bếp", L.GRILL_POSITION + Vector3(-0.7, 2.35, -1.3), 20, "f0d39b")
+	host.bao_model.position = L.GRILL_POSITION + Vector3(-1.5, 0, -0.85)
+	host.bao_label = label(host, "Bảo • bếp", L.GRILL_POSITION + Vector3(-1.5, 2.15, -0.85), 20, "f0d39b")
 	RestaurantBatchVisuals.add(host, "plate_bench", L.PASS_POSITION)
 	solid_block(host, L.PASS_POSITION + Vector3(0, 0.83, 0), Vector3(1.1, 0.12, 0.75))
 	RestaurantBatchVisuals.add(host, "bin", L.PASS_POSITION + Vector3(-0.95, 0, 0))
@@ -278,4 +296,5 @@ static func _player(host: Node3D) -> void:
 	collider.position.y = 0.8
 	player.add_child(collider)
 	host.player = player
+	(host.demo_camera as RestaurantCamera3D).target = player
 	host.body = PersonRig3D.build(player, "rin")

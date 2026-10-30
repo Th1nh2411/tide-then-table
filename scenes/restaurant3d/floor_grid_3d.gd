@@ -7,25 +7,28 @@ const CELL := 0.25
 const SIZE := Vector2i(160, 64)
 const PAD := 0.25
 ## Furniture footprints: centre x, centre z, width, depth.
-const TABLE_SIZE := Vector2(2.6, 1.2)
+const TABLE_SIZE := RestaurantLayout3D.TABLE_NAV_SIZE
 const FIXED: Array[Rect2] = [
 	Rect2(1.6, -4.925, 2.8, 1.25),   # kitchen counter
 	Rect2(-1.35, -4.675, 1.1, 0.75), # plate table
 	Rect2(4.95, -3.95, 0.5, 0.5),    # beer tap
-	Rect2(4.9, 1.45, 1.2, 0.2),      # bep board
-	Rect2(0.75, 6.84, 1.5, 0.12),    # menu board
+	Rect2(RestaurantLayout3D.KITCHEN_BOARD_POSITION.x-.6, RestaurantLayout3D.KITCHEN_BOARD_POSITION.z-.05, 1.2, .1), # kitchen board
+	Rect2(RestaurantLayout3D.BOARD_POSITION.x-.75, RestaurantLayout3D.BOARD_POSITION.z-.06, 1.5, .12), # menu board
 	Rect2(8.2, -4.7, 3.6, 0.8),     # grocery counter
 	Rect2(-1.95, -7.6, 0.9, 0.8),    # fridge
 ]
 
 static var shared: FloorGrid3D
+static var _shared_key := ""
 
 var astar := AStarGrid2D.new()
 
 
 static func get_shared(tables: Array) -> FloorGrid3D:
-	if shared == null:
+	var key := str(hash(tables))+":"+str(GameState.get_upgrade_level("seats"))
+	if shared == null or _shared_key != key:
 		shared = FloorGrid3D.new(tables)
+		_shared_key = key
 	return shared
 
 
@@ -34,10 +37,17 @@ func _init(tables: Array) -> void:
 	astar.cell_size = Vector2(CELL, CELL)
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
 	astar.update()
-	for table: Vector3 in tables:
+	for i in mini(tables.size(),RestaurantLayout3D.table_count(GameState.get_upgrade_level("seats"))):
+		var table: Vector3 = tables[i]
 		_block(Rect2(table.x - TABLE_SIZE.x * 0.5, table.z - TABLE_SIZE.y * 0.5, TABLE_SIZE.x, TABLE_SIZE.y))
 	for rect in FIXED:
 		_block(rect)
+	var left := RestaurantLayout3D.lease_left(GameState.get_upgrade_level("seats"))
+	for x in SIZE.x:
+		for y in SIZE.y:
+			var p := ORIGIN+Vector2(x+.5,y+.5)*CELL
+			if p.y < RestaurantLayout3D.PUBLIC_WALK_Z+.3 and (p.x < left+.3 or p.x > RestaurantLayout3D.LEASE_RIGHT-.3):
+				astar.set_point_solid(Vector2i(x,y),true)
 
 
 ## True when the point sits on furniture (with padding).

@@ -152,6 +152,7 @@ func _ready() -> void:
 	add_child(cooking_overlay)
 	plan = MenuPlan.new(3 + mini(DishBook.kitchen_level(), 2))
 	plan.kitchen_level = DishBook.kitchen_level()
+	($WorldMenuBoard as WorldMenuBoard3D).bind(plan, menu)
 	DayClock.set_progress(0.0, DayClock.shop_open_hour, DayClock.shop_close_hour)
 	DailyTrend.ensure(null, menu)
 	planning_panel.setup(plan, menu, market_stock, _has_stock, _ui_theme(), _panel_style())
@@ -233,7 +234,7 @@ func _open_renovation() -> void:
 
 func _on_renovation_finished(applied: bool) -> void:
 	if applied:
-		_show_note("Sửa quán xong!")
+		_show_note("Đã thuê thêm mặt bằng và mở bàn mới." if renovation and renovation.last_seat_change else "Sửa quán xong!")
 
 func _buy_upgrade(upgrade: UpgradeData) -> void:
 	if GameState.buy_upgrade(upgrade):
