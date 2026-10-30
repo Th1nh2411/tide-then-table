@@ -13,9 +13,101 @@ static func _tween(node: Node) -> Tween:
 	return tween
 
 
-## Pivot in the middle so scale animations grow from the centre.
+## Pivot in the middle so scale animations grow from the centre (kept there
+## when a container resizes it later, e.g. the first frame after show()).
 static func _center_pivot(control: Control) -> void:
 	control.pivot_offset = control.size * 0.5
+	if not control.has_meta("ui_fx_pivot"):
+		control.set_meta("ui_fx_pivot", true)
+		control.resized.connect(func() -> void: control.pivot_offset = control.size * 0.5)
+
+
+## Grows a little and wobbles while the mouse is over it (cards, buttons);
+## settles back to its resting tilt (`ui_fx_tilt` meta, see `tilt`).
+static func hover_lift(control: Control, amount: float = 0.05) -> void:
+	_center_pivot(control)
+	control.mouse_entered.connect(func() -> void:
+		_scale_to(control, 1.0 + amount)
+		wobble(control))
+	control.mouse_exited.connect(func() -> void: _scale_to(control, 1.0))
+
+
+## Resting rotation in degrees (paper slips, signs hang a bit crooked).
+static func tilt(control: Control, degrees: float) -> void:
+	_center_pivot(control)
+	control.set_meta("ui_fx_tilt", deg_to_rad(degrees))
+	control.rotation = deg_to_rad(degrees)
+	# Containers zero the rotation on every re-sort: put the tilt back after.
+	if control.get_parent() == null:
+		control.tree_entered.connect(tilt.bind(control, degrees), CONNECT_ONE_SHOT)
+		return
+	var parent := control.get_parent() as Container
+	if parent and not control.has_meta("ui_fx_tilt_hooked"):
+		control.set_meta("ui_fx_tilt_hooked", true)
+		var retilt := func() -> void:
+			control.set_deferred("rotation", control.get_meta("ui_fx_tilt", 0.0))
+		parent.sort_children.connect(retilt)
+		# Unhook before the control goes, or the parent calls a dead lambda.
+		control.tree_exiting.connect(func() -> void:
+			if parent.sort_children.is_connected(retilt):
+				parent.sort_children.disconnect(retilt)
+			control.remove_meta("ui_fx_tilt_hooked"), CONNECT_ONE_SHOT)
+
+
+## Quick left-right rock that ends on the resting tilt.
+static func wobble(control: Control, degrees: float = 3.0) -> Tween:
+	_center_pivot(control)
+	var rest: float = control.get_meta("ui_fx_tilt", 0.0)
+	var tween := _tween(control)
+	for step: float in [1.0, -0.6, 0.3]:
+		tween.tween_property(control, "rotation", rest + deg_to_rad(degrees * step), 0.06)
+	tween.tween_property(control, "rotation", rest, 0.08)
+	return tween
+
+
+## Paper slid onto the table: comes in from `offset` turned, settles on its tilt.
+static func settle(control: Control, offset: Vector2 = Vector2(0, -24), delay: float = 0.0, turn: float = -8.0) -> Tween:
+	_center_pivot(control)
+	var rest: float = control.get_meta("ui_fx_tilt", 0.0)
+	var home := control.position
+	control.position = home + offset
+	control.rotation = rest + deg_to_rad(turn)
+	control.modulate.a = 0.0
+	var tween := _tween(control).set_parallel()
+	tween.tween_property(control, "position", home, 0.3).set_delay(delay) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(control, "rotation", rest, 0.4).set_delay(delay) \
+		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(control, "modulate:a", 1.0, 0.12).set_delay(delay)
+	return tween
+
+
+## Rubber stamp: slams down from big, then a tiny shake of `shake_target`.
+static func stamp(control: Control, shake_target: Control = null, delay: float = 0.0) -> Tween:
+	_center_pivot(control)
+	control.scale = Vector2.ONE * 2.2
+	control.modulate.a = 0.0
+	var tween := _tween(control)
+	tween.tween_interval(delay)
+	tween.tween_property(control, "modulate:a", 1.0, 0.01)
+	tween.tween_property(control, "scale", Vector2.ONE * 0.92, 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(control, "scale", Vector2.ONE, 0.08)
+	if shake_target:
+		tween.tween_callback(func() -> void: shake(shake_target, 2.0))
+	return tween
+
+
+static func _scale_to(control: Control, target: float) -> void:
+	if not control.is_inside_tree():
+		return
+	if control.has_meta("ui_fx_hover"):
+		var old: Tween = control.get_meta("ui_fx_hover")
+		if old and old.is_valid():
+			old.kill()
+	var tween := _tween(control)
+	tween.tween_property(control, "scale", Vector2.ONE * target, 0.12) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	control.set_meta("ui_fx_hover", tween)
 
 
 ## Scale up from small with a little overshoot, fading in.
