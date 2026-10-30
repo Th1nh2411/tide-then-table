@@ -37,6 +37,25 @@ vào biển 3D; Tiếp tục dùng điểm resume trong save hiện tại.
    nốt khách. Tổng kết hiện một lần (nút Đóng); sau đó Rin vẫn đi lại, dùng nút
    Sửa quán và Ra khơi ghim trên màn hình. Đồ nghề biển và nhân viên trong J.
 
+## Thử thách ngày và thành tựu
+
+- **Thử thách hôm nay:** lúc mở cửa, `DailyChallenges` chọn 3 mẫu trong
+  `data/challenges/` (seed theo ngày, chỉ mẫu làm được: nướng khi thực đơn có món
+  nướng, bia từ ngày bán bia, HOT khi món HOT có trên thực đơn). Id lưu ở story
+  flags `challenge_day` / `challenge_ids`. Thẻ nhỏ góc phải trên (`ChallengeCard3D`),
+  gần như không chữ: mỗi dòng icon + thanh tiến độ + "2/5" + dấu tick khi xong, câu đầy
+  đủ ở tooltip. Icon tạm: `GoalIcons.icon(id)` (pixel ASCII, id: money, clock, star,
+  guest, fire, beer, fish, chili, check, lock, trophy, heart, tip) — sẽ đổi sang `UiIcons`.
+  NEO báo một lần ("NEO: Thử thách xong: ... +30k"),
+  thưởng trả lúc hết ca (một lần/ngày). Thêm mẫu = .tres mới + nối vào catalog.
+- **Thành tựu:** `data/achievements/` (11 cái), so với `GameState.stats` (đếm cả
+  đời, có lưu) lúc hết ca; mở = flag `ach_<id>`, trả thưởng một lần, toast
+  cúp + icon + tên (`AchievementToast`). Tab "Thành tựu" trong điện thoại (J): lưới
+  huy hiệu (vàng = đã mở; xám + ổ khóa + thanh tiến độ = chưa), chi tiết ở tooltip.
+- **API cho bảng điểm sau này:** `ShiftLog` (host.shift_log, reset khi mở ca) ghi
+  từng món/bàn/khách bỏ về; `host.shift_results` sau khi đóng ca có `challenges`,
+  `achievements`, `bonus`; tổng kết hiện thêm vài dòng tóm tắt.
+
 ## Kiểm tra đã có
 
 - `tools/run_tests.sh`: logic 2D hiện có, các regression 3D và smoke scene.
@@ -51,7 +70,10 @@ vào biển 3D; Tiếp tục dùng điểm resume trong save hiện tại.
 - `scenes/test/sea3d_parity_test.tscn`: dầu/đèn/cần câu, lượt đàn cá, Dex,
   phần thưởng, overflow và tọa độ ghim.
 - `scenes/restaurant3d/restaurant_flow_check.tscn`: nấu/nhận/phục vụ/ăn/trả
-  tiền/dọn, Rin đi được trước/sau ca, nút Đóng sớm, pantry-only, chống thanh toán trùng và thuê Vy từ lựa chọn.
+  tiền/dọn, Rin đi được trước/sau ca, nút Đóng sớm, pantry-only, chống thanh toán trùng và thuê Vy từ lựa chọn,
+  ShiftLog → thử thách/thống kê/thành tựu lúc đóng ca.
+- `scenes/test/challenges_test.tscn`: roll thử thách cố định theo ngày và chỉ mẫu làm
+  được, tiến độ từ ShiftLog, thưởng trả một lần, thành tựu mở một lần, lưu/tải stats.
 
 Các lệnh kiểm tra luôn chạy `-- --no-autosave`; save roundtrip dùng file tạm.
 Bot dịch chuyển nhanh giữa địa điểm và tạo kết quả minigame thành công có chủ

@@ -147,6 +147,13 @@ QUÁN
   Sau tổng kết: Sửa quán để nâng cấp, Ra khơi bắt đầu ngày tiếp theo.
   J: mua đồ nghề đi biển hoặc thuê nhân viên (khi đã mở khóa).
 
+THỬ THÁCH & THÀNH TỰU
+  Mở quán là có 3 thử thách hôm nay (góc phải trên): phục vụ đủ bàn,
+  nướng, rót bia, bán món HOT, phục vụ nhanh, nhận tiền boa...
+  Xong thử thách: NEO báo, cuối ca được thưởng tiền.
+  Thành tựu cả đời quán (100 bàn, 5 sao...) có thưởng; xem ở tab
+  "Thành tựu" trong điện thoại (J).
+
 Bản 3D hiện dùng một khách/một món mỗi bàn. Hướng dẫn chi tiết theo
 ô, nhóm khách và túi đồ chợ ở tab Quán mô tả bản 2D."""
 ]

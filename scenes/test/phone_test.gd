@@ -54,6 +54,10 @@ func _ready() -> void:
 			_check("map tab shows map", _phone.get_node("%Map").visible and not _phone.get_node("%Scroll").visible)
 		elif tab == PhoneApp.STAFF_TAB:
 			_check("staff tab shows the staff app", _phone.get_node("%Scroll").visible == false)
+		elif tab == PhoneApp.ACHIEVEMENTS_TAB:
+			var badges: PhoneAchievements = _phone._achievements
+			_check("achievements tab shows badge tiles", badges.visible and not _phone.get_node("%Scroll").visible
+				and badges.tile_count() == badges.catalog.achievements.size())
 		elif tab == PhoneApp.SHOP_TAB:
 			var shop: PhoneShop = _phone.get_node("%Shop")
 			_check("shop tab lists upgrades", shop.visible and shop._rows.size() == shop.upgrades.size()

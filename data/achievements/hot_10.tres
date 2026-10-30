@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AchievementData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/achievement_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "hot_10"
+title = "Bắt trend"
+icon = "chili"
+desc = "Bán 10 món HOT"
+stat = "hot_total"
+target = 10
+reward_k = 60

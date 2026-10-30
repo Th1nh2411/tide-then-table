@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AchievementData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/achievement_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "grill_20"
+title = "Tay nướng"
+icon = "fire"
+desc = "Nướng 20 món"
+stat = "grill_total"
+target = 20
+reward_k = 60

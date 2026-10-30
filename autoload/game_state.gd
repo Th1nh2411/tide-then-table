@@ -74,6 +74,9 @@ var staff: Dictionary = {}
 ## Seconds spent in the game itself (not the main menu / ending), saved.
 ## Shown on the ending's thank-you card.
 var play_seconds: float = 0.0
+## Lifetime restaurant counters (LifetimeStats keys + "dishes_sold"), for
+## achievements and the shift scoreboard. Saved.
+var stats: Dictionary = {}
 ## History entries kept (older ones are dropped).
 const MAX_HISTORY: int = 14
 
@@ -103,6 +106,7 @@ func reset() -> void:
 	resume_at = "sea"
 	trip_notes.clear()
 	play_seconds = 0.0
+	stats = {}
 
 
 func _ready() -> void:

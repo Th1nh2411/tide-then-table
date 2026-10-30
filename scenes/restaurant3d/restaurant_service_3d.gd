@@ -84,6 +84,7 @@ func finish_meal(table: int) -> void:
 		price = roundi(float(price) * host.tuning.rich_price_scale)
 	if dish.is_market_dish():
 		price = roundi(float(price) * KitchenLogic.freshness_multiplier(float(order["freshness"])))
+	host.shift_log.record_dish(dish, price, DailyTrend.is_hot(dish))
 	var party: PartyOrders3D = order.get("party")
 	if party:
 		party.bill += price
@@ -97,6 +98,7 @@ func finish_meal(table: int) -> void:
 	var tip: int = roundi(price * (host.tuning.tip_ratio + host.staff_roster.tip_bonus())) if visit.is_empty() and patience_ratio > host.tuning.tip_patience_threshold else 0
 	GameState.add_money(price + tip)
 	host.earned += price + tip
+	host.shift_log.record_party(price, tip, patience_ratio, not visit.is_empty())
 	if not visit.is_empty():
 		FishOrders.complete(visit["order"])
 		GameState.set_flag("regular_served_once")
@@ -115,8 +117,9 @@ func finish_meal(table: int) -> void:
 func lose_order(table: int) -> void:
 	var already_cooked: bool = bool(host.orders[table].get("cooked", false))
 	var left_party: PartyOrders3D = host.orders[table].get("party")
+	var part_paid: int = 0
 	if left_party:
-		var part_paid: int = left_party.abandon(host.plan, host.market_stock)
+		part_paid = left_party.abandon(host.plan, host.market_stock)
 		GameState.add_money(part_paid)
 		host.earned += part_paid
 	if table == host.cooking_table:
@@ -138,6 +141,7 @@ func lose_order(table: int) -> void:
 	host.guests[table].visible = false
 	host.order_labels[table].text = ""
 	host.lost += 1
+	host.shift_log.record_lost(part_paid)
 	host._show_note("Khách bàn %d đợi lâu quá nên bỏ về." % (table + 1))
 	host._dispatch_ready()
 
@@ -182,8 +186,12 @@ func end_shift() -> void:
 	GameState.add_money(-host.wages_paid)
 	var stars := DayRating.stars(host.served, host.lost, limited_variety)
 	GameState.last_rating = stars
-	GameState.add_day_record({"day": GameState.day, "earned": host.earned, "market": host.market_spent, "rating": stars, "served": host.served, "left": host.lost, "wages": host.wages_paid})
-	host.panels.show_summary("HẾT CA • XÓM ĐÈN\nPhục vụ: %d  |  Bỏ về: %d\nThu: %dk  |  Chợ: %dk  |  Lương: %dk\nDư: %d phần  |  Đánh giá: %d sao" % [host.served, host.lost, host.earned, host.market_spent, host.wages_paid, leftover, stars])
+	host.shift_results = host.goals.finish_shift(stars)
+	var bonus: int = int(host.shift_results.get("bonus", 0))
+	GameState.add_day_record({"day": GameState.day, "earned": host.earned, "market": host.market_spent, "rating": stars, "served": host.served, "left": host.lost, "wages": host.wages_paid, "bonus": bonus})
+	var goal_lines := RestaurantGoals3D.summary_lines(host.shift_results)
+	host.panels.show_summary("HẾT CA • XÓM ĐÈN\nPhục vụ: %d  |  Bỏ về: %d\nThu: %dk  |  Chợ: %dk  |  Lương: %dk\nDư: %d phần  |  Đánh giá: %d sao" % [host.served, host.lost, host.earned, host.market_spent, host.wages_paid, leftover, stars]
+		+ ("\n" + goal_lines if goal_lines != "" else ""))
 
 func sync_food_visuals() -> void:
 	for i: int in range(host.orders.size()):

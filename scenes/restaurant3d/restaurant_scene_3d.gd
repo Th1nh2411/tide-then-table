@@ -97,6 +97,11 @@ var table_plates: Array[Node3D] = []
 var ready_plates: Array[Node3D] = []
 var bao_model: PersonRig3D
 var bao_label: Label3D
+## This shift's events (RestaurantService3D fills it; new one at shift start).
+var shift_log := ShiftLog.new()
+## Set at closing by RestaurantGoals3D.finish_shift (challenges, achievements).
+var shift_results: Dictionary = {}
+var goals: RestaurantGoals3D
 
 func _pick_tuning() -> ServiceTuning:
 	var current: ServiceTuning = TUNINGS[0]
@@ -184,6 +189,8 @@ func _build_ui() -> void:
 	hud.renovate_requested.connect(_open_renovation)
 	hud.close_requested.connect(_close_early)
 	hud.sail_requested.connect(_sail)
+	goals = RestaurantGoals3D.new(self)
+	goals.build()
 	add_child(load("res://scenes/ui/pause_menu.tscn").instantiate())
 	add_child(load("res://scenes/ui/phone_app.tscn").instantiate())
 	bag.build_fridge(self)
@@ -258,6 +265,7 @@ func _open_shift() -> void:
 	shift_running = true
 	seconds_left = SHIFT_SECONDS
 	spawn_clock = tuning.first_spawn_delay
+	goals.start_shift()
 	_show_note("Bảo nấu món thường. E ở bàn nhận món; nướng và rót bia do Rin làm. T: đóng sớm.")
 
 func _physics_process(delta: float) -> void:

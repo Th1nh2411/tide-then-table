@@ -92,6 +92,10 @@ func _run() -> void:
 	assert(room.shift_running, "Closing discarded a guest still eating")
 	room._process(5.0)
 	assert(room.shift_over and not GameState.day_history.is_empty())
+	var results: Dictionary = room.shift_results
+	var goals_ok: bool = room.shift_log.parties_served() == room.served and (results.get("challenges", []) as Array).size() == 3 \
+		and LifetimeStats.value(GameState.stats, "served_total") == room.served and GameState.has_flag("ach_first_guest")
+	print("PASS shift log -> challenges, stats, achievements" if goals_ok else "FAIL shift log -> challenges, stats, achievements")
 	await get_tree().process_frame
 	var after_walk: Vector3 = room.player.position
 	Input.action_press("turn_left")

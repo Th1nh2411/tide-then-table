@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ChallengeData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/challenge_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "earn_k"
+text = "Thu ít nhất {n}k"
+kind = 5
+icon = "money"
+target = 150
+target_per_day = 40.0
+reward_k = 40
+min_day = 1

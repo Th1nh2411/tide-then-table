@@ -91,6 +91,7 @@ static func to_dict() -> Dictionary:
 		"weather_id": GameState.weather_id,
 		"resume_at": GameState.resume_at,
 		"play_seconds": GameState.play_seconds,
+		"stats": GameState.stats.duplicate(true),
 		"map_pins": GameState.map_pins.map(func(pin: Vector2) -> Array: return [pin.x, pin.y]),
 	}
 
@@ -178,6 +179,8 @@ static func apply_dict(data: Dictionary) -> void:
 			var order := FishOrders.from_save(entry, catalog)
 			if not order.is_empty():
 				GameState.orders.append(order)
+
+	GameState.stats = LifetimeStats.from_save(data.get("stats"))
 
 	var resume: Variant = data.get("resume_at")
 	if resume is String and RESUME_POINTS.has(resume):

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AchievementData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/achievement_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "earned_1000"
+title = "Nghìn đầu tiên"
+icon = "money"
+desc = "Thu tổng cộng 1000k"
+stat = "earned_total"
+target = 1000
+reward_k = 100

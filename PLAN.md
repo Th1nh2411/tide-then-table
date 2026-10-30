@@ -528,4 +528,8 @@ Hướng dẫn chạy, kiểm tra và danh sách còn thiếu: `docs/3D_DEMO.md`
 - 2026-10-30: biển 3D tách 4 helper; đá ngầm ẩn, mây sương, câu đầu đêm/[WARN] như 2D;
   `tint` cutscene 3D; cảnh ngất dùng model Rin + clip `Faint`.
 - 2026-10-30: thúng chèo từng nhịp (vật lý theo lần chèo, clip `Row` + mái chèo).
+- 2026-10-30: mục tiêu ở quán 3D: 3 thử thách ngày (`DailyChallenges`, 8 mẫu trong
+  `data/challenges/`, thẻ HUD + NEO báo, thưởng cuối ca), 11 thành tựu (`Achievements`,
+  `data/achievements/`, toast + tab "Thành tựu" trong điện thoại), `GameState.stats` đếm cả
+  đời (có lưu), `ShiftLog` + `host.shift_results` làm dữ liệu cho bảng điểm/mạng xã hội sau.
 - Chưa xong: preview bếp/thùng đá, playtest tay, pacing (bot 3D có >20.000k ở ngày 4 — cần xem lại kinh tế), art 3D (mèo đi bốn chân).
