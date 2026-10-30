@@ -14,3 +14,4 @@ Thumbs.db
 # Scratch / backups (local only)
 /tmp/
 /.art_backups/
+.claude/worktrees/
