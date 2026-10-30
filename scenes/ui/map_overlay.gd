@@ -22,23 +22,18 @@ func _ready() -> void:
 	add_child(center)
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = panel_size
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.05, 0.07, 0.11, 0.97)
-	style.border_color = Color(1.0, 0.85, 0.3, 0.7)
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(4)
-	style.set_content_margin_all(6)
-	panel.add_theme_stylebox_override("panel", style)
+	panel.theme_type_variation = &"PaperPanel"  # folded paper chart
 	center.add_child(panel)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 3)
 	panel.add_child(box)
 	var title := HBoxContainer.new()
 	box.add_child(title)
-	title.add_child(_label("BẢN ĐỒ", Color(1.0, 0.85, 0.3), 10, true))
-	title.add_child(_label("bấm: ghim · M / Esc: đóng", Color(0.6, 0.65, 0.7), 8, false))
+	title.add_child(_label("BẢN ĐỒ", &"HeadingLabel", 12, true))
+	title.add_child(_label("bấm: ghim · M / Esc: đóng", &"MutedLabel", 8, false))
 	_map = PhoneMap.new()
 	_map.label_size = 9
+	_map.paper = Color("ebede9")  # chart on the cream paper
 	_map.show_legend = true
 	_map.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(_map)
@@ -58,10 +53,10 @@ func close() -> void:
 		_opened_pause = false
 
 
-func _label(text: String, color: Color, font_size: int, expand: bool) -> Label:
+func _label(text: String, variation: StringName, font_size: int, expand: bool) -> Label:
 	var label := Label.new()
 	label.text = text
-	label.add_theme_color_override("font_color", color)
+	label.theme_type_variation = variation
 	label.add_theme_font_size_override("font_size", font_size)
 	if expand:
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL

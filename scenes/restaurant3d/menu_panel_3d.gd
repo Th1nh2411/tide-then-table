@@ -2,7 +2,7 @@ class_name MenuPanel3D
 extends PanelContainer
 ## 3D restaurant menu planning: header (MenuPanelHeader3D: stats, HOT chip,
 ## takings chart), slot cards (MenuDishCard3D), dish picker (MenuPicker3D),
-## pantry pictures, icon buttons and "Mở cửa". Pure rules live in MenuPlan /
+## pantry pictures (MenuPantryStrip3D), icon buttons and "Mở cửa". Pure rules live in MenuPlan /
 ## DishBook / DailyTrend; this is only the view.
 
 signal shop_requested
@@ -31,7 +31,7 @@ var _slot_dishes: Array[DishData] = []
 var _cards: Array[MenuDishCard3D] = []
 var _slots_box: HBoxContainer
 var _picker: MenuPicker3D
-var _pantry: HBoxContainer
+var _pantry: MenuPantryStrip3D
 var _buttons: HBoxContainer
 var _open_pulse: Tween
 
@@ -98,10 +98,7 @@ func _build_buttons() -> void:
 	_button("hammer", "", "Sửa quán", func() -> void: renovate_requested.emit())
 	_button("close", "", "Đóng (Esc)", close)
 	# Market goods in stock: tiny pictures + counts, then the button to buy more.
-	_pantry = HBoxContainer.new()
-	_pantry.add_theme_constant_override("separation", 4)
-	_pantry.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_pantry.alignment = BoxContainer.ALIGNMENT_END
+	_pantry = MenuPantryStrip3D.new()
 	_buttons.add_child(_pantry)
 	_button("cart", "Cô Năm", "Mua rau, bia ở Cô Năm", func() -> void: shop_requested.emit())
 	sail_button = _button("boat", "Ra khơi", "", func() -> void: sail_requested.emit())
@@ -182,7 +179,7 @@ func refresh() -> void:
 		var dish := _slot_dishes[index]
 		_cards[index].display(dish, plan.get_portion_count(dish),
 			plan.can_add(dish, GameState.storage) if dish else false)
-	_fill_pantry()
+	_pantry.fill(menu, market_stock)
 	var seafood := visible_dishes(menu.dishes, plan.kitchen_level)
 	clear_button.disabled = plan.total_portions() == 0
 	auto_button.disabled = seafood.all(func(d: DishData) -> bool:
@@ -228,33 +225,6 @@ func _update_revenue() -> void:
 	for index in _slot_dishes.size():
 		labels.append(str(index + 1))
 	header.set_revenue(_revenue_per_slot(), labels, hot, expected_revenue(), visible)
-
-
-func _fill_pantry() -> void:
-	for child in _pantry.get_children():
-		_pantry.remove_child(child)
-		child.queue_free()
-	for dish in menu.dishes:
-		if dish.is_market_dish() and dish.unlock_day <= GameState.day:
-			var row := HBoxContainer.new()
-			row.add_theme_constant_override("separation", 1)
-			row.tooltip_text = dish.display_name
-			row.mouse_filter = Control.MOUSE_FILTER_PASS
-			var picture := TextureRect.new()
-			picture.texture = Art.texture("dishes/" + dish.id)
-			picture.custom_minimum_size = Vector2(18, 18)
-			picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			row.add_child(picture)
-			var count := Label.new()
-			count.text = "x%d" % market_stock.portions(dish)
-			count.theme_type_variation = &"ChalkLabel"
-			count.add_theme_font_size_override("font_size", 10)
-			if market_stock.portions(dish) == 0:
-				count.add_theme_color_override("font_color", Color("f0a08a"))
-			row.add_child(count)
-			_pantry.add_child(row)
 
 
 func _update_title() -> void:

@@ -3,11 +3,12 @@ extends Node3D
 ## Night trip in 3D. Persistent fish, upgrades, oil, hull and clock use the
 ## existing game systems; only the presentation and boat controller are new.
 ## Orchestrator: world -> SeaWorldBuilder3D, places/events -> SeaPlaces3D,
-## rod/net/hold -> SeaCatch3D, HUD/navigation -> SeaHud3D.
+## rod/net/hold -> SeaCatch3D, HUD/navigation -> SeaHud3D, steering ->
+## SeaBoatMover3D, oil / unload / trip end -> SeaTrip3D, debug keys -> SeaDebug3D.
 
-const REST_SCENE := "res://scenes/rest/rest_scene.tscn"
-const ENDING_SCENE := "res://scenes/ending/ending_scene.tscn"
-const FISHING_OVERLAY := "res://scenes/fishing3d/fishing_overlay_3d.tscn"
+const REST_SCENE := SeaTrip3D.REST_SCENE
+const ENDING_SCENE := SeaTrip3D.ENDING_SCENE
+const FISHING_OVERLAY := SeaSetup3D.FISHING_OVERLAY
 const ROD_UPGRADE := preload("res://data/upgrades/rod_upgrade.tres")
 const LAMP_UPGRADE := preload("res://data/upgrades/lamp_upgrade.tres")
 const CAMERA_OFFSET := Vector3(0,6.2,8.4)
@@ -108,29 +109,7 @@ func _ready() -> void:
 		boat_lamp.spot_range *= weather.lamp_scale
 	SeaHud3D.build_hud(self)
 	SeaHud3D.build_shared_ui(self)
-	var story_scene := load("res://scenes/story3d/story_bridge_3d.tscn") as PackedScene
-	if story_scene:
-		story_bridge = story_scene.instantiate()
-		add_child(story_bridge)
-		story_bridge.set("stage_kind", "sea")
-	var packed := load(FISHING_OVERLAY) as PackedScene
-	if packed:
-		overlay = packed.instantiate() as CanvasLayer
-		add_child(overlay)
-		overlay.connect("catch_detailed", _on_catch_detailed)
-		overlay.connect("catch_finished", _on_catch_finished)
-		overlay.connect("rin_fainted", _on_rin_fainted)
-		overlay.call("bind_hold", hold_ui)
-	else:
-		push_error("SeaScene3D: fishing overlay unavailable")
-	cinematic = CastCinematic3D.new()
-	cinematic.sea = self
-	cinematic.camera = camera
-	cinematic.boat_visual = boat_visual
-	cinematic.hidden_figure = rin_figure
-	add_child(cinematic)
-	camera.position = boat.position + CAMERA_OFFSET
-	camera.look_at(boat.position + Vector3(0, .65, -CAMERA_LOOK_AHEAD))
+	SeaSetup3D.build_tools(self)
 	SeaHud3D.build_navigation(self)
 	DayClock.start_night()
 	DailyTrend.ensure()
@@ -141,81 +120,18 @@ func _ready() -> void:
 	_night_start_lines(fog_tonight)
 	_update_hud()
 
-## Same night-start lines as the 2D sea, queued one after another.
 func _night_start_lines(fog_tonight: bool) -> void:
-	if GameState.last_spoiled_count > 0:
-		_say("Hư mất %d con trong kho rồi, tiếc ghê..." % GameState.last_spoiled_count, 2.5)
-		GameState.last_spoiled_count = 0
-	if not GameState.has_flag("neo_hello"):
-		GameState.set_flag("neo_hello")
-		_say("NEO: Chào anh Rin. Rin's Catch đã khởi động lại. Tôi sẽ nhắc anh dầu đèn, khoang cá và đơn hàng.", 4.0)
-	var trend := DailyTrend.announcement()
-	if trend != "":
-		_say(trend, 4.0)
-	if fog_tonight:
-		_say("Biển lặng lạ thường... phía đông bắc sương dày lên.", 3.0)
-	elif Story.is_fog_open():
-		_say("Sương phủ kín góc đông bắc... trong đó có ánh sáng gì vậy?", 3.0)
-	if weather and weather.start_message != "":
-		_say(weather.start_message, 4.0)
-	_say("Tìm bọt khí trên mặt biển. Bến ở phía sau.", 4.0)
+	SeaTrip3D.night_start_lines(self, fog_tonight)
 
 func _physics_process(delta: float) -> void:
 	if ending or fishing or poi_busy or (hold_ui and hold_ui.visible) or (phone_app and phone_app.visible):
 		return
 	elapsed += delta
-	impact_cooldown = maxf(impact_cooldown - delta, 0.0)
-	var forward := Vector3.FORWARD.rotated(Vector3.UP, boat.rotation.y)
-	var throttle := Input.get_axis("throttle_back", "throttle_forward")
-	var steer := Input.get_axis("turn_left", "turn_right")
-	if not _application_focused or _wait_controls_release:
-		if _application_focused and not _movement_controls_held():
-			_wait_controls_release = false
-		throttle = 0.0
-		steer = 0.0
-	var condition := lerpf(0.6, 1.0, clampf(GameState.boat_hp / 50.0, 0.0, 1.0)) * (0.65 if _is_towing() else 1.0)
-	if boat_data.rowed:
-		# Paddled: pushed only while a stroke pulls, then it glides and spins down.
-		var push := row.step(delta, throttle, steer, boat_data)
-		boat.velocity += forward * push.x * condition
-		yaw_velocity += push.y
-		boat.velocity *= exp(-boat_data.glide_drag * delta)
-		yaw_velocity *= exp(-boat_data.spin_drag * delta)
-	else:
-		boat.velocity += forward * throttle * boat_data.acceleration / 10.0 * delta
-		boat.velocity *= exp(-1.15 * delta)
-	if not _at_dock():
-		boat.velocity += wind * delta
-	boat.velocity = boat.velocity.limit_length(boat_data.max_speed / 10.0 * condition)
-	var forward_speed := boat.velocity.dot(forward)
-	if not boat_data.rowed:
-		var turn_target := steer * deg_to_rad(boat_data.turn_speed) * (0.35 + minf(absf(forward_speed) / 8.0, 0.65))
-		yaw_velocity = move_toward(yaw_velocity, turn_target, delta * (3.0 - boat_data.spin_drift))
-	boat.rotation.y += yaw_velocity * delta
-	boat.velocity.y = 0.0
-	var before := boat.position
-	var impact_speed := boat.velocity.length()
-	boat.move_and_slide()
-	boat.position.y = 0.0
-	if boat.get_slide_collision_count() > 0:
-		if before.distance_to(boat.position) < 0.3 and impact_speed > 2.0 and impact_cooldown <= 0.0:
-			BoatCondition.damage(minf(14.0, impact_speed * 1.6) * blessed_damage_scale)
-			impact_cooldown = 0.85
-			_say("Mạn thuyền va vào vật cản!", 1.8)
-		boat.velocity *= 0.45
-		if GameState.boat_hp <= 0.0:
-			_say("Thuyền hỏng rồi. Có người kéo Rin về bến.", 3.0)
-			_end_trip(true)
-			return
-	# Boat range is inherited from the selected upgrade.
-	var min_z := SeaLayout3D.reach_z(boat_data.max_depth)
-	if boat.position.z < min_z:
-		boat.position.z = min_z
-		boat.velocity.z = maxf(boat.velocity.z, 0.0)
-		_say("Sóng ngoài khơi đẩy thuyền trở lại.", 1.5)
-	var half := SeaLayout3D.size_world() * 0.5 - Vector2.ONE * 2.0
-	boat.position.x = clampf(boat.position.x, -half.x, half.x)
-	boat.position.z = clampf(boat.position.z, -half.y, SeaLayout3D.to_world(Vector2(0, SeaLayout3D.SHORE_PX)).z + 1.0)
+	var motion := SeaBoatMover3D.drive(self, delta)
+	if motion.is_empty():
+		return
+	var forward: Vector3 = motion[0]
+	var forward_speed: float = motion[1]
 	map_boat_proxy.position = SeaLayout3D.to_map(boat.position)
 	map_boat_proxy.rotation = -PI / 2.0 - boat.rotation.y
 	SeaWorldBuilder3D.animate(self, delta, forward, forward_speed)
@@ -236,32 +152,9 @@ func _physics_process(delta: float) -> void:
 	_update_hud()
 
 func _unhandled_input(event: InputEvent) -> void:
-	var debug_key := event as InputEventKey
-	if OS.is_debug_build() and debug_key and debug_key.pressed and not debug_key.echo:
-		if debug_key.physical_keycode == KEY_F4:
-			if WaveMark.has_power():
-				GameState.story_flags.erase(WaveMark.FLAG)
-			else:
-				GameState.set_flag(WaveMark.FLAG)
-			if overlay:
-				var power := overlay.get("wave_power") as WavePower
-				if power:
-					power.charges = WaveMark.max_charges()
-			_say("[debug] Nhịp Sóng: %s" % ("có (C)" if WaveMark.has_power() else "tắt"), 2.0)
-			get_viewport().set_input_as_handled()
-			return
-		if debug_key.physical_keycode == KEY_F3 and story_bridge and not story_bridge.playing and not trip_end_cutscenes.is_empty():
-			var cutscene: Cutscene = trip_end_cutscenes[debug_cutscene_index % trip_end_cutscenes.size()]
-			debug_cutscene_index += 1
-			story_bridge.play(cutscene)
-			get_viewport().set_input_as_handled()
-			return
-		if debug_key.physical_keycode == KEY_F2:
-			# Pretend the omen happened yesterday and reload to open the fog.
-			GameState.set_flag(Story.OMEN_DAY_FLAG, GameState.day - 1)
-			get_tree().reload_current_scene()
-			get_viewport().set_input_as_handled()
-			return
+	if SeaDebug3D.handle(self, event as InputEventKey):
+		get_viewport().set_input_as_handled()
+		return
 	if ending or fishing or poi_busy or (hold_ui and hold_ui.visible) or get_tree().paused:
 		return
 	if event.is_action_pressed("open_hold") and hold_ui:
@@ -321,19 +214,7 @@ func _visit_night_event(index: int) -> void:
 	await SeaPlaces3D.visit_night_event(self, index)
 
 func _enter_whirlpool() -> void:
-	if ending:
-		return
-	ending = true
-	DayClock.stop()
-	GameState.set_flag(Story.ENDING_SEEN_FLAG)
-	Sfx.play("whoosh")
-	boat.velocity = Vector3.ZERO
-	var tween := create_tween().set_parallel()
-	tween.tween_property(boat, "position", WHIRLPOOL_POS, 2.0)
-	tween.tween_property(boat, "rotation:y", boat.rotation.y + TAU * 3.0, 2.0)
-	tween.tween_property(boat_visual, "scale", Vector3.ONE * 0.3, 2.0)
-	await tween.finished
-	SceneRouter.go_to(ENDING_SCENE, Color.WHITE)
+	SeaTrip3D.enter_whirlpool(self)
 
 ## Lamp reach for bubbles and submerged rocks: shrinks as the oil runs low.
 func _bubble_range() -> float:
@@ -370,37 +251,10 @@ func _on_catch_finished(_success: bool, _fish_data: FishData) -> void:
 	_update_hud()
 
 func _unload() -> void:
-	if hold.items.is_empty():
-		_say("Khoang trống. Nhấn R để về nhà.", 2.0)
-		return
-	var items := hold.items.duplicate()
-	for item in items:
-		hold.remove(item)
-	GameState.unload_catch(items)
-	_say("Đã dỡ %d con cá. Có thể ra biển tiếp hoặc nhấn R về nhà." % items.size(), 3.0)
-	_update_hud()
+	SeaTrip3D.unload(self)
 
 func _end_trip(towed: bool, rescue_fee: int = -1) -> void:
-	if ending:
-		return
-	ending = true
-	for event in night_events:
-		if event["towing"]:
-			if towed:
-				GameState.trip_notes.append("%s được cứu hộ kéo về luôn, không gửi tiền." % event["owner"])
-			else:
-				GameState.add_money(80)
-				GameState.trip_notes.append("Kéo ghe %s về bến: +80k" % event["owner"])
-	if towed:
-		var fee := rescue_fee if rescue_fee >= 0 else (150 if BoatCondition.is_broken() else 80)
-		GameState.spend_money(mini(fee, GameState.money))
-		BoatCondition.tow_patch(20.0)
-		GameState.trip_notes.append("Rin được kéo thuyền về bến trong đêm.")
-	DayClock.stop()
-	GameState.finish_sea_day(DayClock.current_minutes, towed, hold.items.duplicate())
-	if story_bridge and not trip_end_cutscenes.is_empty():
-		await story_bridge.call("play_eligible", trip_end_cutscenes)
-	SceneRouter.go_to(REST_SCENE)
+	SeaTrip3D.end_trip(self, towed, rescue_fee)
 
 ## Rin / NEO line; waits for the current one to finish (one bubble at a time).
 func _say(text: String, seconds: float) -> void:
@@ -443,25 +297,11 @@ func _notification(what: int) -> void:
 
 
 func _spend_oil(units: float) -> void:
-	oil = maxf(oil - units, 0.0)
-	var fraction := oil / maxf(oil_capacity, 1.0)
-	DayClock.set_progress(1.0 - fraction, DayClock.night_start_hour, DayClock.dawn_hour)
-	if not oil_critical_sent and fraction <= 0.1 and oil > 0.0:
-		oil_critical_sent = true
-		_say("NEO: Dầu còn 10%. Anh Rin nên về bến ngay.", 3.0)
-	elif not oil_low_sent and fraction <= 0.25 and fraction > 0.1:
-		oil_low_sent = true
-		_say("NEO: Dầu đèn còn 25%. Anh Rin quay về bến nhé.", 3.0)
-	if is_instance_valid(boat_lamp):
-		boat_lamp.light_energy = 2.5 * lerpf(0.3, 1.0, clampf(fraction * 2.0, 0.0, 1.0))
+	SeaTrip3D.spend_oil(self, units)
 
 
 func _on_rin_fainted() -> void:
-	GameState.trip_notes.append("Rin bất tỉnh khi vật lộn với cá ngoài khơi.")
-	_say("Choáng quá... may có người kéo thuyền về bến.", 3.0)
-	if hold_ui and hold_ui.visible:
-		await hold_ui.closed
-	_end_trip(true, 0)
+	SeaTrip3D.rin_fainted(self)
 
 
 func _casts_used_total() -> int:

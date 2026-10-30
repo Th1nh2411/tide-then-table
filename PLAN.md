@@ -446,16 +446,19 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng)
 **P1 — Playtest & cân bằng**
 - [ ] Chơi tay trọn vòng 3D theo `PLAYTEST.md` (bot chỉ kiểm tích hợp, không đo độ khó).
 - [ ] Kinh tế: bot 3D có ~15.000–25.000k ở ngày 4–5 → xem lại giá / khách / thưởng; thưởng và mục tiêu thử thách ngày (`data/challenges/`), doanh thu quán đối thủ (`data/social/rivals/`), ngưỡng follower / hạng quán (`data/social/social_tuning.tres`).
+  - Đo 30/10 (bot câu hết cá + phục vụ hoàn hảo, nhưng có đồng hồ ca 180 s thật): ~25–30 khách/ca từ ngày 2, thu ~4.000–5.600k ngày 2, ~7.400–8.500k ngày 3–4, cuối ~15.500k; câu 50% cá: cuối 160–9.000k (dao động lớn). Mỗi khách ~100–150k ngày 1, ~270k ngày 3+ (1–3 món/bàn, gọi thêm, x1,3 nấu khéo, size/quality, tip 20%).
+  - Vấn đề: tiền nâng cấp (tổng ~12.850k) mua hết vào ngày 3 → sau đó tiền vô dụng; quán là nút thắt (kho 85–100 con, chỉ bán ~30 khách); thưởng thử thách 30–40k, đối thủ 220–940k/ngày, mục tiêu "kiếm 150k + 40k/ngày" quá nhỏ so với 4.000k+/ngày từ ngày 2; bot không mua hàng Cô Năm.
+  - Đã sửa: món HOT ở quán 3D bị tính x2,25 (x1,5 hai lần) → nay x1,5. Chưa chỉnh số cân bằng nào, chờ playtest.
 - [ ] Tốc độ mới (Rin đi 1,8 / bưng 1,6 m/s, lăn khi Shift; khách 1,1 m/s; nhân viên ~0,9–1,6 m/s) có thể làm khách chờ lâu / bỏ về nhiều → chỉnh sau playtest.
 - [ ] Chốt font: bộ hiện tại (Paytone One + Be Vietnam Pro + VT323) hay toàn VT323 — ảnh so sánh `build/shot/fontcmp/`.
 
 **P2 — UI còn sót**
-- [ ] Tab "Bản đồ" + bản đồ lớn (M) chưa theo phong cách mới (vẫn font mặc định).
-- [ ] VT323 cỡ nhỏ khó đọc trong điện thoại (Dex: "Tôm" / "Mực") → tăng cỡ hoặc đổi chỗ đó sang Be Vietnam Pro.
-- [ ] Chữ nhỏ trên tấm gỗ khung nấu nướng hơi mờ; icon mưa đang tạm.
-- [ ] Hoá đơn cuối ca không chặn, che bớt bàn bên trái — cân nhắc vị trí.
-- [ ] Guide lần đầu cho tab Review chưa có (mới có `challenges3d`).
-- [ ] File dài hơn ~200 dòng cần tách: `restaurant_scene_3d.gd` (~550), `sea_scene_3d.gd` (~490), `menu_panel_3d.gd` (~330), `phone_cards.gd` (~235), `phone_review.gd` (~225), `xom_den_review.gd` (~210); ngoài ra các builder 3D (`cutscene_stage_3d.gd`, `sea_world_builder_3d.gd`, `restaurant_room_builder_3d.gd`, ~300).
+- [x] Tab "Bản đồ" + bản đồ lớn (M): hải đồ giấy (bảng màu Xóm Đèn, ký hiệu viền mực `MapSymbols`, font game), bản đồ lớn trên "PaperPanel".
+- [x] Tên loài trong Dex dùng Be Vietnam Pro đậm ("CardLabel") thay VT323.
+- [x] Chữ gợi ý / trạng thái trên tấm gỗ khung nấu nướng: Bold, +1 cỡ. (Icon mưa vẫn tạm: việc art.)
+- [x] Hoá đơn cuối ca dời sát mép trái (x=8), không che dãy bàn.
+- [x] Guide lần đầu "review_tab" (trong PhoneApp): chỉ vào tab Review khi đã có bài đăng.
+- [ ] File dài hơn ~200 dòng: đã tách `restaurant_scene_3d.gd` 551→305 (`RinMover3D`, `RestaurantInteract3D`, `RestaurantShift3D`, `RestaurantShop3D`, `RestaurantSetup3D`; phần còn lại là biến + hàm bọc cho test/bot), `sea_scene_3d.gd` 490→330 (`SeaBoatMover3D`, `SeaTrip3D`, `SeaDebug3D`, `SeaSetup3D`), `menu_panel_3d.gd` 330→300 (`MenuPantryStrip3D`), `phone_cards.gd` 236→202 (`PhoneLedger`). Còn: `phone_app.gd` (~260), `phone_review.gd` (~225), `xom_den_review.gd` (~210), các builder 3D (~300).
 
 **P3 — Art**
 - [ ] Toàn bộ art UI đang là placeholder → giao Codex theo `docs/UI_ART_BRIEF_CODEX.md` (5 danh sách `docs/ui_art_needed_*.md`).
@@ -468,6 +471,7 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng)
 **P4 — Tương đương 2D / kỹ thuật**
 - [ ] Thử thách, thành tựu, Review / xếp hạng chỉ có ở quán 3D (`ShiftCloser` 2D chưa nối).
 - [ ] Một số script art chỉ nằm ngoài repo (dựng Rin từ pilot2 `finish_rin2_exact.py`, clip tay `make_rin_arm_clips.py`, `retarget_walk.py`, retarget Walk theo pitch, thêm mắt, Carry đối xứng, sửa trọng số dép) — nếu cần chạy lại phải viết lại vào `tools/art/`. Trong repo đã có `make_rin_faint.py`, `make_rin_row.py`, `recolor_cat_portrait.py` và các tool mắt/tóc/Walk batch.
-- [ ] Dọn worktree agent cũ trong `.claude/worktrees/` (đã gộp hết).
+- [x] Dọn worktree agent cũ: `.claude/worktrees/` đã trống, `git worktree list` chỉ còn nhánh chính.
+- [x] `ground_motion_check` chờ theo `roll_seconds` (test cũ chờ 20 khung, cú lăn 0,6 s → FAIL sẵn từ trước).
 
 **Sau MVP (chưa làm, xem §1):** twist app / Thâm Lam, Arc Bảo, Arc Vy phần còn lại (cảnh nhặt cá rơi, đổi ngoại hình, bước 5 trong Arc Bảo), mèo biến mất sau điềm báo + bóng rồng ở cảnh kết, người bạn từ thế giới bên kia.

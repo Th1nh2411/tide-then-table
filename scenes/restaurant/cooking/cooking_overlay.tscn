@@ -36,9 +36,10 @@ horizontal_alignment = 1
 [node name="HintLabel" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"BoldLabel"
 theme_override_colors/font_outline_color = Color(0.0353, 0.0392, 0.0784, 1)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 8
+theme_override_font_sizes/font_size = 9
 text = "hint"
 horizontal_alignment = 1
 
@@ -50,9 +51,10 @@ size_flags_vertical = 3
 [node name="StatusLabel" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"BoldLabel"
 theme_override_colors/font_outline_color = Color(0.0353, 0.0392, 0.0784, 1)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 9
+theme_override_font_sizes/font_size = 10
 text = "status"
 horizontal_alignment = 1
 

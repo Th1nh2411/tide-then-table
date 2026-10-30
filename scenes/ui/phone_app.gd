@@ -104,6 +104,19 @@ func _ready() -> void:
 	_cards.custom_minimum_size = _shop.custom_minimum_size
 	_scroll.add_sibling(_cards)
 	_key_hint($Phone/Margin/VBox/Hint as Label)
+	_add_guide()
+
+
+## First-time pointer on the Review tab once a post about the shop exists.
+func _add_guide() -> void:
+	var guide := Guide.new()
+	add_child(guide)
+	guide.layer = layer + 1  # over the phone
+	guide.blocked = func() -> bool: return _big_map.visible
+	guide.add("review_tab", "Xem khách review quán",
+		func() -> bool: return visible and _tab_buttons[REVIEW_TAB].visible and not XomDenReview.posts().is_empty(),
+		func() -> Vector2: return Guide.control_center(_tab_buttons[REVIEW_TAB]),
+		func() -> bool: return visible and _tab == REVIEW_TAB, true)
 
 
 func _unhandled_input(event: InputEvent) -> void:

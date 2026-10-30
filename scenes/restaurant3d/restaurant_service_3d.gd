@@ -79,7 +79,8 @@ func finish_meal(table: int) -> void:
 	var visit: Dictionary = order.get("visit", {})
 	var plate := DishShelf.Plate.new(dish, ingredients, float(order["multiplier"]), visit)
 	var variety := MenuPlan.variety_multiplier(host.opening_variety, MenuPanel3D.VARIETY_TABLE)
-	var price := TableBill.plate_price(plate, variety, DailyTrend.price_scale(dish))
+	# plate_price already applies today's dish; the well-off bonus is applied below.
+	var price := TableBill.plate_price(plate, variety, 1.0)
 	if bool(order.get("rich", false)):
 		price = roundi(float(price) * host.tuning.rich_price_scale)
 	if dish.is_market_dish():

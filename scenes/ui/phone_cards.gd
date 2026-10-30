@@ -4,7 +4,7 @@ extends ScrollContainer
 ## boat, ledger): flat white app cards ("AppCardPanel") with fish / dish
 ## pictures, coin chips, bars and a small chart, VT323 for the few words.
 ## The full text (PhoneReports) stays on the phone's ContentLabel (tests,
-## and the tooltip of the screen). Dex grid: PhoneDex.
+## and the tooltip of the screen). Dex grid: PhoneDex; ledger: PhoneLedger.
 
 const INK := Color("090a14")
 const RED := Color("a53030")
@@ -32,7 +32,7 @@ func show_tab(index: int, app: PhoneApp) -> void:
 		1: _menu(app.menu)
 		3: PhoneDex.fill(_box, app.fish_catalog)
 		4: _boat(app)
-		_: _ledger()
+		_: PhoneLedger.fill(_box)
 	UiFx.stagger(_box, 0.03)
 
 
@@ -200,37 +200,3 @@ func _boat(app: PhoneApp) -> void:
 		pips.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(pips)
 		pips.set_count(level, upgrade.max_level())
-
-
-## Money, then the last 7 days' profit as a bar chart and the last rating.
-func _ledger() -> void:
-	header(_box, "ledger", "Sổ sách")
-	var money := card(_box, 4)
-	money.add_child(UiIcons.make("money", 16, Color("de9e41")))
-	money.add_child(neo("%dk" % GameState.money, 14))
-	if GameState.day_history.is_empty():
-		return
-	var values: Array[float] = []
-	var labels: Array[String] = []
-	var best := 0
-	var days := GameState.day_history.slice(-7)
-	for i in days.size():
-		var record: Dictionary = days[i]
-		var profit := int(record.get("earned", 0)) - int(record.get("market", 0))
-		values.append(float(maxi(profit, 0)))
-		labels.append("N%d" % int(record.get("day", 0)))
-		if values[i] > values[best]:
-			best = i
-	var chart_row := card(_box)
-	var chart := MiniChart.new()
-	chart.custom_minimum_size = Vector2(220, 64)
-	chart.bar_color = Color("4f8fba")
-	chart.label_color = Color(INK, 0.7)
-	chart.highlight = best
-	chart_row.add_child(chart)
-	chart.set_values(values, labels)
-	var last: Dictionary = days[-1]
-	var side := VBoxContainer.new()
-	chart_row.add_child(side)
-	side.add_child(coin("%dk" % int(values[-1]), GREEN))
-	side.add_child(icon_text("star", str(int(last.get("rating", 0))), Color("de9e41")))

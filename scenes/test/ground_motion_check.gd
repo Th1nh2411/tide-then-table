@@ -123,10 +123,10 @@ func _run() -> void:
 	for step in 20: await get_tree().physics_frame
 	Input.action_press("dash")
 	for step in 2: await get_tree().physics_frame
-	var dash_started: bool = room._dash_left>0 and room.player.velocity.length()>3.0
+	var dash_started: bool = room.mover.dash_left>0 and room.player.velocity.length()>3.0
 	Input.action_release("dash")
-	for step in 20: await get_tree().physics_frame
-	check(dash_started and room._dash_left<=0 and room.player.velocity.length()<=3.01,"Dash finishes without a long overspeed glide")
+	for step in ceili(room.roll_seconds * 60.0) + 6: await get_tree().physics_frame
+	check(dash_started and room.mover.dash_left<=0 and room.player.velocity.length()<=3.01,"Dash finishes without a long overspeed glide")
 	Input.action_release("turn_right")
 	room.queue_free()
 	await get_tree().process_frame

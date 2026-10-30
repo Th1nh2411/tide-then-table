@@ -28,7 +28,7 @@ var _tween: Tween
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	position = Vector2(150, 0)
+	position = Vector2(8, 0)  # left edge, clear of the tables
 	size = Vector2(WIDTH + 24.0, SLOT_Y + 24.0)
 	_paper = PanelContainer.new()
 	_paper.theme_type_variation = &"ReceiptPanel"

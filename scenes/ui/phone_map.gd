@@ -8,14 +8,13 @@ extends Control
 
 const PIN_HIT_RADIUS_PX: float = 8.0
 
-@export var background: Color = Color(0.03, 0.05, 0.09)
-@export var land_color: Color = Color(0.55, 0.5, 0.35)
-@export var dock_color: Color = Color(1.0, 0.9, 0.4)
-@export var place_color: Color = Color(1.0, 0.55, 0.4)
-@export var boat_color: Color = Color(1.0, 1.0, 1.0)
-@export var net_color: Color = Color(1.0, 0.55, 0.2)
-@export var pin_color: Color = Color(1.0, 0.4, 0.9)
-@export var fog_color: Color = Color(0.4, 1.0, 0.9)
+## Chart paper + palette tones (Xóm Đèn).
+@export var paper: Color = Color("e7d5b3")
+@export var land_color: Color = Color("c09473")
+@export var rock_color: Color = Color("577277")
+@export var zone_label_color: Color = Color("ebede9")
+## Sea tones a zone color snaps to, deep to shallow.
+@export var sea_tones: Array[Color] = [Color("172038"), Color("253a5e"), Color("3c5e8b"), Color("4f8fba"), Color("73bed3")]
 @export var label_size: int = 7
 ## Big map (MapOverlay): legend row + zone names.
 @export var show_legend: bool = false
@@ -92,57 +91,78 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _draw() -> void:
-	var font := ThemeDB.fallback_font
-	draw_rect(Rect2(Vector2.ZERO, size), background)
+	var font := _font()
+	draw_rect(Rect2(Vector2.ZERO, size), paper)
+	draw_rect(Rect2(Vector2.ZERO, size), MapSymbols.INK, false, 2.0)
 	if not has_snapshot():
 		draw_string(font, Vector2(8, 20), "Chưa có dữ liệu bản đồ. Ra khơi một lần để đồng bộ.",
-			HORIZONTAL_ALIGNMENT_LEFT, size.x - 16, 8, Color(0.7, 0.75, 0.8))
+			HORIZONTAL_ALIGNMENT_LEFT, size.x - 16, label_size, MapSymbols.INK)
 		return
 	var fog_open := Story.is_fog_open()
 	for zone: Dictionary in _snap["zones"]:
 		if zone["fog"] and not fog_open:
 			continue
-		var color: Color = zone["color"]
-		draw_rect(_to_map_rect(zone["rect"]), color.darkened(0.35))
-		if show_legend and zone.has("name"):
-			var r := _to_map_rect(zone["rect"])
-			draw_string(font, r.position + Vector2(4, label_size + 3), zone["name"], HORIZONTAL_ALIGNMENT_LEFT, -1,
-				label_size, Color(1, 1, 1, 0.45))
+		draw_rect(_to_map_rect(zone["rect"]), _sea_tone(zone["color"]))
+	_draw_grid()
 	for rect: Rect2 in _snap["land"]:
-		draw_rect(_to_map_rect(rect), land_color)
+		var land := _to_map_rect(rect)
+		draw_rect(land, land_color)
+		draw_line(land.position, Vector2(land.end.x, land.position.y), MapSymbols.INK, 2.0)
 	for rock: Dictionary in _snap["rocks"]:
-		draw_circle(_to_map(rock["pos"]), maxf(float(rock["radius"]) * _scale(), 1.5), rock["color"])
+		MapSymbols.dot(self, _to_map(rock["pos"]), maxf(float(rock["radius"]) * _scale(), 1.5), rock_color)
+	draw_rect(_to_map_rect(Rect2(Vector2.ZERO, _snap["size"])), MapSymbols.INK, false, 1.0)
+	if show_legend:
+		for zone: Dictionary in _snap["zones"]:
+			if zone.has("name") and (not zone["fog"] or fog_open):
+				var r := _to_map_rect(zone["rect"])
+				draw_string(font, r.position + Vector2(4, label_size + 3), zone["name"], HORIZONTAL_ALIGNMENT_LEFT, -1,
+					label_size, Color(zone_label_color, 0.8))
 	_draw_range(font)
 	_draw_story_marks(font, fog_open)
-	_draw_dot(font, _snap["dock"], "Bến", dock_color, 3.0)
+	MapSymbols.dock(self, _to_map(_snap["dock"]))
 	for place: Dictionary in _snap["places"]:
-		_draw_dot(font, place["pos"], place["label"], place_color, 2.5)
+		var at := _to_map(place["pos"])
+		MapSymbols.dot(self, at, 2.0, MapSymbols.PLACE)
+		MapSymbols.label(self, font, at + Vector2(5, 3), place["label"], label_size)
 	for buoy: Node2D in get_tree().get_nodes_in_group("net_buoys"):
-		_draw_dot(font, buoy.global_position, "", net_color, 2.0)
+		MapSymbols.dot(self, _to_map(buoy.global_position), 2.0, MapSymbols.NET)
 	for i in GameState.map_pins.size():
-		_draw_pin(font, GameState.map_pins[i], i + 1)
-	_draw_boat()
-	var hint := "Ghim %d/%d" % [GameState.map_pins.size(), GameState.MAX_PINS]
+		MapSymbols.pin(self, font, _to_map(GameState.map_pins[i]), i + 1, label_size)
 	var boat := get_tree().get_first_node_in_group("boat") as Node2D
+	if boat:
+		MapSymbols.boat(self, _to_map(boat.global_position), boat.global_rotation)
+	var hint := "Ghim %d/%d" % [GameState.map_pins.size(), GameState.MAX_PINS]
 	if boat:
 		var meters := roundi(boat.global_position.distance_to(_snap["dock"]) / pixels_per_meter)
 		hint += " · về bến %dm" % meters
-	draw_string(font, Vector2(4, size.y - 4), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(0.6, 0.65, 0.7))
+	draw_string(font, Vector2(6, size.y - 5), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, MapSymbols.INK)
 	if show_legend:
-		_draw_legend(font)
+		MapSymbols.legend(self, font, size.x - 6.0, size.y - 5, label_size)
 
 
-## Key to the symbols, bottom right.
-func _draw_legend(font: Font) -> void:
-	var items: Array = [["Thuyền", boat_color], ["Bến", dock_color], ["Địa điểm", place_color],
-		["Lưới", net_color], ["Ghim", pin_color]]
-	var x := size.x - 4.0
-	for i in range(items.size() - 1, -1, -1):
-		var text: String = items[i][0]
-		x -= font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size).x
-		draw_string(font, Vector2(x, size.y - 4), text, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(0.75, 0.8, 0.85))
-		draw_circle(Vector2(x - 6, size.y - 4 - label_size * 0.35), 2.5, items[i][1])
-		x -= 16.0
+## Chart grid: faint ink lines every sixth of the map.
+func _draw_grid() -> void:
+	var area := _to_map_rect(Rect2(Vector2.ZERO, _snap["size"]))
+	var line := Color(MapSymbols.INK, 0.12)
+	for i in range(1, 6):
+		var x := roundf(area.position.x + area.size.x * i / 6.0)
+		var y := roundf(area.position.y + area.size.y * i / 6.0)
+		draw_line(Vector2(x, area.position.y), Vector2(x, area.end.y), line, 1.0)
+		draw_line(Vector2(area.position.x, y), Vector2(area.end.x, y), line, 1.0)
+
+
+## Snaps a zone's color to the palette's sea blues (deep = dark).
+func _sea_tone(color: Color) -> Color:
+	var best: Color = sea_tones[0]
+	for tone in sea_tones:
+		if absf(tone.get_luminance() - color.get_luminance()) < absf(best.get_luminance() - color.get_luminance()):
+			best = tone
+	return best
+
+
+func _font() -> Font:
+	var bold := get_theme_font(&"font", &"BoldLabel")
+	return bold if bold else get_theme_default_font()
 
 
 ## Dashed foam line: how far the current boat can go.
@@ -153,60 +173,34 @@ func _draw_range(font: Font) -> void:
 	var map_size: Vector2 = _snap["size"]
 	var left := _to_map(Vector2(0, range_y))
 	var right := _to_map(Vector2(map_size.x, range_y))
-	draw_dashed_line(left, right, Color(0.85, 0.95, 1.0, 0.8), 1.0, 4.0)
-	draw_string(font, left + Vector2(2, -2), "sóng lớn", HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(0.85, 0.95, 1.0))
+	draw_dashed_line(left, right, MapSymbols.BOAT, 1.0, 4.0)
+	MapSymbols.label(self, font, left + Vector2(3, -3), "sóng lớn", label_size, Color("253a5e"))
 
 
 func _draw_story_marks(font: Font, fog_open: bool) -> void:
 	if fog_open:
-		_draw_dot(font, _snap["whirlpool"], "???", fog_color, 3.0)
+		var at := _to_map(_snap["whirlpool"])
+		MapSymbols.whirlpool(self, at)
+		MapSymbols.label(self, font, at + Vector2(6, 3), "???", label_size, Color("253a5e"))
 		return
 	if Story.stage() >= 1:
 		# Omen seen but fog not open: the GPS glitches over that corner.
 		var corner := _to_map(Vector2(_snap["size"].x * 0.88, _snap["size"].y * 0.12))
-		draw_string(font, corner - Vector2(20, 0), PhoneReports.glitch("[ERR] NaN", floori(Time.get_ticks_msec() / 400.0)),
-			HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(1.0, 0.35, 0.35))
-
-
-func _draw_boat() -> void:
-	var boat := get_tree().get_first_node_in_group("boat") as Node2D
-	if boat == null:
-		return
-	var at := _to_map(boat.global_position)
-	var pulse := fmod(Time.get_ticks_msec() * 0.001, 1.2) / 1.2  # "you are here" ring
-	draw_arc(at, 4.0 + pulse * 10.0, 0.0, TAU, 20, Color(boat_color, 0.8 * (1.0 - pulse)), 1.0)
-	var forward := Vector2.RIGHT.rotated(boat.global_rotation)
-	var side := forward.orthogonal()
-	draw_colored_polygon(PackedVector2Array([at + forward * 6.0, at - forward * 4.0 + side * 3.5,
-		at - forward * 4.0 - side * 3.5]), boat_color)
-
-
-func _draw_dot(font: Font, world_pos: Vector2, label: String, color: Color, radius: float) -> void:
-	var at := _to_map(world_pos)
-	draw_circle(at, radius, color)
-	if label:
-		draw_string_outline(font, at + Vector2(4, 3), label, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, 2, Color.BLACK)
-		draw_string(font, at + Vector2(4, 3), label, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, color)
-
-
-func _draw_pin(font: Font, world_pos: Vector2, number: int) -> void:
-	var at := _to_map(world_pos)
-	draw_line(at, at - Vector2(0, 7), pin_color, 1.5)
-	draw_circle(at - Vector2(0, 8), 3.0, pin_color)
-	draw_string(font, at + Vector2(-2, -12), str(number), HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, pin_color)
+		MapSymbols.label(self, font, corner - Vector2(20, 0),
+			PhoneReports.glitch("[ERR] NaN", floori(Time.get_ticks_msec() / 400.0)), label_size, Color("a53030"))
 
 
 # --- world <-> map coordinates (fit the whole map, centered) ---
 
 func _scale() -> float:
 	var map_size: Vector2 = _snap["size"]
-	var usable := size - Vector2(8, 16)
+	var usable := size - Vector2(12, 20)
 	return minf(usable.x / map_size.x, usable.y / map_size.y)
 
 
 func _origin() -> Vector2:
 	var map_size: Vector2 = _snap["size"]
-	return Vector2((size.x - map_size.x * _scale()) * 0.5, 4.0)
+	return Vector2(roundf((size.x - map_size.x * _scale()) * 0.5), 6.0)
 
 
 func _to_map(world_pos: Vector2) -> Vector2:

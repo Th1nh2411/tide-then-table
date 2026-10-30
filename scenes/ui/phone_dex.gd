@@ -56,7 +56,13 @@ static func _tile(fish: FishData) -> PanelContainer:
 	var fish_name := "???"
 	if caught > 0:
 		fish_name = PhoneReports.glitch(fish.display_name, GameState.day) if fish.is_aberrant else fish.display_name
-	var label := PhoneCards.neo(fish_name, 8, Color("a53030") if fish.is_aberrant and caught > 0 else PhoneCards.INK)
+	# Be Vietnam Pro, not VT323: thin pixel strokes blur diacritics at this size.
+	var label := Label.new()
+	label.text = fish_name
+	label.theme_type_variation = &"CardLabel"
+	label.add_theme_font_size_override("font_size", 9)
+	if fish.is_aberrant and caught > 0:
+		label.add_theme_color_override("font_color", Color("a53030"))
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.clip_text = true
 	box.add_child(label)
