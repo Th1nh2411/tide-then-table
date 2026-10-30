@@ -528,6 +528,7 @@ Hướng dẫn chạy, kiểm tra và danh sách còn thiếu: `docs/3D_DEMO.md`
 - 2026-10-30: biển 3D tách 4 helper; đá ngầm ẩn, mây sương, câu đầu đêm/[WARN] như 2D;
   `tint` cutscene 3D; cảnh ngất dùng model Rin + clip `Faint`.
 - 2026-10-30: thúng chèo từng nhịp (vật lý theo lần chèo, clip `Row` + mái chèo).
+- 2026-10-30: UI mới: font Be Vietnam Pro / Paytone One / VT323, theme pixel theo chất liệu (giấy, bảng phấn, gỗ, bảng hiệu, điện thoại), UiIcons + MiniChart, menu chính / tạm dừng / lên món / chợ / hướng dẫn ít chữ; thử thách ngày + thành tựu + số liệu tích luỹ; Xóm Đèn Review (bài đăng, follower, hạng quán) + xếp hạng tuần với 3 quán đối thủ. Art tạm, danh sách cần vẽ: docs/ui_art_needed_*.md.
 - 2026-10-30: mục tiêu ở quán 3D: 3 thử thách ngày (`DailyChallenges`, 8 mẫu trong
   `data/challenges/`, thẻ HUD + NEO báo, thưởng cuối ca), 11 thành tựu (`Achievements`,
   `data/achievements/`, toast + tab "Thành tựu" trong điện thoại), `GameState.stats` đếm cả
