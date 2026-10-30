@@ -479,3 +479,17 @@ Rin đứng sát mạn phải thúng, chạy clip `Row` (tạo bởi `tools/art/
 IK hai tay lên cán chèo) đúng theo pha nhịp chèo; mái chèo là mesh đặt qua hai bàn
 tay mỗi khung hình nên luôn nằm trong tay. Test: `thung_rowing_test` (13).
 
+
+## Giao diện menu (2026-10-30)
+
+Phong cách "đồ thật ngoài phố" thay cho hộp navy bo tròn: bảng hiệu đỏ + đèn tuýp
+(menu chính, tạm dừng), bảng phấn khung gỗ (lên thực đơn, hướng dẫn), thẻ giấy
+(món, ghi chú, lời thoại), quầy gỗ + thùng các-tông + thẻ giá (Cô Năm). Khung là
+nine-patch pixel trong `assets/sprites/ui/frames/` (placeholder vẽ bằng code, thay
+bằng art thật cùng tên rồi chạy lại `tools/ui/build_game_theme.gd`); chọn chất liệu
+bằng `theme_type_variation` (`PaperPanel`, `ChalkPanel`, `WoodPanel`, `SignPanel`,
+`CardboardPanel`, `PhoneScreen`, `SignButton`, `PaperButton`...; danh sách đầu file builder).
+Ít chữ: icon `UiIcons` (sticker pixel từ game-icons.net, `assets/icons/CREDITS.md`;
+art thật `assets/sprites/ui/icons/<id>.png` tự thay), chấm `PipBar`, biểu đồ `MiniChart`.
+Hiệu ứng `UiFx`: pop, nghiêng/lắc khi rê chuột, giấy trượt vào, đóng dấu.
+Danh sách art cần vẽ: `docs/ui_art_needed_menus.md`.

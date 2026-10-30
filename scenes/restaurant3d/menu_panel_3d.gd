@@ -1,8 +1,9 @@
 class_name MenuPanel3D
 extends PanelContainer
-## 3D restaurant menu planning: slot cards (picture, price, HOT, servings), a
-## dish picker, pantry line, auto-fill and the "Mở cửa" start. Pure rules live
-## in MenuPlan / DishBook / DailyTrend; this is only the view.
+## 3D restaurant menu planning: header (MenuPanelHeader3D: stats, HOT chip,
+## takings chart), slot cards (MenuDishCard3D), dish picker (MenuPicker3D),
+## pantry pictures, icon buttons and "Mở cửa". Pure rules live in MenuPlan /
+## DishBook / DailyTrend; this is only the view.
 
 signal shop_requested
 signal open_requested
@@ -16,8 +17,10 @@ var plan: MenuPlan
 var menu: DishCatalog
 var market_stock: MarketStock
 var has_stock: Callable
+var header: MenuPanelHeader3D
+var heading: Label
 var title_label: Label
-var always_label: Label
+var revenue_label: Label
 var auto_button: Button
 var clear_button: Button
 var open_button: Button
@@ -25,11 +28,12 @@ var sail_button: Button
 var picker_dishes: Array[DishData] = []
 var editing_slot: int = -1
 var _slot_dishes: Array[DishData] = []
-var _cards: Array[MenuSlotCard] = []
+var _cards: Array[MenuDishCard3D] = []
 var _slots_box: HBoxContainer
-var _picker: ScrollContainer
-var _grid: GridContainer
+var _picker: MenuPicker3D
+var _pantry: HBoxContainer
 var _buttons: HBoxContainer
+var _open_pulse: Tween
 
 
 ## Seafood dishes the player may see: known fish and a kitchen that can cook them.
@@ -44,6 +48,8 @@ static func visible_dishes(dishes: Array[DishData], level: int) -> Array[DishDat
 	return result
 
 
+## `theme_` comes from the scene (RestaurantPanels3D, text size); `style` is
+## kept for the API but the board is the "ChalkPanel" material.
 func setup(p_plan: MenuPlan, p_menu: DishCatalog, p_stock: MarketStock, p_has_stock: Callable,
 		theme_: Theme, style: StyleBoxFlat) -> void:
 	plan = p_plan
@@ -51,50 +57,67 @@ func setup(p_plan: MenuPlan, p_menu: DishCatalog, p_stock: MarketStock, p_has_st
 	market_stock = p_stock
 	has_stock = p_has_stock
 	theme = theme_
-	add_theme_stylebox_override("panel", style)
-	position = Vector2(28, 66)  # below the HUD bar + quest line
+	theme_type_variation = &"ChalkPanel"
+	if style == null:
+		push_warning("MenuPanel3D: no style")
+	position = Vector2(28, 64)  # below the HUD bar + quest line
 	custom_minimum_size = Vector2(584, 0)
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 4)
+	box.add_theme_constant_override("separation", 5)
 	add_child(box)
-	title_label = Label.new()
-	box.add_child(title_label)
+	header = MenuPanelHeader3D.new()
+	heading = header.heading
+	title_label = header.title_label
+	revenue_label = header.revenue_label
+	box.add_child(header)
 	_slots_box = HBoxContainer.new()
 	_slots_box.alignment = BoxContainer.ALIGNMENT_CENTER
-	_slots_box.add_theme_constant_override("separation", 6)
+	_slots_box.add_theme_constant_override("separation", 10)
+	_slots_box.custom_minimum_size.y = 146
 	box.add_child(_slots_box)
-	_picker = ScrollContainer.new()
-	_picker.custom_minimum_size = Vector2(572, 170)
-	_picker.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_picker = MenuPicker3D.new()
+	_picker.chosen.connect(func(dish: DishData) -> void: select_dish(dish))
+	_picker.back_requested.connect(_close_picker)
 	box.add_child(_picker)
-	_grid = GridContainer.new()
-	_grid.columns = 4
-	_picker.add_child(_grid)
 	_picker.hide()
-	always_label = Label.new()
-	always_label.add_theme_font_size_override("font_size", 10)
-	box.add_child(always_label)
 	_buttons = HBoxContainer.new()
 	_buttons.add_theme_constant_override("separation", 4)
 	box.add_child(_buttons)
-	auto_button = _button("Tự xếp", func() -> void:
-		plan.auto_fill(menu.dishes, GameState.storage))
-	clear_button = _button("Xóa hết", func() -> void: plan.clear(GameState.storage))
-	_button("Mua ở Cô Năm", func() -> void: shop_requested.emit())
-	_button("Sửa quán", func() -> void: renovate_requested.emit())
-	_button("Đóng", close)
-	open_button = _button("Mở cửa", func() -> void: open_requested.emit())
-	sail_button = _button("Ra khơi", func() -> void: sail_requested.emit())
+	_build_buttons()
 	plan.changed.connect(refresh)
 	hide()
 	refresh()
+
+
+## Icon + a word for the main actions, icon-only (tooltip) for the rest.
+func _build_buttons() -> void:
+	auto_button = _button("auto", "Tự xếp", "Tự xếp món (Q)", func() -> void:
+		plan.auto_fill(menu.dishes, GameState.storage))
+	clear_button = _button("trash", "", "Xóa hết", func() -> void: plan.clear(GameState.storage))
+	_button("hammer", "", "Sửa quán", func() -> void: renovate_requested.emit())
+	_button("close", "", "Đóng (Esc)", close)
+	# Market goods in stock: tiny pictures + counts, then the button to buy more.
+	_pantry = HBoxContainer.new()
+	_pantry.add_theme_constant_override("separation", 4)
+	_pantry.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_pantry.alignment = BoxContainer.ALIGNMENT_END
+	_buttons.add_child(_pantry)
+	_button("cart", "Cô Năm", "Mua rau, bia ở Cô Năm", func() -> void: shop_requested.emit())
+	sail_button = _button("boat", "Ra khơi", "", func() -> void: sail_requested.emit())
+	open_button = _button("shop", "Mở cửa", "", func() -> void: open_requested.emit())
+	open_button.theme_type_variation = &"AccentButton"
+	open_button.custom_minimum_size.x = 92
+	_open_pulse = UiFx.pulse(open_button, 0.05, 1.1)
 
 
 func open() -> void:
 	_close_picker()
 	refresh()
 	show()
+	UiFx.pop_in(self)
+	UiFx.stagger(_slots_box, 0.07, 0.1)
+	header.count_up()
 
 
 func close() -> void:
@@ -103,12 +126,19 @@ func close() -> void:
 	closed.emit()
 
 
-func _button(text: String, action: Callable) -> Button:
-	var button := Button.new()
-	button.text = text
+func _button(icon: String, text: String, tooltip: String, action: Callable) -> Button:
+	var button: Button
+	if text == "":
+		button = UiIcons.icon_button(icon, tooltip, 14)
+	else:
+		button = UiIcons.dress(Button.new(), icon, 14)
+		button.text = text
+		button.tooltip_text = tooltip
 	button.focus_mode = Control.FOCUS_NONE
+	button.add_theme_font_size_override("font_size", 10)
 	button.pressed.connect(action)
 	_buttons.add_child(button)
+	UiFx.hover_lift(button, 0.06)
 	return button
 
 
@@ -118,11 +148,11 @@ func _build_slots() -> void:
 		card.queue_free()
 	_cards.clear()
 	_slot_dishes.resize(plan.slots)
+	# Fewer slots = wider cards; five still fit the panel.
+	var card_width := clampf((560.0 - 10.0 * (plan.slots - 1)) / plan.slots, 100.0, 124.0)
 	for index in plan.slots:
-		var card := MenuSlotCard.new()
-		card.custom_minimum_size = Vector2(100, 0)
-		card.choose_button.custom_minimum_size = Vector2(100, 100)
-		card.picture.custom_minimum_size = Vector2(48, 48)
+		var card := MenuDishCard3D.new(index + 1, card_width)
+		UiFx.tilt(card.choose_button, 1.5 if index % 2 == 0 else -1.2)  # pinned slips, a bit crooked
 		card.picked.connect(_open_picker.bind(index))
 		card.added.connect(func() -> void:
 			if _slot_dishes[index]:
@@ -152,42 +182,84 @@ func refresh() -> void:
 		var dish := _slot_dishes[index]
 		_cards[index].display(dish, plan.get_portion_count(dish),
 			plan.can_add(dish, GameState.storage) if dish else false)
-	always_label.text = _pantry_text()
+	_fill_pantry()
 	var seafood := visible_dishes(menu.dishes, plan.kitchen_level)
 	clear_button.disabled = plan.total_portions() == 0
 	auto_button.disabled = seafood.all(func(d: DishData) -> bool:
 		return not plan.can_add(d, GameState.storage))
 	var stocked: bool = has_stock.call()
 	open_button.disabled = not stocked
+	if stocked:
+		_open_pulse.play()
+	else:
+		_open_pulse.pause()
+		open_button.scale = Vector2.ONE
 	sail_button.visible = not stocked
+	_update_revenue()
 	if editing_slot < 0:
 		_update_title()
 	else:
 		_fill_picker()
 
 
-func _pantry_text() -> String:
-	var parts: PackedStringArray = []
+## Rough takings if every serving sells (today's dish and variety included).
+func expected_revenue() -> int:
+	var total := 0
+	for value in _revenue_per_slot():
+		total += roundi(value)
+	return total
+
+
+func _revenue_per_slot() -> Array[float]:
+	var variety := MenuPlan.variety_multiplier(plan.variety_count(), VARIETY_TABLE)
+	var values: Array[float] = []
+	for dish in _slot_dishes:
+		values.append(plan.get_portion_count(dish) * dish.base_price * DailyTrend.price_scale(dish) * variety
+			if dish else 0.0)
+	return values
+
+
+func _update_revenue() -> void:
+	var hot := -1
+	for index in _slot_dishes.size():
+		if _slot_dishes[index] and DailyTrend.is_hot(_slot_dishes[index]):
+			hot = index
+	var labels: Array[String] = []
+	for index in _slot_dishes.size():
+		labels.append(str(index + 1))
+	header.set_revenue(_revenue_per_slot(), labels, hot, expected_revenue(), visible)
+
+
+func _fill_pantry() -> void:
+	for child in _pantry.get_children():
+		_pantry.remove_child(child)
+		child.queue_free()
 	for dish in menu.dishes:
 		if dish.is_market_dish() and dish.unlock_day <= GameState.day:
-			parts.append("%s %d" % [dish.display_name, market_stock.portions(dish)])
-	return "Luôn có (tạp hoá): " + ", ".join(parts)
+			var row := HBoxContainer.new()
+			row.add_theme_constant_override("separation", 1)
+			row.tooltip_text = dish.display_name
+			row.mouse_filter = Control.MOUSE_FILTER_PASS
+			var picture := TextureRect.new()
+			picture.texture = Art.texture("dishes/" + dish.id)
+			picture.custom_minimum_size = Vector2(18, 18)
+			picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			row.add_child(picture)
+			var count := Label.new()
+			count.text = "x%d" % market_stock.portions(dish)
+			count.theme_type_variation = &"ChalkLabel"
+			count.add_theme_font_size_override("font_size", 10)
+			if market_stock.portions(dish) == 0:
+				count.add_theme_color_override("font_color", Color("f0a08a"))
+			row.add_child(count)
+			_pantry.add_child(row)
 
 
 func _update_title() -> void:
-	var text := "Thực đơn · %d/%d món · %d phần · kho %d con" % [
-		plan.used_slots(), plan.slots, plan.total_portions(), GameState.storage.size()]
-	var hot := DailyTrend.dish_id()
-	if hot != "":
-		for dish in menu.dishes:
-			if dish.id == hot:
-				text += " · HOT: " + dish.display_name
 	var variety := MenuPlan.variety_multiplier(plan.variety_count(), VARIETY_TABLE)
-	if variety != 1.0:
-		text += " · giá x%s" % str(snappedf(variety, 0.01))
-	title_label.text = text
-	if visible_dishes(menu.dishes, plan.kitchen_level).is_empty():
-		title_label.text += "\nChưa có cá nấu được. Ra biển bắt cá trước."
+	header.show_plan(plan, menu, variety, not visible_dishes(menu.dishes, plan.kitchen_level).is_empty())
 
 
 func _open_picker(index: int) -> void:
@@ -196,43 +268,15 @@ func _open_picker(index: int) -> void:
 	_buttons.hide()
 	_picker.show()
 	_fill_picker()
+	_picker.animate_in()
 
 
 func _fill_picker() -> void:
-	title_label.text = "Chọn món · ô %d (số 1-9, Esc quay lại)" % (editing_slot + 1)
-	for child in _grid.get_children():
-		_grid.remove_child(child)
-		child.queue_free()
+	header.show_picker(editing_slot)
 	var previous := _slot_dishes[editing_slot]
 	var available := plan.storage_after_returning(previous, GameState.storage)
 	picker_dishes = visible_dishes(menu.dishes, plan.kitchen_level)
-	for i in picker_dishes.size():
-		var dish := picker_dishes[i]
-		var reason := ""
-		if dish != previous and dish in plan.get_dishes():
-			reason = "Đã có trên menu"
-		elif not KitchenLogic.can_cook(dish, available):
-			reason = "Hết nguyên liệu"
-		var button := Button.new()
-		button.focus_mode = Control.FOCUS_NONE
-		button.custom_minimum_size = Vector2(138, 40)
-		button.clip_text = true
-		button.icon = Art.texture("dishes/" + dish.id)
-		button.expand_icon = true
-		button.add_theme_constant_override("icon_max_width", 24)
-		button.add_theme_font_size_override("font_size", 10)
-		button.disabled = reason != ""
-		var detail := reason if reason != "" else "%dk · %d phần%s" % [
-			dish.base_price, MenuPlan.max_portions(dish, available),
-			" · HOT" if DailyTrend.is_hot(dish) else ""]
-		button.text = "%d. %s\n%s" % [i + 1, dish.display_name, detail]
-		button.pressed.connect(select_dish.bind(dish))
-		_grid.add_child(button)
-	if picker_dishes.is_empty():
-		var empty := Label.new()
-		empty.text = "Chưa có món nào nấu được.\nRa biển bắt cá, rồi quay lại lên thực đơn."
-		empty.add_theme_font_size_override("font_size", 11)
-		_grid.add_child(empty)
+	_picker.fill(picker_dishes, previous, plan.get_dishes(), available)
 
 
 func select_dish(dish: DishData) -> bool:
@@ -240,11 +284,14 @@ func select_dish(dish: DishData) -> bool:
 		return false
 	var previous := _slot_dishes[editing_slot]
 	_slot_dishes[editing_slot] = dish
+	var slot := editing_slot
 	if not plan.replace_dish(previous, dish, GameState.storage):
 		_slot_dishes[editing_slot] = previous
 		refresh()
 		return false
 	_close_picker()
+	if slot < _cards.size():
+		_cards[slot].celebrate()
 	return true
 
 
