@@ -106,9 +106,11 @@ func refresh_prompt(camera: Camera3D, blocked: bool) -> void:
 	if blocked:
 		return
 	var hint: Dictionary = RestaurantPrompt3D.describe(host)
-	if hint.is_empty():
+	# Only the key when E would act; where to go is shown by the goal pulse.
+	if hint.is_empty() or not str(hint["words"]).begins_with("[E]"):
 		return
-	_prompt_text.text = str(hint["words"])
+	_prompt_text.text = "E"
+	_prompt.tooltip_text = str(hint["words"]).trim_prefix("[E] ")
 	_prompt.reset_size()
 	var screen: Vector2 = camera.unproject_position(hint["at"])
 	var size: Vector2 = host.get_viewport().get_visible_rect().size

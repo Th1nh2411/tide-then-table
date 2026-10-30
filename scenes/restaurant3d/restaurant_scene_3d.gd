@@ -102,6 +102,7 @@ var shift_log := ShiftLog.new()
 ## Set at closing by RestaurantGoals3D.finish_shift (challenges, achievements).
 var shift_results: Dictionary = {}
 var goals: RestaurantGoals3D
+var goal_pulse: TargetPulse3D
 ## Xóm Đèn Review posts, followers and the weekly ranking at closing.
 var social: RestaurantSocial3D
 
@@ -120,6 +121,8 @@ func _next_spawn_interval() -> float:
 		* RestaurantSocial3D.spawn_scale()
 
 func _ready() -> void:
+	goal_pulse = TargetPulse3D.new()
+	add_child(goal_pulse)
 	rng.randomize()
 	tuning = _pick_tuning()
 	panels = RestaurantPanels3D.new(self)
@@ -321,6 +324,9 @@ func _physics_process(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	panels.refresh_prompt(demo_camera, get_tree().paused or _focus_lost or modal_open())
+	# The next goal pulses softly instead of text over tables and stations.
+	if goal_pulse:
+		goal_pulse.set_target(null if modal_open() else RestaurantGoal3D.target(self))
 	if cat_node:
 		cat_node.rotation.y = sin(Time.get_ticks_msec() / 650.0) * 0.06
 	panels.tick(delta)

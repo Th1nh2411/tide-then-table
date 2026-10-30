@@ -568,3 +568,16 @@ Cùng phong cách "đồ thật ngoài phố", gần như không chữ (chữ n�
 - Hết ca: hoá đơn in từng dòng từ máy tính tiền (`ShiftReceipt3D` +
   `ShiftReceiptRows`), tiền đếm lên, biểu đồ 7 ngày, rồi con dấu sao đỏ đập xuống.
 Art cần vẽ: `docs/ui_art_needed_hud.md`. Test: `receipt_test`.
+
+
+### Bớt chữ trong quán, mục tiêu nhấp nháy — 2026-10-30
+
+Khi chơi ở quán không còn chữ nổi trên bàn ("Bàn 1 • đang ăn", "E dọn"...) và
+các bảng "NHẬN MÓN • E", "RÓT BIA • E", "BẾP / BẢNG MÓN", "Bảo • bếp" (giữ hai
+bảng hiệu thật "HẢI SẢN XÓM ĐÈN", "TẠP HOÁ CÔ NĂM"). Gợi ý thao tác chỉ còn phím
+"E" khi đứng đúng chỗ. Việc cần làm tiếp nhấp nháy nhẹ màu vàng ấm
+(`TargetPulse3D`, chọn bởi `RestaurantGoal3D`): đang bưng món → bàn đó; có món
+chờ → bàn kê; món nướng chờ → lò; bia chờ → thùng bia; bàn bẩn; trước ca chưa
+lên món → bảng thực đơn. Chỉnh độ sáng/nhịp ở `strength` / `period`.
+Bóng tiếp đất mềm (`ContactShadow3D`) dưới người, mèo, bàn ghế, thuyền.
+

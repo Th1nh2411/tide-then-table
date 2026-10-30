@@ -247,7 +247,10 @@ static func _tables(host: Node3D, start_index := 0) -> void:
 		partner.sample_seating(1)
 		partner.set_seated(true)
 		guest.set_meta("seating_partner",partner)
-		host.order_labels.append(label(host, "", p + Vector3(0, 2.25, 0.6), 18, "f2d98a"))
+		# Order text stays in data only (tickets show orders); no words over tables.
+		var order_label := label(host, "", p + Vector3(0, 2.25, 0.6), 18, "f2d98a")
+		order_label.visible = false
+		host.order_labels.append(order_label)
 		host.orders.append({})
 		host.dirty_tables.append(false)
 		var dish_visual := plate_model(host)
@@ -265,7 +268,6 @@ static func _kitchen(host: Node3D) -> void:
 	solid_block(host, L.GRILL_POSITION + Vector3(0, 0.7, 0), Vector3(2.8, 1.3, 1.25))
 	RestaurantBatchVisuals.add(host, "charcoal_grill", L.GRILL_POSITION + Vector3(-2.25, 0, 0))
 	box(host, L.KITCHEN_BOARD_POSITION + Vector3(0, 0.7, 0), Vector3(1.2, 1.3, 0.1), "884b2b", true)
-	label(host, "BẾP\nBẢNG MÓN", L.KITCHEN_BOARD_POSITION + Vector3(0, 0.8, 0.07), 16, "e7d5b3")
 	# Cô Năm keeps her grocery counter separate from the kitchen.
 	RestaurantBatchVisuals.add(host, "grocery_counter", L.COUNTER_POSITION)
 	solid_block(host, L.COUNTER_POSITION + Vector3(0, 0.75, 0), Vector3(3.6, 1.0, 0.8))
@@ -277,14 +279,14 @@ static func _kitchen(host: Node3D) -> void:
 	# Bảo cooks independently, leaving grill and beer to Rin.
 	host.bao_model = PersonRig3D.build(host, "bao")
 	host.bao_model.position = L.GRILL_POSITION + Vector3(-1.5, 0, -0.85)
-	host.bao_label = label(host, "Bảo • bếp", L.GRILL_POSITION + Vector3(-1.5, 2.15, -0.85), 20, "f0d39b")
+	# Kept for code that sets its text; no floating words over Bảo.
+	host.bao_label = label(host, "", L.GRILL_POSITION + Vector3(-1.5, 2.15, -0.85), 20, "f0d39b")
+	host.bao_label.visible = false
 	RestaurantBatchVisuals.add(host, "plate_bench", L.PASS_POSITION)
 	solid_block(host, L.PASS_POSITION + Vector3(0, 0.83, 0), Vector3(1.1, 0.12, 0.75))
 	RestaurantBatchVisuals.add(host, "bin", L.PASS_POSITION + Vector3(-0.95, 0, 0))
-	label(host, "NHẬN MÓN • E", L.PASS_POSITION + Vector3(0, 1.5, 0), 18, "e5cf9d")
 	RestaurantBatchVisuals.add(host, "beer_keg", L.BEER_POSITION)
 	solid_block(host, L.BEER_POSITION + Vector3(0, 0.85, 0), Vector3(0.5, 1.2, 0.5))
-	label(host, "RÓT BIA • E", L.BEER_POSITION + Vector3(0, 1.75, 0), 18, "e5cf9d")
 
 static func _player(host: Node3D) -> void:
 	var player := CharacterBody3D.new()
