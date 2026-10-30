@@ -43,6 +43,9 @@ var _wait_controls_release := false
 var _application_focused := true
 var navigation: Control
 var yaw_velocity := 0.0
+## Paddle strokes of a rowed boat (thúng); its phase also poses Rin and the paddle.
+var row := RowStroke.new()
+var paddle: Node3D
 var impact_cooldown := 0.0
 var elapsed := 0.0
 var fishing := false
@@ -170,15 +173,24 @@ func _physics_process(delta: float) -> void:
 			_wait_controls_release = false
 		throttle = 0.0
 		steer = 0.0
-	var acceleration := boat_data.acceleration / 10.0
-	boat.velocity += forward * throttle * acceleration * delta
+	var condition := lerpf(0.6, 1.0, clampf(GameState.boat_hp / 50.0, 0.0, 1.0)) * (0.65 if _is_towing() else 1.0)
+	if boat_data.rowed:
+		# Paddled: pushed only while a stroke pulls, then it glides and spins down.
+		var push := row.step(delta, throttle, steer, boat_data)
+		boat.velocity += forward * push.x * condition
+		yaw_velocity += push.y
+		boat.velocity *= exp(-boat_data.glide_drag * delta)
+		yaw_velocity *= exp(-boat_data.spin_drag * delta)
+	else:
+		boat.velocity += forward * throttle * boat_data.acceleration / 10.0 * delta
+		boat.velocity *= exp(-1.15 * delta)
 	if not _at_dock():
 		boat.velocity += wind * delta
-	boat.velocity *= exp(-1.15 * delta)
-	boat.velocity = boat.velocity.limit_length(boat_data.max_speed / 10.0 * lerpf(0.6, 1.0, clampf(GameState.boat_hp / 50.0, 0.0, 1.0)) * (0.65 if _is_towing() else 1.0))
+	boat.velocity = boat.velocity.limit_length(boat_data.max_speed / 10.0 * condition)
 	var forward_speed := boat.velocity.dot(forward)
-	var turn_target := steer * deg_to_rad(boat_data.turn_speed) * (0.35 + minf(absf(forward_speed) / 8.0, 0.65))
-	yaw_velocity = move_toward(yaw_velocity, turn_target, delta * (3.0 - boat_data.spin_drift))
+	if not boat_data.rowed:
+		var turn_target := steer * deg_to_rad(boat_data.turn_speed) * (0.35 + minf(absf(forward_speed) / 8.0, 0.65))
+		yaw_velocity = move_toward(yaw_velocity, turn_target, delta * (3.0 - boat_data.spin_drift))
 	boat.rotation.y += yaw_velocity * delta
 	boat.velocity.y = 0.0
 	var before := boat.position

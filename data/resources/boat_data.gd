@@ -23,6 +23,20 @@ extends Resource
 ## Shown in the phone / shop, e.g. "tới rạn đá".
 @export var range_label: String = "ra khơi xa"
 
+@export_group("Rowing (3D sea)")
+## Paddled boat: moves only while a stroke pulls (RowStroke), then glides.
+@export var rowed: bool = false
+## Seconds per paddle stroke (catch -> pull -> lift).
+@export var stroke_seconds: float = 1.0
+## Forward speed one full stroke adds (world units/second).
+@export var stroke_push: float = 5.0
+## Spin speed one side stroke adds (radians/second).
+@export var stroke_turn: float = 1.6
+## Water drag between strokes (higher = shorter glide).
+@export var glide_drag: float = 1.5
+## Spin drag (higher = stops turning sooner).
+@export var spin_drag: float = 2.2
+
 @export_group("Placeholder visuals")
 ## Hull length (x) and width (y) in pixels. Also sizes the collision circle.
 @export var hull_size: Vector2 = Vector2(24, 12)

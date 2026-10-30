@@ -465,3 +465,17 @@ Rin, clip `Faint` trong `rin_pilot.glb` tạo bởi `tools/art/make_rin_faint.py
 khuỵu gối, ngả ra sau, hông giữ tại chỗ (chân trượt ra trước) để nằm gọn trong
 thúng, không bật nhảy; `Faint`, `Death`, `Cast` không loop. Lệnh `tint dawn` của
 cutscene 3D đã có hiệu lực. Test: `sea3d_hazards_test` (13), `story3d_stage_test`.
+
+### Chèo thúng — 2026-10-30
+
+Thuyền thúng (`BoatData.rowed`) không còn đẩy liên tục: giữ W/S/A/D thì Rin chèo
+từng nhịp (`RowStroke`, thuần logic). Mỗi nhịp `stroke_seconds` chỉ đẩy trong khúc
+kéo nước (pha 0,15–0,6), một nhịp đủ cộng đúng `stroke_push`; nhịp đã bắt đầu luôn
+chèo hết, rồi thúng trôi chậm dần theo `glide_drag`. A/D là chèo một bên, mỗi nhịp
+xoay `stroke_turn` (không giữ W vẫn xoay tại chỗ, nhích nhẹ); S chèo lùi yếu hơn.
+Ghe chèo/ghe máy giữ cách lái cũ. Thông số trong `data/boats/thuyen_thung.tres`.
+
+Rin đứng sát mạn phải thúng, chạy clip `Row` (tạo bởi `tools/art/make_rin_row.py`,
+IK hai tay lên cán chèo) đúng theo pha nhịp chèo; mái chèo là mesh đặt qua hai bàn
+tay mỗi khung hình nên luôn nằm trong tay. Test: `thung_rowing_test` (13).
+

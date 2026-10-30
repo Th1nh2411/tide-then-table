@@ -527,4 +527,5 @@ Hướng dẫn chạy, kiểm tra và danh sách còn thiếu: `docs/3D_DEMO.md`
   túi chợ → tủ lạnh, preview sửa quán, biển 3D theo bố cục 2D + `SeaShoals3D`, dàn cảnh cutscene 3D.
 - 2026-10-30: biển 3D tách 4 helper; đá ngầm ẩn, mây sương, câu đầu đêm/[WARN] như 2D;
   `tint` cutscene 3D; cảnh ngất dùng model Rin + clip `Faint`.
+- 2026-10-30: thúng chèo từng nhịp (vật lý theo lần chèo, clip `Row` + mái chèo).
 - Chưa xong: preview bếp/thùng đá, playtest tay, pacing (bot 3D có >20.000k ở ngày 4 — cần xem lại kinh tế), art 3D (mèo đi bốn chân).
