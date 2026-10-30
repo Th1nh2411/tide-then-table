@@ -73,6 +73,7 @@ func _process(delta: float) -> void:
 		_name_label.modulate.a = 1.0
 		_hint.visible = true
 		_can_close = true
+		Sfx.play("shutter")
 		Sfx.play("catch")
 
 

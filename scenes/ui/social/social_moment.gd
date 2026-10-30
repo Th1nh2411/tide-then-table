@@ -77,6 +77,8 @@ func _slide(card: ReviewPostCard, delay: float, settle: float) -> void:
 	card.position = home + Vector2(WIDTH + 20.0, 0)
 	card.rotation_degrees = 10.0
 	var tween := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).set_parallel()
+	# Each new post lands with a camera click.
+	tween.tween_callback(Sfx.play.bind("shutter")).set_delay(delay)
 	tween.tween_property(card, "position", home, 0.3).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.tween_property(card, "rotation_degrees", -settle * 2.0, 0.22).set_delay(delay)
 	tween.chain().tween_property(card, "rotation_degrees", settle * 0.5, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

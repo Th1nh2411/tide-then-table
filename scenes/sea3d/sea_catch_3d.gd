@@ -160,6 +160,8 @@ static func store_catch(sea: SeaScene3D, fish: FishData, quality: float, count: 
 	if Story.on_fish_caught(fish):
 		sea._say("[WARN] species_id không có trong database. Ngoài khơi đông bắc có gì đó lạ.", 3.0)
 	var rewards := CollectionRewards.claim(fish, size, is_new, previous_best)
+	if not is_new and previous_best > 0.0 and size > previous_best:
+		Sfx.play("shutter")  # size record: Rin snaps a photo
 	var overflow: Array[InventoryItem] = []
 	for i in range(count):
 		var item := InventoryItem.new(fish, quality, size)

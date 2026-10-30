@@ -31,6 +31,10 @@ const SOUNDS := {
 	"neo": [{"w": "sine", "f": [1175, 1175], "d": 0.05, "v": 0.12}, {"w": "sine", "f": [1568, 1568], "d": 0.09, "v": 0.12}],
 	# Shift receipt: printer tick per line, rubber stamp thump.
 	"print": [{"w": "noise", "lp": 0.5, "d": 0.04, "v": 0.07}, {"w": "square", "f": [880, 880], "d": 0.015, "v": 0.03}],
+	# Camera shutter: two bright clicks, then a short film wind (new catch, posts, records).
+	"shutter": [{"w": "noise", "lp": 0.92, "d": 0.022, "v": 0.32}, {"at": 0.0, "w": "square", "f": [2600, 1900], "d": 0.012, "v": 0.07},
+		{"at": 0.06, "w": "noise", "lp": 0.85, "d": 0.03, "v": 0.26}, {"at": 0.06, "w": "square", "f": [2200, 1600], "d": 0.012, "v": 0.06},
+		{"at": 0.12, "w": "noise", "lp": 0.45, "d": 0.16, "v": 0.07, "a": 0.04}],
 	"stamp": [{"w": "noise", "lp": 0.1, "d": 0.1, "v": 0.35}, {"at": 0.0, "w": "sine", "f": [180, 70], "d": 0.13, "v": 0.45}],
 }
 const LOOPS := {
