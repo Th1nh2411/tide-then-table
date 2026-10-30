@@ -38,6 +38,7 @@ static func build(parent: Node3D, kind_: String, shirt: String = "") -> PersonRi
 	parent.add_child(rig)
 	if kind_ == "cat":
 		rig._build_cat()
+		ContactShadow3D.attach(rig, 0.22, 1.4)
 		return rig
 	if kind_ == "rin":
 		rig.current_variant = "rin"
@@ -51,6 +52,8 @@ static func build(parent: Node3D, kind_: String, shirt: String = "") -> PersonRi
 		rig._build_rin_pilot()
 	if kind_ != "guest":
 		rig.add_to_group("person_" + kind_)
+	# Grounds the person where no lamp casts a real shadow.
+	ContactShadow3D.attach(rig, 0.36, 0.8)
 	return rig
 
 

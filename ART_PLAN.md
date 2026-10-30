@@ -76,7 +76,7 @@ Tiến độ 2026-10-25: đã thêm mặt tiền cửa hàng, bảng menu, quầ
     (cười thật, mắt cong — chỉ dùng nhiều ở nửa sau arc), `lo`. Bản "sau" (`vy_sau`, `vy_sau_vui`...) tóc buộc
     cao, có thể làm sau, thiếu thì dùng bản đầu.
 - **Cô Năm:** Vietnamese woman around 40, youthful modern appearance, simple tied-back dark/gray hair with a few silver strands, green blouse, grocery seller.
-- **Mèo (Mỡ):** chubby orange cat.
+- **Mèo (Mỡ):** chubby blue-black tabby with a light grey chest, teal eyes (theo portrait `portraits/cat/base.png`; model 3D tô lại bằng `tools/art/recolor_cat_portrait.py`, 2026-10-30).
 
 ## Sprite gameplay — giữ phần sửa tay
 
@@ -160,7 +160,7 @@ giữ nguyên; model game ở `assets/models/ready/rin/rin_pilot.glb`.
 
 Ngày 2026-10-29, đã chỉnh mắt và màu 11 nhân vật ngoài Rin cùng mèo: bỏ mắt hộp
 đen, dùng chi tiết mắt nhỏ bám mặt/xương Head; sửa palette theo portrait và
-concept. Mèo tiếp tục là mèo cam theo mục mô tả Mỡ. Không thay PNG approved,
+concept. (Mèo: từ 2026-10-30 đổi sang đen vằn ngực xám theo portrait.) Không thay PNG approved,
 không sửa Rin. Review: `scenes/art_pilots/character_faces_review.tscn`.
 
 

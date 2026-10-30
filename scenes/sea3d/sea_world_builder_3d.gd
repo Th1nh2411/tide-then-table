@@ -243,6 +243,8 @@ static func build_boat(sea: SeaScene3D) -> void:
 	sea.rin_figure = [rider]
 	box(sea.boat_visual, Vector3(0.58, 1.02, -0.85), Vector3(0.08, 0.82, 0.08), "e7d5b3")
 	box(sea.boat_visual, Vector3(0.58, 1.48, -0.85), Vector3(0.33, 0.22, 0.33), "f2d98a")
+	# Dark patch on the water under the hull, visible away from the lamps.
+	ContactShadow3D.attach(sea.boat_visual, 1.45 if boat_id == "thuyen_thung" else 1.3, 1.0 if boat_id == "thuyen_thung" else 2.0, 0.35)
 	var lamp := SpotLight3D.new()
 	sea.boat_visual.add_child(lamp)
 	lamp.position = Vector3(0.58, 1.45, -0.85)

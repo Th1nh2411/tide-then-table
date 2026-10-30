@@ -213,6 +213,7 @@ static func _tables(host: Node3D, start_index := 0) -> void:
 		table.position = p
 		table.rotation.y = L.TABLE_YAW
 		WorldPresentation3D.cast_shadows(table)
+		ContactShadow3D.attach(table, 0.9, 0.8, 0.4)
 		solid_block(host, p + Vector3(0, 0.8, 0), L.TABLE_COLLISION_SIZE)
 		for side in [-1.0, 1.0]:
 			var stool_pos := p + L.chair_offset(side)
@@ -224,6 +225,7 @@ static func _tables(host: Node3D, start_index := 0) -> void:
 			stool.rotation.y = L.TABLE_YAW
 			stool.scale = Vector3.ONE * WorldPresentation3D.RESTAURANT_STOOL_SCALE
 			WorldPresentation3D.cast_shadows(stool)
+			ContactShadow3D.attach(stool, 0.34)
 			stool.name = "PilotStool_%d_%s" % [i, "blue" if side < 0 else "red"]
 			if side > 0:
 				var red := mat("a53030")
