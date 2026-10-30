@@ -157,7 +157,8 @@ static func store_catch(sea: SeaScene3D, fish: FishData, quality: float, count: 
 	var previous_best := GameState.best_size(fish)
 	# A landed catch belongs in the Dex even when the hold needs sorting.
 	GameState.record_catch(fish, count, size)
-	Story.on_fish_caught(fish)
+	if Story.on_fish_caught(fish):
+		sea._say("[WARN] species_id không có trong database. Ngoài khơi đông bắc có gì đó lạ.", 3.0)
 	var rewards := CollectionRewards.claim(fish, size, is_new, previous_best)
 	var overflow: Array[InventoryItem] = []
 	for i in range(count):

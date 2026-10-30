@@ -25,6 +25,10 @@ const WHIRLPOOL_PX := Vector2(1720, 190)
 ## [x, y, radius] of the 2D reef / shore rocks.
 const ROCKS_PX := [[260, 700, 18], [320, 650, 12], [700, 780, 22], [1150, 640, 16],
 	[1210, 700, 24], [1650, 760, 18], [1550, 1000, 14]]
+## [x, y, radius] of the 2D submerged rocks (đá ngầm): only seen inside the lamp's reach.
+const SUBMERGED_PX := [[400, 820, 12], [620, 700, 10], [880, 850, 9], [980, 610, 13],
+	[1300, 870, 10], [1520, 640, 12], [1780, 860, 11], [170, 600, 10], [760, 420, 14],
+	[1100, 300, 12], [300, 160, 11], [1700, 520, 13]]
 
 
 static func to_world(px: Vector2) -> Vector3:
@@ -44,8 +48,16 @@ static func rect_world(rect: Rect2) -> Rect2:
 
 
 static func rocks() -> Array[Dictionary]:
+	return _rock_list(ROCKS_PX)
+
+
+static func submerged_rocks() -> Array[Dictionary]:
+	return _rock_list(SUBMERGED_PX)
+
+
+static func _rock_list(src: Array) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
-	for r: Array in ROCKS_PX:
+	for r: Array in src:
 		out.append({"pos": to_world(Vector2(float(r[0]), float(r[1]))), "radius": float(r[2]) / PX_PER_UNIT})
 	return out
 

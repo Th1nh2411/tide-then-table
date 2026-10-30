@@ -3,7 +3,7 @@ extends RefCounted
 ## Builds the 3D sea's static world, places, boat and phone-map snapshot, and
 ## animates the decorative bits each frame.
 ## Host (SeaScene3D) fields written: wave_marks, bubble_spots, wake_marks,
-## whirlpool_marks, rin_figure, boat_lamp, map_boat_proxy.
+## submerged, whirlpool_marks, rin_figure, boat_lamp, map_boat_proxy.
 
 static var _materials: Dictionary = {}
 
@@ -108,6 +108,7 @@ static func build_world(sea: SeaScene3D) -> void:
 	if Story.is_fog_open():
 		var fog := SeaLayout3D.rect_world(SeaLayout3D.FOG_RECT)
 		box(sea, Vector3(fog.get_center().x, 0.085, fog.get_center().y), Vector3(fog.size.x, 0.02, fog.size.y), "2d4b52")
+		sea.add_child(SeaFog3D.new())
 	# Land strip behind the dock (the 2D shore).
 	var shore_z: float = SeaLayout3D.to_world(Vector2(0, SeaLayout3D.SHORE_PX)).z
 	solid_box(sea, Vector3(0, 0.2, (shore_z + size.y * 0.5) * 0.5 + 1.5), Vector3(size.x, 0.42, size.y * 0.5 - shore_z - 3.0), "394a50")
@@ -138,6 +139,11 @@ static func build_world(sea: SeaScene3D) -> void:
 		for i in range(5):
 			var angle := float(i) * TAU / 5.0
 			box(sea, pos + Vector3(cos(angle) * radius * 1.7, 0.11, sin(angle) * radius * 1.3), Vector3(0.52, 0.02, 0.08), "819796")
+	for rock in SeaLayout3D.submerged_rocks():
+		var hidden := SubmergedRock3D.new()
+		sea.add_child(hidden)
+		hidden.setup(rock["pos"], float(rock["radius"]), sea.boat)
+		sea.submerged.append(hidden)
 	solid_box(sea, sea.RAFT_POS + Vector3(0, 0.32, 0), Vector3(5.0, 0.55, 3.0), "7a4841", false)
 	batch_model(sea, "lobster_raft", sea.RAFT_POS + Vector3(0, -0.10, 0))
 	# Shoals are only hinted by bubbles on the water (BubbleSpot3D).
@@ -256,6 +262,8 @@ static func animate(sea: SeaScene3D, delta: float, forward: Vector3, forward_spe
 	var bubble_range := sea._bubble_range()
 	for spot in sea.bubble_spots:
 		spot.view_range = bubble_range
+	for rock in sea.submerged:
+		rock.view_range = bubble_range
 	for i in range(sea.whirlpool_marks.size()):
 		var a := TAU * float(i) / float(sea.whirlpool_marks.size()) + t * 0.65
 		sea.whirlpool_marks[i].position = sea.WHIRLPOOL_POS + Vector3(cos(a) * 2.3, 0.16, sin(a) * 2.3)

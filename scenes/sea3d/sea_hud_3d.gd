@@ -23,7 +23,12 @@ static func build_hud(sea: SeaScene3D) -> void:
 	sea.help.add_theme_color_override("font_color", Color("a4dddb"))
 	layer.add_child(sea.help)
 	sea.message = Label.new()
-	sea.message.position = Vector2(14, 58)
+	# Bottom-left above the key help, clear of the quest box.
+	sea.message.position = Vector2(14, 290)
+	sea.message.size = Vector2(440, 32)
+	sea.message.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	sea.message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sea.message.add_theme_font_size_override("font_size", 11)
 	sea.message.add_theme_color_override("font_color", Color("f2d98a"))
 	layer.add_child(sea.message)
 
@@ -62,8 +67,7 @@ static func update(sea: SeaScene3D) -> void:
 		else:
 			prompt = "E ghé " + str(PLACE_NAMES.get(poi, poi))
 	sea.header.text = "%s · %s · %dk · Dầu %d%% · Thân thuyền %d%%\nCá %d · Lưới %d/2 · %s" % [sea.boat_data.display_name, DayClock.get_time_text(), GameState.money, roundi(sea.oil / sea.oil_capacity * 100.0), roundi(GameState.boat_hp), sea.hold.items.size(), sea.nets.size(), prompt]
-	if Time.get_ticks_msec() / 1000.0 > sea.status_until:
-		sea.message.text = ""
+	sea._next_line()
 
 static func build_navigation(sea: SeaScene3D) -> void:
 	var layer := CanvasLayer.new()

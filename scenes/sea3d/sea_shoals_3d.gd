@@ -66,7 +66,7 @@ static func _is_free(pos: Vector3, shoals: Array[Shoal]) -> bool:
 			SeaLayout3D.LIGHTHOUSE_PX, SeaLayout3D.RAFT_PX, SeaLayout3D.WHIRLPOOL_PX]:
 		if SeaLayout3D.to_world(px).distance_to(pos) < min_d:
 			return false
-	for rock in SeaLayout3D.rocks():
+	for rock in SeaLayout3D.rocks() + SeaLayout3D.submerged_rocks():
 		var rpos: Vector3 = rock["pos"]
 		if rpos.distance_to(pos) < float(rock["radius"]) + CLEARANCE_PX / SeaLayout3D.PX_PER_UNIT:
 			return false

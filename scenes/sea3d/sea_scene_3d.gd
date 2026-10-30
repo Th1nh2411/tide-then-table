@@ -49,6 +49,7 @@ var fishing := false
 var ending := false
 var status := ""
 var status_until := 0.0
+var _said: Array[Array] = []
 var rng := RandomNumberGenerator.new()
 var overlay: CanvasLayer
 var debug_cutscene_index := 0
@@ -57,6 +58,7 @@ var help: Label
 var message: Label
 var wave_marks: Array[MeshInstance3D] = []
 var bubble_spots: Array[BubbleSpot3D] = []
+var submerged: Array[SubmergedRock3D] = []
 var cinematic: CastCinematic3D
 ## Tests and bots can turn the cast scene off (E then opens the minigame at once).
 var cast_cinematic_enabled := true
@@ -129,14 +131,31 @@ func _ready() -> void:
 	SeaHud3D.build_navigation(self)
 	DayClock.start_night()
 	DailyTrend.ensure()
-	Story.check_day()
+	var fog_tonight := Story.check_day()
 	GameState.resume_at = "sea"
 	SaveSystem.autosave("sea")
 	Sfx.ambience("sea")
-	_say("Tìm bọt khí trên mặt biển. Bến ở phía sau.", 4.0)
+	_night_start_lines(fog_tonight)
+	_update_hud()
+
+## Same night-start lines as the 2D sea, queued one after another.
+func _night_start_lines(fog_tonight: bool) -> void:
+	if GameState.last_spoiled_count > 0:
+		_say("Hư mất %d con trong kho rồi, tiếc ghê..." % GameState.last_spoiled_count, 2.5)
+		GameState.last_spoiled_count = 0
+	if not GameState.has_flag("neo_hello"):
+		GameState.set_flag("neo_hello")
+		_say("NEO: Chào anh Rin. Rin's Catch đã khởi động lại. Tôi sẽ nhắc anh dầu đèn, khoang cá và đơn hàng.", 4.0)
+	var trend := DailyTrend.announcement()
+	if trend != "":
+		_say(trend, 4.0)
+	if fog_tonight:
+		_say("Biển lặng lạ thường... phía đông bắc sương dày lên.", 3.0)
+	elif Story.is_fog_open():
+		_say("Sương phủ kín góc đông bắc... trong đó có ánh sáng gì vậy?", 3.0)
 	if weather and weather.start_message != "":
 		_say(weather.start_message, 4.0)
-	_update_hud()
+	_say("Tìm bọt khí trên mặt biển. Bến ở phía sau.", 4.0)
 
 func _physics_process(delta: float) -> void:
 	if ending or fishing or poi_busy or (hold_ui and hold_ui.visible) or (phone_app and phone_app.visible):
@@ -225,6 +244,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			story_bridge.play(cutscene)
 			get_viewport().set_input_as_handled()
 			return
+		if debug_key.physical_keycode == KEY_F2:
+			# Pretend the omen happened yesterday and reload to open the fog.
+			GameState.set_flag(Story.OMEN_DAY_FLAG, GameState.day - 1)
+			get_tree().reload_current_scene()
+			get_viewport().set_input_as_handled()
+			return
 	if ending or fishing or poi_busy or (hold_ui and hold_ui.visible) or get_tree().paused:
 		return
 	if event.is_action_pressed("open_hold") and hold_ui:
@@ -298,7 +323,7 @@ func _enter_whirlpool() -> void:
 	await tween.finished
 	SceneRouter.go_to(ENDING_SCENE, Color.WHITE)
 
-## Lamp reach for bubbles: shrinks as the oil runs low.
+## Lamp reach for bubbles and submerged rocks: shrinks as the oil runs low.
 func _bubble_range() -> float:
 	var fraction := oil / maxf(oil_capacity, 1.0)
 	var base: float = boat_lamp.spot_range if is_instance_valid(boat_lamp) else 14.0
@@ -365,10 +390,24 @@ func _end_trip(towed: bool, rescue_fee: int = -1) -> void:
 		await story_bridge.call("play_eligible", trip_end_cutscenes)
 	SceneRouter.go_to(REST_SCENE)
 
+## Rin / NEO line; waits for the current one to finish (one bubble at a time).
 func _say(text: String, seconds: float) -> void:
+	if message.text != "" and Time.get_ticks_msec() / 1000.0 < status_until:
+		if text != status and _said.size() < 4:
+			_said.append([text, seconds])
+		return
 	status = text
 	status_until = Time.get_ticks_msec() / 1000.0 + seconds
 	message.text = status
+
+## Called from the HUD tick: shows the next queued line once the last one ends.
+func _next_line() -> void:
+	if Time.get_ticks_msec() / 1000.0 <= status_until:
+		return
+	message.text = ""
+	if not _said.is_empty():
+		var line: Array = _said.pop_front()
+		_say(str(line[0]), float(line[1]))
 
 func _update_hud() -> void:
 	SeaHud3D.update(self)
