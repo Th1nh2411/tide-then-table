@@ -35,6 +35,11 @@ const SOUNDS := {
 	"shutter": [{"w": "noise", "lp": 0.92, "d": 0.022, "v": 0.32}, {"at": 0.0, "w": "square", "f": [2600, 1900], "d": 0.012, "v": 0.07},
 		{"at": 0.06, "w": "noise", "lp": 0.85, "d": 0.03, "v": 0.26}, {"at": 0.06, "w": "square", "f": [2200, 1600], "d": 0.012, "v": 0.06},
 		{"at": 0.12, "w": "noise", "lp": 0.45, "d": 0.16, "v": 0.07, "a": 0.04}],
+	# Rod fight: reel click, line snapping, wheel tick, fish slapping on the deck.
+	"reel": [{"w": "noise", "lp": 0.9, "d": 0.012, "v": 0.09}, {"at": 0.0, "w": "square", "f": [1900, 1500], "d": 0.012, "v": 0.035}],
+	"snap": [{"w": "noise", "lp": 0.95, "d": 0.04, "v": 0.38}, {"at": 0.02, "w": "tri", "f": [1100, 160], "d": 0.28, "v": 0.22}],
+	"tick": [{"w": "square", "f": [2400, 2200], "d": 0.012, "v": 0.05}],
+	"flop": [{"w": "noise", "lp": 0.35, "d": 0.05, "v": 0.26}, {"at": 0.1, "w": "noise", "lp": 0.35, "d": 0.04, "v": 0.16}],
 	"stamp": [{"w": "noise", "lp": 0.1, "d": 0.1, "v": 0.35}, {"at": 0.0, "w": "sine", "f": [180, 70], "d": 0.13, "v": 0.45}],
 }
 const LOOPS := {
@@ -42,6 +47,8 @@ const LOOPS := {
 		{"at": 0.9, "w": "sine", "f": [50, 50], "d": 0.01, "v": 0.0}],
 	"rain": [{"w": "noise", "lp": 0.55, "d": 2.0, "v": 0.12, "a": 0.0, "swell": 1.0}],
 	"sizzle": [{"w": "noise", "lp": 0.85, "d": 1.0, "v": 0.08}],
+	# Line under high tension: a thin whine.
+	"strain": [{"w": "tri", "f": [1180, 1220], "d": 0.5, "v": 0.035}],
 	"pour": [{"w": "noise", "lp": 0.3, "d": 1.0, "v": 0.1}],
 	"sea": [{"w": "noise", "lp": 0.015, "d": 6.0, "v": 0.35, "a": 0.0, "swell": 3.0}],
 	"street": [{"w": "noise", "lp": 0.04, "d": 4.0, "v": 0.14, "a": 0.0, "swell": 2.0}],

@@ -67,10 +67,10 @@ Mỗi loại thuyền một file, theo cấp nâng cấp thuyền. Áp cho cả 
 
 | File | Size | Mô tả | Trạng thái |
 |---|---|---|---|
-| sprites/fishing/boat_side_thuyen_thung.png | 80x40 | thuyền thúng tre tròn (đầu game) nhìn ngang, vành tre sáng, nan đan rõ, quét dầu nâu; Rin đứng ở x = 28 | cần vẽ lại |
-| sprites/fishing/boat_side_ghe_cheo.png | 144x48 | ghe gỗ chèo, mũi và đuôi cong lên, ván gỗ có vân, mái chèo gác mạn trái; Rin đứng ở x = 60 | cần vẽ lại |
-| sprites/fishing/boat_side_ghe_may.png | 192x56 | ghe máy dài thân xanh (#3c5e8b / #4f8fba, sáng hơn nước), sọc đỏ, cabin nhỏ trắng có cửa sổ vàng (x ≈ 108–146), máy ở đuôi trái; Rin đứng ở x = 68 | cần vẽ lại |
-| sprites/fishing/rin_side.png | 96x64 | sheet 3 khung 32x64, nhìn ngang quay phải, tóc đen rối, kính đen, áo ba lỗ trắng theo model 3D và portrait Rin (không nón lá): (1) đứng chờ cầm cần, (2) kéo cần, (3) gồng ngả người ra sau. Tay cầm cần ở khoảng (24, 32) trong khung; chân ở giữa mép dưới khung, đứng trên mặt boong; cần câu do code vẽ | cần vẽ lại |
+| sprites/fishing/boat_side_thuyen_thung.png | 80x40 | thuyền thúng tre tròn (đầu game) nhìn ngang, vành tre sáng, nan đan rõ, quét dầu nâu; Rin đứng ở x = 28 | đã vẽ |
+| sprites/fishing/boat_side_ghe_cheo.png | 144x48 | ghe gỗ chèo, mũi và đuôi cong lên, ván gỗ có vân, mái chèo gác mạn trái; Rin đứng ở x = 60 | đã vẽ |
+| sprites/fishing/boat_side_ghe_may.png | 192x56 | ghe máy dài thân xanh (#3c5e8b / #4f8fba, sáng hơn nước), sọc đỏ, cabin nhỏ trắng có cửa sổ vàng (x ≈ 108–146), máy ở đuôi trái; Rin đứng ở x = 68 | đã vẽ |
+| sprites/fishing/rin_side.png | 96x64 | sheet 3 khung 32x64, nhìn ngang quay phải, tóc đen rối, kính đen, áo ba lỗ trắng theo model 3D và portrait Rin (không nón lá): (1) đứng chờ cầm cần, (2) kéo cần, (3) gồng ngả người ra sau. Tay cầm cần ở khoảng (24, 32) trong khung; chân ở giữa mép dưới khung, đứng trên mặt boong; cần câu do code vẽ | đã vẽ |
 
 Bản đợt 1 (bị trả lại) để ở `tmp/fishing_rejected/` để so sánh.
 

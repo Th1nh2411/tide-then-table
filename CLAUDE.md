@@ -139,7 +139,7 @@ Vietnamese, keep code comments in short English.
   W/S raises/lowers the hook, Space hooks the aimed fish, then W reels and S
   gives slack; E spins a green/yellow/red all-in wheel; trip stun reaches 100%
   = Rin faints and is rescued); spot picks species via its featured fish +
-  depth; the rod fight is full screen, side view (`FishFightView` + `FishFightBackdrop` per zone + `FishFightBoat` per boat upgrade + `FishFightGauges`: reel, level, daze, wheel; art list docs/ui_art_needed_fishing.md), `FishPortrait` on a card top right (nets keep the crate panel, portrait standing up): a shadow + "?" while waiting for the
+  depth; the rod fight is full screen, side view (`FishFightView` + `FishFightBackdrop` per zone + `FishFightBoat` per boat upgrade + `FishFightGauges` + `FishFightFeel` (reel/strain/snap sounds, shakes, bite freeze): reel, level, daze, wheel; art list docs/ui_art_needed_fishing.md), `FishPortrait` on a card top right (nets keep the crate panel, portrait standing up): a shadow + "?" while waiting for the
   bite and for species not in the Dex yet, named "???"), `CatchRoll` rolls size: deeper = pricier/bigger, size scales price
   and difficulty; records in `GameState.best_sizes`), `NetController` (Q nets → HaulGame; nets bring shrimp / crab / snails, each rolled from the zone with its own size: near shore mostly shrimp, reef mostly crab — rods catch fish and squid only),
   `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab; a species caught

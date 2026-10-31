@@ -7,6 +7,7 @@ extends MinigameBase
 signal tugged
 signal rin_fainted
 signal fish_hooked(size_scale: float)
+signal yanked(result: YankResult)
 
 enum YankResult { GREEN, YELLOW, RED }
 
@@ -50,6 +51,8 @@ var stun: float = 0.0
 var hooked_index: int = -1
 var yank_spinning: bool = false
 var school: Array[Dictionary] = []
+## W held during the fight (reel clicks).
+var reeling: bool = false
 ## FishData.Zone of the spot: picks the sea backdrop.
 var zone: int = 0
 ## BoatData id of Rin's boat (how the fishing screen draws it).
@@ -68,6 +71,7 @@ var _pointer_angle: float = -PI * 0.5
 var _wheel_roll: float = 0.0
 var _rng := RandomNumberGenerator.new()
 var _view := FishFightView.new(self)
+var _feel := FishFightFeel.new(self)
 
 
 func setup(p_fish: FishData, p_zone_scale: float) -> void:
@@ -83,6 +87,11 @@ func setup(p_fish: FishData, p_zone_scale: float) -> void:
 ## Keeps animating after the result (the fish lands in the boat).
 func _process(delta: float) -> void:
 	_view.tick(delta)
+	_feel.tick(delta)
+	if _feel.hitstop > 0.0:  # the bite freezes the fight for a few frames
+		_feel.hitstop -= delta
+		queue_redraw()
+		return
 	super(delta)
 	if _done:
 		_time += delta
@@ -90,9 +99,15 @@ func _process(delta: float) -> void:
 
 
 func _finish(success: bool, perfect: bool) -> void:
-	if not _done and success and hooked_index >= 0:
-		_view.land()
+	if not _done:
+		_feel.on_finish(success)
+		if success and hooked_index >= 0:
+			_view.land()
 	super(success, perfect)
+
+
+func _exit_tree() -> void:
+	_feel.stop()
 
 
 func get_hint() -> String:
@@ -233,7 +248,7 @@ func bite_progress() -> float:
 func _haul_hooked_fish(delta: float, depth: float) -> void:
 	var entry: Dictionary = school[hooked_index]
 	var pos: Vector2 = entry["pos"]
-	var reeling := depth < -0.05
+	reeling = depth < -0.05
 	if reeling:
 		pos.y -= reel_speed * zone_scale * delta
 		var pull := 1.0 + float(entry["size"]) * 0.35
@@ -347,6 +362,7 @@ func resolve_yank(roll: float) -> YankResult:
 		tension += 0.22
 		stun += 0.24
 		balance += float(entry["dir"]) * 0.4
+	yanked.emit(result)
 	tugged.emit()
 	return result
 

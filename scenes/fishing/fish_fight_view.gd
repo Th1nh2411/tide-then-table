@@ -16,6 +16,7 @@ const FISH_WIDTH := 46.0
 ## Boat and Rin are drawn at 2x (Rin 32x64 on screen).
 const BOAT_SCALE := 2.0
 const LAND_SECONDS := 0.7
+const RING_SECONDS := 0.35
 
 var game: FishFightGame
 var _particles: Array[Dictionary] = []
@@ -23,6 +24,7 @@ var _bubble_clock: float = 0.0
 var _landed_clock: float = -1.0
 var _land_from := Vector2.ZERO
 var _backdrop_cache: Dictionary = {}
+var _facing: float = 1.0
 
 
 func _init(owner: FishFightGame) -> void:
@@ -45,7 +47,10 @@ func tick(delta: float) -> void:
 		_particles.append({"kind": "bubble", "pos": hook_screen() + Vector2(randf_range(-3, 3), 0),
 			"vel": Vector2(randf_range(-4, 4), -22.0), "life": 1.6})
 	if _landed_clock >= 0.0:
+		var before := _landed_clock
 		_landed_clock += delta
+		if before < LAND_SECONDS and _landed_clock >= LAND_SECONDS:
+			Sfx.play("flop")  # slaps onto the deck
 
 
 ## The caught fish leaps out of the water into the boat.
@@ -54,6 +59,11 @@ func land() -> void:
 	_land_from = hook_screen()
 	splash(Vector2(_land_from.x, surface()), 10)
 	Sfx.play("splash")
+
+
+## A bright ring spreading from `at` (the bite).
+func ring(at: Vector2) -> void:
+	_particles.append({"kind": "ring", "pos": at, "vel": Vector2.ZERO, "life": RING_SECONDS})
 
 
 func splash(at: Vector2, count: int) -> void:
@@ -146,15 +156,23 @@ func _draw_boat_and_rod(at: Vector2) -> Vector2:
 	var spec := FishFightBoat.spec(game.boat_id)
 	var feet := Vector2(float(spec["rin_x"]) + roundf(game.balance * 3.0), float(spec["deck"]))
 	var stance := 0 if game.hooked_index < 0 else 2 if game.tension > 0.6 else 1
+	# Rin turns to face the hook (the sheet faces right).
+	var offset := hook_screen().x - (origin.x + feet.x * BOAT_SCALE)
+	if absf(offset) > 10.0:  # a dead zone under his feet, so he doesn't flicker
+		_facing = signf(offset)
+	var facing := _facing
 	var rin_rect := Rect2(origin + (feet + Vector2(-8, -32)) * BOAT_SCALE, Vector2(16, 32) * BOAT_SCALE)
-	if not Art.draw_frame(game, "fishing/rin_side", 3, 1, stance, 0, rin_rect):
+	if not Art.draw_frame(game, "fishing/rin_side", 3, 1, stance, 0, rin_rect, facing < 0.0):
 		game.draw_set_transform(origin, 0.0, Vector2.ONE * BOAT_SCALE)
 		_draw_rin_placeholder(feet, stance)
 		game.draw_set_transform(Vector2.ZERO)
 	# The rod from Rin's hands, bending towards the hook with the tension.
-	var hands := origin + (feet + Vector2(4, -16)) * BOAT_SCALE
+	var hands := origin + (feet + Vector2(4.0 * facing, -16)) * BOAT_SCALE
 	var toward := (hook_screen() - hands).normalized()
-	var straight := hands + (Vector2(0.55, -0.85).normalized().lerp(toward, 0.35 + game.tension * 0.5)).normalized() * 64.0
+	# Held up and forward, swinging towards the hook as the line tightens.
+	var rest := Vector2(0.55 * facing, -0.85).angle()
+	var angle := lerp_angle(rest, toward.angle(), 0.25 + game.tension * 0.35)
+	var straight := hands + Vector2.from_angle(angle) * 64.0
 	var bend := straight + toward * game.tension * 18.0
 	var points := PackedVector2Array()
 	for k in 7:
@@ -214,7 +232,10 @@ func _draw_landing(boat: Vector2) -> void:
 func _draw_particles() -> void:
 	for p: Dictionary in _particles:
 		var pos: Vector2 = (p["pos"] as Vector2).round()
-		if p["kind"] == "drop":
+		if p["kind"] == "ring":
+			var life := float(p["life"]) / RING_SECONDS
+			game.draw_arc(pos, 4.0 + (1.0 - life) * 22.0, 0.0, TAU, 24, Color(0.95, 1.0, 0.8, life), 2.0)
+		elif p["kind"] == "drop":
 			game.draw_rect(Rect2(pos, Vector2(1, 2)), Color(0.85, 0.95, 1.0, 0.9))
 		elif pos.y > surface():
 			game.draw_arc(pos, 1.5, 0.0, TAU, 8, Color(0.75, 0.9, 1.0, 0.6), 1.0)
