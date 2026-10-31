@@ -24,15 +24,23 @@ var _bubble_clock: float = 0.0
 var _landed_clock: float = -1.0
 var _land_from := Vector2.ZERO
 var _backdrop_cache: Dictionary = {}
-var _facing: float = 1.0
+var _rig: FishFightRig
+var _line := FishFightLine.new()
+var _frame_delta: float = 1.0 / 60.0
+var _bump_clock: float = 0.0
 
 
 func _init(owner: FishFightGame) -> void:
 	game = owner
+	_rig = FishFightRig.new(owner)
 	game.tugged.connect(func() -> void: splash(hook_screen(), 6))
+	game.boat_bumped.connect(func() -> void: splash(boat_screen() + Vector2(signf(game.boat_position) * 50.0, 0), 8))
+	game.fish_bumped.connect(_on_fish_bumped)
 
 
 func tick(delta: float) -> void:
+	_frame_delta = delta
+	_bump_clock = maxf(_bump_clock - delta, 0.0)
 	for p: Dictionary in _particles:
 		p["life"] = float(p["life"]) - delta
 		var vel: Vector2 = p["vel"]
@@ -59,6 +67,18 @@ func land() -> void:
 	_land_from = hook_screen()
 	splash(Vector2(_land_from.x, surface()), 10)
 	Sfx.play("splash")
+
+
+## Fish knocking together: a spark and a puff of bubbles (at most 4 a second).
+func _on_fish_bumped(at: Vector2) -> void:
+	if _bump_clock > 0.0:
+		return
+	_bump_clock = 0.25
+	var where := to_screen(at)
+	_particles.append({"kind": "spark", "pos": where, "vel": Vector2.ZERO, "life": 0.18})
+	for i in 3:
+		_particles.append({"kind": "bubble", "pos": where + Vector2(randf_range(-4, 4), randf_range(-3, 3)),
+			"vel": Vector2(randf_range(-6, 6), -18.0), "life": 0.9})
 
 
 ## A bright ring spreading from `at` (the bite).
@@ -98,7 +118,7 @@ func draw() -> void:
 	for i in game.school.size():
 		if i != game.hooked_index or _landed_clock < 0.0:
 			_draw_fish(i)
-	var tip := _draw_boat_and_rod(boat)
+	var tip := _rig.draw(boat, hook_screen())
 	if _landed_clock < 0.0:
 		_draw_line(tip)
 	else:
@@ -120,6 +140,23 @@ func _draw_fish(i: int) -> void:
 		rotation = -0.55 * facing + sin(game._time * 28.0) * (0.08 + game.tension * 0.2)
 	var tint := _fish_tint(pos.y)
 	_draw_fish_sprite(pos, rotation, facing, scale, tint)
+	# Scales flash now and then when the fish swims through the lamp light.
+	if _known() and _in_light(pos) and sin(game._time * 5.0 + float(entry["phase"]) * 7.0) > 0.93:
+		_glint(pos + Vector2(facing * FISH_WIDTH * scale * 0.2, -3), 1.0)
+
+
+## Inside the boat lamp's cone (see FishFightBackdrop._draw_light).
+func _in_light(pos: Vector2) -> bool:
+	var lamp_x := boat_screen().x + (FishFightBoat.spec(game.boat_id)["lamp"] as Vector2).x * BOAT_SCALE
+	return absf(pos.x - lamp_x) < 20.0 + (pos.y - surface()) * 0.6
+
+
+## A tiny white star; `size` 1 = 3 px cross, 2 = 5 px.
+func _glint(at: Vector2, size: float) -> void:
+	var arm := roundf(maxf(size, 0.5))
+	var color := Color(1, 1, 0.92, clampf(size, 0.0, 1.0))
+	game.draw_rect(Rect2(at.round() - Vector2(arm, 0), Vector2(arm * 2 + 1, 1)), color)
+	game.draw_rect(Rect2(at.round() - Vector2(0, arm), Vector2(1, arm * 2 + 1)), color)
 
 
 func _fish_tint(y: float) -> Color:
@@ -147,74 +184,25 @@ func _draw_fish_sprite(pos: Vector2, rotation: float, facing: float, scale: floa
 	game.draw_set_transform(Vector2.ZERO)
 
 
-## Boat (never rotated: pixel art stays crisp) with Rin leaning against the
-## balance; returns the rod tip. Art is drawn at its screen size, 1:1.
-func _draw_boat_and_rod(at: Vector2) -> Vector2:
-	var bob := roundf(sin(game._time * 2.0) * 1.0)
-	var origin := (at + Vector2(0, bob)).round()
-	FishFightBoat.draw(game, game.boat_id, origin, BOAT_SCALE)
-	var spec := FishFightBoat.spec(game.boat_id)
-	var feet := Vector2(float(spec["rin_x"]) + roundf(game.balance * 3.0), float(spec["deck"]))
-	var stance := 0 if game.hooked_index < 0 else 2 if game.tension > 0.6 else 1
-	# Rin turns to face the hook (the sheet faces right).
-	var offset := hook_screen().x - (origin.x + feet.x * BOAT_SCALE)
-	if absf(offset) > 10.0:  # a dead zone under his feet, so he doesn't flicker
-		_facing = signf(offset)
-	var facing := _facing
-	var rin_rect := Rect2(origin + (feet + Vector2(-8, -32)) * BOAT_SCALE, Vector2(16, 32) * BOAT_SCALE)
-	if not Art.draw_frame(game, "fishing/rin_side", 3, 1, stance, 0, rin_rect, facing < 0.0):
-		game.draw_set_transform(origin, 0.0, Vector2.ONE * BOAT_SCALE)
-		_draw_rin_placeholder(feet, stance)
-		game.draw_set_transform(Vector2.ZERO)
-	# The rod from Rin's hands, bending towards the hook with the tension.
-	var hands := origin + (feet + Vector2(4.0 * facing, -16)) * BOAT_SCALE
-	var toward := (hook_screen() - hands).normalized()
-	# Held up and forward, swinging towards the hook as the line tightens.
-	var rest := Vector2(0.55 * facing, -0.85).angle()
-	var angle := lerp_angle(rest, toward.angle(), 0.25 + game.tension * 0.35)
-	var straight := hands + Vector2.from_angle(angle) * 64.0
-	var bend := straight + toward * game.tension * 18.0
-	var points := PackedVector2Array()
-	for k in 7:
-		var t := k / 6.0
-		points.append(hands.lerp(straight, t).lerp(hands.lerp(bend, t), t))
-	game.draw_polyline(points, Color("4d2b32"), 3.0)
-	game.draw_polyline(points.slice(3), Color("ad7757"), 2.0)
-	return points[points.size() - 1]
-
-
-## `feet`: bottom centre of Rin.
-func _draw_rin_placeholder(feet: Vector2, stance: int) -> void:
-	feet += Vector2(-4, 0)
-	var lean := 1.0 if stance == 2 else 0.0
-	game.draw_rect(Rect2(feet + Vector2(1, -10), Vector2(6, 10)), Color("253a5e"))
-	game.draw_rect(Rect2(feet + Vector2(lean, -20), Vector2(8, 11)), Color("4f8fba"))
-	game.draw_rect(Rect2(feet + Vector2(1 + lean, -26), Vector2(6, 6)), Color("c09473"))
-	game.draw_rect(Rect2(feet + Vector2(lean, -28), Vector2(8, 4)), Color("151d28"))  # black hair
-
-
 func _draw_line(tip: Vector2) -> void:
 	var hook := hook_screen()
 	var color := Color("f2d98a").lerp(Color("e0302b"), clampf((game.tension - 0.55) * 2.2, 0.0, 1.0))
-	var shake := Vector2(0, sin(game._time * 60.0) * game.tension * 1.5) if game.hooked_index >= 0 else Vector2.ZERO
-	var middle := (tip + hook) * 0.5 + Vector2(-game._hook_velocity_x * 14.0, 4.0) + shake
-	var points := PackedVector2Array()
-	for i in 11:
-		var t := i / 10.0
-		points.append(tip.lerp(middle, t).lerp(middle.lerp(hook, t), t))
-	game.draw_polyline(points, color, 1.0)
+	# Soft rope: sags while slack (a free hook counts as a little tension: the bait's weight).
+	var pull := game.tension if game.hooked_index >= 0 else 0.12
+	_line.step(tip, hook, pull, surface(), _frame_delta)
+	game.draw_polyline(_line.points, color, 1.0)
 	if game.hooked_index < 0:  # bobber where the line meets the water
-		var y := surface()
-		for i in points.size() - 1:
-			if points[i].y < y and points[i + 1].y >= y:
-				var at := Vector2(points[i].x, y + roundf(sin(game._time * 3.0)))
-				game.draw_circle(at, 2.5, Color("e0302b"))
-				game.draw_rect(Rect2(at + Vector2(-2, -1), Vector2(5, 1)), Color("ebede9"))
-				break
+		var crossing: Variant = _line.surface_crossing(surface())
+		if crossing != null:
+			var at: Vector2 = (crossing as Vector2) + Vector2(0, roundf(sin(game._time * 3.0)))
+			game.draw_circle(at, 2.5, Color("e0302b"))
+			game.draw_rect(Rect2(at + Vector2(-2, -1), Vector2(5, 1)), Color("ebede9"))
 	# Hook and bait.
 	game.draw_arc(hook + Vector2(0, 2), 2.5, 0.0, PI, 6, Color("c7cfcc"), 1.0)
 	if game.hooked_index < 0:
 		game.draw_rect(Rect2(hook + Vector2(-1, 2), Vector2(3, 2)), Color("cf573c"))
+	if sin(game._time * 4.0) > 0.9:  # the hook catches the lamp light
+		_glint(hook + Vector2(2, 0), 1.0)
 	if game.hooked_index < 0 and game._bite_candidate >= 0:
 		game.draw_arc(hook, 9.0, -PI * 0.5, -PI * 0.5 + TAU * game.bite_progress(), 20, Color("a8ca58"), 2.0)
 
@@ -232,7 +220,9 @@ func _draw_landing(boat: Vector2) -> void:
 func _draw_particles() -> void:
 	for p: Dictionary in _particles:
 		var pos: Vector2 = (p["pos"] as Vector2).round()
-		if p["kind"] == "ring":
+		if p["kind"] == "spark":
+			_glint(pos, float(p["life"]) / 0.18 * 2.0)
+		elif p["kind"] == "ring":
 			var life := float(p["life"]) / RING_SECONDS
 			game.draw_arc(pos, 4.0 + (1.0 - life) * 22.0, 0.0, TAU, 24, Color(0.95, 1.0, 0.8, life), 2.0)
 		elif p["kind"] == "drop":
@@ -255,7 +245,6 @@ func _draw_daze(size: Vector2, boat: Vector2) -> void:
 	if game.stun > 0.45:
 		for i in 3:
 			var angle := game._time * 4.0 + i * TAU / 3.0
-			var spec := FishFightBoat.spec(game.boat_id)
-			var head := Vector2(float(spec["rin_x"]), float(spec["deck"]) - 35.0) * BOAT_SCALE
+			var head := (FishFightBoat.feet(game.boat_id) + Vector2(0, -35)) * BOAT_SCALE
 			var at := boat + head + Vector2(cos(angle) * 12.0, sin(angle) * 4.0)
 			game.draw_rect(Rect2(at.round(), Vector2(2, 2)), Color("f2d98a"))

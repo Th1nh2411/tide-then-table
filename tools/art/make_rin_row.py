@@ -24,13 +24,13 @@ GRIP = 0.22           # metres from the top hand down the shaft to the lower han
 PULL = (0.15, 0.6)    # phase window of the power stroke (keep in sync with RowStroke)
 # Paddle keys: phase -> (top hand T, blade tip B), model space metres.
 KEYS = [
-    (0.00, (-0.05, 1.33, 0.30), (-1.15, -0.10, 0.85)),   # catch: reach forward, over the rim
-    (0.15, (-0.06, 1.31, 0.26), (-1.20, -0.18, 0.65)),   # blade in
-    (0.60, (-0.10, 1.25, -0.02), (-1.20, -0.18, -0.60)),  # pulled back
-    (0.78, (-0.08, 1.32, 0.05), (-1.10, 0.35, -0.30)),   # lift out
-    (1.00, (-0.05, 1.33, 0.30), (-1.15, -0.10, 0.85)),
+    (0.00, (-0.05, 1.33, 0.35), (-1.15, -0.10, 0.90)),   # catch in front of the torso
+    (0.15, (-0.06, 1.31, 0.35), (-1.20, -0.18, 0.72)),   # blade in
+    (0.60, (-0.10, 1.25, 0.35), (-1.20, -0.18, 0.15)),   # pull alongside, never behind the body
+    (0.78, (-0.08, 1.32, 0.35), (-1.10, 0.35, 0.30)),    # lift out in front
+    (1.00, (-0.05, 1.33, 0.35), (-1.15, -0.10, 0.90)),
 ]
-POLE = {'L': np.array([0.5, -1.0, -0.4]), 'R': np.array([-0.6, -1.0, -0.2])}
+POLE = {'L': np.array([0.5, -0.5, 0.8]), 'R': np.array([-1.0, 0.0, 0.0])}
 
 
 def q_mat(q):
@@ -175,10 +175,13 @@ def append(data, kind):
 times = np.arange(int(round(LENGTH*FPS))+1)/FPS
 tracks = {i: [] for i in joints}
 err = 0.0
+err_at = None
 for t in times:
     rots, hands, world = frame(t/LENGTH)
     for side in 'LR':
-        err = max(err, np.linalg.norm(world[by_name['Wrist.'+side]][:3, 3]-hands[side]))
+        hand_error = np.linalg.norm(world[by_name['Wrist.'+side]][:3, 3]-hands[side])
+        if hand_error > err:
+            err, err_at = hand_error, (side, float(t))
     for i in joints:
         tracks[i].append(rots[i])
 tin = append(times, 'SCALAR')
@@ -194,4 +197,4 @@ d['animations'] = [a for a in d['animations'] if a['name'] != 'Row']
 d['animations'].append({'name': 'Row', 'samplers': samplers, 'channels': channels})
 backup(GLB)
 write_document(GLB, d, binary)
-print('Row: %d channels, %.2f s, max hand error %.3f m' % (len(channels), LENGTH, err))
+print('Row: %d channels, %.2f s, max hand error %.3f m at %s' % (len(channels), LENGTH, err, err_at))

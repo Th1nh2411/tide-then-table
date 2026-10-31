@@ -8,13 +8,24 @@ signal tugged
 signal rin_fainted
 signal fish_hooked(size_scale: float)
 signal yanked(result: YankResult)
+## The boat hit the side of the screen hard (splash, shake).
+signal boat_bumped
+## Two fish knocked into each other this step (`at` in arena units).
+signal fish_bumped(at: Vector2)
 
 enum YankResult { GREEN, YELLOW, RED }
 
 @export_group("Free hook")
 @export var school_size: int = 6
-@export var boat_speed: float = 1.2
-@export var hook_depth_speed: float = 0.58
+## Boat: top speed, push from A/D and water drag (it glides, then stops).
+@export var boat_speed: float = 0.85
+@export var boat_accel: float = 4.0
+@export var boat_drag: float = 2.5
+## Hook depth: top speed, push from W/S, drag, and the bait's slow sink.
+@export var hook_depth_speed: float = 0.42
+@export var hook_accel: float = 3.0
+@export var hook_drag: float = 4.0
+@export var hook_sink: float = 0.03
 @export var hook_radius: float = 0.14
 @export var bite_seconds: float = 0.35
 ## Spring and drag use normalized arena units. Together they make the line
@@ -22,8 +33,11 @@ enum YankResult { GREEN, YELLOW, RED }
 @export var line_spring: float = 12.0
 @export var line_drag: float = 3.0
 @export var line_max_sway: float = 0.38
-@export var fish_speed_easy: float = 0.16
-@export var fish_speed_hard: float = 0.32
+@export var fish_speed_easy: float = 0.12
+@export var fish_speed_hard: float = 0.25
+## How fast fish swing round (units/s²) and drift up and down (units/s).
+@export var fish_turn_accel: float = 0.5
+@export var fish_drift: float = 0.03
 @export_group("Haul")
 @export var reel_speed: float = 0.13
 @export var give_slack_speed: float = 0.1
@@ -59,6 +73,8 @@ var zone: int = 0
 var boat_id: String = "thuyen_thung"
 
 var _hook_velocity_x: float = 0.0
+var _hook_velocity_y: float = 0.0
+var _boat_velocity: float = 0.0
 var _bite_candidate: int = -1
 var _bite_elapsed: float = 0.0
 var _fight_time: float = 0.0
@@ -148,8 +164,10 @@ func step_fight(delta: float, steer: float, depth: float, _manual_hook: bool = f
 	if yank_spinning:
 		_update_wheel(delta)
 		return
-	boat_position = clampf(boat_position + steer * boat_speed * delta, -1.0, 1.0)
-	_update_school(delta)
+	_move_boat(delta, steer)
+	var bumps := FishSchoolPhysics.step(school, hooked_index, delta, _time, fish_turn_accel, fish_drift)
+	if not bumps.is_empty():
+		fish_bumped.emit(bumps[0])
 	if hooked_index < 0:
 		_move_free_hook(delta, depth)
 		_update_auto_bite(delta)
@@ -173,27 +191,32 @@ func _spawn_school() -> void:
 			"size": size_scale,
 			"phase": _rng.randf_range(0.0, TAU),
 		})
+		school[i]["vx"] = float(school[i]["dir"]) * float(school[i]["speed"])
 
 
-func _update_school(delta: float) -> void:
-	for i in school.size():
-		var entry: Dictionary = school[i]
-		var pos: Vector2 = entry["pos"]
-		var direction: float = entry["dir"]
-		var speed: float = entry["speed"]
-		# A hooked fish fights harder when it is large, but still obeys the same
-		# simple movement as every other fish—there are no hidden states.
-		if i == hooked_index:
-			speed *= 1.0 + float(entry["size"]) * 0.35
-		pos.x += direction * speed * delta
-		if absf(pos.x) >= 1.0:
-			pos.x = clampf(pos.x, -1.0, 1.0)
-			entry["dir"] = -direction
-		entry["pos"] = pos
+## Glides with inertia; hitting the side of the screen bounces it back.
+func _move_boat(delta: float, steer: float) -> void:
+	_boat_velocity += steer * boat_accel * delta
+	_boat_velocity = clampf(_boat_velocity * exp(-boat_drag * delta), -boat_speed, boat_speed)
+	boat_position += _boat_velocity * delta
+	if absf(boat_position) >= 1.0:
+		boat_position = clampf(boat_position, -1.0, 1.0)
+		if absf(_boat_velocity) > 0.3:
+			boat_bumped.emit()
+		_boat_velocity *= -0.3
 
 
 func _move_free_hook(delta: float, depth: float) -> void:
-	hook_position.y = clampf(hook_position.y + depth * hook_depth_speed * delta, 0.05, 1.0)
+	# Weighted bait: W/S push it, water drags it, it sinks slowly on its own.
+	var push := depth * hook_accel if absf(depth) > 0.05 else hook_sink
+	_hook_velocity_y = clampf((_hook_velocity_y + push * delta) * exp(-hook_drag * delta),
+		-hook_depth_speed, hook_depth_speed)
+	hook_position.y += _hook_velocity_y * delta
+	if hook_position.y < 0.05 or hook_position.y > 1.0:
+		hook_position.y = clampf(hook_position.y, 0.05, 1.0)
+		_hook_velocity_y = 0.0
+	# A fish brushing past knocks the hook along.
+	_hook_velocity_x += FishSchoolPhysics.hook_nudge(school, hook_position) * delta * 6.0
 	# Damped spring pendulum: moving the boat pulls the line, while inertia lets
 	# the hook trail behind and swing past the resting point when the boat stops.
 	_hook_velocity_x += (boat_position - hook_position.x) * line_spring * delta
@@ -235,6 +258,7 @@ func _hook_fish(index: int) -> void:
 	hooked_index = index
 	hook_position = school[index]["pos"]
 	_hook_velocity_x = 0.0
+	_hook_velocity_y = 0.0
 	var size_scale: float = school[index]["size"]
 	fish_hooked.emit(size_scale)
 	tugged.emit()

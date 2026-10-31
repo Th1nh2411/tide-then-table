@@ -9,11 +9,13 @@ extends RefCounted
 ## lamp pole and lamp are drawn by code.
 
 const INK := Color("090a14")
-## size: art size; lamp: lamp centre; rin_x: Rin's feet; deck: deck height.
+## size: art size; lamp: lamp centre; rin_x: Rin's feet; deck: top of the
+## gunwale; sink: how far below it Rin's feet are (he stands inside, the
+## hull hides his feet; drawn hull over Rin).
 const SPECS := {
-	"thuyen_thung": {"size": Vector2(40, 20), "lamp": Vector2(12, -24), "rin_x": -6.0, "deck": -6.0},
-	"ghe_cheo": {"size": Vector2(72, 24), "lamp": Vector2(21, -31), "rin_x": -6.0, "deck": -8.0},
-	"ghe_may": {"size": Vector2(96, 28), "lamp": Vector2(30, -36), "rin_x": -14.0, "deck": -9.0},
+	"thuyen_thung": {"size": Vector2(40, 20), "lamp": Vector2(12, -24), "rin_x": -6.0, "deck": -6.0, "sink": 5.0},
+	"ghe_cheo": {"size": Vector2(72, 24), "lamp": Vector2(21, -31), "rin_x": -6.0, "deck": -8.0, "sink": 4.0},
+	"ghe_may": {"size": Vector2(96, 28), "lamp": Vector2(30, -36), "rin_x": -14.0, "deck": -9.0, "sink": 4.0},
 }
 
 
@@ -21,8 +23,27 @@ static func spec(id: String) -> Dictionary:
 	return SPECS.get(id, SPECS["thuyen_thung"])
 
 
-## Hull (art or placeholder) at `origin` (screen px), then the lamp pole and lamp.
-static func draw(canvas: CanvasItem, id: String, origin: Vector2, scale: float) -> void:
+## Rin's feet in boat units: inside the hull, below the gunwale.
+static func feet(id: String) -> Vector2:
+	var s := spec(id)
+	return Vector2(float(s["rin_x"]), float(s["deck"]) + float(s["sink"]))
+
+
+## The lamp pole and lamp (drawn behind Rin and the hull); the glow flickers.
+static func draw_lamp(canvas: CanvasItem, id: String, origin: Vector2, scale: float, time: float) -> void:
+	var s := spec(id)
+	var deck: float = s["deck"]
+	var lamp: Vector2 = s["lamp"]
+	var flicker := 1.0 + sin(time * 13.0) * 0.06 + sin(time * 31.0 + 1.7) * 0.04
+	canvas.draw_set_transform(origin, 0.0, Vector2.ONE * scale)
+	canvas.draw_rect(Rect2(lamp.x - 1.0, lamp.y + 1.0, 2.0, deck - lamp.y + 2.0), Color("4d2b32"))
+	canvas.draw_circle(lamp, 3.0, Color("f2d98a"))
+	canvas.draw_circle(lamp, 7.0 * flicker, Color(0.95, 0.85, 0.54, 0.16 * flicker))
+	canvas.draw_set_transform(Vector2.ZERO)
+
+
+## Hull (art or placeholder) at `origin` (screen px).
+static func draw_hull(canvas: CanvasItem, id: String, origin: Vector2, scale: float) -> void:
 	var s := spec(id)
 	var size: Vector2 = s["size"]
 	var deck: float = s["deck"]
@@ -36,12 +57,7 @@ static func draw(canvas: CanvasItem, id: String, origin: Vector2, scale: float) 
 				_ghe_may(canvas, deck)
 			_:
 				_thuyen_thung(canvas, deck)
-	canvas.draw_set_transform(origin, 0.0, Vector2.ONE * scale)
-	var lamp: Vector2 = s["lamp"]
-	canvas.draw_rect(Rect2(lamp.x - 1.0, lamp.y + 1.0, 2.0, deck - lamp.y - 1.0), Color("4d2b32"))
-	canvas.draw_circle(lamp, 3.0, Color("f2d98a"))
-	canvas.draw_circle(lamp, 7.0, Color(0.95, 0.85, 0.54, 0.18))
-	canvas.draw_set_transform(Vector2.ZERO)
+		canvas.draw_set_transform(Vector2.ZERO)
 
 
 ## Round bamboo basket boat.

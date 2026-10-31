@@ -48,6 +48,8 @@ var yaw_velocity := 0.0
 var row := RowStroke.new()
 var paddle: Node3D
 var impact_cooldown := 0.0
+## Bounce, spin, rocking, shake and splash of collisions (SeaBoatMover3D calls it).
+var impact := SeaBoatImpact3D.new()
 var elapsed := 0.0
 var fishing := false
 var ending := false
@@ -135,6 +137,7 @@ func _physics_process(delta: float) -> void:
 	map_boat_proxy.position = SeaLayout3D.to_map(boat.position)
 	map_boat_proxy.rotation = -PI / 2.0 - boat.rotation.y
 	SeaWorldBuilder3D.animate(self, delta, forward, forward_speed)
+	impact.apply(self, delta)
 	_update_night_events(delta)
 	var oil_scale := weather.oil_burn_scale if weather else 1.0
 	if not _at_dock():

@@ -3,7 +3,7 @@
 Phong cách chung (tham khảo Dave the Diver + DREDGE): pixel art sắc nét, chỉ
 dùng bảng màu "Xóm Đèn" (`assets/palette/xom_den.*`, xem `ART_PLAN.md`), đồ vật
 thật của quán vỉa hè ban đêm (bảng phấn, giấy, thùng các-tông, bảng hiệu đỏ +
-đèn tuýp). Góc vuông (hoặc bậc 1 px), viền mực 2 px `#090a14`, bevel sáng 1 px
+đèn tuýp). Góc vuông (hoặc bậc 1 px), viền mỏng 1 px hoặc không viền, bevel sáng 1 px
 trên/trái, bóng đổ cứng (2,2) không mờ, ít hạt (giấy / phấn / vân gỗ).
 Icon: sticker pixel — hình đặc **có màu** + viền mực 1 px (game không tô màu
 PNG; chỉ placeholder SVG trắng mới được nướng thành sticker). Nền trong suốt.

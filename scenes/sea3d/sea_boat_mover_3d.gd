@@ -2,7 +2,8 @@ class_name SeaBoatMover3D
 extends RefCounted
 ## Steering the 3D boat for one physics frame: rowed boats push only while a
 ## stroke pulls (RowStroke), motor boats accelerate; wind away from the dock,
-## a worn hull or a towed boat slows it, collisions damage the hull, the
+## a worn hull or a towed boat slows it, collisions bounce it off and damage
+## the hull (SeaBoatImpact3D: spin, rocking, shake, splash), the
 ## boat's range (max_depth) pushes it back, the map edge clamps it.
 ## State stays on the sea scene (velocity, yaw_velocity, row...): other
 ## helpers read it.
@@ -46,6 +47,7 @@ static func drive(sea: SeaScene3D, delta: float) -> Array:
 	boat.velocity.y = 0.0
 	var before := boat.position
 	var impact_speed := boat.velocity.length()
+	var before_velocity := boat.velocity
 	boat.move_and_slide()
 	boat.position.y = 0.0
 	if boat.get_slide_collision_count() > 0:
@@ -53,7 +55,7 @@ static func drive(sea: SeaScene3D, delta: float) -> Array:
 			BoatCondition.damage(minf(14.0, impact_speed * 1.6) * sea.blessed_damage_scale)
 			sea.impact_cooldown = 0.85
 			sea._say("Mạn thuyền va vào vật cản!", 1.8)
-		boat.velocity *= 0.45
+		sea.impact.hit(sea, boat.get_slide_collision(0), before_velocity, forward)
 		if GameState.boat_hp <= 0.0:
 			sea._say("Thuyền hỏng rồi. Có người kéo Rin về bến.", 3.0)
 			sea._end_trip(true)

@@ -2,7 +2,7 @@
 
 Cùng phong cách với `docs/ui_art_needed_hud.md`: pixel art sắc nét, chỉ bảng màu
 "Xóm Đèn" (`assets/palette/xom_den.*`), đồ vật thật (giấy, gỗ thùng cá, sổ tay,
-mẩu báo, ghim, băng keo, sticker). Viền mực 2 px `#090a14`, gờ sáng 1 px
+mẩu báo, ghim, băng keo, sticker). Viền mỏng 1 px hoặc không viền, gờ sáng 1 px
 trên/trái, bóng cứng (2,2) không mờ, góc vuông hoặc bậc 1 px. Nền trong suốt,
 nearest filter.
 

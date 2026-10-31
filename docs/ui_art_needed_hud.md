@@ -2,7 +2,7 @@
 
 Cùng phong cách với `docs/ui_art_needed_menus.md`: pixel art sắc nét, chỉ bảng
 màu "Xóm Đèn" (`assets/palette/xom_den.*`), đồ vật thật (ván gỗ, tờ giấy, phiếu
-order, máy tính tiền, con dấu cao su đỏ, điện thoại). Viền mực 2 px `#090a14`,
+order, máy tính tiền, con dấu cao su đỏ, điện thoại). Viền mỏng 1 px hoặc không viền (xem UI_ART_BRIEF_CODEX.md),
 gờ sáng 1 px trên/trái, bóng đổ cứng (2,2) không mờ, góc vuông hoặc bậc 1 px.
 Nền trong suốt. Hiển thị bằng nearest filter.
 

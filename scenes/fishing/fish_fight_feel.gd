@@ -28,6 +28,9 @@ func _init(owner: FishFightGame) -> void:
 	game.tugged.connect(func() -> void: shake(2.0, 0.18))
 	game.fish_hooked.connect(_on_hooked)
 	game.yanked.connect(_on_yanked)
+	game.boat_bumped.connect(func() -> void:
+		Sfx.play("bump")
+		shake(3.0, 0.25))
 
 
 func tick(delta: float) -> void:

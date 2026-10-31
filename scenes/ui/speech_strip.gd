@@ -3,11 +3,17 @@ extends PanelContainer
 ## Bottom speech note (paper strip, "StripPanel"), shared by the 3D restaurant
 ## and the 3D sea. "Bảo: ..." puts the name in red ink; "NEO: ..." and
 ## "[WARN]" / "[ERR]" lines are NEO's: VT323 with its small hologram
-## (NeoAvatar), red when alarming. Other lines get `default_speaker` ("" =
-## none). Slides in with a small turn, flashes on a new line, fades out.
+## (NeoAvatar), red when alarming; for NEO the paper turns into a dark navy
+## machine screen (thin cyan edge, scanlines, glitch blink-in: NeoScreenFx)
+## and the words type out with soft ticks. Other lines get
+## `default_speaker` ("" = none). Slides in with a small turn, flashes on a
+## new line, fades out.
 
-const NEO_INK := Color("253a5e")
-const ALARM_INK := Color("a53030")
+const NEO_INK := Color("a4dddb")
+const ALARM_INK := Color("e0302b")
+## Seconds per typed character of NEO's lines (capped by NEO_TYPE_MAX).
+const NEO_TYPE_SPEED := 0.022
+const NEO_TYPE_MAX := 1.2
 
 ## Speaker for lines without "Name:" (the sea: Rin talking to himself).
 @export var default_speaker: String = ""
@@ -21,6 +27,10 @@ var _text: Label
 var _neo: NeoAvatar
 var _screen: Control
 var _clock: float = 0.0
+var _fx: NeoScreenFx
+var _neo_style: StyleBoxFlat
+var _typed: int = 0
+var _type_tween: Tween
 
 
 func _ready() -> void:
@@ -53,8 +63,26 @@ func _ready() -> void:
 	_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_text.custom_minimum_size.x = text_width
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# Lay out the whole line before typing it out, so the strip has its final size.
+	_text.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
 	row.add_child(_text)
+	_fx = NeoScreenFx.new()
+	_fx.hide()
+	add_child(_fx)
+	_neo_style = _machine_style()
 	hide()
+
+
+## Dark navy screen with a thin cyan edge, same margins as the paper strip.
+func _machine_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color("151d28", 0.95)
+	style.border_color = Color(NeoScreenFx.CYAN, 0.55)
+	style.set_border_width_all(1)
+	var paper := get_theme_stylebox(&"panel")
+	for side: int in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
+		style.set_content_margin(side, paper.get_content_margin(side) if paper else 5.0)
+	return style
 
 
 ## Shows a line; `seconds` <= 0 keeps it until `clear()`.
@@ -82,6 +110,7 @@ func say(words: String, seconds: float = 4.0) -> void:
 	_text.theme_type_variation = &"NeoLabel" if neo else &"InkLabel"
 	_text.add_theme_font_size_override("font_size", roundi(font_size * PhoneApp.NEO_FONT_SCALE) if neo else font_size)
 	_text.add_theme_color_override("font_color", (ALARM_INK if alarm else NEO_INK) if neo else HudChips.INK)
+	_set_machine(neo, alarm)
 	_clock = seconds
 	var fresh := not visible or modulate.a < 1.0
 	show()
@@ -107,7 +136,34 @@ func clear() -> void:
 			hide())
 
 
+## NEO: machine screen, glitch blink-in, typed words. Others: plain paper.
+func _set_machine(neo: bool, alarm: bool) -> void:
+	_fx.visible = neo
+	if _type_tween:
+		_type_tween.kill()
+	if not neo:
+		remove_theme_stylebox_override(&"panel")
+		_text.visible_ratio = 1.0
+		return
+	add_theme_stylebox_override(&"panel", _neo_style)
+	_neo_style.border_color = Color(ALARM_INK if alarm else NeoScreenFx.CYAN, 0.55)
+	_fx.alarm = alarm
+	_fx.play()
+	Sfx.play("neo", 0.0)
+	_typed = 0
+	_text.visible_ratio = 0.0
+	_type_tween = create_tween()
+	_type_tween.tween_property(_text, "visible_ratio", 1.0,
+		minf(_text.text.length() * NEO_TYPE_SPEED, NEO_TYPE_MAX))
+
+
 func _process(delta: float) -> void:
+	if _fx.visible and current != "":
+		modulate.a = _fx.flicker()
+		var shown := _text.visible_characters
+		if shown >= 0 and shown - _typed >= 3:  # a soft tick every few letters
+			_typed = shown
+			Sfx.play("tick", 0.15)
 	if _clock > 0.0:
 		_clock -= delta
 		if _clock <= 0.0:

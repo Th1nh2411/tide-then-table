@@ -5,7 +5,7 @@ Code đã sẵn: thả PNG đúng đường dẫn là game dùng ngay, không s�
 
 Hướng hình ảnh: một **app mạng xã hội phẳng trên điện thoại của Rin** (như các app
 trong điện thoại của Dave the Diver), không phải hộp kính bo tròn.
-- Pixel art, nền trong suốt, viền tối 1-2 px (Xám 1 `#090a14`), không khử răng cưa,
+- Pixel art, nền trong suốt, viền mỏng 1 px (Xám 1 `#090a14`) hoặc không viền, không khử răng cưa,
   không gradient, không bóng mờ. Bóng cứng lệch (2,2) màu Xám 1 nếu có.
 - Chỉ màu palette "Xóm Đèn": `assets/palette/xom_den.gpl`. Màu chính của app:
   Xanh biển 4 `#4f8fba` (thanh tiêu đề), giấy Đất đá 6 `#e7d5b3` (thẻ bài),

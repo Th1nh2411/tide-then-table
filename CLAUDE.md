@@ -48,7 +48,7 @@ Vietnamese, keep code comments in short English.
   Rin talking to himself by default ("Sóng to quá... phải nâng cấp thuyền"),
   "Bảo: ..." / "Cô Năm: ..." over them; "NEO: ..." / "[...]" is NEO, the AI
   assistant in Rin's Catch (JARVIS-like, says "tôi" / "anh Rin"; bottom-left
-  with its `NeoAvatar` hologram, "[WARN]"/"[ERR]" in red): system reminders
+  with its `NeoAvatar` hologram; in 3D the `SpeechStrip` turns into a dark navy machine screen with `NeoScreenFx` and typed words, "[WARN]"/"[ERR]" in red): system reminders
   (oil, hold, repairs, orders, rush, closing time, today's dish, rewards) are
   NEO's, Rin keeps the emotional ones (catches, spills, "sóng to quá"). One bubble per
   speaker, a speaker's next line waits for the current one (1-2.5 s). Write
@@ -139,7 +139,7 @@ Vietnamese, keep code comments in short English.
   W/S raises/lowers the hook, Space hooks the aimed fish, then W reels and S
   gives slack; E spins a green/yellow/red all-in wheel; trip stun reaches 100%
   = Rin faints and is rescued); spot picks species via its featured fish +
-  depth; the rod fight is full screen, side view (`FishFightView` + `FishFightBackdrop` per zone + `FishFightBoat` per boat upgrade + `FishFightGauges` + `FishFightFeel` (reel/strain/snap sounds, shakes, bite freeze): reel, level, daze, wheel; art list docs/ui_art_needed_fishing.md), `FishPortrait` on a card top right (nets keep the crate panel, portrait standing up): a shadow + "?" while waiting for the
+  depth; the rod fight is full screen, side view (`FishFightView` + `FishFightBackdrop` per zone + `FishFightBoat` per boat upgrade + `FishFightGauges` + `FishFightFeel` (reel/strain/snap sounds, shakes, bite freeze) + `FishSchoolPhysics` (inertia, turns, bumps) + `FishFightLine` (Verlet rope) + `FishFightRig` (Rin inside the hull, rod): reel, level, daze, wheel; art list docs/ui_art_needed_fishing.md), `FishPortrait` on a card top right (nets keep the crate panel, portrait standing up): a shadow + "?" while waiting for the
   bite and for species not in the Dex yet, named "???"), `CatchRoll` rolls size: deeper = pricier/bigger, size scales price
   and difficulty; records in `GameState.best_sizes`), `NetController` (Q nets → HaulGame; nets bring shrimp / crab / snails, each rolled from the zone with its own size: near shore mostly shrimp, reef mostly crab — rods catch fish and squid only),
   `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab; a species caught
@@ -150,6 +150,7 @@ Vietnamese, keep code comments in short English.
   oil; the night tint is dark, so lamps are how the player sees), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,
   `OffscreenMarkers` (edge arrows), `SeaGuide` (first-time pointers), `PauseMenu` (Esc;
   must sit before `HoldUI` in the tree so the hold can eat Esc first).
+- 3D sea collisions: `SeaBoatImpact3D` (`sea.impact`, called from `SeaBoatMover3D`): bounce off the normal, spin, hull rocking spring, camera shake, splash; test boat_impact_test.
 - Night variety: `BoatRange` (foam line from `BoatData.max_depth`, pushes
   back), submerged `Rock`s (LIGHT_ONLY material), `WeatherController` +
   `WeatherData`/`WeatherCatalog` (GameState.weather_id rolled on the rest
