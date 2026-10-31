@@ -10,4 +10,4 @@ icon = "fire"
 desc = "Nướng 20 món"
 stat = "grill_total"
 target = 20
-reward_k = 60
+reward_k = 180

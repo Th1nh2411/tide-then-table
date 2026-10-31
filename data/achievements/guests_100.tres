@@ -10,4 +10,4 @@ icon = "guest"
 desc = "Phục vụ 100 bàn khách"
 stat = "served_total"
 target = 100
-reward_k = 200
+reward_k = 600

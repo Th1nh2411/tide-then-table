@@ -130,7 +130,7 @@ func _test_ranking() -> void:
 	_check("small week -> last place", RivalRanking.player_rank(board) == 4)
 	_check("player daily window", RivalRanking.player_daily(2, history, 7) == [0, 0, 0, 0, 0, 50, 60])
 	GameState.money = 0
-	history.append({"day": 3, "earned": 900})
+	history.append({"day": 3, "earned": 3200})
 	var closed := RivalRanking.close_day(3, history)
 	_check("big day beats the small rivals", int(closed["rank_before"]) == 4 and int(closed["rank_after"]) < 4
 		and (closed["beaten"] as Array).has("chu_hen") and GameState.has_flag("rival_beat_chu_hen"))

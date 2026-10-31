@@ -53,16 +53,18 @@ func _scene_checks() -> void:
 	for i in 6:
 		sea._physics_process(dt)
 	var during_catch := sea.boat.velocity.length()
-	var paddle_before := sea.paddle.position
+	# The top hand stays in front of the chest; the blade sweeps round it.
+	var blade := Vector3(0, -1.72, 0)
+	var paddle_before := sea.paddle.transform * blade
 	for i in 24:
 		sea._physics_process(dt)
-	var paddle_mid := sea.paddle.position
+	var paddle_mid := sea.paddle.transform * blade
 	for i in 30:
 		sea._physics_process(dt)
 	var after_stroke := sea.boat.velocity.length()
 	check(during_catch < 0.05, "boat still while the paddle reaches forward")
 	check(after_stroke > 1.0, "one stroke moves the boat")
-	check(paddle_mid.distance_to(paddle_before) > 0.1, "paddle moves with the stroke")
+	check(paddle_mid.distance_to(paddle_before) > 0.1, "paddle blade sweeps with the stroke")
 	Input.action_release("throttle_forward")
 	for i in 240:
 		sea._physics_process(dt)

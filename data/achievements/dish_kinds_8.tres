@@ -10,4 +10,4 @@ icon = "fish"
 desc = "Bán 8 món khác nhau"
 stat = "dish_kinds"
 target = 8
-reward_k = 80
+reward_k = 240

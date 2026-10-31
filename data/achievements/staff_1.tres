@@ -10,4 +10,4 @@ icon = "guest"
 desc = "Thuê nhân viên đầu tiên"
 stat = "staff_max"
 target = 1
-reward_k = 40
+reward_k = 120

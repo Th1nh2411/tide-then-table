@@ -17,7 +17,7 @@ const RAIL := Rect2(232, 0, 290, 56)
 const PHASES := {
 	# id: [icon, plate, glyph, words]
 	"plan": ["menu", Color("f2d98a"), Color("090a14"), "Lên thực đơn"],
-	"open": ["shop", Color("e0302b"), Color("e6f6ff"), "Đang bán"],
+	"open": ["shop", Color("884b2b"), Color("f2d98a"), "Đang bán"],
 	"closing": ["clock", Color("de9e41"), Color("090a14"), "Sắp đóng cửa"],
 	"over": ["moon", Color("253a5e"), Color("f2d98a"), "Đã đóng cửa"],
 }

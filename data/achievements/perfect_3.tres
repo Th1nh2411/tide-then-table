@@ -10,4 +10,4 @@ icon = "heart"
 desc = "3 ca không khách nào bỏ về"
 stat = "perfect_days"
 target = 3
-reward_k = 100
+reward_k = 300

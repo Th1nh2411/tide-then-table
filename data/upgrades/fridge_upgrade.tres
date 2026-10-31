@@ -7,6 +7,6 @@ script = ExtResource("1_upgrade")
 id = "fridge"
 display_name = "Tủ lạnh quán"
 description = "Đồ trong kho giữ tươi lâu hơn qua đêm."
-levels = Array[int]([450, 1200])
+levels = Array[int]([500, 2000])
 values = [35.0, 25.0, 15.0]
 value_labels = Array[String](["-35 độ tươi/ngày", "-25 độ tươi/ngày", "-15 độ tươi/ngày"])

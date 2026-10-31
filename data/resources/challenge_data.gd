@@ -24,12 +24,18 @@ enum Kind {
 @export var target: int = 3
 ## Extra target per day after day 1 (rounded down).
 @export var target_per_day: float = 0.0
+## Reward on day 1 (k) and extra per day after it (income grows fast).
 @export var reward_k: int = 30
+@export var reward_per_day: int = 0
 @export var min_day: int = 1
 
 
 func target_on(day: int) -> int:
 	return maxi(target + floori(target_per_day * float(maxi(day - 1, 0))), 1)
+
+
+func reward_on(day: int) -> int:
+	return reward_k + reward_per_day * maxi(day - 1, 0)
 
 
 func describe(day: int) -> String:

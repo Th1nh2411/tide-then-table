@@ -13,7 +13,7 @@ extends SceneTree
 ## Materials (theme_type_variation):
 ##   Panels (PanelContainer): default = dark board; "PaperPanel" (cream slip),
 ##     "ChalkPanel" (chalkboard in a wood frame: menu planning), "WoodPanel"
-##     (hand-painted plank), "SignPanel" (red shop sign + tube light: main /
+##     (hand-painted plank), "SignPanel" (lacquered rust shop sign + gold trim: main /
 ##     pause menu), "CardboardPanel" (Cô Năm's boxes), "PhoneScreen" (phone
 ##     bezel), "StripPanel" (paper strip: speech note), "RowPanel" = paper
 ##     note, "CardPanel" = paper, "ReceiptPanel" (thermal receipt, torn
@@ -22,7 +22,7 @@ extends SceneTree
 ##     hold), "NotebookPanel" (ruled notebook page: rest card),
 ##     "ClippingPanel" (newspaper clipping: ending), "AppCardPanel" (flat
 ##     phone app card). Extra materials: tools/ui/ui_extra_frames.gd.
-##   Buttons: default = wood plank; "SignButton" / "AccentButton" (red sign,
+##   Buttons: default = wood plank; "SignButton" / "AccentButton" (rust sign,
 ##     main call to action), "PaperButton" (price tag), "ChalkButton" (chalk
 ##     outline), "ChipButton" (small tab: wood, paper when toggled),
 ##     "CardFace" (paper card you click), "CardEmpty" (chalk dashed slot).
@@ -41,7 +41,6 @@ const CREAM := Color("e7d5b3")
 const GOLD := Color("f2d98a")
 const AMBER := Color("de9e41")
 const DO2 := Color("a53030")
-const TUBE := Color("e6f6ff")
 const SEA := Color("73bed3")
 
 var _theme := Theme.new()
@@ -103,7 +102,7 @@ func _buttons(bold: Font) -> void:
 		_theme.set_stylebox("focus", type, StyleBoxEmpty.new())
 		_theme.set_font("font", type, bold)
 		var ink := type in ["PaperButton", "CardFace"]
-		var text := XAM1 if ink else (TUBE if base == "btn_sign" else CREAM)
+		var text := XAM1 if ink else CREAM
 		_theme.set_color("font_color", type, text)
 		_theme.set_color("font_focus_color", type, text)
 		_theme.set_color("font_hover_color", type, XAM1 if ink else GOLD)

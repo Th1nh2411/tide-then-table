@@ -4,6 +4,7 @@
 [ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="2_fish"]
 [ext_resource type="Resource" path="res://data/weather/weather_catalog.tres" id="3_weather"]
 [ext_resource type="Resource" path="res://data/dishes/menu.tres" id="90_menu"]
+[ext_resource type="Script" path="res://scenes/rest/rest_backdrop.gd" id="4_backdrop"]
 
 [node name="RestScene" type="Control"]
 layout_mode = 3
@@ -17,7 +18,7 @@ menu = ExtResource("90_menu")
 fish_catalog = ExtResource("2_fish")
 weather_catalog = ExtResource("3_weather")
 
-[node name="Sky" type="ColorRect" parent="."]
+[node name="Backdrop" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,28 +26,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.9098, 0.7569, 0.4392, 1)
-
-[node name="Sea" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -110.0
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 2
-color = Color(0.3098, 0.5608, 0.7294, 1)
-
-[node name="Sun" type="ColorRect" parent="."]
-layout_mode = 0
-offset_left = 470.0
-offset_top = 234.0
-offset_right = 510.0
-offset_bottom = 250.0
-mouse_filter = 2
-color = Color(0.949, 0.851, 0.5412, 1)
+script = ExtResource("4_backdrop")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1

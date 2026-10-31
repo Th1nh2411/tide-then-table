@@ -187,16 +187,16 @@ func _draw_fish_sprite(pos: Vector2, rotation: float, facing: float, scale: floa
 func _draw_line(tip: Vector2) -> void:
 	var hook := hook_screen()
 	var color := Color("f2d98a").lerp(Color("e0302b"), clampf((game.tension - 0.55) * 2.2, 0.0, 1.0))
-	# Soft rope: sags while slack (a free hook counts as a little tension: the bait's weight).
-	var pull := game.tension if game.hooked_index >= 0 else 0.12
-	_line.step(tip, hook, pull, surface(), _frame_delta)
+	# Soft rope: tip → floating bobber → hook while free, one rope once a fish is on.
+	if game.hooked_index >= 0:
+		_line.step_taut(tip, hook, game.tension, surface(), _frame_delta)
+	else:
+		_line.step_slack(tip, hook, surface(), game._time, _frame_delta)
 	game.draw_polyline(_line.points, color, 1.0)
-	if game.hooked_index < 0:  # bobber where the line meets the water
-		var crossing: Variant = _line.surface_crossing(surface())
-		if crossing != null:
-			var at: Vector2 = (crossing as Vector2) + Vector2(0, roundf(sin(game._time * 3.0)))
-			game.draw_circle(at, 2.5, Color("e0302b"))
-			game.draw_rect(Rect2(at + Vector2(-2, -1), Vector2(5, 1)), Color("ebede9"))
+	if _line.bobber != null:
+		var at: Vector2 = (_line.bobber as Vector2).round()
+		game.draw_circle(at, 2.5, Color("e0302b"))
+		game.draw_rect(Rect2(at + Vector2(-2, -1), Vector2(5, 1)), Color("ebede9"))
 	# Hook and bait.
 	game.draw_arc(hook + Vector2(0, 2), 2.5, 0.0, PI, 6, Color("c7cfcc"), 1.0)
 	if game.hooked_index < 0:

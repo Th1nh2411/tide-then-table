@@ -28,6 +28,10 @@ Cùng một đường dẫn có thể xuất hiện ở nhiều danh sách (vd. 
 - **Chỉ dùng bảng màu "Xóm Đèn"**: `assets/palette/xom_den.gpl` (38 màu Apollo +
   5 màu riêng; bảng hex trong `assets/palette/xom_den.hex`). Không gradient,
   không phát sáng mờ, không bóng đổ mờ.
+- **Tông ấm, dễ nhìn như gameplay và nhân vật:** gỗ, giấy kem, nâu gỉ `#884b2b`,
+  hổ phách, vàng `#e8c170` / `#f2d98a`. Không phủ mảng lớn đỏ tươi (`#a53030`,
+  `#e0302b`) hay trắng/xanh lạnh (`#e6f6ff`, kẻ dòng xanh da trời); đỏ chỉ là
+  điểm nhấn nhỏ (cảnh báo, tim). Biển hiệu "XÓM ĐÈN" = nâu gỉ sơn mài, viền vàng.
 - **Viền mỏng hoặc không viền** (người chơi chọn): khung, nút, thẻ dùng viền 1 px
   (mực `#090a14` hoặc tông tối của chính vật liệu), hoặc không viền, chỉ tách
   khỏi nền bằng mảng màu và bevel. **Không dùng viền mực dày 2 px.** Icon /

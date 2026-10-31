@@ -10,4 +10,4 @@ icon = "star"
 desc = "Một ca được 5 sao"
 stat = "five_star_days"
 target = 1
-reward_k = 80
+reward_k = 240

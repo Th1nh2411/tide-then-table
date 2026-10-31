@@ -10,4 +10,4 @@ icon = "money"
 desc = "Thu tổng cộng 1000k"
 stat = "earned_total"
 target = 1000
-reward_k = 100
+reward_k = 300

@@ -66,17 +66,17 @@ static func paint(p: RefCounted, img: Image, name: String) -> bool:
 			img.set_pixel(3, 3, Color(BIEN6, 0.5))  # wet glint
 			img.set_pixel(4, 3, Color(BIEN6, 0.3))
 		"notebook":
-			p.call("_box", img, XAM8, Color.WHITE, XAM7, XAM7, 0.02)
+			p.call("_box", img, DAT6, XAM8, DAT5, DAT5, 0.02)
 			for y in range(12, s - 6, 5):
 				for x in range(3, s - 5):
-					img.set_pixel(x, y, Color(BIEN5, 0.45))  # ruled lines
+					img.set_pixel(x, y, Color(DAT4, 0.6))  # ruled lines
 			for y in range(3, s - 5):
 				img.set_pixel(8, y, Color(DO3, 0.7))  # red margin
 			for x in range(5, s - 6, 6):
 				img.set_pixel(x, 4, XAM6)  # spiral holes
 				img.set_pixel(x + 1, 4, XAM6)
 		"clipping":
-			p.call("_box", img, XAM7, XAM8, XAM6, XAM6, 0.07)
+			p.call("_box", img, DAT5, DAT6, DAT3, DAT3, 0.07)  # yellowed newsprint
 			_ragged(img, p.get("_rng"), 2)
 		"app_card":
 			p.call("_box", img, XAM8, Color.WHITE, BIEN6, BIEN6, 0.0)

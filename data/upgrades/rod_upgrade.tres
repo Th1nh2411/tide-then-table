@@ -7,6 +7,6 @@ script = ExtResource("1_upgrade")
 id = "rod"
 display_name = "Cần câu"
 description = "Vùng xanh rộng hơn, cá giãy chậm hơn."
-levels = Array[int]([350, 1050])
+levels = Array[int]([400, 1800])
 values = [1.0, 1.2, 1.4]
 value_labels = Array[String](["Vùng xanh +0%", "Vùng xanh +20%", "Vùng xanh +40%"])

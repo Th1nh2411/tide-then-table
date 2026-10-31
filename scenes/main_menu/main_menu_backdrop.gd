@@ -64,7 +64,7 @@ func _draw() -> void:
 	_draw_village(w, horizon)
 	_draw_waves(w, h, horizon)
 	_draw_boat(Vector2(w * 0.78, horizon + 58), horizon)
-	_glow_at(title_glow_at, 150.0, Color(Color("e0302b"), 0.3 * title_glow_strength))
+	_glow_at(title_glow_at, 150.0, Color(AMBER, 0.25 * title_glow_strength))
 	_draw_lanterns(w)
 	for b in _bokeh:
 		var a := 0.12 + 0.12 * sin(_time * 0.9 + b.w)

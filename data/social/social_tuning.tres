@@ -11,5 +11,5 @@ max_saved_posts = 20
 followers_by_stars = Array[int]([0, -8, -3, 2, 6, 12])
 tier_names = Array[String](["Quán vỉa hè", "Quán quen", "Quán có tiếng", "Quán nổi tiếng"])
 tier_followers = Array[int]([0, 40, 120, 300])
-tier_reward_k = Array[int]([0, 60, 150, 300])
+tier_reward_k = Array[int]([0, 200, 500, 1200])
 tier_spawn_scale = Array[float]([1.0, 0.95, 0.9, 0.85])

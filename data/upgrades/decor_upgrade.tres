@@ -7,6 +7,6 @@ script = ExtResource("1_upgrade")
 id = "decor"
 display_name = "Đèn lồng & trang trí"
 description = "Quán đẹp: khách tới đông hơn, có thêm khách sang trả nhiều tiền."
-levels = Array[int]([600, 1500])
+levels = Array[int]([700, 2600])
 values = [0, 1, 2]
 value_labels = Array[String](["Quán trơn", "Treo đèn lồng", "Đèn lồng + hoa, tranh"])

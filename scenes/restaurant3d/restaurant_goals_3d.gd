@@ -52,7 +52,7 @@ func start_shift() -> void:
 	_announced.clear()
 	var entries: Array[Dictionary] = []
 	for challenge in picks:
-		entries.append({"icon": challenge.icon, "text": "%s  +%dk" % [challenge.describe(GameState.day), challenge.reward_k]})
+		entries.append({"icon": challenge.icon, "text": "%s  +%dk" % [challenge.describe(GameState.day), challenge.reward_on(GameState.day)]})
 	if card:
 		card.bind(entries)
 	refresh()
@@ -72,7 +72,7 @@ func refresh(final: bool = false) -> void:
 
 
 func _announce(challenge: ChallengeData) -> void:
-	var words := "NEO: Thử thách xong: %s +%dk" % [challenge.describe(GameState.day), challenge.reward_k]
+	var words := "NEO: Thử thách xong: %s +%dk" % [challenge.describe(GameState.day), challenge.reward_on(GameState.day)]
 	if not host.is_inside_tree():
 		return
 	host.get_tree().create_timer(NEO_DELAY).timeout.connect(func() -> void:

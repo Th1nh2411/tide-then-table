@@ -10,4 +10,4 @@ icon = "chili"
 desc = "Bán 10 món HOT"
 stat = "hot_total"
 target = 10
-reward_k = 60
+reward_k = 180

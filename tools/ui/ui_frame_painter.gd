@@ -22,8 +22,6 @@ const NAU4 := Color("de9e41")
 const NAU5 := Color("e8c170")
 const DO1 := Color("752438")
 const DO2 := Color("a53030")
-const SIGN := Color("e0302b")
-const TUBE := Color("e6f6ff")
 const LA1 := Color("25562e")
 const BIEN1 := Color("172038")
 const GOLD := Color("f2d98a")
@@ -84,8 +82,8 @@ func paint(name: String, s: int) -> Image:
 			_box(img, DAT4, DAT5, DAT3, DAT3, 0.06)
 			_line(img, 4, DAT3)  # box flap fold
 		"sign":
-			_box(img, SIGN, Color("ef6b5f"), DO1, DO2, 0.0)
-			_inset_rect(img, 4, TUBE)  # tube light
+			_box(img, Color("884b2b"), NAU3, Color("602c2c"), Color("602c2c"), 0.0)
+			_inset_rect(img, 4, NAU5)  # gold trim
 		"chalk":
 			_box(img, DAT2, DAT3, Color("4d2b32"), Color("4d2b32"), 0.0)
 			_fill_inner(img, 6, LA1, Color(XAM7, 0.35), 0.012)
@@ -95,7 +93,7 @@ func paint(name: String, s: int) -> Image:
 			_inset_rect(img, 3, XAM3)
 			_fill_inner(img, 10, BIEN1, BIEN1, 0.0)
 		"keycap": _box(img, XAM3, XAM5, XAM1, XAM3, 0.0, 1)
-		"stamp": _box(img, DO2, Color("cf573c"), DO1, DO1, 0.0, 1)
+		"stamp": _box(img, Color("884b2b"), NAU3, Color("602c2c"), Color("602c2c"), 0.0, 1)
 		_:
 			if not Extra.paint(self, img, name):
 				_button(img, name)
@@ -111,9 +109,9 @@ func _button(img: Image, name: String) -> void:
 		_box(img, XAM4 if disabled else fill, XAM5 if disabled else NAU5 if hover else DAT4,
 			XAM3 if disabled else DAT2, DAT2, 0.0, 2, not pressed, 2 if pressed else 0)
 	elif name.begins_with("btn_sign"):
-		var fill := Color("ef4a3c") if hover else (DO2 if pressed else SIGN)
-		_box(img, XAM4 if disabled else fill, XAM5 if disabled else Color("f07a6e"),
-			XAM3 if disabled else DO1, DO1, 0.0, 2, not pressed, 2 if pressed else 0)
+		var fill := NAU3 if hover else (Color("602c2c") if pressed else Color("884b2b"))
+		_box(img, XAM4 if disabled else fill, XAM5 if disabled else NAU5,
+			XAM3 if disabled else Color("602c2c"), Color("602c2c"), 0.0, 2, not pressed, 2 if pressed else 0)
 	elif name.begins_with("btn_paper"):
 		var fill := XAM8 if hover else (NAU5 if pressed else DAT6)
 		_box(img, XAM6 if disabled else fill, XAM7 if disabled else XAM8,

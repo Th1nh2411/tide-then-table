@@ -117,7 +117,7 @@ static func settle(picks: Array[ChallengeData], shift: ShiftLog, day: int, fast_
 	var results: Array[Dictionary] = []
 	for challenge in picks:
 		var state := status(challenge, shift, day, fast_ratio, true)
-		var reward: int = challenge.reward_k if bool(state["done"]) and not already_paid else 0
+		var reward: int = challenge.reward_on(day) if bool(state["done"]) and not already_paid else 0
 		if reward > 0:
 			GameState.add_money(reward)
 		results.append({"id": challenge.id, "icon": challenge.icon, "text": challenge.describe(day), "progress": state["progress"],

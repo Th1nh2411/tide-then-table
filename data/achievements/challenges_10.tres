@@ -10,4 +10,4 @@ icon = "check"
 desc = "Hoàn thành 10 thử thách ngày"
 stat = "challenges_done"
 target = 10
-reward_k = 100
+reward_k = 300
