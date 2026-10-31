@@ -90,8 +90,13 @@ func on_cooking_finished(_dish: DishData, _result: CookingGameBase.Result, multi
 	var visit: Dictionary = host.orders[table].get("visit", {})
 	if not visit.is_empty():
 		visit["cooked"] = true
+	# Rin made it himself, so it goes straight into his hands (cooking needs empty hands).
+	if host.carrying_table < 0:
+		host.carrying_table = table
+		host._show_note("Đem %s tới bàn %d." % [host.orders[table]["dish"].display_name, table + 1])
+	else:
+		host._show_note("Món bàn %d đã xong!" % (table + 1))
 	host._dispatch_ready()
-	host._show_note("Món bàn %d đã xong!" % (table + 1))
 
 
 func on_cooking_spilled(dish: DishData) -> void:

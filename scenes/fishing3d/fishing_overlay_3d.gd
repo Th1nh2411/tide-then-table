@@ -25,6 +25,8 @@ var trip_stun: float = 0.0
 var _fainted: bool = false
 var _hold: HoldUI
 var wave_power: WavePower
+## FishData.Zone of the next rod cast (sea backdrop); -1 = the fish's own.
+var zone: int = -1
 
 
 func _ready() -> void:
@@ -62,6 +64,7 @@ func start_catch(fish_data: FishData, zone_scale: float = 1.0, size: float = 1.0
 	_container.grab_focus()
 	_minigame.process_mode = Node.PROCESS_MODE_ALWAYS
 	_minigame.school_size = maxi(school, 1)
+	_minigame.zone = zone
 	_minigame.start(fish_data, zone_scale, count, size, trip_stun)
 
 

@@ -139,7 +139,7 @@ Vietnamese, keep code comments in short English.
   W/S raises/lowers the hook, Space hooks the aimed fish, then W reels and S
   gives slack; E spins a green/yellow/red all-in wheel; trip stun reaches 100%
   = Rin faints and is rescued); spot picks species via its featured fish +
-  depth (`FishPortrait` right of the minigame, standing up (`vertical`): a shadow + "?" while waiting for the
+  depth; the rod fight is full screen, side view (`FishFightView` + `FishFightBackdrop` per zone + `FishFightGauges`: reel, level, daze, wheel; art list docs/ui_art_needed_fishing.md), `FishPortrait` on a card top right (nets keep the crate panel, portrait standing up): a shadow + "?" while waiting for the
   bite and for species not in the Dex yet, named "???"), `CatchRoll` rolls size: deeper = pricier/bigger, size scales price
   and difficulty; records in `GameState.best_sizes`), `NetController` (Q nets → HaulGame; nets bring shrimp / crab / snails, each rolled from the zone with its own size: near shore mostly shrimp, reef mostly crab — rods catch fish and squid only),
   `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab; a species caught
@@ -184,7 +184,7 @@ Vietnamese, keep code comments in short English.
   first N slots from the seats upgrade; draws upgrade looks, also previewed
   while renovating), `StreetBackdrop` (shop front + traffic), `StreetProps`
   (static drawings), `StreetPerson` (16x32 body, path walking) -> `RinChef`
-  (player = the waiter: WASD, Shift dash, E on the faced cell; carries plates,
+  (player = the waiter: WASD, Space dash (3D: Shift runs on stamina, `StaminaBar3D`), E on the faced cell; carries plates,
   cleans tables, grills, pours beer), `ChefBao` "Bảo" (the chef, behind the
   stove from day 1: cooks every non-grilled dish by himself, oldest ticket
   first, puts plates on the plate table; `ChefBao.cooks(dish)`), `Customer` (a party of 1-2: the leader orders 1-3

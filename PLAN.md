@@ -449,10 +449,12 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng)
   - Đo 30/10 (bot câu hết cá + phục vụ hoàn hảo, nhưng có đồng hồ ca 180 s thật): ~25–30 khách/ca từ ngày 2, thu ~4.000–5.600k ngày 2, ~7.400–8.500k ngày 3–4, cuối ~15.500k; câu 50% cá: cuối 160–9.000k (dao động lớn). Mỗi khách ~100–150k ngày 1, ~270k ngày 3+ (1–3 món/bàn, gọi thêm, x1,3 nấu khéo, size/quality, tip 20%).
   - Vấn đề: tiền nâng cấp (tổng ~12.850k) mua hết vào ngày 3 → sau đó tiền vô dụng; quán là nút thắt (kho 85–100 con, chỉ bán ~30 khách); thưởng thử thách 30–40k, đối thủ 220–940k/ngày, mục tiêu "kiếm 150k + 40k/ngày" quá nhỏ so với 4.000k+/ngày từ ngày 2; bot không mua hàng Cô Năm.
   - Đã sửa: món HOT ở quán 3D bị tính x2,25 (x1,5 hai lần) → nay x1,5. Chưa chỉnh số cân bằng nào, chờ playtest.
-- [ ] Tốc độ mới (Rin đi 1,8 / bưng 1,6 m/s, lăn khi Shift; khách 1,1 m/s; nhân viên ~0,9–1,6 m/s) có thể làm khách chờ lâu / bỏ về nhiều → chỉnh sau playtest.
+- [x] Quán 3D: nướng / rót bia xong Rin cầm món luôn (bia hiện tháp bia trên tay); Shift = chạy 3,2 m/s tốn thể lực (`StaminaBar3D` trên đầu, đầy thì ẩn; hết thì đi bộ tới khi hồi 35%), Space = lộn. Số trong export của `restaurant_scene_3d`.
+- [ ] Tốc độ mới (Rin đi 1,8 / bưng 1,6 / chạy 3,2 m/s, lộn khi Space; khách 1,1 m/s; nhân viên ~0,9–1,6 m/s) có thể làm khách chờ lâu / bỏ về nhiều → chỉnh sau playtest.
 - [ ] Chốt font: bộ hiện tại (Paytone One + Be Vietnam Pro + VT323) hay toàn VT323 — ảnh so sánh `build/shot/fontcmp/`.
 
 **P2 — UI còn sót**
+- [x] Câu cần toàn màn hình, nhìn ngang mặt cắt biển: nền theo vùng (gần bờ / rạn / khơi / sương), thuyền + Rin 2x nghiêng theo thăng bằng, cần cong theo độ căng, phao, cá dùng sprite (loài chưa có trong Dex là bóng đen), nước bắn / bọt, viền choáng, cá vọt vào thuyền khi bắt được; chỉ số trên tấm gỗ (cuộn dây + vòng căng, thước thăng bằng, choáng), đĩa tất tay chỉ hiện khi cá cắn; tên cá trên thẻ góc phải. Luật chơi không đổi. Lưới giữ khung cũ. Art: `docs/ui_art_needed_fishing.md` (chưa vẽ).
 - [x] Tab "Bản đồ" + bản đồ lớn (M): hải đồ giấy (bảng màu Xóm Đèn, ký hiệu viền mực `MapSymbols`, font game), bản đồ lớn trên "PaperPanel".
 - [x] Tên loài trong Dex dùng Be Vietnam Pro đậm ("CardLabel") thay VT323.
 - [x] Chữ gợi ý / trạng thái trên tấm gỗ khung nấu nướng: Bold, +1 cỡ. (Icon mưa vẫn tạm: việc art.)

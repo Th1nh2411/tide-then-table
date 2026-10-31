@@ -29,6 +29,7 @@ static func try_fish(sea: SeaScene3D) -> void:
 			var difficulty := float(GameState.get_upgrade_value(SeaScene3D.ROD_UPGRADE)) * CatchRoll.size_zone_scale(size) * WaveMark.fight_scale(fish, CatchRoll.is_big(size)) * maxf(1.0 - used * 0.08, 0.75)
 			# One fish leaves the shoal per cast, caught or not.
 			shoal.fish_left -= 1
+			sea.overlay.set("zone", SeaLayout3D.zone_at(boat.position, Story.is_fog_open()))
 			if sea.cast_cinematic_enabled and sea.cinematic:
 				cast_then_fish(sea, shoal.pos, fish, difficulty, size, school)
 			else:

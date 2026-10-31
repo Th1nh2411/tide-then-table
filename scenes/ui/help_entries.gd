@@ -28,7 +28,7 @@ const TABS: Array[Dictionary] = [
 		{"icon": "cart", "title": "Cô Năm", "rows": [
 			["E", "Mở tạp hoá"], ["@leaf", "Rau, bia luôn có"], ["@money", "Mua lô rẻ hơn"]]},
 		{"icon": "meal", "title": "Phục vụ", "rows": [
-			["W A S D", "Đi"], ["Shift", "Lướt"], ["E", "Lấy / đưa món"], ["E", "Dọn bàn bẩn"]]},
+			["W A S D", "Đi"], ["Shift", "Chạy"], ["Space", "Lộn"], ["E", "Lấy, đưa món, dọn bàn"]]},
 		{"icon": "grill", "title": "Nướng, bia", "rows": [
 			["E", "Lò nướng"], ["Space", "Bấm đúng lúc"], ["E", "Rót bia"], ["Space", "Giữ để rót"]]},
 		{"icon": "house", "title": "Hết ca", "rows": [

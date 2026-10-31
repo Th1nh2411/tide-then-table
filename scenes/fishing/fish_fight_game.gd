@@ -2,6 +2,7 @@ class_name FishFightGame
 extends MinigameBase
 ## One cast shows a small school. A/D moves the boat, W/S raises/lowers the
 ## hook, and a fish bites by itself after the hook stays close long enough.
+## Full screen; FishFightView draws it (this script is the rules only).
 
 signal tugged
 signal rin_fainted
@@ -9,7 +10,6 @@ signal fish_hooked(size_scale: float)
 
 enum YankResult { GREEN, YELLOW, RED }
 
-const INK := Color("090a14")
 @export_group("Free hook")
 @export var school_size: int = 6
 @export var boat_speed: float = 1.2
@@ -50,6 +50,8 @@ var stun: float = 0.0
 var hooked_index: int = -1
 var yank_spinning: bool = false
 var school: Array[Dictionary] = []
+## FishData.Zone of the spot: picks the sea backdrop.
+var zone: int = 0
 
 var _hook_velocity_x: float = 0.0
 var _bite_candidate: int = -1
@@ -63,6 +65,7 @@ var _wheel_to: float = -PI * 0.5
 var _pointer_angle: float = -PI * 0.5
 var _wheel_roll: float = 0.0
 var _rng := RandomNumberGenerator.new()
+var _view := FishFightView.new(self)
 
 
 func setup(p_fish: FishData, p_zone_scale: float) -> void:
@@ -72,7 +75,22 @@ func setup(p_fish: FishData, p_zone_scale: float) -> void:
 	else:
 		_rng.randomize()
 	_spawn_school()
-	custom_minimum_size = Vector2(310, 184)
+	set_anchors_preset(Control.PRESET_FULL_RECT)
+
+
+## Keeps animating after the result (the fish lands in the boat).
+func _process(delta: float) -> void:
+	_view.tick(delta)
+	super(delta)
+	if _done:
+		_time += delta
+		queue_redraw()
+
+
+func _finish(success: bool, perfect: bool) -> void:
+	if not _done and success and hooked_index >= 0:
+		_view.land()
+	super(success, perfect)
 
 
 func get_hint() -> String:
@@ -332,116 +350,4 @@ func resolve_yank(roll: float) -> YankResult:
 
 
 func _draw() -> void:
-	var origin := _centered_origin(Vector2(310, 172))
-	var arena := Rect2(origin, Vector2(235, 122))
-	draw_rect(arena, Color(0.035, 0.14, 0.24))
-	for i in 5:
-		var y := arena.position.y + 18.0 + i * 23.0
-		draw_line(Vector2(arena.position.x + 4, y), Vector2(arena.end.x - 4, y), Color(0.2, 0.55, 0.65, 0.16))
-	var boat_x := lerpf(arena.position.x + 14.0, arena.end.x - 14.0, (boat_position + 1.0) * 0.5)
-	var boat_pos := Vector2(boat_x, arena.position.y + 13.0)
-	var hook_pos := _to_screen(hook_position, arena)
-	_draw_fishing_line(boat_pos, hook_pos)
-	_draw_boat(boat_pos)
-	for i in school.size():
-		_draw_fish(_to_screen(school[i]["pos"], arena), school[i], i == hooked_index)
-	draw_circle(hook_pos, 3.0, Color.WHITE)
-	draw_arc(hook_pos, 6.0, 0.0, TAU, 16, Color(1.0, 0.85, 0.35), 1.0)
-	if hooked_index < 0 and _bite_candidate >= 0:
-		draw_arc(hook_pos, 8.0, -PI * 0.5, -PI * 0.5 + TAU * bite_progress(), 20,
-			Color(0.35, 1.0, 0.55), 2.0)
-	_draw_wheel(Vector2(arena.end.x + 38.0, arena.position.y + 52.0))
-	draw_rect(arena.grow(2.0), INK, false, 2.0)  # pixel frame of the water window
-	_draw_bar(Rect2(origin.x, arena.end.y + 8.0, 145.0, 7.0), progress, _tint(fish.color), "rod")
-	_draw_bar(Rect2(origin.x + 158.0, arena.end.y + 8.0, 145.0, 7.0), tension, Color("de9e41"), "hook")
-	_draw_balance(Rect2(origin.x, arena.end.y + 28.0, 145.0, 7.0))
-	_draw_bar(Rect2(origin.x + 158.0, arena.end.y + 28.0, 145.0, 7.0), stun, Color("c65197"), "wave")
-
-
-func _draw_fishing_line(boat_pos: Vector2, hook_pos: Vector2) -> void:
-	var points := PackedVector2Array()
-	var middle := (boat_pos + hook_pos) * 0.5
-	# Velocity bows the line opposite the hook's travel; a small downward sag
-	# keeps the pendulum readable even near its turning point.
-	var control := middle + Vector2(-_hook_velocity_x * 14.0, 3.0 + absf(hook_pos.x - boat_pos.x) * 0.06)
-	for i in 9:
-		var t := float(i) / 8.0
-		points.append(boat_pos * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + hook_pos * t * t)
-	draw_polyline(points, Color(1.0, 0.86, 0.55, 0.9), 1.0, true)
-
-
-func _to_screen(pos: Vector2, arena: Rect2) -> Vector2:
-	return Vector2(lerpf(arena.position.x + 10.0, arena.end.x - 10.0, (pos.x + 1.0) * 0.5),
-		lerpf(arena.position.y + 25.0, arena.end.y - 8.0, pos.y))
-
-
-func _draw_boat(pos: Vector2) -> void:
-	draw_set_transform(pos, balance * 0.16)
-	draw_colored_polygon(PackedVector2Array([Vector2(-17, -6), Vector2(13, -6), Vector2(19, 0),
-		Vector2(12, 7), Vector2(-15, 7), Vector2(-20, 0)]), Color(0.55, 0.3, 0.16))
-	draw_circle(Vector2(balance * 7.0, -7.0), 4.0, Color(0.95, 0.72, 0.42))
-	draw_set_transform(Vector2.ZERO)
-
-
-func _draw_fish(pos: Vector2, entry: Dictionary, hooked: bool) -> void:
-	var scale: float = entry["size"]
-	var direction: float = entry["dir"]
-	var color := _tint(fish.color).lightened(0.2) if hooked else _tint(fish.color)
-	draw_set_transform(pos, 0.0, Vector2.ONE * scale)
-	draw_circle(Vector2.ZERO, 5.0, color)
-	draw_colored_polygon(PackedVector2Array([Vector2(-direction * 4.0, 0),
-		Vector2(-direction * 10.0, 5.0), Vector2(-direction * 10.0, -5.0)]), color)
-	draw_set_transform(Vector2.ZERO)
-
-
-func _draw_wheel(center: Vector2) -> void:
-	var radius := 28.0
-	var start := -PI * 0.5
-	var green := yank_green_chance()
-	var yellow := yank_yellow_chance()
-	draw_arc(center, radius, start, start + TAU, 64, Color(0.65, 0.16, 0.2), 9.0, true)
-	if hooked_index >= 0:
-		draw_arc(center, radius, start + TAU * green, start + TAU * (green + yellow), 24,
-			Color(1.0, 0.72, 0.2), 9.0, true)
-		draw_arc(center, radius, start, start + TAU * green, maxi(3, roundi(64.0 * green)),
-			Color(0.25, 0.9, 0.48), 9.0, true)
-	draw_circle(center, radius - 6.0, Color(0.07, 0.09, 0.14))
-	draw_line(center, center + Vector2.RIGHT.rotated(_pointer_angle) * (radius + 2.0), Color.WHITE, 2.0, true)
-	draw_circle(center, 3.0, Color.WHITE)
-	var font := get_theme_font(&"font", &"TitleLabel")
-	draw_string_outline(font, center + Vector2(-12, 4), "%d%%" % roundi(green * 100.0),
-		HORIZONTAL_ALIGNMENT_CENTER, 24.0, 9, 3, INK)
-	draw_string(font, center + Vector2(-12, 4), "%d%%" % roundi(green * 100.0),
-		HORIZONTAL_ALIGNMENT_CENTER, 24.0, 9, Color("ebede9"))
-	# "E" key cap under the wheel: spin it all-in.
-	var cap := Rect2(center + Vector2(-6, radius + 5), Vector2(12, 11))
-	var key_box := get_theme_stylebox(&"normal", &"KeyLabel")
-	if key_box:
-		draw_style_box(key_box, cap)
-	draw_string(font, cap.position + Vector2(3, 9), "E", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("e7d5b3"))
-
-
-func _draw_balance(rect: Rect2) -> void:
-	var track := _bar_track(rect, "boat")
-	var center_x := track.position.x + track.size.x * 0.5
-	draw_line(Vector2(center_x, track.position.y), Vector2(center_x, track.end.y), Color.WHITE, 1.0)
-	draw_circle(Vector2(center_x + balance * track.size.x * 0.47, track.position.y + track.size.y * 0.5), 3.0,
-		Color("a8ca58") if absf(balance) < 0.8 else Color("e0302b"))
-
-
-## Icon sticker on the left, then an ink-outlined dark track; returns the track.
-func _bar_track(rect: Rect2, icon_id: String) -> Rect2:
-	var icon := UiIcons.sticker(icon_id, 12, Color("e7d5b3"))
-	if icon:
-		draw_texture_rect(icon, Rect2(rect.position + Vector2(4, rect.size.y * 0.5 - 6), Vector2(12, 12)), false)
-	var track := Rect2(rect.position + Vector2(20, 0), Vector2(rect.size.x - 20, rect.size.y))
-	draw_rect(track.grow(1.0), INK)
-	draw_rect(track, Color("151d28"))
-	return track
-
-
-func _draw_bar(rect: Rect2, value: float, color: Color, icon_id: String) -> void:
-	var track := _bar_track(rect, icon_id)
-	var fill := Rect2(track.position, Vector2(roundf(track.size.x * clampf(value, 0.0, 1.0)), track.size.y))
-	draw_rect(fill, color)
-	draw_rect(Rect2(fill.position, Vector2(fill.size.x, 1)), color.lightened(0.3))
+	_view.draw()

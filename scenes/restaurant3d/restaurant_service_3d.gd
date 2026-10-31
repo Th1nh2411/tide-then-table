@@ -218,6 +218,16 @@ func sync_food_visuals() -> void:
 		var displayed_dish: DishData = order.get("dish")
 		var is_beer := displayed_dish != null and displayed_dish.id == "bia_con_meo"
 		for plate: Node3D in [host.ready_plates[i], host.table_plates[i]]:
-			for part: Node in plate.get_children():
-				if part is Node3D:
-					part.visible = is_beer if part.name == "BeerTower" else not is_beer
+			_show_beer(plate, is_beer)
+	# What Rin carries: a beer tower or a plate.
+	var held: Node3D = host.body.plate
+	if not held.has_node("BeerTower"):
+		RestaurantBatchVisuals.add(held, "beer_tower", Vector3(0, 0.02, 0)).name = "BeerTower"
+	var carried: DishData = host.orders[host.carrying_table].get("dish") if host.carrying_table >= 0 else null
+	_show_beer(held, carried != null and carried.instant_serve)
+
+
+static func _show_beer(plate: Node3D, is_beer: bool) -> void:
+	for part: Node in plate.get_children():
+		if part is Node3D:
+			part.visible = is_beer if part.name == "BeerTower" else not is_beer

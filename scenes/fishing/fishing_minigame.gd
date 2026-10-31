@@ -4,7 +4,9 @@ extends CanvasLayer
 ## stays close; the same game then continues as a rod fight. Nets use HAUL.
 ## Shows the result briefly, then reports quality and how many were
 ## caught (more than 1 when hauling a net). LampOil doesn't burn while this
-## overlay is running: time stops while fishing.
+## overlay is running: time stops while fishing. The rod fight fills the
+## screen (the panel turns into a see-through frame, the fish card moves
+## top right); the net haul stays in the crate panel.
 
 signal finished(fish: FishData, caught: bool, quality: float, count: int)
 signal fight_stun_changed(value: float)
@@ -34,6 +36,8 @@ var _in_bite_stage: bool = false
 var _bite_clean: bool = true
 var _starting_stun: float = 0.0
 var _fainted: bool = false
+## FishData.Zone of the spot (sea backdrop); -1 = the fish's first zone.
+var zone: int = -1
 
 @onready var _title_label: Label = %TitleLabel
 @onready var _hint_label: Label = %HintLabel
@@ -43,6 +47,13 @@ var _fainted: bool = false
 @onready var _hold_button: Button = %HoldButton
 
 var _portrait: FishPortrait
+var _row: HBoxContainer
+## Full-screen rod fight: the game sits here, under the panel.
+var _stage: Control
+## Fish card top right in full screen.
+var _tag: PanelContainer
+var _tag_box: VBoxContainer
+@onready var _panel: PanelContainer = $Panel
 
 
 func _ready() -> void:
@@ -63,6 +74,59 @@ func _ready() -> void:
 	_portrait.vertical = true
 	_portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_portrait)
+	_row = row
+	# Built here, not as member defaults: a scene freed before entering the tree would leak them.
+	_stage = Control.new()
+	_tag = PanelContainer.new()
+	_tag_box = VBoxContainer.new()
+	_stage.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_stage)
+	move_child(_stage, 0)
+	_tag.theme_type_variation = &"PaperPanel"
+	_tag.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_tag.offset_left = -164.0
+	_tag.offset_top = 6.0
+	_tag.offset_right = -6.0
+	_tag.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tag.hide()
+	_tag_box.add_theme_constant_override("separation", 0)
+	_tag.add_child(_tag_box)
+	add_child(_tag)
+
+
+## Rod fight: full screen; net haul: the centred crate panel.
+func _set_full(on: bool) -> void:
+	_status_label.visible = not on
+	_tag.visible = on
+	if on:
+		_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+		_portrait.vertical = false
+		_portrait.custom_minimum_size = Vector2(100, 46)
+		_portrait.reparent(_tag_box)
+		# Name on the card, first-time hint at the bottom: the sky stays clear for Rin.
+		_title_label.reparent(_tag_box)
+		_title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_title_label.add_theme_font_size_override("font_size", 10)
+		_hint_label.get_parent().move_child(_hint_label, _row.get_index())
+	else:
+		_panel.set_anchors_preset(Control.PRESET_CENTER)
+		_panel.offset_left = -180.0
+		_panel.offset_top = -130.0
+		_panel.offset_right = 180.0
+		_panel.offset_bottom = 130.0
+		_panel.remove_theme_stylebox_override("panel")
+		_portrait.vertical = true
+		_portrait.custom_minimum_size = Vector2(56, 120)
+		_portrait.reparent(_row)
+		if _title_label.get_parent() != _hint_label.get_parent():
+			_title_label.reparent(_hint_label.get_parent())
+			_title_label.get_parent().move_child(_title_label, 0)
+		_title_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		_title_label.add_theme_font_size_override("font_size", 13)
+		_hint_label.get_parent().move_child(_hint_label, 1)
 
 
 func is_running() -> bool:
@@ -106,7 +170,9 @@ func _start_stage(game: MinigameBase) -> void:
 	_game.catch_count = _count
 	_game.setup(_fish, _zone_scale)
 	_game.completed.connect(_on_game_completed)
-	_game_holder.add_child(_game)
+	var full := _game is FishFightGame
+	_set_full(full)
+	(_stage if full else _game_holder).add_child(_game)
 	_hint_label.text = _game.get_hint()
 	# First time with each game only; the how-to lives in Hướng dẫn.
 	var guide_id := "game_fish_school_auto_bite_v2" if _game is FishFightGame \
@@ -120,6 +186,7 @@ func _start_stage(game: MinigameBase) -> void:
 func _create_fight() -> MinigameBase:
 	var game := FishFightGame.new()
 	game.school_size = school_size
+	game.zone = zone if zone >= 0 else (int(_fish.zones[0]) if not _fish.zones.is_empty() else 0)
 	game.stun = _starting_stun
 	game.tugged.connect(_portrait.jolt)
 	game.rin_fainted.connect(_on_rin_fainted)
@@ -183,7 +250,7 @@ func _on_rin_fainted() -> void:
 
 
 func _free_game() -> void:
-	_game_holder.remove_child(_game)
+	_game.get_parent().remove_child(_game)
 	_game.queue_free()
 	_game = null
 

@@ -127,7 +127,17 @@ func _run() -> void:
 	Input.action_release("dash")
 	for step in ceili(room.roll_seconds * 60.0) + 6: await get_tree().physics_frame
 	check(dash_started and room.mover.dash_left<=0 and room.player.velocity.length()<=3.01,"Dash finishes without a long overspeed glide")
+	room.player.position = Vector3(-2,0,2)
+	Input.action_press("sprint")
+	for step in 30: await get_tree().physics_frame
+	var ran: bool = room.player.velocity.length()>room.walk_speed+.5 and room.mover.stamina<1.0 and room.mover._bar.visible
+	check(ran,"Shift runs faster, drains stamina and shows the bar")
+	for step in ceili(room.stamina_seconds*60.0): await get_tree().physics_frame
+	check(room.mover.winded and room.player.velocity.length()<=room.walk_speed+.01,"Empty stamina drops Rin back to walking")
+	Input.action_release("sprint")
 	Input.action_release("turn_right")
+	for step in ceili((room.stamina_rest_delay+room.stamina_refill_seconds)*60.0)+10: await get_tree().physics_frame
+	check(room.mover.stamina>=1.0 and not room.mover._bar.visible,"Stamina refills and the bar hides")
 	room.queue_free()
 	await get_tree().process_frame
 	print("GROUND MOTION CHECK ","PASS" if failures==0 else "FAIL")

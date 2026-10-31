@@ -37,10 +37,17 @@ const MEAL_SECONDS := 5.0
 @export var staff_catalog: StaffCatalog
 
 ## Rin's ground speeds (m/s). Near the Walk clip's own pace (~1.3) so steps
-## match the ground; above ~2.25 the Run clip takes over (dash only).
+## match the ground; above ~2.25 the Run clip takes over (running, roll).
 @export var walk_speed: float = 1.8
 @export var carry_speed: float = 1.6
-## Shift = a quick roll: seconds, ground speed (m/s), cooldown.
+## Shift = run: speed (m/s, carrying scales it the same), seconds of stamina,
+## rest before it refills, seconds to refill, level that ends being winded.
+@export var run_speed: float = 3.2
+@export var stamina_seconds: float = 3.5
+@export var stamina_rest_delay: float = 0.5
+@export var stamina_refill_seconds: float = 2.5
+@export var stamina_resume: float = 0.35
+## Space = a quick roll: seconds, ground speed (m/s), cooldown.
 @export var roll_seconds: float = 0.6
 @export var roll_speed: float = 4.0
 @export var roll_cooldown: float = 0.8

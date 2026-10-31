@@ -1,13 +1,19 @@
 class_name RinMover3D
 extends RefCounted
 ## Rin's walking in the 3D restaurant: WASD relative to the camera, carry
-## speed, Shift roll (dash) with a cooldown, Nhịp Sóng keeps his real-time
-## speed, and inputs released when the window loses focus.
-## Speeds are the host's exports (walk_speed, carry_speed, roll_*).
+## speed, Shift runs while stamina lasts (StaminaBar3D over his head), Space
+## rolls (dash) with a cooldown, Nhịp Sóng keeps his real-time speed, and
+## inputs released when the window loses focus.
+## Speeds are the host's exports (walk_speed, carry_speed, run_*, stamina_*, roll_*).
 
 var host: Node3D
 var dash_left: float = 0.0
 var focus_lost: bool = false
+## 0..1; empty = winded until it refills to stamina_resume.
+var stamina: float = 1.0
+var winded: bool = false
+var _rest_clock: float = 0.0
+var _bar := StaminaBar3D.new()
 var _dash_cooldown: float = 0.0
 var _dash_direction := Vector3.ZERO
 var _time_scale := 1.0
@@ -15,12 +21,14 @@ var _time_scale := 1.0
 
 func _init(owner: Node3D) -> void:
 	host = owner
+	host.add_child(_bar)
 
 
 ## Stands still (paused, modal open or window unfocused).
 func stop(delta: float) -> void:
 	host.player.velocity = Vector3.ZERO
 	host.body.drive_ground_motion(Vector3.ZERO, delta, false)
+	_bar.visible = false
 
 
 func move(delta: float) -> void:
@@ -51,6 +59,8 @@ func move(delta: float) -> void:
 		player.velocity = _dash_direction * host.roll_speed * lerpf(0.5, 1.2, t) * rin_scale
 	else:
 		var speed: float = host.carry_speed if host.carrying_table >= 0 else host.walk_speed
+		if _run_stamina(delta * rin_scale, direction.length_squared() > 0.01):
+			speed *= host.run_speed / host.walk_speed
 		var desired := direction * speed * rin_scale
 		# Dash ends at walking/running speed, rather than coasting several extra metres.
 		player.velocity = player.velocity.limit_length(speed * rin_scale)
@@ -64,6 +74,25 @@ func move(delta: float) -> void:
 		player.rotation.y = lerp_angle(player.rotation.y, atan2(moved.x, moved.z), 1.0 - exp(-16.0 * delta * rin_scale))
 	body.set_carrying(host.carrying_table >= 0)
 	body.drive_ground_motion(moved, delta, false)
+	_bar.show_at(host.demo_camera, player.global_position, stamina)
+
+
+## Drains while Shift is held and Rin moves, refills after a short rest.
+## True while he runs.
+func _run_stamina(delta: float, moving: bool) -> bool:
+	if winded and stamina >= host.stamina_resume:
+		winded = false
+	var running := moving and Input.is_action_pressed("sprint") and not winded
+	if running:
+		stamina = maxf(stamina - delta / host.stamina_seconds, 0.0)
+		_rest_clock = 0.0
+		if stamina <= 0.0:
+			winded = true
+	else:
+		_rest_clock += delta
+		if _rest_clock >= host.stamina_rest_delay:
+			stamina = minf(stamina + delta / host.stamina_refill_seconds, 1.0)
+	return running
 
 
 ## Window focus out: drop held keys so Rin doesn't keep walking.
@@ -71,5 +100,5 @@ func on_focus(focused: bool) -> void:
 	focus_lost = not focused
 	if focus_lost:
 		dash_left = 0.0
-		for action: String in ["turn_left", "turn_right", "throttle_forward", "throttle_back", "dash"]:
+		for action: String in ["turn_left", "turn_right", "throttle_forward", "throttle_back", "dash", "sprint"]:
 			Input.action_release(action)
