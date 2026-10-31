@@ -1,12 +1,12 @@
 class_name FishFightView
 extends RefCounted
 ## Draws FishFightGame full screen, side view: the sea (FishFightBackdrop),
-## Rin's boat on the surface tipping with the balance, Rin with a rod that
+## Rin's boat on the surface (Rin leans with the balance), with a rod that
 ## bends with the line tension, the line, bobber and hook, the school
 ## (sprites "fish/<id>", a dark shadow for species not in the Dex yet),
 ## splashes and bubbles, the daze vignette, and the readouts
 ## (FishFightGauges). After a catch the fish flies out of the water into
-## the boat. Art hooks: "fishing/boat_side" (72x24), "fishing/rin_side"
+## the boat. Art hooks: the boat per BoatData id (FishFightBoat), "fishing/rin_side"
 ## (sheet 3x1 of 16x32: waiting, reeling, straining).
 
 const INK := Color("090a14")
@@ -84,7 +84,7 @@ func boat_screen() -> Vector2:
 func draw() -> void:
 	var size := game.size
 	var boat := boat_screen()
-	FishFightBackdrop.draw(game, size, game.zone, game._time, boat.x + 21.0 * BOAT_SCALE, _backdrop_cache)
+	FishFightBackdrop.draw(game, size, game.zone, game._time, boat.x + (FishFightBoat.spec(game.boat_id)["lamp"] as Vector2).x * BOAT_SCALE, _backdrop_cache)
 	for i in game.school.size():
 		if i != game.hooked_index or _landed_clock < 0.0:
 			_draw_fish(i)
@@ -137,27 +137,22 @@ func _draw_fish_sprite(pos: Vector2, rotation: float, facing: float, scale: floa
 	game.draw_set_transform(Vector2.ZERO)
 
 
-## Boat tipping with the balance, Rin on it; returns the rod tip.
+## Boat (never rotated: pixel art stays crisp) with Rin leaning against the
+## balance; returns the rod tip. Art is drawn at its screen size, 1:1.
 func _draw_boat_and_rod(at: Vector2) -> Vector2:
-	var tilt := game.balance * 0.16
 	var bob := roundf(sin(game._time * 2.0) * 1.0)
-	game.draw_set_transform(at + Vector2(0, bob), tilt, Vector2.ONE * BOAT_SCALE)
-	if not Art.draw(game, "fishing/boat_side", Rect2(-36, -14, 72, 24)):
-		game.draw_colored_polygon(PackedVector2Array([Vector2(-37, -13), Vector2(-31, -8), Vector2(29, -8),
-			Vector2(37, -13), Vector2(27, 9), Vector2(-27, 9)]), INK)
-		game.draw_colored_polygon(PackedVector2Array([Vector2(-34, -11), Vector2(-30, -7), Vector2(28, -7),
-			Vector2(34, -11), Vector2(25, 7), Vector2(-25, 7)]), Color("884b2b"))
-		game.draw_rect(Rect2(-30, -4, 58, 2), Color("ad7757"))
-	game.draw_rect(Rect2(20, -30, 2, 22), Color("4d2b32"))  # lamp pole
-	game.draw_circle(Vector2(21, -31), 3.0, Color("f2d98a"))
-	game.draw_circle(Vector2(21, -31), 7.0, Color(0.95, 0.85, 0.54, 0.18))
+	var origin := (at + Vector2(0, bob)).round()
+	FishFightBoat.draw(game, game.boat_id, origin, BOAT_SCALE)
+	var spec := FishFightBoat.spec(game.boat_id)
+	var feet := Vector2(float(spec["rin_x"]) + roundf(game.balance * 3.0), float(spec["deck"]))
 	var stance := 0 if game.hooked_index < 0 else 2 if game.tension > 0.6 else 1
-	var lean := game.balance * 3.0
-	if not Art.draw_frame(game, "fishing/rin_side", 3, 1, stance, 0, Rect2(-14 + lean, -40, 16, 32)):
-		_draw_rin_placeholder(Vector2(-6 + lean, -8), stance)
-	game.draw_set_transform(Vector2.ZERO)
+	var rin_rect := Rect2(origin + (feet + Vector2(-8, -32)) * BOAT_SCALE, Vector2(16, 32) * BOAT_SCALE)
+	if not Art.draw_frame(game, "fishing/rin_side", 3, 1, stance, 0, rin_rect):
+		game.draw_set_transform(origin, 0.0, Vector2.ONE * BOAT_SCALE)
+		_draw_rin_placeholder(feet, stance)
+		game.draw_set_transform(Vector2.ZERO)
 	# The rod from Rin's hands, bending towards the hook with the tension.
-	var hands := (at + Vector2(0, bob) + (Vector2(-2 + lean, -24) * BOAT_SCALE).rotated(tilt)).round()
+	var hands := origin + (feet + Vector2(4, -16)) * BOAT_SCALE
 	var toward := (hook_screen() - hands).normalized()
 	var straight := hands + (Vector2(0.55, -0.85).normalized().lerp(toward, 0.35 + game.tension * 0.5)).normalized() * 64.0
 	var bend := straight + toward * game.tension * 18.0
@@ -170,13 +165,14 @@ func _draw_boat_and_rod(at: Vector2) -> Vector2:
 	return points[points.size() - 1]
 
 
+## `feet`: bottom centre of Rin.
 func _draw_rin_placeholder(feet: Vector2, stance: int) -> void:
+	feet += Vector2(-4, 0)
 	var lean := 1.0 if stance == 2 else 0.0
 	game.draw_rect(Rect2(feet + Vector2(1, -10), Vector2(6, 10)), Color("253a5e"))
 	game.draw_rect(Rect2(feet + Vector2(lean, -20), Vector2(8, 11)), Color("4f8fba"))
 	game.draw_rect(Rect2(feet + Vector2(1 + lean, -26), Vector2(6, 6)), Color("c09473"))
-	game.draw_colored_polygon(PackedVector2Array([feet + Vector2(-3 + lean, -25), feet + Vector2(11 + lean, -25),
-		feet + Vector2(4 + lean, -32)]), Color("d7b594"))
+	game.draw_rect(Rect2(feet + Vector2(lean, -28), Vector2(8, 4)), Color("151d28"))  # black hair
 
 
 func _draw_line(tip: Vector2) -> void:
@@ -238,5 +234,7 @@ func _draw_daze(size: Vector2, boat: Vector2) -> void:
 	if game.stun > 0.45:
 		for i in 3:
 			var angle := game._time * 4.0 + i * TAU / 3.0
-			var at := boat + Vector2(-12, -86) + Vector2(cos(angle) * 12.0, sin(angle) * 4.0)
+			var spec := FishFightBoat.spec(game.boat_id)
+			var head := Vector2(float(spec["rin_x"]), float(spec["deck"]) - 35.0) * BOAT_SCALE
+			var at := boat + head + Vector2(cos(angle) * 12.0, sin(angle) * 4.0)
 			game.draw_rect(Rect2(at.round(), Vector2(2, 2)), Color("f2d98a"))

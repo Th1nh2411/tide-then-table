@@ -70,7 +70,7 @@ id + tên + ảnh).
 | `assets/sprites/ui/avatars/ut_bong.png` | 24x24 | Út Bông | Cô gái tóc dài buộc nơ, áo vàng |
 | `assets/sprites/ui/avatars/ba_xe_om.png` | 24x24 | Ba Xe Ôm | Chú xe ôm, mũ bảo hiểm xanh, áo khoác |
 | `assets/sprites/ui/avatars/mimi.png` | 24x24 | Mimi Review | Cô reviewer đeo kính tròn, giơ tay chữ V |
-| `assets/sprites/ui/avatars/chu_sau.png` | 24x24 | Chú Sáu Lưới | Ngư dân già, nón lá, da sạm |
+| `assets/sprites/ui/avatars/chu_sau.png` | 24x24 | Chú Sáu Lưới | Ngư dân già, tóc bạc, da sạm |
 | `assets/sprites/ui/avatars/thanh_food.png` | 24x24 | Thành Food | Anh food blogger, mũ lưỡi trai ngược |
 | `assets/sprites/ui/avatars/nhoc_ca.png` | 24x24 | Nhóc Cá Khô | Cậu bé gầy, tóc dựng, áo thun rộng |
 

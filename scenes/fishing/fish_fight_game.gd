@@ -52,6 +52,8 @@ var yank_spinning: bool = false
 var school: Array[Dictionary] = []
 ## FishData.Zone of the spot: picks the sea backdrop.
 var zone: int = 0
+## BoatData id of Rin's boat (how the fishing screen draws it).
+var boat_id: String = "thuyen_thung"
 
 var _hook_velocity_x: float = 0.0
 var _bite_candidate: int = -1

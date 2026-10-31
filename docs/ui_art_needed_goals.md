@@ -17,7 +17,7 @@ Quy ước chung
 
 | File | Kích thước | Dùng ở đâu | Mô tả |
 | --- | --- | --- | --- |
-| `assets/sprites/ui/icons/guest.png` | 16x16 | Thẻ thử thách (Phục vụ N bàn), huy hiệu dự phòng | Bán thân một vị khách đội nón lá nhìn thẳng, màu da ấm |
+| `assets/sprites/ui/icons/guest.png` | 16x16 | Thẻ thử thách (Phục vụ N bàn), huy hiệu dự phòng | Bán thân một vị khách đầu trần nhìn thẳng, màu da ấm |
 | `assets/sprites/ui/icons/heart.png` | 16x16 | Thẻ thử thách (không ai bỏ về) | Trái tim đỏ hồng, có điểm sáng nhỏ |
 | `assets/sprites/ui/icons/fire.png` | 16x16 | Thẻ thử thách (nướng N món) | Ngọn lửa than cam-vàng trên hai thanh than đỏ |
 | `assets/sprites/ui/icons/beer.png` | 16x16 | Thẻ thử thách (rót N tháp bia) | Ly bia vàng có quai, bọt trắng trào miệng |

@@ -79,7 +79,7 @@ Vietnamese, keep code comments in short English.
   in ~/Library/Application Support/Godot/export_templates/<version>; macOS
   universal needs `import_etc2_astc` on, already set in project.godot).
   Hand out `PLAYTEST.md` with it.
-- Debug keys (debug builds): sea 1-3 boat, F2 open the fog; restaurant F1
+- Debug keys (debug builds): sea 1-3 boat (3D: reloads the scene; in the rod fight: switches the drawn boat live), F2 open the fog; restaurant F1
   fish, F2 beer; both F3 play this scene's cutscenes one by one, F4 toggle
   Nhịp Sóng (`CutsceneDebug`); anywhere F9 = `DebugJumpMenu`: jump to any
   day's night / restaurant or any cutscene, state rebuilt by `StoryTimeline`
@@ -130,7 +130,7 @@ Vietnamese, keep code comments in short English.
   whole-game bot). The ending shows a run card (`EndingStats`: days +
   minutes, fish, guests, earnings) and a thank-you for playtesters.
 - Sea view matches the restaurant: the boat camera zooms x2 (Rin is 16x32
-  on screen, standing in a nón lá; `Boat._draw` is 3/4: the deck turns, the
+  on screen, standing, no hat (art plans have no nón lá); `Boat._draw` is 3/4: the deck turns, the
   hull side always faces the bottom of the screen, Rin and the cat stay
   upright). World coordinates / speeds are unchanged; art for the sea is
   drawn at screen size and placed at scale 0.5.
@@ -139,7 +139,7 @@ Vietnamese, keep code comments in short English.
   W/S raises/lowers the hook, Space hooks the aimed fish, then W reels and S
   gives slack; E spins a green/yellow/red all-in wheel; trip stun reaches 100%
   = Rin faints and is rescued); spot picks species via its featured fish +
-  depth; the rod fight is full screen, side view (`FishFightView` + `FishFightBackdrop` per zone + `FishFightGauges`: reel, level, daze, wheel; art list docs/ui_art_needed_fishing.md), `FishPortrait` on a card top right (nets keep the crate panel, portrait standing up): a shadow + "?" while waiting for the
+  depth; the rod fight is full screen, side view (`FishFightView` + `FishFightBackdrop` per zone + `FishFightBoat` per boat upgrade + `FishFightGauges`: reel, level, daze, wheel; art list docs/ui_art_needed_fishing.md), `FishPortrait` on a card top right (nets keep the crate panel, portrait standing up): a shadow + "?" while waiting for the
   bite and for species not in the Dex yet, named "???"), `CatchRoll` rolls size: deeper = pricier/bigger, size scales price
   and difficulty; records in `GameState.best_sizes`), `NetController` (Q nets → HaulGame; nets bring shrimp / crab / snails, each rolled from the zone with its own size: near shore mostly shrimp, reef mostly crab — rods catch fish and squid only),
   `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab; a species caught

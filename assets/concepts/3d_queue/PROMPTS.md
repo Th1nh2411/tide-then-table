@@ -299,7 +299,7 @@ Use case: image-to-3D input prop for a 3D Vietnamese street game. ONE tied pink 
 Use case: image-to-3D input prop for a 3D Vietnamese coastal fishing game. ONE open wooden fish crate made of a few broad slats with gaps, 0.60 metres long, 0.40 metres wide, 0.30 metres tall, empty. Weathered light brown wood. Style: faceted low-poly game prop, broad planar shapes, flat solid colours, no wood grain, no texture, no text. Composition: whole crate in a single three-quarter front view, camera about 30 degrees above, generous margin. Transparent background, no floor, no shadow, no fish, no other objects. One view only.
 ```
 
-### non_la — nón lá (Rin đội khi ra khơi)
+### non_la — nón lá (ĐÃ BỎ: không vẽ / không dùng; nhân vật không đội nón lá)
 
 ```
 Use case: image-to-3D input prop for a 3D Vietnamese coastal fishing game. ONE Vietnamese conical palm-leaf hat (non la), 0.42 metres in diameter and 0.18 metres tall, pale straw colour with a few faint concentric rings, a thin chin strap hanging below. Style: faceted low-poly game prop, broad planar shapes, flat solid colours, no texture, no text. Composition: the hat alone seen from a three-quarter side view, camera about 20 degrees above the brim, generous margin. Transparent background, no head, no person, no shadow, no other objects. One view only.

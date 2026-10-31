@@ -5,8 +5,8 @@ extends CanvasLayer
 ## Shows the result briefly, then reports quality and how many were
 ## caught (more than 1 when hauling a net). LampOil doesn't burn while this
 ## overlay is running: time stops while fishing. The rod fight fills the
-## screen (the panel turns into a see-through frame, the fish card moves
-## top right); the net haul stays in the crate panel.
+## screen (the panel turns into a see-through frame, no portrait: the
+## fish's name sits bottom centre); the net haul stays in the crate panel.
 
 signal finished(fish: FishData, caught: bool, quality: float, count: int)
 signal fight_stun_changed(value: float)
@@ -14,6 +14,8 @@ signal rin_fainted
 signal catch_size_changed(value: float)
 ## The player pressed the hold button / key during the minigame.
 signal hold_requested
+
+const BOAT_UPGRADE := preload("res://data/upgrades/boat_upgrade.tres")
 
 @export var perfect_quality: float = 1.0
 @export var normal_quality: float = 0.7
@@ -50,9 +52,6 @@ var _portrait: FishPortrait
 var _row: HBoxContainer
 ## Full-screen rod fight: the game sits here, under the panel.
 var _stage: Control
-## Fish card top right in full screen.
-var _tag: PanelContainer
-var _tag_box: VBoxContainer
 @onready var _panel: PanelContainer = $Panel
 
 
@@ -77,40 +76,25 @@ func _ready() -> void:
 	_row = row
 	# Built here, not as member defaults: a scene freed before entering the tree would leak them.
 	_stage = Control.new()
-	_tag = PanelContainer.new()
-	_tag_box = VBoxContainer.new()
 	_stage.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_stage)
 	move_child(_stage, 0)
-	_tag.theme_type_variation = &"PaperPanel"
-	_tag.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_tag.offset_left = -164.0
-	_tag.offset_top = 6.0
-	_tag.offset_right = -6.0
-	_tag.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_tag.hide()
-	_tag_box.add_theme_constant_override("separation", 0)
-	_tag.add_child(_tag_box)
-	add_child(_tag)
 
 
 ## Rod fight: full screen; net haul: the centred crate panel.
 func _set_full(on: bool) -> void:
 	_status_label.visible = not on
-	_tag.visible = on
+	# Full screen: the fish is in the water, so no portrait card; its name sits
+	# bottom centre (between the plank and the wheel), the sky stays clear.
+	_portrait.visible = not on
+	var box := _hint_label.get_parent()
 	if on:
 		_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-		_portrait.vertical = false
-		_portrait.custom_minimum_size = Vector2(100, 46)
-		_portrait.reparent(_tag_box)
-		# Name on the card, first-time hint at the bottom: the sky stays clear for Rin.
-		_title_label.reparent(_tag_box)
-		_title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_title_label.add_theme_font_size_override("font_size", 10)
-		_hint_label.get_parent().move_child(_hint_label, _row.get_index())
+		_title_label.add_theme_font_size_override("font_size", 11)
+		box.move_child(_title_label, _row.get_index())
+		box.move_child(_hint_label, _row.get_index() + 1)
 	else:
 		_panel.set_anchors_preset(Control.PRESET_CENTER)
 		_panel.offset_left = -180.0
@@ -118,15 +102,9 @@ func _set_full(on: bool) -> void:
 		_panel.offset_right = 180.0
 		_panel.offset_bottom = 130.0
 		_panel.remove_theme_stylebox_override("panel")
-		_portrait.vertical = true
-		_portrait.custom_minimum_size = Vector2(56, 120)
-		_portrait.reparent(_row)
-		if _title_label.get_parent() != _hint_label.get_parent():
-			_title_label.reparent(_hint_label.get_parent())
-			_title_label.get_parent().move_child(_title_label, 0)
-		_title_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 		_title_label.add_theme_font_size_override("font_size", 13)
-		_hint_label.get_parent().move_child(_hint_label, 1)
+		box.move_child(_title_label, 0)
+		box.move_child(_hint_label, 1)
 
 
 func is_running() -> bool:
@@ -186,6 +164,8 @@ func _start_stage(game: MinigameBase) -> void:
 func _create_fight() -> MinigameBase:
 	var game := FishFightGame.new()
 	game.school_size = school_size
+	var boat := GameState.get_upgrade_value(BOAT_UPGRADE) as BoatData
+	game.boat_id = boat.id if boat else "thuyen_thung"
 	game.zone = zone if zone >= 0 else (int(_fish.zones[0]) if not _fish.zones.is_empty() else 0)
 	game.stun = _starting_stun
 	game.tugged.connect(_portrait.jolt)
@@ -204,6 +184,19 @@ func _on_fish_hooked(size_scale: float) -> void:
 	_title_label.modulate = aberrant_title_color if _fish.is_aberrant else Color.WHITE
 	_hint_label.text = _game.get_hint()
 	_hint_label.visible = Guide.once("game_fish_haul_v1")
+
+
+## Debug builds: 1-3 switch the boat during a rod fight (to look at the art).
+func _unhandled_key_input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if not OS.is_debug_build() or key == null or not key.pressed or key.echo or not _game is FishFightGame:
+		return
+	if key.physical_keycode < KEY_1 or key.physical_keycode > KEY_3:
+		return
+	GameState.upgrade_levels[BOAT_UPGRADE.id] = int(key.physical_keycode - KEY_1)
+	var boat := GameState.get_upgrade_value(BOAT_UPGRADE) as BoatData
+	(_game as FishFightGame).boat_id = boat.id
+	get_viewport().set_input_as_handled()
 
 
 func _process(_delta: float) -> void:

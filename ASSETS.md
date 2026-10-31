@@ -25,7 +25,7 @@ mục "Tên file" ở cuối.
   đen làm nền, chỉ đèn (cam) và thứ phát sáng (xanh ngọc) là sáng — giống DREDGE: cái gì quan trọng mới sáng.
 - **Xem trước:** chạy game bản debug, bấm **F7** → cả màn hình vẽ lại chỉ bằng bảng màu này (bấm lại để tắt).
 - **AI làm nháp, tay làm xong:** AI hợp với chân dung, hải sản, món ăn, đồ đứng yên, nền xa; tự vẽ tay sprite đi
-  bộ (animation), ô gạch lặp, và đồ đậm chất Việt (nón lá, thuyền thúng, xe đẩy inox, biển hiệu chữ Việt).
+  bộ (animation), ô gạch lặp, và đồ đậm chất Việt (thuyền thúng, xe đẩy inox, biển hiệu chữ Việt).
   Lệnh cho AI: "pixel art, <cỡ>, limited palette, transparent background, no anti-aliasing" + ảnh mẫu màu +
   một hình đã vẽ chuẩn làm tham chiếu; tả nhân vật cố định theo ART_PLAN (Rin: tóc đen rối, kính chữ nhật, áo ba lỗ trắng).
 - **Chân dung runtime:** dùng ảnh approved 128×128, hiển thị nearest 2× trong khung thoại 256 theo quy ước mới ở `ART_PLAN.md`. Rin có base/vui, Vy có base; Bảo đã có base, base_open và vui trong runtime.
@@ -106,7 +106,7 @@ Biển hiển thị zoom x2 cho cùng tỉ lệ với quán. Vẽ asset biển t
 | Thuyền thúng | 32x32 trên màn hình | góc 3/4 như quán: vẽ 8 hướng (hoặc 1 hướng + code xoay mặt boong); thành thuyền thấy ở phía dưới |
 | Ghe chèo | 48x20 trên màn hình | như trên |
 | Ghe máy | 60x24 trên màn hình | có vệt nước sau đuôi |
-| Rin trên thuyền | 16x32 | đội nón lá, đứng / thả câu / kéo lưới |
+| Rin trên thuyền | 16x32 | đầu trần (không nón lá), đứng / thả câu / kéo lưới |
 | Nước biển | ô 16x16 lặp | 3 độ sâu: gần bờ / rạn đá / khơi xa |
 | Bờ, bến, nhà Xóm Đèn | theo bản đồ 1920x1280 | cầu tàu, đèn bến |
 | Đám bọt cá | 16x16, 3 khung | màu nhạt theo loài cá |
@@ -260,7 +260,7 @@ Các ID thành phẩm (giữ tên chính xác):
 |---|---|
 | Nhân vật/cutscene/khách/nhân viên | `bao`, `vy`, `vy_sau`, `co_nam`, `ong_tam`, `guest_1`, `guest_2`, `guest_3`, `guest_rich`, `guest_regular`, `staff`, `cat` |
 | Quán/nâng cấp/tạp hóa/giao thông | `food_cart_0`, `food_cart_1`, `food_cart_2`, `charcoal_grill`, `beer_keg`, `plate_bench`, `fridge_0`, `fridge_1`, `fridge_2`, `menu_board`, `grocery_counter`, `motorbike`, `sidewalk_tree`, `bin`, `plant_pot`, `beer_tower`, `grocery_crate`, `plastic_bag`, `crate`, `bottle` |
-| Biển/POI/sự kiện/phụ kiện Rin | `ghe_cheo`, `ghe_may`, `lighthouse`, `whale_shrine`, `old_man_hut`, `lobster_raft`, `dock`, `rock_1`, `rock_2`, `dolphin`, `non_la`, `net_buoy`, `jellyfish` |
+| Biển/POI/sự kiện/phụ kiện Rin | `ghe_cheo`, `ghe_may`, `lighthouse`, `whale_shrine`, `old_man_hut`, `lobster_raft`, `dock`, `rock_1`, `rock_2`, `dolphin`, `net_buoy`, `jellyfish` |
 
 Mỗi người batch giữ 3,000 tam giác và có skin 20 xương; mèo là mesh ngồi tĩnh
 có bob/sway. Các GLB giữ geometry inference, palette phẳng theo concept và có
