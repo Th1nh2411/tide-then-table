@@ -65,10 +65,12 @@ func _ready() -> void:
 	text = OnScreenText.new()
 	add_child(text)
 	if result == LoopCalendar.Result.RESET:
-		# Stayed home on a calm night: the morning paper and the street tell what happened.
-		if LoopCalendar.last_choice == "home":
-			GameState.set_flag(NewsData.MISSING_FLAG)
-		NightmareWake3D.play(self, "Hộc... hộc...")
+		# A calm night gone wrong (stayed home / came back short): the drowned
+		# came to the door. Three knocks in the dark, wet steps up to the bed.
+		var visited := LoopCalendar.last_calm_miss
+		if visited:
+			WetFootprints3D.build(self, BedroomBuilder3D.DOOR, BedroomBuilder3D.BEDSIDE)
+		NightmareWake3D.play(self, "Hộc... hộc...", visited)
 		if was_ram:
 			# Rằm went by with nothing found: the gate closes for a year.
 			_gate_closed()
@@ -112,8 +114,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	elif _near(BedroomBuilder3D.PAPER):
 		get_viewport().set_input_as_handled()
 		var page := NEWS.page(GameState.day)
-		if GameState.has_flag(NewsData.MISSING_FLAG):
-			page = NEWS.missing_item + "\n\n" + page
 		PaperReader.read(self, "newspaper", NEWS.title, "%s — %s" % [LoopCalendar.date_text(GameState.day), page])
 
 

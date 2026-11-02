@@ -4,5 +4,4 @@
 
 [resource]
 script = ExtResource("1_news")
-missing_item = "TIN MỚI: Đêm qua thêm một ngư dân Xóm Đèn ra khơi không về. Chiếc thúng trôi về bến lúc rạng sáng, dây neo đứt gọn."
 pages = Array[String](["Ngư dân thứ ba mất tích trong sương. Chiếc thúng trôi về bến, không người.", "Người già trong xóm nhắc: cả ba vụ mất tích đều vào đêm không trăng.", "Dây neo thúng của người mất tích được cắt gọn, không phải đứt.", "Trước khi mất tích, cả ba người đều bán cá ở cùng một bè ngoài khơi.", "Tìm thấy một trang nhật ký của người gác đèn Đá Canh Đêm: \"...đèn xanh ở bè, không phải sương...\"", "Tin vắn: bè tôm hùm ngoài khơi mở rộng, chủ bè vừa mua ghe mới.", "Rằm tháng Bảy. Xóm Đèn thả đèn hoa đăng tưởng nhớ người mất ngoài biển."])

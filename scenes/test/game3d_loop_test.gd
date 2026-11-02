@@ -50,33 +50,23 @@ func _run() -> void:
 	if not sea:
 		return
 	_check(sea is Node3D, "F5 gameplay route opens native 3D sea")
-	sea.cast_cinematic_enabled = false
-	sea.boat.position = sea.shoals[sea._nearest_school_index()].pos
-	sea.boat.velocity = Vector3.ZERO
-	sea._try_fish()
-	var overlay: FishingOverlay3D = sea.overlay
-	_check(sea.fishing and overlay.active and get_tree().paused, "fishing spot starts 2D minigame and pauses 3D boat")
-	overlay._minigame.result_seconds = 0.01
-	# The deterministic success isolates scene integration from human skill.
-	overlay._minigame._game._finish(true, true)
-	await _frames(8)
-	if sea.new_catch_card.visible:
-		sea.new_catch_card._next()
-	await _frames(3)
-	_check(not overlay.active and not get_tree().paused and sea.hold.items.size() == 1,
-		"minigame result reaches real hold and resumes boat")
-	var fish: FishData = sea.hold.items[0].fish
+	var rod: Fishing3D = sea.rod
+	var shoal: SeaShoals3D.Shoal = sea.shoals[sea._nearest_school_index()]
+	shoal.fish_left = maxi(shoal.fish_left, LoopCalendar.MIN_FISH)
+	sea.boat.position = shoal.pos + Vector3(0, 0, 8.0)
+	for n: int in range(LoopCalendar.MIN_FISH):
+		catch_one(rod, shoal.pos)
+	_check(rod.basket.count() == LoopCalendar.MIN_FISH and not get_tree().paused, "three fish caught on the rod go into the basket")
+	var fish: FishData = rod.basket.fish[0]
 	_check(GameState.caught_species.has(fish.id), "catch reaches persistent Dex")
 	sea.boat.position = sea.START
 	sea.boat.velocity = Vector3.ZERO
-	sea._unload()
-	_check(sea.hold.items.is_empty(), "dock unload empties the hold")
 	sea._end_trip(false)
 	var room: Node = await _scene(BEDROOM)
 	if not room:
 		return
 	_check(GameState.resume_at == "home" and GameState.day == 2 and GameState.caught_species.has(fish.id),
-		"docking wakes Rin in his room on the next day, catch remembered")
+		"docking with 3 fish wakes Rin in his room on the next day, catch remembered")
 	room.leave()
 	var morning: Node = await _scene(WATERFRONT)
 	if not morning:
@@ -88,6 +78,9 @@ func _run() -> void:
 		return
 	_check(quan is Node3D, "the lane routes to the native 3D restaurant")
 	_check(quan.shift_running, "the shift opens by itself when Rin arrives (no menu planning)")
+	var tray := quan.get_node_or_null(RestaurantFish3D.NODE_NAME) as RestaurantFish3D
+	_check(tray != null and tray.fish_count == LoopCalendar.MIN_FISH and tray.lines.has(RestaurantFish3D.ASK_LINE),
+		"last night's fish wait by Bảo's cart; Bảo asks for tonight's")
 	quan._spawn_order()
 	var table: int = -1
 	for i: int in range(quan.orders.size()):
@@ -145,3 +138,20 @@ func _run() -> void:
 		"save/load retains the day and the shift record")
 	SaveSystem.delete_save(SAVE)
 	get_tree().quit(1 if _failures else 0)
+
+
+## The real rod path, driven like the bot: cast, bite, hook, reel with care, basket.
+static func catch_one(rod: Fishing3D, at: Vector3) -> void:
+	var before := rod.basket.count()
+	for attempt: int in range(10):
+		rod.cast(at)
+		while rod.state == Fishing3D.State.CASTING:
+			rod.tick(0.05)
+		rod.force_bite()
+		rod.hook()
+		while rod.state == Fishing3D.State.REELING:
+			rod.hold_override = rod.reel.tension < (0.45 if rod.reel.running else 0.75)
+			rod.tick(0.05)
+		rod.hold_override = false
+		if rod.drop_in_basket() and rod.basket.count() > before:
+			return

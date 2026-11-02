@@ -4,7 +4,8 @@ extends Node3D
 ## Orchestrator: room -> RestaurantRoomBuilder3D, overlay -> RestaurantPanels3D,
 ## Bảo -> RestaurantCrew3D, shift
 ## clock -> RestaurantShift3D, orders -> RestaurantService3D, E -> RestaurantInteract3D,
-## Rin's walking -> RinMover3D, the street ends -> StreetEnds3D, omen props -> RestaurantOmens3D.
+## Rin's walking -> RinMover3D, the street ends -> StreetEnds3D, omen props -> RestaurantOmens3D,
+## the fish tray + Bảo asking for fish -> RestaurantFish3D.
 ## The underscore wrappers stay: tests and the bot call them.
 
 const SHIFT_SECONDS := RestaurantShift3D.SHIFT_SECONDS
@@ -97,6 +98,7 @@ func _ready() -> void:
 	StreetEnds3D.build(self)
 	RestaurantOmens3D.build(self)
 	RamGuest3D.attach(self)  # rằm only: anh Út and his ginger tea
+	RestaurantFish3D.build(self)  # last night's fish + Bảo asking for tonight's
 	_play_arrival.call_deferred()
 	Sfx.ambience("street")
 	Sfx.bed("street")

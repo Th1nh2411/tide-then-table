@@ -90,8 +90,6 @@ func _process(delta: float) -> void:
 		_was_fishing = false
 		_after_catch = true
 		_catch_timer = taken_after_catch_seconds
-	if sea.hold_ui and sea.hold_ui.visible:
-		return
 	if not sea._at_dock():
 		away_seconds += delta
 	_next_event -= delta

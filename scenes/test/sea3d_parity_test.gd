@@ -1,18 +1,6 @@
 extends Node
 ## Regression checks for native 3D night-trip progression.
 
-class CaptureOverlay:
-	extends CanvasLayer
-	var calls: int = 0
-	var school_value: int = 0
-	var scale_value: float = 0.0
-	var size_value: float = 0.0
-	func start_catch(_fish: FishData, zone_scale: float = 1.0, size: float = 1.0, _count: int = 1, school: int = 6) -> void:
-		calls += 1
-		school_value = school
-		scale_value = zone_scale
-		size_value = size
-
 var failures: int = 0
 
 func check(value: bool, label: String) -> void:
@@ -35,42 +23,16 @@ func _ready() -> void:
 	boat.position = SeaLayout3D.to_world(Vector2(900, 1000))
 	sea.call("_physics_process", 1.0)
 	check(is_equal_approx(float(sea.get("oil")), 100.0 - 100.0 / 240.0), "sea3d sailing uses original oil burn rate")
-	sea.call("_spend_oil", 100.0 - 100.0 / 240.0 - 50.0)
+	var before := float(sea.get("oil"))
+	var at := boat.position
+	sea.set("fishing", true)
+	sea.call("_physics_process", 1.0)
+	sea.set("fishing", false)
+	check(float(sea.get("oil")) < before and boat.position == at, "sea3d lamp burns while the line is out, the boat holds still")
+	sea.call("_spend_oil", float(sea.get("oil")) - 50.0)
 	check(DayClock.current_minutes > 0.0, "sea3d clock follows the tank fraction")
 	var school: int = sea.call("_nearest_school_index")
 	check(school >= 0, "sea3d starter boat can reach a fishing school")
-	var original := sea.get("overlay") as CanvasLayer
-	original.queue_free()
-	var capture := CaptureOverlay.new()
-	sea.add_child(capture)
-	sea.set("overlay", capture)
-	var shoal: SeaShoals3D.Shoal = sea.shoals[school]
-	shoal.fish_left = 3
-	shoal.max_fish = 3
-	sea.set("cast_cinematic_enabled", false)
-	boat.position = shoal.pos
-	boat.velocity = Vector3.ZERO
-	sea.set("rng", RandomNumberGenerator.new())
-	sea.call("_try_fish")
-	check(capture.school_value == 3 and shoal.fish_left == 2, "sea3d minigame fish count equals shoal fish left, then shoal drops by one")
-	check(capture.calls == 1 and capture.scale_value > 0.0 and capture.size_value > 0.0, "sea3d casts pass difficulty and rolled size to minigame")
-	sea.call("_on_catch_finished", false, null)
-	sea.call("_try_fish")
-	sea.call("_on_catch_finished", false, null)
-	sea.call("_try_fish")
-	sea.call("_on_catch_finished", false, null)
-	sea.call("_try_fish")
-	check(capture.calls == 3, "sea3d fishing school empties after three fish")
-	sea.set("hold", GridInventory.new(Vector2i.ONE))
-	var card := sea.get("new_catch_card") as NewCatchCard
-	card.queue_free()
-	sea.set("new_catch_card", null)
-	var fish := load("res://data/fish/ca_thu.tres") as FishData
-	sea.call("_store_catch", fish, 1.0, 1, 1.0)
-	check(int(GameState.caught_species.get(fish.id, 0)) == 1, "sea3d overflow catch records Dex before sorting")
-	var hold_ui := sea.get("hold_ui") as HoldUI
-	check(hold_ui.has_pending(), "sea3d full hold preserves catch in overflow tray")
-	hold_ui.close()
 	_check_shoals(sea)
 	_check_bubbles(sea)
 	get_tree().paused = false

@@ -1,14 +1,13 @@
 class_name SeaScene3D
 extends Node3D
-## Night trip in 3D (horror build): the thúng, lamp oil, hull, rod fishing,
-## the hold. No money, upgrades, weather, nets, phone or visitable places.
-## Orchestrator: world -> SeaWorldBuilder3D,
-## rod/hold -> SeaCatch3D, HUD/navigation -> SeaHud3D, steering ->
-## SeaBoatMover3D, oil / unload / trip end -> SeaTrip3D, debug keys -> SeaDebug3D.
+## Night trip in 3D (horror build): the thúng, lamp oil, hull, first-person
+## rod fishing into a basket. No money, upgrades, weather, nets, phone or
+## visitable places. Orchestrator: world -> SeaWorldBuilder3D, rod + basket ->
+## Fishing3D, HUD/navigation -> SeaHud3D, steering -> SeaBoatMover3D,
+## oil / trip end -> SeaTrip3D, debug keys -> SeaDebug3D.
 
 const REST_SCENE := SeaTrip3D.BEDROOM_SCENE
 const ENDING_SCENE := SeaTrip3D.ENDING_SCENE
-const FISHING_OVERLAY := SeaSetup3D.FISHING_OVERLAY
 const CAMERA_OFFSET := Vector3(0,6.2,8.4)
 const CAMERA_LOOK_AHEAD := 1.8
 const OIL_BURN_PER_SECOND: float = 100.0 / 240.0
@@ -23,7 +22,6 @@ const OIL_BURN_PER_SECOND: float = 100.0 / 240.0
 @onready var boat_visual: Node3D = $Boat/BoatVisual
 @onready var camera: Camera3D = $Camera3D
 
-var hold: GridInventory
 var oil := 100.0
 var oil_low_sent := false
 ## Extra oil burn (đêm âm: DarkNight3D).
@@ -36,7 +34,6 @@ var HUT_POS: Vector3 = SeaLayout3D.to_world(SeaLayout3D.HUT_PX)
 var RAFT_POS: Vector3 = SeaLayout3D.to_world(SeaLayout3D.RAFT_PX)
 var WHIRLPOOL_POS: Vector3 = SeaLayout3D.to_world(SeaLayout3D.WHIRLPOOL_PX)
 var shoals: Array[SeaShoals3D.Shoal] = []
-var new_catch_card: NewCatchCard
 var _wait_controls_release := false
 var _application_focused := true
 var navigation: Control
@@ -48,26 +45,23 @@ var impact_cooldown := 0.0
 ## Bounce, spin, rocking, shake and splash of collisions (SeaBoatMover3D calls it).
 var impact := SeaBoatImpact3D.new()
 var elapsed := 0.0
+## True while the line is out (Fishing3D): the boat holds still.
 var fishing := false
 var ending := false
 var status := ""
 var status_until := 0.0
 var _said: Array[Array] = []
 var rng := RandomNumberGenerator.new()
-var overlay: CanvasLayer
 var hud_view: SeaHudView3D
 ## Current Rin's line (hidden; hud_view's speech strip shows it).
 var message: Label
 var bubble_spots: Array[BubbleSpot3D] = []
 var submerged: Array[SubmergedRock3D] = []
-var cinematic: CastCinematic3D
-## Tests and bots can turn the cast scene off (E then opens the minigame at once).
-var cast_cinematic_enabled := true
 var rin_figure: Array[Node3D] = []
-var _cast_played := false
 var wake_marks: Array[MeshInstance3D] = []
 var boat_lamp: SpotLight3D
-var hold_ui: HoldUI
+## The rod, the bobber and the basket (Fishing3D).
+var rod: Fishing3D
 ## Always false now (no place dialogs); DarkNight3D still reads it.
 var poi_busy := false
 var whirlpool_marks: Array[MeshInstance3D] = []
@@ -77,7 +71,6 @@ func _ready() -> void:
 	if boat_data == null:
 		boat_data = load("res://data/boats/thuyen_thung.tres") as BoatData
 	oil = oil_capacity
-	hold = GridInventory.new(boat_data.hold_size)
 	boat.position = START
 	shoals = SeaShoals3D.spawn(fish_catalog, rng, Story.is_fog_open())
 	SeaWorldBuilder3D.build_environment(self)
@@ -100,7 +93,12 @@ func _night_start_lines(fog_tonight: bool) -> void:
 	SeaTrip3D.night_start_lines(self, fog_tonight)
 
 func _physics_process(delta: float) -> void:
-	if ending or fishing or (hold_ui and hold_ui.visible):
+	if ending:
+		return
+	if fishing:
+		# The lamp still burns while Rin waits on a bite.
+		if not _at_dock():
+			_spend_oil(delta * OIL_BURN_PER_SECOND * oil_burn_scale)
 		return
 	elapsed += delta
 	var motion := SeaBoatMover3D.drive(self, delta)
@@ -128,23 +126,14 @@ func _unhandled_input(event: InputEvent) -> void:
 	if SeaDebug3D.handle(self, event as InputEventKey):
 		get_viewport().set_input_as_handled()
 		return
-	if ending or fishing or (hold_ui and hold_ui.visible) or get_tree().paused:
-		return
-	if event.is_action_pressed("open_hold") and hold_ui:
-		hold_ui.open_browse()
-		get_viewport().set_input_as_handled()
+	if ending or fishing or get_tree().paused:
 		return
 	if not event is InputEventKey:
 		return
 	var key := event as InputEventKey
 	if not key.pressed or key.echo:
 		return
-	if key.physical_keycode == KEY_E:
-		if _at_dock():
-			_unload()
-		else:
-			_try_fish()
-	elif key.physical_keycode == KEY_R and _at_dock():
+	if key.physical_keycode == KEY_R and _at_dock():
 		_end_trip(false)
 	elif key.physical_keycode == KEY_F and _at_dock():
 		if BoatCondition.is_damaged():
@@ -152,8 +141,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			_say("Vá xong mạn thúng.", 2.5)
 		else:
 			_say("Thúng còn lành.", 2.0)
-	elif key.physical_keycode == KEY_H and hold_ui:
-		hold_ui.open_browse()
 	else:
 		return
 	get_viewport().set_input_as_handled()
@@ -170,30 +157,6 @@ func _bubble_range() -> float:
 	var base: float = boat_lamp.spot_range if is_instance_valid(boat_lamp) else 14.0
 	return base * 0.6 * lerpf(0.55, 1.0, clampf(fraction * 2.0, 0.0, 1.0))
 
-
-func _try_fish() -> void:
-	SeaCatch3D.try_fish(self)
-
-func _on_catch_detailed(fish: FishData, caught: bool, quality: float, count: int, size: float) -> void:
-	SeaCatch3D.on_catch_detailed(self, fish, caught, quality, count, size)
-
-func _store_catch(fish: FishData, quality: float, count: int, size: float) -> void:
-	SeaCatch3D.store_catch(self, fish, quality, count, size)
-
-func _on_catch_finished(_success: bool, _fish_data: FishData) -> void:
-	if _cast_played and cinematic:
-		_cast_played = false
-		await cinematic.play_return()
-		if not is_inside_tree():
-			return
-	fishing = false
-	_wait_controls_release = true
-	boat.velocity = Vector3.ZERO
-	yaw_velocity = 0.0
-	_update_hud()
-
-func _unload() -> void:
-	SeaTrip3D.unload(self)
 
 func _end_trip(towed: bool) -> void:
 	SeaTrip3D.end_trip(self, towed)
@@ -237,10 +200,6 @@ func _notification(what: int) -> void:
 
 func _spend_oil(units: float) -> void:
 	SeaTrip3D.spend_oil(self, units)
-
-
-func _on_rin_fainted() -> void:
-	SeaTrip3D.rin_fainted(self)
 
 
 func _casts_used_total() -> int:

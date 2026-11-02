@@ -73,9 +73,6 @@ func _test_weight_and_price() -> void:
 	var snapped := CatchRoll.snap_size(1.3, 3.0)
 	_check("snap to whole kg", is_equal_approx(_fish("ca_mu").weight_kg(snapped), 4.0))
 	_check("snap small to 10g", is_equal_approx(_fish("tom").weight_kg(CatchRoll.snap_size(1.17, 0.06)), 0.07))
-	var item := InventoryItem.new(_fish("ca_thu"), 1.0, 1.5)
-	var copy := InventoryItem.from_dict(item.to_dict(), fish_catalog)
-	_check("size saved in item dict", copy != null and is_equal_approx(copy.size, 1.5))
 
 
 func _share(zone: FishData.Zone, depth: float, id: String) -> float:

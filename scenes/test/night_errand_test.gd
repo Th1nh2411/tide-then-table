@@ -1,8 +1,7 @@
 extends Node
 ## Standalone test for NightErrand3D (run with F6): a calm night puts one thing
 ## to pick up inside the thúng's reach, picking it up writes a notebook page that
-## survives a loop reset; an omen night has none. Also the missing-person news
-## flag is cleared when the next day starts.
+## survives a loop reset; an omen night has none.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
 
@@ -38,9 +37,6 @@ func _run() -> void:
 	await get_tree().process_frame
 	failures += _check("omen night has no errand", sea.get_node_or_null("NightErrand") == null)
 	sea.queue_free()
-	GameState.set_flag(NewsData.MISSING_FLAG)
-	LoopCalendar.next_day()
-	failures += _check("missing-person news lasts one morning", not GameState.has_flag(NewsData.MISSING_FLAG))
 	GameState.reset()
 	print("NIGHT ERRAND TEST ", "PASS" if failures == 0 else "FAIL")
 	get_tree().quit(1 if failures else 0)

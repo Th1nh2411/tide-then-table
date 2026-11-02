@@ -2,7 +2,9 @@ class_name NightmareWake3D
 extends CanvasLayer
 ## Waking from a bad night (horror build): whenever the loop resets, Rin jolts
 ## awake in bed — black screen and a pounding heart, a sharp gasp, his eyes
-## open on the ceiling, he sits up shaking, then a line. Drives the bedroom's
+## open on the ceiling, he sits up shaking, then a line. With `knocks` (the
+## drowned came to the door) three slow knocks sound in the black first.
+## Drives the bedroom's
 ## `eye_offset` / `held_pitch` (FirstPersonView3D reads them) and `waking`.
 
 ## Eye lying on the bed, relative to standing at BedroomBuilder3D.START.
@@ -11,17 +13,22 @@ const LYING_PITCH := 1.25  # looking up at the ceiling
 
 @export var dark_seconds := 1.4
 @export var sit_up_seconds := 0.75
+## Longer black when someone knocks: the knocks, then a silence.
+@export var knock_dark_seconds := 3.2
+@export var knock_at := 0.5
 
 var room: BedroomScene3D
 var line := ""
+var knocks := false
 var _black := ColorRect.new()
 var _shake := 0.0
 
 
-static func play(owner: BedroomScene3D, after: String) -> NightmareWake3D:
+static func play(owner: BedroomScene3D, after: String, knock: bool = false) -> NightmareWake3D:
 	var wake := NightmareWake3D.new()
 	wake.room = owner
 	wake.line = after
+	wake.knocks = knock
 	owner.add_child(wake)
 	return wake
 
@@ -37,7 +44,12 @@ func _ready() -> void:
 	room.held_pitch = LYING_PITCH
 	Sfx.hold("heartbeat", true)
 	var tween := create_tween()
-	tween.tween_interval(dark_seconds)
+	if knocks:
+		tween.tween_interval(knock_at)
+		tween.tween_callback(func() -> void: Sfx.play("knock3", 0.0))
+		tween.tween_interval(knock_dark_seconds - knock_at)
+	else:
+		tween.tween_interval(dark_seconds)
 	tween.tween_callback(func() -> void: Sfx.play("gasp", 0.0))
 	tween.tween_property(_black, "color:a", 0.0, 0.12)
 	tween.tween_interval(0.35)

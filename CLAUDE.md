@@ -37,7 +37,7 @@ Vietnamese, keep code comments in short English.
   + append to its catalog, no code change.
 - Signals between nodes (past-tense names); node refs via `@export` + NodePath,
   not long `get_node("../..")` chains.
-- Pure logic lives in `systems/` (no nodes): `GridInventory`, `DayRating`,
+- Pure logic lives in `systems/` (no nodes): `ReelLogic`, `DayRating`,
   `SaveSystem`, `Story`, `BoatCondition`, `CatchRoll`, `LoopCalendar`,
   `OmenPicker`, `DialogueLibrary`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
@@ -70,9 +70,10 @@ Vietnamese, keep code comments in short English.
 - Run everything: `tools/run_tests.sh` (imports, runs `scenes/test/*_test.tscn`,
   smoke-runs main scenes, exit code ≠ 0 on FAIL/script errors).
 - Test scenes print `PASS ...` / `FAIL ...` lines; the runner counts them.
-- Whole game: `tools/run_bot.sh` (`tools/bot/game_bot.gd`: New Game → ending
-  through the real scenes, prints a line per day + minutes of human play,
-  exit ≠ 0 on STUCK / SAVE MISMATCH / no ending; no upgrades, so no POLICY).
+- Whole game: `tools/run_bot.sh` (`tools/bot/game_bot_3d.gd`: New Game → ending
+  through the real scenes, prints a line per day, catches 3 fish on calm
+  nights through `Fishing3D`, exit ≠ 0 on STUCK / SAVE MISMATCH / no ending;
+  no upgrades, so no POLICY).
   Run it after changing pacing, the day flow or saves;
   it reads scene internals (`tools/bot/game_bot_3d.gd`), keep it in sync.
 - Playtest builds: `tools/export.sh` (runs the tests, then the presets in
@@ -122,7 +123,37 @@ Vietnamese, keep code comments in short English.
   Nhịp Sóng (`WaveMark` / `WavePower`, C), staff / Vy hiring, the cat, weather,
   night events, nets (Q), sea places with dialogs (shrine, hut, lighthouse;
   the raft stays as scenery), the 2D restaurant / sea / cutscene classes, the
-  cooking overlay + shift receipt. Bullets below that describe these are history.
+  cooking overlay + shift receipt; (PLAN §10 H8) the 2D rod fight
+  (`FishingMinigame`, `FishFightGame` + view/rig/line/gauges/feel, `HaulGame`,
+  `FishPortrait`), the fishing overlay, `CastCinematic3D`, `SeaCatch3D`, the
+  grid hold (`GridInventory`, `InventoryItem`, `HoldUI`, `NewCatchCard`, Tab,
+  E unload at the dock) and the missing-fisherman paper item / Cô Năm gossip.
+  Bullets below that describe these are history.
+- **Fishing (horror build, H8):** first person from the thúng, `Fishing3D`
+  (scenes/fishing3d, node "Fishing" under the sea; `tick()` = one frame, bots /
+  tests drive it, `hold_override` = holding the button). Left click (`cast`)
+  throws the line where Rin looks (`FishingSpot3D.aim`: 6-12 m, clamped to
+  reachable water); bite after 3-8 s (x0.45 at a bubble shoal, never within 12 m
+  of the dock): rod tip shakes, bobber dips, "!" for 1.2 s, click = hook, late =
+  gone (wait again), click before = reel in, WASD while waiting = reel in.
+  Hold to reel (`BiteReel3D` + pure `ReelLogic`, numbers in `ReelTuning`):
+  tension rises while reeling and in the fish's runs (stronger for big /
+  aberrant fish), falls when released; full for > 0.6 s = snap; line won back
+  = landed. `Rod3D` draws rod bend, ImmediateMesh line (pale -> red), bobber,
+  "!", the fish in hand; `ReelBar` a tiny bar under the crosshair. Landed fish
+  is held until Rin looks at the basket (`FishBasket3D` in the boat) and
+  presses E ("E  Bỏ vào giỏ" via OnScreenText); no casting while holding.
+  Species / size from `SeaShoals3D` + `CatchRoll`; `GameState.record_catch`
+  still feeds the ending card. The lamp burns while the line is out.
+- **3-fish rule:** a calm night is only right if Rin docks with
+  `LoopCalendar.MIN_FISH` (3) in the basket (`SeaTrip3D._go_home` ->
+  `LoopCalendar.choose(true, fish)`, flag `night_catch`); staying home or
+  coming back short = reset + `LoopCalendar.last_calm_miss`: the bedroom's
+  `NightmareWake3D` knocks three times in the black and `WetFootprints3D` lays
+  wet steps door -> bed (no text). A right night leaves `shop_fish` (the tray
+  of fish beside Bảo's cart, `RestaurantFish3D`) and, after staying home on an
+  omen night, `bao_no_fish` (Bảo grumbles). Bảo asks for 3 fish once per shift
+  (not on rằm). Omen nights / rằm keep their rules.
 - Autoloads: `GameState` (day, story_flags, last_rating, boat_hp,
   caught_species, best_sizes, day_history (`earned` only for the ending card),
   resume_at, trip_notes, play_seconds), `Sfx`, `DayClock` (display-only time of day: driven by
