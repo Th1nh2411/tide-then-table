@@ -50,8 +50,8 @@ func _ready() -> void:
 		add_child(lantern)
 		var far := rng.randf_range(6.0, 16.0) if inward else rng.randf_range(3.0, 11.0)
 		lantern.position = start + Vector3(rng.randf_range(-7.0, 7.0), 0.1, -far)
-		OmenProps3D.box(lantern, Vector3.ZERO, Vector3(0.3, 0.05, 0.3), "e86a8a")
-		OmenProps3D.glow_box(lantern, Vector3(0, 0.08, 0), Vector3(0.12, 0.12, 0.12), "ffcf6a", 3.0)
+		ConceptModel3D.spawn(lantern, "hoa_dang_lantern", Vector3(0, -0.02, 0), 0.16)
+		OmenProps3D.glow_box(lantern, Vector3(0, 0.07, 0), Vector3(0.05, 0.07, 0.05), "ffcf6a", 3.0)
 		OmenProps3D.light(lantern, Vector3(0, 0.3, 0), "ffb347", 0.5, 2.5)
 		lantern.set_meta("phase", rng.randf() * TAU)
 		_lanterns.append(lantern)
@@ -63,19 +63,13 @@ func _ready() -> void:
 
 
 func _build_pier_head(post: Vector3, figure: bool) -> void:
-	OmenProps3D.box(self, post + Vector3(0, 0.45, 0), Vector3(0.16, 0.9, 0.16), "4a3a2e")
+	ConceptModel3D.spawn(self, "pier_lamp_post", post, 1.5)
 	if not figure:
 		OmenProps3D.glow_box(self, post + Vector3(0, 0.8, 0.14), Vector3(0.14, 0.18, 0.14), "ffcf6a", 3.0)
 		OmenProps3D.light(self, post + Vector3(0, 0.9, 0.3), "ffb347", 1.0, 4.0)
 		return
 	OmenProps3D.box(self, post + Vector3(0, 0.8, 0.14), Vector3(0.14, 0.18, 0.14), "3a3226")
-	var at := post + Vector3(-0.8, 0, 0.1)
-	for side: float in [-0.09, 0.09]:
-		OmenProps3D.shadow_box(self, at + Vector3(side, 0.42, 0), Vector3(0.14, 0.84, 0.18))
-	OmenProps3D.shadow_box(self, at + Vector3(0, 1.15, 0), Vector3(0.44, 0.66, 0.24))
-	OmenProps3D.shadow_box(self, at + Vector3(0, 1.6, 0), Vector3(0.2, 0.24, 0.2))
-	for side: float in [-0.27, 0.27]:
-		OmenProps3D.shadow_box(self, at + Vector3(side, 1.1, 0), Vector3(0.1, 0.62, 0.12))
+	ConceptModel3D.spawn(self, "drowned_figure", post + Vector3(-0.8, 0, 0.1), 1.72, PI)
 
 
 func _process(delta: float) -> void:

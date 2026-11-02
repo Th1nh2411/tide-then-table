@@ -6,7 +6,6 @@ extends RefCounted
 
 const HAND_COUNT := 7
 const RIM_RADIUS := 1.5
-const HAND_COLOR := Color("2b3229")
 
 
 static func play(sea: SeaScene3D, speed: float = 1.0) -> void:
@@ -60,9 +59,6 @@ static func _flicker_out(sea: SeaScene3D, seconds: float) -> void:
 
 ## Arms with three fingers, under the water around the rim, facing inward.
 static func _hands(sea: SeaScene3D) -> Array[Node3D]:
-	var material := StandardMaterial3D.new()
-	material.albedo_color = HAND_COLOR
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	var hands: Array[Node3D] = []
 	for i in HAND_COUNT:
 		var angle := TAU * float(i) / HAND_COUNT + 0.3
@@ -71,25 +67,11 @@ static func _hands(sea: SeaScene3D) -> Array[Node3D]:
 		sea.boat_visual.add_child(hand)
 		hand.position = Vector3(cos(angle) * RIM_RADIUS, -1.6, sin(angle) * RIM_RADIUS)
 		hand.rotation.y = atan2(-cos(angle), -sin(angle))  # +Z towards the boat
-		_bar(hand, Vector3(0, -0.5, 0), Vector3(0.11, 1.0, 0.11), material)
-		for f in 3:
-			_bar(hand, Vector3((f - 1) * 0.045, 0.09, 0.03), Vector3(0.03, 0.18, 0.03), material).rotation.x = 0.6
+		ConceptModel3D.spawn(hand, "drowned_hand", Vector3(0, -1.0, 0), 1.15)
 		hands.append(hand)
 	return hands
 
 
-static func _bar(parent: Node3D, at: Vector3, size: Vector3, material: Material) -> MeshInstance3D:
-	var mesh := BoxMesh.new()
-	mesh.size = size
-	var node := MeshInstance3D.new()
-	node.mesh = mesh
-	node.material_override = material
-	parent.add_child(node)
-	node.position = at
-	return node
-
-
-## Murky dark green over everything while the boat goes under.
 static func _veil(sea: SeaScene3D) -> ColorRect:
 	var layer := CanvasLayer.new()
 	layer.layer = 50

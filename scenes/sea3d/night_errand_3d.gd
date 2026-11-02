@@ -15,7 +15,7 @@ const NOTE_PREFIX := "note_clue_"
 var sea: SeaScene3D
 var taken := false
 var _ring: MeshInstance3D
-var _item: MeshInstance3D
+var _item: Node3D
 var _text: OnScreenText
 var _time := 0.0
 
@@ -43,7 +43,11 @@ func _ready() -> void:
 	var angle := -0.9 + 0.3 * float((GameState.day * 5) % 7)
 	position = sea.START + Vector3(sin(angle) * distance, 0, -cos(angle) * distance)
 	_ring = OmenProps3D.glow_box(self, Vector3(0, 0.12, 0), Vector3(1.6, 0.02, 1.6), "7fe8d8", 1.6)
-	_item = OmenProps3D.glow_box(self, Vector3(0, 0.22, 0), Vector3(0.12, 0.12, 0.34), "d9cfa8", 0.6)
+	_item = Node3D.new()
+	add_child(_item)
+	_item.position = Vector3(0, 0.22, 0)
+	var bottle := ConceptModel3D.spawn(_item, "bottle_letter", Vector3(0, -0.06, 0.17), 0.34)
+	bottle.rotation.x = -PI * 0.5  # floating on its side
 	OmenProps3D.light(self, Vector3(0, 0.6, 0), "7fe8d8", 0.9, 5.0)
 	_text = OnScreenText.new()
 	add_child(_text)

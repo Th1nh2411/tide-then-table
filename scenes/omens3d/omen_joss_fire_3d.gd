@@ -26,7 +26,7 @@ func _ready() -> void:
 	wrong = OmenPicker.state(OMEN_ID) == "omen"
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 11
-	OmenProps3D.box(self, Vector3(0, 0.2, 0), Vector3(0.36, 0.4, 0.36), "5a5f62")
+	ConceptModel3D.spawn(self, "joss_paper_bucket", Vector3.ZERO, 0.45)
 	OmenProps3D.glow_box(self, Vector3(0, 0.41, 0), Vector3(0.3, 0.02, 0.3), "ff7a2a", 1.5 if wrong else 4.0)
 	_fire = OmenProps3D.light(self, Vector3(0, 0.8, 0), "ff9a4a", 0.6 if wrong else 1.6, 3.5)
 	for i: int in range(SMOKE):

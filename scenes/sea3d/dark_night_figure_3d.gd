@@ -26,14 +26,12 @@ var _materials: Array[StandardMaterial3D] = []
 func _ready() -> void:
 	var head_y := 1.62 if kind == Kind.STAND else 0.08
 	if kind == Kind.STAND:
-		var body := CapsuleMesh.new()
-		body.radius = 0.2
-		body.height = 1.5
-		_part(body, Vector3(0, 0.75, 0), body_color, false)
-	var head := SphereMesh.new()
-	head.radius = 0.15
-	head.height = 0.32
-	_part(head, Vector3(0, head_y, 0), body_color, false)
+		ConceptModel3D.spawn(self, "drowned_figure", Vector3.ZERO, 1.72)
+	else:
+		var head := SphereMesh.new()
+		head.radius = 0.15
+		head.height = 0.32
+		_part(head, Vector3(0, head_y, 0), body_color, false)
 	var eye := SphereMesh.new()
 	eye.radius = 0.025
 	eye.height = 0.05

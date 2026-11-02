@@ -44,8 +44,8 @@ static func lantern(parent: Node3D, pos: Vector3, with_light: bool = true) -> No
 	var node := Node3D.new()
 	parent.add_child(node)
 	node.position = pos
-	OmenProps3D.box(node, Vector3.ZERO, Vector3(0.3, 0.05, 0.3), "e86a8a")
-	OmenProps3D.glow_box(node, Vector3(0, 0.08, 0), Vector3(0.12, 0.12, 0.12), "ffcf6a", 3.0)
+	ConceptModel3D.spawn(node, "hoa_dang_lantern", Vector3(0, -0.02, 0), 0.16)
+	OmenProps3D.glow_box(node, Vector3(0, 0.07, 0), Vector3(0.05, 0.07, 0.05), "ffcf6a", 3.0)
 	if with_light:
 		OmenProps3D.light(node, Vector3(0, 0.3, 0), "ffb347", 0.5, 2.5)
 	return node

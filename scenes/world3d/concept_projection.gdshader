@@ -17,9 +17,21 @@ void vertex() {
 	local = VERTEX;
 }
 
+// The concepts sit on a plain light-grey background; edges that hit it would glow grey.
+bool is_background(vec3 c) {
+	return abs(c.r - c.g) < 0.035 && abs(c.g - c.b) < 0.035 && c.r > 0.55;
+}
+
 void fragment() {
 	vec2 k = (local.xy - bounds_min.xy) / bounds_size.xy;
 	vec2 uv = crop.xy + vec2(k.x, 1.0 - k.y) * crop.zw;
-	ALBEDO = texture(concept, uv).rgb * tint;
+	vec3 c = texture(concept, uv).rgb;
+	if (is_background(c)) {
+		c = texture(concept, mix(uv, crop.xy + crop.zw * 0.5, 0.3)).rgb;  // a little further in
+		if (is_background(c)) {
+			c = vec3(0.22, 0.2, 0.18);
+		}
+	}
+	ALBEDO = c * tint;
 	ROUGHNESS = roughness;
 }
