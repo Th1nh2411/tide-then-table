@@ -5,9 +5,9 @@ extends Node3D
 ## day, back to mùng 9, or the ending; picks tonight's omen (OmenPicker);
 ## then autosaves. Rin walks (first
 ## person, FirstPersonView3D) to read the paper under the door and leaves
-## through the door with E ("Ra quán").
+## through the door with E (out to the waterfront).
 
-const RESTAURANT := "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
+const WATERFRONT := "res://scenes/home3d/waterfront_scene_3d.tscn"
 const ENDING := "res://scenes/ending/ending_scene.tscn"
 const NEWS: NewsData = preload("res://data/story/news.tres")
 const REACH := 1.3
@@ -22,6 +22,10 @@ var body: Node3D = null
 var start_yaw := 0.0
 var text: OnScreenText
 var leaving := false
+## Nightmare wake (NightmareWake3D): eye moved / pitch held; no walking meanwhile.
+var waking := false
+var eye_offset := Vector3.ZERO
+var held_pitch := NAN
 var _calendar: Label3D
 
 
@@ -58,7 +62,10 @@ func _ready() -> void:
 	text = OnScreenText.new()
 	add_child(text)
 	if result == LoopCalendar.Result.RESET:
-		text.say("...Lại mùng 9?", 3.0)
+		# Stayed home on a calm night: nothing seen, only the news of one more missing.
+		var after := "...Lại mùng 9? Báo sáng nay... thêm một người mất tích." if LoopCalendar.last_choice == "home" \
+			else "...Hộc... hộc... Chỉ là mơ... Lại mùng 9?"
+		NightmareWake3D.play(self, after)
 	GameState.resume_at = "home"
 	SaveSystem.autosave("home")
 	Sfx.ambience("sea")
@@ -66,7 +73,7 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	if leaving or get_tree().paused:
+	if leaving or waking or get_tree().paused:
 		return
 	var axes := Input.get_vector("turn_left", "turn_right", "throttle_forward", "throttle_back")
 	var right := demo_camera.global_basis.x
@@ -82,7 +89,7 @@ func _process(_delta: float) -> void:
 	if leaving:
 		return
 	if _near(BedroomBuilder3D.DOOR):
-		text.prompt("E  Ra quán")
+		text.prompt("E  Ra ngoài")
 	elif _near(BedroomBuilder3D.PAPER):
 		text.prompt("E  Đọc báo")
 	else:
@@ -91,7 +98,7 @@ func _process(_delta: float) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
-	if key == null or not key.pressed or key.echo or key.physical_keycode != KEY_E or leaving:
+	if key == null or not key.pressed or key.echo or key.physical_keycode != KEY_E or leaving or waking:
 		return
 	if _near(BedroomBuilder3D.DOOR):
 		get_viewport().set_input_as_handled()
@@ -111,7 +118,7 @@ func _go_to_ending() -> void:
 func leave() -> void:
 	leaving = true
 	text.prompt("")
-	SceneRouter.go_to(RESTAURANT)
+	SceneRouter.go_to(WATERFRONT)
 
 
 func _near(point: Vector3) -> bool:

@@ -10,6 +10,9 @@ const SETTINGS_PATH := "user://settings.cfg"
 
 ## name -> segments (see SfxSynth). Short and quiet on purpose.
 const SOUNDS := {
+	# Waking from a nightmare: a sharp breath in, a shaky breath out.
+	"gasp": [{"w": "noise", "lp": 0.35, "d": 0.42, "v": 0.5, "a": 0.18},
+		{"at": 0.5, "w": "noise", "lp": 0.2, "d": 0.7, "v": 0.3, "a": 0.05}],
 	"click": [{"w": "square", "f": [1200, 900], "d": 0.03, "v": 0.08}],
 	"blip": [{"w": "square", "f": [660, 660], "d": 0.025, "v": 0.04}],
 	"pop": [{"w": "sine", "f": [500, 1100], "d": 0.07, "v": 0.2}],

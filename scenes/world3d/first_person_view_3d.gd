@@ -73,7 +73,7 @@ func _attach(scene: Node) -> void:
 		scene.set("demo_camera", _camera)
 		_camera.far = 80.0
 		# Restaurant: facing the shop front (-Z); bedroom: towards the door.
-		_yaw = float(scene.get("start_yaw")) if scene is BedroomScene3D else 0.0
+		_yaw = float(scene.get("start_yaw")) if (scene is BedroomScene3D or scene is WaterfrontScene3D) else 0.0
 		var body := scene.get("body") as Node
 		if body:
 			for child in body.get_children():
@@ -136,16 +136,21 @@ func _update_mouse(handed_back: bool) -> void:
 		Input.mouse_mode = mode
 
 
-## Scenes where Rin walks with WASD relative to `demo_camera` (restaurant, bedroom).
+## Scenes where Rin walks with WASD relative to `demo_camera` (restaurant, bedroom, waterfront).
 func _walks(scene: Node) -> bool:
-	return scene is RestaurantScene3D or scene is BedroomScene3D
+	return scene is RestaurantScene3D or scene is BedroomScene3D or scene is WaterfrontScene3D
 
 
 func _follow_walker(room: Node) -> void:
 	var player := room.get("player") as Node3D
 	if player == null:
 		return
-	_camera.global_position = player.global_position + EYE_RESTAURANT
+	# A scene may move the eye / hold the pitch for a moment (BedroomScene3D's nightmare wake).
+	var offset: Variant = room.get("eye_offset")
+	_camera.global_position = player.global_position + EYE_RESTAURANT + (offset as Vector3 if offset is Vector3 else Vector3.ZERO)
+	var held: Variant = room.get("held_pitch")
+	if held is float and not is_nan(held as float):
+		_pitch = held as float
 	_camera.global_rotation = Vector3(_pitch, _yaw, 0)
 
 

@@ -18,6 +18,10 @@ const KEPT_PREFIXES: Array[String] = ["note_", "tip_"]
 
 enum Result { NONE, NEXT, RESET, END }
 
+## The last choice take_result() judged ("out" / "home" / ""), so the bedroom
+## can tell how the night went wrong.
+static var last_choice := ""
+
 
 static func lunar_day(day: int) -> int:
 	return FIRST_LUNAR + clampi(day, 1, NIGHTS) - 1
@@ -43,6 +47,7 @@ static func choose(went_out: bool) -> void:
 static func take_result() -> Result:
 	var choice: Variant = GameState.story_flags.get(CHOICE_FLAG, "")
 	GameState.story_flags.erase(CHOICE_FLAG)
+	last_choice = str(choice)
 	if choice != "out" and choice != "home":
 		return Result.NONE
 	var omen := GameState.has_flag(OMEN_FLAG)

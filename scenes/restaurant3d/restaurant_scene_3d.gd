@@ -7,7 +7,6 @@ extends Node3D
 ## Rin's walking -> RinMover3D, the street ends -> StreetEnds3D, omen props -> RestaurantOmens3D.
 ## The underscore wrappers stay: tests and the bot call them.
 
-const SEA_SCENE := RestaurantShift3D.SEA_SCENE
 const SHIFT_SECONDS := RestaurantShift3D.SHIFT_SECONDS
 # Layout lives in RestaurantLayout3D; aliases keep the old RestaurantScene3D.X names working.
 const TABLES := RestaurantLayout3D.TABLES
@@ -243,14 +242,8 @@ func _end_shift() -> void:
 func _sync_food_visuals() -> void:
 	service.sync_food_visuals()
 
-func _sail_without_shift() -> void:
-	shift.sail_without_shift()
-
-func _sail() -> void:
-	shift.sail()
-
-func _go_home() -> void:
-	shift.go_home()
+func _walk_home() -> void:
+	shift.walk_home()
 
 func _show_note(words: String) -> void:
 	panels.say(words)

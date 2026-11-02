@@ -4,6 +4,7 @@ extends Node
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
 const BEDROOM := "res://scenes/home3d/bedroom_scene_3d.tscn"
+const WATERFRONT := "res://scenes/home3d/waterfront_scene_3d.tscn"
 const QUAN := "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
 const SAVE := "user://test_game3d_loop.json"
 var _failures: int = 0
@@ -78,10 +79,15 @@ func _run() -> void:
 	_check(GameState.resume_at == "home" and GameState.last_catch.size() == 1 and GameState.day == 2,
 		"docking wakes Rin in his room on the next day, catch kept")
 	room.leave()
+	var morning: Node = await _scene(WATERFRONT)
+	if not morning:
+		return
+	_check(not morning.evening, "bedroom door opens onto the waterfront in the morning")
+	morning.go_to_restaurant()
 	var quan: Node = await _scene(QUAN)
 	if not quan:
 		return
-	_check(quan is Node3D, "bedroom door routes to native 3D restaurant")
+	_check(quan is Node3D, "the lane routes to the native 3D restaurant")
 	_check(quan.shift_running, "the shift opens by itself when Rin arrives (no menu planning)")
 	quan._spawn_order()
 	var table: int = -1
@@ -123,11 +129,16 @@ func _run() -> void:
 	_check(GameState.get_upgrade_level("kitchen") == 1 and GameState.money == upgrade_money - cost,
 		"restaurant upgrade spends money once and persists level")
 	var saved_money: int = GameState.money
-	quan._sail()
+	quan._walk_home()
+	var evening: Node = await _scene(WATERFRONT)
+	if not evening:
+		return
+	_check(evening.evening, "after the shift Rin walks back to the waterfront in the evening")
+	evening.go_to_sea()
 	sea = await _scene(SEA)
 	if not sea:
 		return
-	_check(GameState.day == 2 and GameState.money == saved_money, "dock end of the street goes to sea the same night, money kept")
+	_check(GameState.day == 2 and GameState.money == saved_money, "the thúng goes to sea the same night, money kept")
 	_check(SaveSystem.save_game(SAVE), "3D loop can save to isolated scratch slot")
 	var saved_day: int = GameState.day
 	GameState.money = 0

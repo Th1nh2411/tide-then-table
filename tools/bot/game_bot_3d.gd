@@ -1,14 +1,16 @@
 extends Node
-## Integration bot for the horror build's day loop (PLAN §10): bedroom ->
-## restaurant -> street end -> (night at sea) -> bedroom, mùng 9 to rằm, then
-## the ending. Perfect info: on omen nights (OmenPicker) it takes the home
-## end, otherwise the dock. Once (day 2 of the first loop) it picks the wrong
-## end to check the reset to mùng 9. Travel and minigame skill are scripted;
+## Integration bot for the horror build's day loop (PLAN §10), mùng 9 to
+## rằm, then the ending: bedroom -> waterfront (morning) -> restaurant ->
+## waterfront (evening) -> house (sleep) or thúng (night at sea) -> bedroom.
+## Perfect info: on omen nights (OmenPicker) it goes into the house to sleep,
+## otherwise down into the thúng. Once (day 2 of the first loop) it picks the
+## wrong one to check the reset to mùng 9. Travel and minigame skill are scripted;
 ## scenes, service, bills, story and transitions are real.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
 const BEDROOM := "res://scenes/home3d/bedroom_scene_3d.tscn"
 const QUAN := "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
+const WATERFRONT := "res://scenes/home3d/waterfront_scene_3d.tscn"
 const END := "res://scenes/ending/ending_scene.tscn"
 var _ticks: int = 0
 var _failed := false
@@ -86,7 +88,7 @@ func _night(sea: Node) -> void:
 	sea._unload()
 	sea._end_trip(false)
 
-func _service(quan: Node, go_home: bool = false) -> void:
+func _service(quan: Node) -> void:
 	await _frames(3)
 	quan._open_shift()  # normally opens on arrival; a no-op then
 	quan.cooking_overlay.result_seconds = 0.01
@@ -140,10 +142,7 @@ func _service(quan: Node, go_home: bool = false) -> void:
 	print("DAY %d | served %d | lost %d | money %dk | boat %d | kitchen %d" % [GameState.day,
 		quan.served, quan.lost, GameState.money, GameState.get_upgrade_level("boat"), GameState.get_upgrade_level("kitchen")])
 	_roundtrip()
-	if go_home:
-		quan._go_home()
-	else:
-		quan._sail()
+	quan._walk_home()
 
 func _roundtrip() -> void:
 	var expected: Dictionary = SaveSystem.to_dict()
@@ -187,6 +186,13 @@ func _run() -> void:
 		print("HOME | %s | loops %d | omen %s | customs %s" % [LoopCalendar.date_text(GameState.day), LoopCalendar.loops(),
 			omen.id if omen else "-", ",".join(customs)])
 		room.leave()
+		var morning: Node = await _until(WATERFRONT)
+		if not morning:
+			return
+		if morning.evening:
+			_fail("waterfront in the morning thinks it is evening")
+			return
+		morning.go_to_restaurant()
 		var quan: Node = await _until(QUAN)
 		if not quan:
 			return
@@ -197,19 +203,24 @@ func _run() -> void:
 			reset_checked = true
 			go_home = not go_home
 			expect_reset = "out on an omen night" if omen else "home on a calm night"
-		await _service(quan, go_home)
+		await _service(quan)
+		var evening: Node = await _until(WATERFRONT)
+		if not evening:
+			return
+		if not evening.evening or not evening.has_node("DockOmens"):
+			_fail("evening waterfront without its dock omen props")
+			return
 		if go_home:
+			evening.go_to_sleep()
 			continue
+		evening.go_to_sea()
 		var sea: Node = await _until(SEA)
 		if not sea:
-			return
-		if omen and omen.where == OmenData.Where.DOCK and not sea.has_node("DockOmens"):
-			_fail("no dock omen props")
 			return
 		await _night(sea)
 	_fail("no ending after 20 days")
 
-## The restaurant built tonight's omen props (the dock's are checked at sea).
+## The restaurant built tonight's omen props (the dock's are checked on the waterfront).
 func _omen_shown(quan: Node, omen: OmenData) -> bool:
 	var props := quan.get_node_or_null("Omens") as RestaurantOmens3D
 	var ok := props != null

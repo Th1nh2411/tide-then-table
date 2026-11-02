@@ -26,6 +26,5 @@ static func build_tools(sea: SeaScene3D) -> void:
 	sea.cinematic = cinematic
 	sea.add_child(cinematic)
 	DarkNight3D.attach(sea)  # đêm âm: only when tonight has an omen
-	DockOmens3D.build(sea)
 	sea.camera.position = sea.boat.position + SeaScene3D.CAMERA_OFFSET
 	sea.camera.look_at(sea.boat.position + Vector3(0, .65, -SeaScene3D.CAMERA_LOOK_AHEAD))

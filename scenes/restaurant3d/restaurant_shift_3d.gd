@@ -2,11 +2,9 @@ class_name RestaurantShift3D
 extends RefCounted
 ## The 3D restaurant's shift clock: open the shift, tick it (clock, Bảo,
 ## guests arriving, eating and running out of patience), close early (T),
-## and leave by a street end: the dock (night at sea) or home (sleep); the
-## bedroom judges the night (LoopCalendar). Balance: ServiceTuning by day.
+## and walk home to the waterfront, where the night's choice is made. Balance: ServiceTuning by day.
 
-const SEA_SCENE := "res://scenes/sea3d/sea_scene_3d.tscn"
-const BEDROOM_SCENE := "res://scenes/home3d/bedroom_scene_3d.tscn"
+const WATERFRONT_SCENE := "res://scenes/home3d/waterfront_scene_3d.tscn"
 ## Short shifts: one day of the loop should take a few minutes.
 const SHIFT_SECONDS := 120.0
 const TUNINGS := [
@@ -91,23 +89,9 @@ func has_stock() -> bool:
 	return true
 
 
-## Skip the shift (leave() returns the planned fish and releases today's regulars).
-func sail_without_shift() -> void:
-	FishOrders.expire_after_shift(host.fish_catalog)
-	sail()
-
-
-## The dock end of the street: tonight at sea (the day turns in the bedroom).
-func sail() -> void:
-	await leave(true)
-
-
-## The home end of the street: sleep, no night at sea.
-func go_home() -> void:
-	await leave(false)
-
-
-func leave(to_dock: bool) -> void:
+## The way out of the street (StreetEnds3D): back to the waterfront for the
+## evening, where the night's choice is made (WaterfrontScene3D).
+func walk_home() -> void:
 	if host.sailing or host.shift_running:
 		return
 	host.sailing = true
@@ -116,8 +100,5 @@ func leave(to_dock: bool) -> void:
 		for visit: Dictionary in host.regular_visits:
 			FishOrders.release(visit)
 	GameState.resume_at = "home"
-	if to_dock:
-		SceneRouter.go_to(SEA_SCENE)
-	else:
-		LoopCalendar.choose(false)
-		SceneRouter.go_to(BEDROOM_SCENE)
+	GameState.set_flag(WaterfrontScene3D.EVENING_FLAG)
+	SceneRouter.go_to(WATERFRONT_SCENE)

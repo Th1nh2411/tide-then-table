@@ -1,21 +1,23 @@
 class_name DockOmens3D
 extends Node3D
-## The dock's omen props, seen from the boat when the night starts, each in
-## its normal or wrong state (OmenPicker.state):
+## The dock's omen props on the waterfront (WaterfrontScene3D), seen before
+## the night's choice, each in its normal or wrong state (OmenPicker.state):
 ## - "hoa_dang" (a custom, some nights): paper lanterns float out to sea;
 ##   on its night they drift back in and bunch up against the pier.
 ## - "hai_dang": the lighthouse beacons (by the pier and far out on Đá Canh
 ##   Đêm) burn warm yellow; on its night they burn green.
 ## - "bong_cau_tau": a lamp hangs lit on the post at the pier head; on its
 ##   night the lamp is out and a dark figure stands by the post.
-## Also adds DockTurnBack3D (Rin can still go home before leaving the dock).
 
 const LANTERNS := 5
 const LANTERN_SPEED := 0.22
 const BEACON_CALM := "ffe2a0"
 const BEACON_OMEN := "39ff8a"
 
-var sea: SeaScene3D
+## Set by build(): the pier-head post, the beacons' tops, and where the lanterns float.
+var pier_post: Vector3
+var beacon_tops: Array[Vector3] = []
+var water_origin: Vector3
 var _lanterns: Array[Node3D] = []
 var _drift := Vector3(0, 0, -LANTERN_SPEED)
 ## Lanterns drifting in stop here (just off the pier head).
@@ -24,20 +26,18 @@ var _beacons: Array[MeshInstance3D] = []
 var _time := 0.0
 
 
-static func build(owner: SeaScene3D) -> DockOmens3D:
+static func build(owner: Node3D, post: Vector3, beacons: Array[Vector3], water: Vector3) -> DockOmens3D:
 	var omens := DockOmens3D.new()
 	omens.name = "DockOmens"
-	omens.sea = owner
+	omens.pier_post = post
+	omens.beacon_tops = beacons
+	omens.water_origin = water
 	owner.add_child(omens)
-	var back := DockTurnBack3D.new()
-	back.name = "DockTurnBack"
-	back.sea = owner
-	owner.add_child(back)
 	return omens
 
 
 func _ready() -> void:
-	var start: Vector3 = sea.START
+	var start := water_origin
 	_shore_z = start.z + 2.4
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 15
@@ -56,10 +56,10 @@ func _ready() -> void:
 		lantern.set_meta("phase", rng.randf() * TAU)
 		_lanterns.append(lantern)
 	var beacon_hex := BEACON_OMEN if OmenPicker.is_tonight("hai_dang") else BEACON_CALM
-	for at: Vector3 in [start + Vector3(-7.8, 3.35, 6.3), sea.LIGHTHOUSE_POS + Vector3(-1.8, 3.6, -0.6)]:
+	for at: Vector3 in beacon_tops:
 		_beacons.append(OmenProps3D.sphere(self, at, 0.45, beacon_hex, 6.0))
 		OmenProps3D.light(self, at, beacon_hex, 2.0, 9.0)
-	_build_pier_head(start + Vector3(1.4, 0.62, 3.5), OmenPicker.is_tonight("bong_cau_tau"))
+	_build_pier_head(pier_post, OmenPicker.is_tonight("bong_cau_tau"))
 
 
 func _build_pier_head(post: Vector3, figure: bool) -> void:
