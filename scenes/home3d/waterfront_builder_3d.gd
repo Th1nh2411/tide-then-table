@@ -22,13 +22,16 @@ const WATER_Y := -0.35
 static func build(host: Node3D, evening: bool) -> void:
 	_light(host, evening)
 	# Village ground, a sandy edge, the sea beyond.
-	B.box(host, Vector3(0, -0.1, 8.0), Vector3(34, 0.2, 12), "4a4136", true)
+	B.box(host, Vector3(0, -0.1, 8.0), Vector3(34, 0.2, 12), "4a4136", true).material_override = HorrorMaterials.tiled("ground_village", 2.0)
 	B.box(host, Vector3(0, -0.12, SHORE_Z + 0.6), Vector3(34, 0.2, 1.4), "8a7a5e", true)
 	_water(host)
 	# Rin's house: a low plastered front with a wooden door and one window.
-	B.box(host, Vector3(-1.0, 1.6, 12.0), Vector3(7.0, 3.2, 5.0), "8f877a", true)
-	B.box(host, Vector3(-1.0, 3.35, 11.6), Vector3(7.6, 0.25, 5.8), "5b3a2e")
+	var wall := HorrorMaterials.tiled("wall_plaster_old", 2.2)
+	var roof := HorrorMaterials.tiled("roof_tin_rusty", 1.4)
+	B.box(host, Vector3(-1.0, 1.6, 12.0), Vector3(7.0, 3.2, 5.0), "8f877a", true).material_override = wall
+	B.box(host, Vector3(-1.0, 3.35, 11.6), Vector3(7.6, 0.25, 5.8), "5b3a2e").material_override = roof
 	B.box(host, DOOR + Vector3(0, 1.0, 0.0), Vector3(0.95, 2.0, 0.08), "4a3a2e")
+	HorrorMaterials.picture(host, "door_wood_old", DOOR + Vector3(0, 1.0, -0.045), Vector2(0.95, 2.0), PI)
 	var window := B.box(host, Vector3(1.4, 1.6, 9.46), Vector3(1.0, 0.8, 0.04), "2b2a26")
 	if evening:
 		var glow := window.material_override as StandardMaterial3D
@@ -38,10 +41,10 @@ static func build(host: Node3D, evening: bool) -> void:
 		glow.emission_energy_multiplier = 0.6
 	# Two dark neighbours down the lane.
 	for x: float in [-8.5, 7.5]:
-		B.box(host, Vector3(x, 1.4, 12.5), Vector3(4.5, 2.8, 4.0), "6f6a60", true)
-		B.box(host, Vector3(x, 2.95, 12.2), Vector3(5.0, 0.2, 4.8), "4b3428")
+		B.box(host, Vector3(x, 1.4, 12.5), Vector3(4.5, 2.8, 4.0), "6f6a60", true).material_override = HorrorMaterials.tiled("wall_plaster_old", 2.2, Color(0.62, 0.66, 0.6))
+		B.box(host, Vector3(x, 2.95, 12.2), Vector3(5.0, 0.2, 4.8), "4b3428").material_override = roof
 	# The pier and ông Tư's thúng at its end.
-	B.box(host, Vector3(THUNG.x, 0.05, (SHORE_Z + THUNG.z) * 0.5 - 0.6), Vector3(1.8, 0.12, SHORE_Z - THUNG.z + 0.4), "6b5240", true)
+	B.box(host, Vector3(THUNG.x, 0.05, (SHORE_Z + THUNG.z) * 0.5 - 0.6), Vector3(1.8, 0.12, SHORE_Z - THUNG.z + 0.4), "6b5240", true).material_override = HorrorMaterials.tiled("floor_wood_planks", 1.2)
 	for z in range(int(SHORE_Z) - 1, int(THUNG.z) - 1, -2):
 		for side: float in [-0.8, 0.8]:
 			B.box(host, Vector3(THUNG.x + side, -0.6, float(z)), Vector3(0.14, 1.3, 0.14), "3e3024")
@@ -57,7 +60,8 @@ static func build(host: Node3D, evening: bool) -> void:
 	SeaWorldBuilder3D.batch_model(host, "lighthouse", NEAR_LIGHTHOUSE, Vector3(0.6, 0.95, 0.6))
 	SeaWorldBuilder3D.batch_model(host, "lighthouse", FAR_LIGHTHOUSE)
 	var beacons: Array[Vector3] = [NEAR_LIGHTHOUSE + Vector3(0, 3.35, 0), FAR_LIGHTHOUSE + Vector3(0, 3.6, 0)]
-	DockOmens3D.build(host, PIER_POST, beacons, Vector3(THUNG.x, WATER_Y + 0.25, THUNG.z - 2.0))
+	if evening:  # the omens are read before the night's choice
+		DockOmens3D.build(host, PIER_POST, beacons, Vector3(THUNG.x, WATER_Y + 0.25, THUNG.z - 2.0))
 	B.box(host, LANE + Vector3(0.6, 0.8, 0), Vector3(0.08, 1.6, 0.08), "4a3a2e")
 	var sign_ := B.box(host, LANE + Vector3(0.6, 1.5, 0), Vector3(0.05, 0.3, 1.0), "c9b896")
 	sign_.rotation.y = 0.0
@@ -77,6 +81,7 @@ static func _water(host: Node3D) -> void:
 	m.shader = SeaWater3D.SHADER
 	m.set_shader_parameter("reef_z", -40.0)
 	m.set_shader_parameter("near_z", -8.0)
+	m.set_shader_parameter("boat_pos", Vector3(0, -100, 9999))  # no boat here: no hull hole / ring
 	water.material_override = m
 	host.add_child(water)
 	water.position = Vector3(0, WATER_Y, SHORE_Z - 55.0)
@@ -100,9 +105,14 @@ static func _light(host: Node3D, evening: bool) -> void:
 		moon.light_energy = 0.5
 		SeaBackdrop3D.apply_sky(env, moon)
 	else:
-		# Grey dawn after the night: no sun, a pale overcast sky.
-		env.background_mode = Environment.BG_COLOR
-		env.background_color = Color("8d97a0")
+		# Grey dawn after the night: a pale overcast panorama, no sun.
+		var sky_material := PanoramaSkyMaterial.new()
+		sky_material.panorama = load("res://assets/textures/sea3d/sky_dawn_overcast.png") as Texture2D
+		var sky := Sky.new()
+		sky.sky_material = sky_material
+		env.sky = sky
+		env.background_mode = Environment.BG_SKY
+		env.fog_sky_affect = 0.3
 		env.ambient_light_color = Color("a9b2b8")
 		env.ambient_light_energy = 0.9
 		env.fog_light_color = Color("98a2aa")

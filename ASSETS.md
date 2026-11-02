@@ -329,6 +329,26 @@ Body/tóc/palette/rig/clip người dùng giữ nguyên. Bản Blender có mắt
 `build/co_nam_eye_restore/`; mắt cũng đã được thêm vào scene Blender đang mở.
 
 
+## Horror art — 2026-11-02
+
+Theo `docs/HORROR_ART_BRIEF.md`: đã tạo 22 PNG và sidecar prompt/provenance bằng
+built-in `image_gen`, chưa tích hợp và chưa approved. Danh sách chi tiết, ảnh review
+và giới hạn đường nối: `docs/HORROR_ART_DELIVERY.md`.
+
+| Thư mục | Asset ID | Kích thước |
+|---|---|---|
+| `assets/textures/horror/` | `wall_plaster_old`, `floor_wood_planks`, `ground_village`, `roof_tin_rusty` | 512×512 RGB; tile-intended, cần review mép |
+| `assets/textures/horror/` | `door_wood_old` | 512×1024 RGB |
+| `assets/textures/horror/` | `calendar_sheet` | 512×640 RGB, vùng chữ trống |
+| `assets/textures/horror/` | `newspaper_front`, `notebook_page` | 1024×1400 RGB |
+| `assets/textures/horror/` | `paper_letter_old` | 1024×1024 RGBA |
+| `assets/textures/horror/` | `paper_diary_page` | 1024×1400 RGBA |
+| `assets/textures/sea3d/` | `sky_dawn_overcast`, `sky_dark_night` | 4096×2048 RGB, upscale, cần review sphere |
+| `assets/concepts/horror/` | `offering_tray_normal`, `offering_tray_eaten`, `joss_paper_bucket`, `hoa_dang_lantern`, `pier_lamp_post`, `drowned_figure`, `drowned_hand`, `bottle_letter`, `rin_house`, `wooden_bed` | 1024×1024 RGB, nền xám nhạt, input concept cho Hunyuan |
+
+Palette theo horror brief: vôi vàng/xanh bạc màu, rỉ sét, gỗ ướt tối,
+biển xám xanh, điểm sáng hổ phách. Không ép palette sprite cũ.
+
 Ghế `ready/stool/stool.glb` giữ nguyên nguồn; runtime quán scale 0,85 cả mesh và
 collider (cao 0,442; footprint 0,4675 × 0,4675). Đây là điều chỉnh tương quan
 người/ghế, không đổi scale nhân vật/bàn/người trên thuyền. Shadow caster được

@@ -18,9 +18,10 @@ const BASELINE_V := 0.867
 
 
 ## Sky for `env`; `moon` is the scene's moon light (its +Z points at the moon).
-static func apply_sky(env: Environment, moon: DirectionalLight3D) -> void:
+## `panorama` / `moon_u`: another painted sky and where its moon sits (đêm âm).
+static func apply_sky(env: Environment, moon: DirectionalLight3D, panorama: Texture2D = SKY, moon_u: float = MOON_U) -> void:
 	var material := PanoramaSkyMaterial.new()
-	material.panorama = SKY
+	material.panorama = panorama
 	material.energy_multiplier = 1.0
 	var sky := Sky.new()
 	sky.sky_material = material
@@ -29,7 +30,7 @@ static func apply_sky(env: Environment, moon: DirectionalLight3D) -> void:
 	# Panorama u = atan(x, -z) / TAU; turn the sky so the painted moon is where the light comes from.
 	var to_moon := moon.global_basis.z
 	var light_u := fposmod(atan2(to_moon.x, -to_moon.z) / TAU, 1.0)
-	env.sky_rotation = Vector3(0, (MOON_U - light_u) * TAU, 0)
+	env.sky_rotation = Vector3(0, (moon_u - light_u) * TAU, 0)
 	env.fog_sky_affect = 0.25
 
 

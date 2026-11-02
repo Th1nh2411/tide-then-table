@@ -3,7 +3,7 @@ extends Node3D
 ## A calm night's small errand at sea (horror build): a faint ghost-light on
 ## the water some way out from the dock, with something floating in it — a
 ## bottle, a rope, a diary page. Rowing there and pressing E picks it up and
-## shows what it says (CLUES, one per day). Kept in Rin's notebook
+## shows it up close (PaperReader; CLUES, one per day). Kept in Rin's notebook
 ## ("note_clue_<day>", survives loop resets). Not added on omen nights.
 
 const CLUES: LinesData = preload("res://data/story/clues.tres")
@@ -81,4 +81,6 @@ func pick_up() -> void:
 	var index := clampi(GameState.day - 1, 0, CLUES.lines.size() - 1)
 	GameState.set_flag(NOTE_PREFIX + str(index + 1))
 	Sfx.play("splash")
-	_text.say(CLUES.line(index), 7.0)
+	# Letters from the bottle are ông Tư's; torn pages are the lighthouse keeper's diary.
+	var diary := CLUES.line(index).begins_with("Trang")
+	PaperReader.read(self, "diary" if diary else "letter", "", CLUES.line(index))

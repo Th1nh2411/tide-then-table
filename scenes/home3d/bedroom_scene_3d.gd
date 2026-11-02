@@ -107,8 +107,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		var page := NEWS.page(GameState.day)
 		if GameState.has_flag(NewsData.MISSING_FLAG):
-			page = NEWS.missing_item + "\n" + page
-		text.say("%s — %s\n%s" % [NEWS.title, LoopCalendar.date_text(GameState.day), page], 7.0)
+			page = NEWS.missing_item + "\n\n" + page
+		PaperReader.read(self, "newspaper", NEWS.title, "%s — %s" % [LoopCalendar.date_text(GameState.day), page])
 
 
 ## Called from _ready while the fade into this room is still running.

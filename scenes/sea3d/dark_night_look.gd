@@ -7,7 +7,7 @@ extends Resource
 @export_group("Fog and light")
 @export var fog_color := Color("1c2219")
 @export var fog_density := 0.05
-@export_range(0.0, 1.0) var fog_sky_affect := 0.93
+@export_range(0.0, 1.0) var fog_sky_affect := 0.6
 @export var ambient_color := Color("5b6b52")
 @export var ambient_scale := 0.55
 @export var background_color := Color("0a0c08")
@@ -33,10 +33,19 @@ extends Resource
 @export var moon_elevation_deg := 16.0
 
 
+const DARK_SKY: Texture2D = preload("res://assets/textures/sea3d/sky_dark_night.png")
+## Where the moon sits across sky_dark_night.png (u, 0..1).
+const DARK_MOON_U := 0.48
+
+
 func apply(sea: SeaScene3D) -> void:
 	var world_env := sea.find_children("*", "WorldEnvironment", false, false)
 	if not world_env.is_empty():
 		var env := (world_env[0] as WorldEnvironment).environment
+		var lights := sea.find_children("*", "DirectionalLight3D", false, false)
+		if not lights.is_empty():
+			# The painted blood-moon sky (assets/textures/sea3d/sky_dark_night.png), its moon on the light's bearing.
+			SeaBackdrop3D.apply_sky(env, lights[0] as DirectionalLight3D, DARK_SKY, DARK_MOON_U)
 		env.fog_light_color = fog_color
 		env.fog_density = fog_density
 		env.fog_sky_affect = fog_sky_affect

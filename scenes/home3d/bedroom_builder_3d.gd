@@ -17,11 +17,12 @@ static func build(host: Node3D) -> Label3D:
 	_light(host)
 	var w := HALF.x * 2.0
 	var d := HALF.y * 2.0
-	B.box(host, Vector3(0, -0.05, 0), Vector3(w, 0.1, d), "5b4a3c")
-	B.box(host, Vector3(0, HEIGHT + 0.05, 0), Vector3(w, 0.1, d), "3a3530")
+	var wall := HorrorMaterials.tiled("wall_plaster_old", 1.6, Color(0.82, 0.8, 0.74))
+	B.box(host, Vector3(0, -0.05, 0), Vector3(w, 0.1, d), "5b4a3c").material_override = HorrorMaterials.tiled("floor_wood_planks", 1.2)
+	B.box(host, Vector3(0, HEIGHT + 0.05, 0), Vector3(w, 0.1, d), "3a3530").material_override = HorrorMaterials.tiled("floor_wood_planks", 1.6, Color(0.55, 0.52, 0.5))
 	for side: float in [-1.0, 1.0]:
-		B.box(host, Vector3(0, HEIGHT * 0.5, side * HALF.y), Vector3(w, HEIGHT, 0.1), "8a8070", true)
-		B.box(host, Vector3(side * HALF.x, HEIGHT * 0.5, 0), Vector3(0.1, HEIGHT, d), "8a8070", true)
+		B.box(host, Vector3(0, HEIGHT * 0.5, side * HALF.y), Vector3(w, HEIGHT, 0.1), "8a8070", true).material_override = wall
+		B.box(host, Vector3(side * HALF.x, HEIGHT * 0.5, 0), Vector3(0.1, HEIGHT, d), "8a8070", true).material_override = wall
 	# Window in the south wall: a pale pane of dawn.
 	var pane := B.box(host, Vector3(0, 1.5, HALF.y - 0.06), Vector3(1.0, 0.8, 0.02), "9fb4c4")
 	var glow := pane.material_override as StandardMaterial3D
@@ -35,13 +36,13 @@ static func build(host: Node3D) -> Label3D:
 	B.box(host, Vector3(0.9, 0.25, 1.3), Vector3(0.8, 0.5, 0.5), "6b5240", true)
 	# Door with its handle; light leaks under it.
 	B.box(host, DOOR + Vector3(0, 1.0, 0.03), Vector3(0.9, 2.0, 0.06), "4a3a2e")
-	B.box(host, DOOR + Vector3(0.32, 1.0, 0.09), Vector3(0.06, 0.06, 0.06), "c9a55a")
+	HorrorMaterials.picture(host, "door_wood_old", DOOR + Vector3(0, 1.0, 0.065), Vector2(0.9, 2.0))
 	# The paper on the floor just inside the door.
 	B.box(host, PAPER, Vector3(0.34, 0.01, 0.24), "d9d2c0").rotation.y = 0.3
 	# Tear-off calendar: a red-topped block on the wall, the date in big ink.
-	B.box(host, CALENDAR + Vector3(0, 0.2, 0), Vector3(0.36, 0.08, 0.03), "a53030")
-	B.box(host, CALENDAR, Vector3(0.34, 0.42, 0.02), "f2ede0")
-	var date := B.label(host, "", CALENDAR + Vector3(0, -0.02, 0.015), 34, "2a2230")
+	B.box(host, CALENDAR, Vector3(0.36, 0.45, 0.02), "3a3026")
+	HorrorMaterials.picture(host, "calendar_sheet", CALENDAR + Vector3(0, 0, 0.012), Vector2(0.34, 0.425))
+	var date := B.label(host, "", CALENDAR + Vector3(0, -0.03, 0.016), 34, "2a2230")
 	date.pixel_size = 0.003
 	return date
 
