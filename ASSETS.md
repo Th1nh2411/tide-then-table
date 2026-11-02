@@ -353,3 +353,21 @@ Ghế `ready/stool/stool.glb` giữ nguyên nguồn; runtime quán scale 0,85 c�
 collider (cao 0,442; footprint 0,4675 × 0,4675). Đây là điều chỉnh tương quan
 người/ghế, không đổi scale nhân vật/bàn/người trên thuyền. Shadow caster được
 bật lúc load qua `WorldPresentation3D`; đèn quán/SSAO không thay màu material gốc.
+
+## Horror art — brief 2, 2026-11-02
+
+Theo `docs/HORROR_CODEX_BRIEF_2.md`: 17 PNG mới, mỗi ảnh có sidecar `.md`
+ghi prompt thực tế, built-in `image_gen`, ngày, nguồn, hậu kỳ và SHA-256.
+Chưa approved, chưa tích hợp runtime. Danh sách và ảnh review:
+`docs/HORROR_CODEX_DELIVERY_2.md`. Bản nháp chữ: `docs/HORROR_TEXTS_DRAFT.md`.
+
+| Thư mục | Asset ID | Kích thước / nền |
+|---|---|---|
+| `assets/concepts/horror/` | `fish_ca_thu`, `fish_ca_mu`, `fish_muc`, `fish_cua`, `fish_tom`, `fish_oc_huong`, `fish_glowing` | 1024×1024 RGB, xám nhạt opaque; tôm 2 con, ốc 3 con |
+| `assets/concepts/horror/` | `fish_basket`, `fishing_rod`, `fishing_bobber` | 1024×1024 RGB, xám nhạt opaque |
+| `assets/concepts/horror/` | `anh_ut`, `ghost_ong_tu`, `villager_chu_hai` | 1024×1024 RGB, toàn thân, xám nhạt opaque |
+| `assets/textures/horror/` | `title_keyart`, `ending_true`, `ending_drowned` | 1920×1080 RGB, opaque |
+| `assets/textures/horror/` | `notebook_cover` | 1024×1400 RGB, opaque, nhãn trống |
+
+Giữ phong cách PS1 horror/palette theo brief, không ép palette sprite cũ.
+Concept là ảnh đầu vào cho image-to-3D; chưa tạo hay thay model GLB.
