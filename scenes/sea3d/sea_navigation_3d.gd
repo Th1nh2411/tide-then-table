@@ -31,9 +31,8 @@ func _draw() -> void:
 		return
 	if bool(world.get("fishing")) or bool(world.get("ending")) or get_tree().paused:
 		return
-	var phone := world.get("phone_app") as CanvasLayer
 	var hold := world.get("hold_ui") as CanvasLayer
-	if (phone and phone.visible) or (hold and hold.visible):
+	if hold and hold.visible:
 		return
 	var targets: Array = world.call("navigation_targets")
 	var font := ThemeDB.fallback_font

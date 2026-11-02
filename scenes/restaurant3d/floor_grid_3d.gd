@@ -26,7 +26,7 @@ var astar := AStarGrid2D.new()
 
 
 static func get_shared(tables: Array) -> FloorGrid3D:
-	var key := str(hash(tables))+":"+str(GameState.get_upgrade_level("seats"))
+	var key := str(hash(tables))
 	if shared == null or _shared_key != key:
 		shared = FloorGrid3D.new(tables)
 		_shared_key = key
@@ -38,7 +38,7 @@ func _init(tables: Array) -> void:
 	astar.cell_size = Vector2(CELL, CELL)
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
 	astar.update()
-	for i in mini(tables.size(),RestaurantLayout3D.table_count(GameState.get_upgrade_level("seats"))):
+	for i in mini(tables.size(),RestaurantLayout3D.table_count()):
 		var table: Vector3 = tables[i]
 		_block(Rect2(table.x - TABLE_SIZE.x * 0.5, table.z - TABLE_SIZE.y * 0.5, TABLE_SIZE.x, TABLE_SIZE.y))
 	for rect in FIXED:

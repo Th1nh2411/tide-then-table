@@ -13,10 +13,7 @@ static func describe(host: Node3D) -> Dictionary:
 	if not host.shift_running:
 		if pos.distance_to(L.COUNTER_POSITION) < 2.1:
 			at = L.COUNTER_POSITION + Vector3(0, 2.0, 0)
-			words = "[E] Mua rau / bia · Cô Năm"
-		elif pos.distance_to(L.BOARD_POSITION) < 2.2 and not host.shift_over:
-			at = L.BOARD_POSITION + Vector3(0, 2.0, 0)
-			words = "[E] Lên thực đơn"
+			words = "[E] Nói chuyện · Cô Năm"
 	elif carrying >= 0:
 		at = L.TABLES[carrying] + Vector3(0, 1.9, 0)
 		words = "Bàn %d · mang món tới đây" % (carrying + 1)
@@ -24,7 +21,7 @@ static func describe(host: Node3D) -> Dictionary:
 			words = "[E] Phục vụ bàn %d" % (carrying + 1)
 	elif pos.distance_to(L.COUNTER_POSITION) < 2.1:
 		at = L.COUNTER_POSITION + Vector3(0, 2.0, 0)
-		words = "[E] Mua rau / bia · Cô Năm"
+		words = "[E] Nói chuyện · Cô Năm"
 	else:
 		var dirty: Array[bool] = host.dirty_tables
 		var cleaning: bool = false
@@ -41,9 +38,6 @@ static func describe(host: Node3D) -> Dictionary:
 			elif pos.distance_to(L.BEER_POSITION) < 1.7:
 				at = L.BEER_POSITION + Vector3(0, 1.9, 0)
 				words = "[E] Rót bia cho khách"
-			elif pos.distance_to(L.GRILL_POSITION) < 2.4:
-				at = L.GRILL_POSITION + Vector3(0, 1.9, 0)
-				words = "[E] Nướng món đang chờ"
 	if words.is_empty():
 		return {}
 	return {"at": at, "words": words}

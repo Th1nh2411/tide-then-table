@@ -1,5 +1,6 @@
 extends Node
-## Verifies the 3D restaurant's debug keys (F4 Nhịp Sóng), seat upgrades and the cat.
+## Smoke test of the 3D restaurant's fixed setup: four tables, the fixed menu
+## on the board, a good rating brings guests faster, no modal overlays.
 
 func _ready() -> void:
 	call_deferred("_run")
@@ -10,26 +11,15 @@ func _run() -> void:
 	room.auto_open = false
 	add_child(room)
 	await get_tree().process_frame
-	var f4 := InputEventKey.new()
-	f4.pressed = true
-	f4.physical_keycode = KEY_F4
-	room._unhandled_key_input(f4)
-	assert(WaveMark.has_power() and room.wave_power.charges == WaveMark.max_charges(), "F4 did not grant Nhịp Sóng")
-	assert(room.orders.size() == 4, "base seats upgrade should provide four tables")
+	var ok: bool = room.orders.size() == 4
+	var board := room.get_node("WorldMenuBoard") as WorldMenuBoard3D
+	ok = ok and board.displayed_dishes.size() == RestaurantService3D.FIXED_MENU.dishes.size()
+	GameState.last_rating = 1
 	room.rng.seed = 42
-	var plain_interval: float = room._next_spawn_interval()
-	GameState.upgrade_levels["decor"] = 2
+	var slow: float = room._next_spawn_interval()
+	GameState.last_rating = 5
 	room.rng.seed = 42
-	assert(room._next_spawn_interval() < plain_interval, "decor should attract guests faster")
-	assert(room._has_stock(), "the fixed menu is always available")
-	room.queue_free()
-	await get_tree().process_frame
-	GameState.upgrade_levels["seats"] = 2
-	GameState.set_flag("cat_adopted")
-	var upgraded: Node3D = load("res://scenes/restaurant3d/restaurant_scene_3d.tscn").instantiate()
-	upgraded.auto_open = false
-	add_child(upgraded)
-	assert(upgraded.orders.size() == 8, "seats level 2 should provide eight tables")
-	assert(upgraded.cat_node != null, "adopted cat should appear in the 3D restaurant")
-	print("PASS restaurant3d debug F4 Nhịp Sóng, fixed menu, seats and cat")
+	ok = ok and room._next_spawn_interval() < slow and not room.modal_open()
+	print(("PASS" if ok else "FAIL") + " restaurant3d: four tables, fixed menu board, rating brings guests")
+	GameState.reset()
 	get_tree().quit()

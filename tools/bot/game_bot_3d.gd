@@ -7,7 +7,7 @@ extends Node
 ## wrong one to check the reset to mùng 9. On rằm it takes the true path:
 ## refuses anh Út's tea, goes out, follows the ghost-lights to the raft and
 ## plays the dawn epilogue (RamNight). Travel and minigame skill are scripted;
-## scenes, service, bills, story and transitions are real.
+## scenes, service, story and transitions are real. No money / upgrades any more.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
 const BEDROOM := "res://scenes/home3d/bedroom_scene_3d.tscn"
@@ -78,22 +78,11 @@ func _night(sea: Node) -> void:
 			await _finish_fishing(sea)
 			sea.boat.position = sea.START
 			sea._unload()
-	sea.boat.position = SeaLayout3D.to_world(Vector2(900, 1000))
-	sea.boat.velocity = Vector3.ZERO
-	sea._drop_net()
-	sea.elapsed += 90.0
-	if not sea._try_haul_net():
-		_fail("net did not haul")
-		return
-	await _finish_fishing(sea)
-	sea.boat.position = sea.START
-	sea._unload()
 	sea._end_trip(false)
 
 func _service(quan: Node) -> void:
 	await _frames(3)
 	quan._open_shift()  # normally opens on arrival; a no-op then
-	quan.cooking_overlay.result_seconds = 0.01
 	for turn: int in range(200):
 		if quan.shift_over:
 			break
@@ -110,16 +99,10 @@ func _service(quan: Node) -> void:
 				quan._finish_meal(table)
 				continue
 			var dish: DishData = order["dish"]
-			if not bool(order.get("cooked", false)):
-				quan.player.position = quan.BEER_POSITION if dish.instant_serve else quan.GRILL_POSITION
+			if not bool(order.get("cooked", false)) and dish.instant_serve:
+				quan.player.position = quan.BEER_POSITION
 				quan._interact()
-				if quan.cooking_overlay.is_running():
-					quan.cooking_overlay._game._finish(CookingGameBase.Result.PERFECT)
-					await _frames(5)
 			if bool(order.get("cooked", false)):
-				# Let hired staff make their real pickup and delivery trips.
-				quan._move_staff(20.0)
-				quan._move_staff(20.0)
 				if str(order.get("phase", "waiting")) == "waiting":
 					quan.player.position = quan.PASS_POSITION
 					quan._interact()
@@ -135,14 +118,7 @@ func _service(quan: Node) -> void:
 	if not quan.shift_over:
 		_fail("restaurant failed to drain orders")
 		return
-	var priority: Array[String] = ["boat", "rod", "lamp", "kitchen", "fridge"]
-	if OS.get_environment("POLICY") == "balanced":
-		priority = ["kitchen", "boat", "lamp", "rod", "fridge"]
-	for id: String in priority:
-		var upgrade: UpgradeData = load("res://data/upgrades/" + id + "_upgrade.tres")
-		GameState.buy_upgrade(upgrade)
-	print("DAY %d | served %d | lost %d | money %dk | boat %d | kitchen %d" % [GameState.day,
-		quan.served, quan.lost, GameState.money, GameState.get_upgrade_level("boat"), GameState.get_upgrade_level("kitchen")])
+	print("DAY %d | served %d | lost %d | rating %d" % [GameState.day, quan.served, quan.lost, GameState.last_rating])
 	if RamNight.is_ram() and not _refuse_tea(quan):
 		return
 	_roundtrip()

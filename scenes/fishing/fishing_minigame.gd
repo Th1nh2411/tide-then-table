@@ -15,7 +15,6 @@ signal catch_size_changed(value: float)
 ## The player pressed the hold button / key during the minigame.
 signal hold_requested
 
-const BOAT_UPGRADE := preload("res://data/upgrades/boat_upgrade.tres")
 
 @export var perfect_quality: float = 1.0
 @export var normal_quality: float = 0.7
@@ -156,16 +155,12 @@ func _start_stage(game: MinigameBase) -> void:
 	var guide_id := "game_fish_school_auto_bite_v2" if _game is FishFightGame \
 		else "game_" + str(_game.get_script().get_global_name())
 	_hint_label.visible = Guide.once(guide_id)
-	if not _hint_label.visible and WaveMark.has_power() and Guide.once("wave_power"):
-		_hint_label.text = "C: Nhịp Sóng · chậm lại vài giây"
-		_hint_label.visible = true
 
 
 func _create_fight() -> MinigameBase:
 	var game := FishFightGame.new()
 	game.school_size = school_size
-	var boat := GameState.get_upgrade_value(BOAT_UPGRADE) as BoatData
-	game.boat_id = boat.id if boat else "thuyen_thung"
+	game.boat_id = "thuyen_thung"  # the boat is fixed (no upgrades)
 	game.zone = zone if zone >= 0 else (int(_fish.zones[0]) if not _fish.zones.is_empty() else 0)
 	game.stun = _starting_stun
 	game.tugged.connect(_portrait.jolt)
@@ -184,19 +179,6 @@ func _on_fish_hooked(size_scale: float) -> void:
 	_title_label.modulate = aberrant_title_color if _fish.is_aberrant else Color.WHITE
 	_hint_label.text = _game.get_hint()
 	_hint_label.visible = Guide.once("game_fish_haul_v1")
-
-
-## Debug builds: 1-3 switch the boat during a rod fight (to look at the art).
-func _unhandled_key_input(event: InputEvent) -> void:
-	var key := event as InputEventKey
-	if not OS.is_debug_build() or key == null or not key.pressed or key.echo or not _game is FishFightGame:
-		return
-	if key.physical_keycode < KEY_1 or key.physical_keycode > KEY_3:
-		return
-	GameState.upgrade_levels[BOAT_UPGRADE.id] = int(key.physical_keycode - KEY_1)
-	var boat := GameState.get_upgrade_value(BOAT_UPGRADE) as BoatData
-	(_game as FishFightGame).boat_id = boat.id
-	get_viewport().set_input_as_handled()
 
 
 func _process(_delta: float) -> void:

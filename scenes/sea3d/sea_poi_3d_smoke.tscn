@@ -1,7 +1,0 @@
-[gd_scene load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://scenes/sea3d/sea_poi_3d_smoke.gd" id="1"]
-
-[node name="SeaPoi3DSmoke" type="Node"]
-process_mode = 3
-script = ExtResource("1")

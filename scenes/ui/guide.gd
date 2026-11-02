@@ -80,11 +80,6 @@ func _add_rules() -> void:
 	pass
 
 
-## Where WavePower draws Rin's mark (bottom left), for the Nhịp Sóng pointer.
-func wave_badge_target() -> Vector2:
-	return Vector2(16, get_viewport().get_visible_rect().size.y - 40)
-
-
 func add(id: String, text: String, active: Callable, target: Callable, done: Callable = Callable(),
 		while_paused: bool = false) -> void:
 	var rule := Rule.new()

@@ -1,11 +1,10 @@
 extends Control
 ## Standalone test for rod catches (run with F6): depth weighting, featured
-## spots, fish size, weight text and size-based prices.
+## fish size and weight text.
 
 const SAMPLES: int = 4000
 
 @export var fish_catalog: FishCatalog
-@export var grill_dish: DishData
 
 var _failures: int = 0
 var _rng := RandomNumberGenerator.new()
@@ -16,26 +15,15 @@ func _ready() -> void:
 	GameState.reset()
 	_test_depth()
 	_test_depth_weighting()
-	_test_spot()
 	_test_size()
 	_test_weight_and_price()
-	_test_nets()
+	_test_rods()
 	GameState.reset()
 	print("CatchRoll: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
 
 
-## Nets: shrimp near shore, crab on the reef, snails in both; rods never
-## bring up shrimp or crab.
-func _test_nets() -> void:
-	var counts := {0: {}, 1: {}}
-	for zone: int in counts:
-		for i in SAMPLES:
-			var fish := fish_catalog.pick_random(zone as FishData.Zone, _rng, FishData.CatchMethod.NET)
-			counts[zone][fish.id] = int(counts[zone].get(fish.id, 0)) + 1
-	_check("net near shore: mostly shrimp, some snails", int(counts[0].get("tom", 0)) > SAMPLES / 2
-		and int(counts[0].get("oc_huong", 0)) > 0 and not counts[0].has("cua"))
-	_check("net on the reef: mostly crab, some snails", int(counts[1].get("cua", 0)) > SAMPLES / 2
-		and int(counts[1].get("oc_huong", 0)) > 0 and not counts[1].has("tom"))
+## Rods never bring up shrimp or crab (nets are gone; those stay uncaught).
+func _test_rods() -> void:
 	var rod_ids: Array[String] = []
 	for zone in [0, 1, 2]:
 		for fish in fish_catalog.get_fish_for_zone(zone as FishData.Zone, FishData.CatchMethod.ROD):
@@ -59,30 +47,6 @@ func _test_depth_weighting() -> void:
 	var glow0 := _share(FishData.Zone.OPEN_SEA, 0.0, "ca_thu_phat_sang")
 	var glow1 := _share(FishData.Zone.OPEN_SEA, 1.0, "ca_thu_phat_sang")
 	_check("aberrant not boosted by depth", glow1 <= glow0 + 0.01)
-
-
-func _test_spot() -> void:
-	var spot := FishingSpot.new()
-	spot.zone = FishData.Zone.OPEN_SEA
-	spot.featured = _fish("ca_thu")
-	spot.featured_chance = 0.7
-	var hits := 0
-	for i in SAMPLES:
-		if spot.roll_fish(fish_catalog, _rng) == spot.featured:
-			hits += 1
-	# 0.7 featured + its normal zone share of the other 0.3.
-	_check("spot: featured dominates", float(hits) / SAMPLES > 0.7)
-	_check("spot hint unknown -> ???", spot.hint_text().contains("???"))
-	GameState.record_catch(_fish("ca_thu"), 1)
-	_check("spot hint known -> name", spot.hint_text().contains("Cá thu"))
-	spot.big_shadow = true
-	_check("spot hint big shadow", spot.hint_text().begins_with("bóng cá lớn"))
-	spot.casts_left = 3
-	spot.use_cast()
-	_check("school gets wary after one cast", spot.chain_text().contains("cảnh giác"))
-	spot.use_cast()
-	_check("last cast is the school leader", spot.chain_text().contains("đầu đàn"))
-	spot.free()
 
 
 func _test_size() -> void:
@@ -109,12 +73,8 @@ func _test_weight_and_price() -> void:
 	var snapped := CatchRoll.snap_size(1.3, 3.0)
 	_check("snap to whole kg", is_equal_approx(_fish("ca_mu").weight_kg(snapped), 4.0))
 	_check("snap small to 10g", is_equal_approx(_fish("tom").weight_kg(CatchRoll.snap_size(1.17, 0.06)), 0.07))
-	var small: Array[InventoryItem] = [InventoryItem.new(_fish("ca_thu"), 1.0, 1.0)]
-	var large: Array[InventoryItem] = [InventoryItem.new(_fish("ca_thu"), 1.0, 1.5)]
-	var p_small := KitchenLogic.calc_price(grill_dish, 1.0, small)
-	var p_large := KitchenLogic.calc_price(grill_dish, 1.0, large)
-	_check("bigger fish sells for more", p_large == roundi(p_small * 1.5))
-	var copy := InventoryItem.from_dict(large[0].to_dict(), fish_catalog)
+	var item := InventoryItem.new(_fish("ca_thu"), 1.0, 1.5)
+	var copy := InventoryItem.from_dict(item.to_dict(), fish_catalog)
 	_check("size saved in item dict", copy != null and is_equal_approx(copy.size, 1.5))
 
 

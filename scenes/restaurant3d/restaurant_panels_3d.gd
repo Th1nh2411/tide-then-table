@@ -1,12 +1,9 @@
 class_name RestaurantPanels3D
 extends RefCounted
-## The restaurant's 2D overlay: note line, shift summary, action hint. Looks come from the project
+## The restaurant's 2D overlay: note line and action hint. Looks come from the project
 ## theme (assets/ui/game_theme.tres).
 
 var host: Node3D
-## Full summary text (the receipt's tooltip; kept for tests / logs).
-var summary_text: Label
-var receipt: ShiftReceipt3D
 var _note: SpeechStrip
 var _prompt: PanelContainer
 var _prompt_text: Label
@@ -40,9 +37,6 @@ func build() -> void:
 	var layer := CanvasLayer.new()
 	host.add_child(layer)
 	_build_note(layer)
-	receipt = ShiftReceipt3D.new()
-	layer.add_child(receipt)
-	summary_text = receipt.summary_text
 	_prompt = PanelContainer.new()
 	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_prompt.theme = ui_theme()
@@ -67,10 +61,6 @@ func _build_note(layer: CanvasLayer) -> void:
 	layer.add_child(_note)
 
 
-func summary_visible() -> bool:
-	return receipt != null and receipt.visible
-
-
 func say(words: String) -> void:
 	_note.say(words, 4.0)
 
@@ -78,13 +68,6 @@ func say(words: String) -> void:
 ## Kept for the scene's frame loop; the strip times itself out.
 func tick(_delta: float) -> void:
 	pass
-
-
-## Prints the shift receipt. `figures` / `results`: see ShiftReceiptRows.
-func show_summary(words: String, figures: Dictionary = {}, results: Dictionary = {}) -> void:
-	var stars: int = int(figures.get("stars", GameState.last_rating))
-	receipt.open(words, ShiftReceiptRows.build(figures, results), ShiftReceiptRows.chart(GameState.day_history),
-		ShiftReceiptRows.chart_days(GameState.day_history), stars)
 
 
 ## Action hint over the thing E acts on; hidden while something else owns the screen.

@@ -37,16 +37,16 @@ func _ready() -> void:
 	GameState.set_flag(RamNight.EXPOSED_FLAG)
 	LoopCalendar.choose(true)
 	failures += _check("rằm, refused + recorded -> end", LoopCalendar.take_result() == LoopCalendar.Result.END)
-	GameState.money = 999
+	GameState.boat_hp = 10.0
 	GameState.play_seconds = 120.0
 	GameState.set_flag("note_paper_1")
 	GameState.set_flag("tip_menu3d")
-	GameState.set_flag("wave_mark")
+	GameState.set_flag("omen_seen")
 	LoopCalendar.reset_loop()
-	failures += _check("reset: back to mùng 9, money reset", GameState.day == 1 and GameState.money == GameState.STARTING_MONEY)
+	failures += _check("reset: back to mùng 9, hull reset", GameState.day == 1 and GameState.boat_hp == 100.0)
 	failures += _check("reset keeps notes, tips, play time", GameState.has_flag("note_paper_1")
 		and GameState.has_flag("tip_menu3d") and is_equal_approx(GameState.play_seconds, 120.0))
-	failures += _check("reset forgets the rest, counts loops", not GameState.has_flag("wave_mark") and LoopCalendar.loops() == 1)
+	failures += _check("reset forgets the rest, counts loops", not GameState.has_flag("omen_seen") and LoopCalendar.loops() == 1)
 	failures += _check("reset forgets the tea and the recording", not RamNight.tea_answered() and not GameState.has_flag(RamNight.EXPOSED_FLAG))
 	LoopCalendar.reset_loop()
 	failures += _check("loop count grows", LoopCalendar.loops() == 2)

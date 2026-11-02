@@ -1,8 +1,7 @@
 class_name SeaBoatMover3D
 extends RefCounted
 ## Steering the 3D boat for one physics frame: rowed boats push only while a
-## stroke pulls (RowStroke), motor boats accelerate; wind away from the dock,
-## a worn hull or a towed boat slows it, collisions bounce it off and damage
+## stroke pulls (RowStroke), motor boats accelerate; a worn hull slows it, collisions bounce it off and damage
 ## the hull (SeaBoatImpact3D: spin, rocking, shake, splash), the
 ## boat's range (max_depth) pushes it back, the map edge clamps it.
 ## State stays on the sea scene (velocity, yaw_velocity, row...): other
@@ -25,7 +24,7 @@ static func drive(sea: SeaScene3D, delta: float) -> Array:
 			sea._wait_controls_release = false
 		throttle = 0.0
 		steer = 0.0
-	var condition := lerpf(0.6, 1.0, clampf(GameState.boat_hp / 50.0, 0.0, 1.0)) * (0.65 if sea._is_towing() else 1.0)
+	var condition := lerpf(0.6, 1.0, clampf(GameState.boat_hp / 50.0, 0.0, 1.0))
 	if data.rowed:
 		# Paddled: pushed only while a stroke pulls, then it glides and spins down.
 		var push := sea.row.step(delta, throttle, steer, data)
@@ -36,8 +35,6 @@ static func drive(sea: SeaScene3D, delta: float) -> Array:
 	else:
 		boat.velocity += forward * throttle * data.acceleration / 10.0 * delta
 		boat.velocity *= exp(-1.15 * delta)
-	if not sea._at_dock():
-		boat.velocity += sea.wind * delta
 	boat.velocity = boat.velocity.limit_length(data.max_speed / 10.0 * condition)
 	var forward_speed := boat.velocity.dot(forward)
 	if not data.rowed:
@@ -52,7 +49,7 @@ static func drive(sea: SeaScene3D, delta: float) -> Array:
 	boat.position.y = 0.0
 	if boat.get_slide_collision_count() > 0:
 		if before.distance_to(boat.position) < 0.3 and impact_speed > 2.0 and sea.impact_cooldown <= 0.0:
-			BoatCondition.damage(minf(14.0, impact_speed * 1.6) * sea.blessed_damage_scale)
+			BoatCondition.damage(minf(14.0, impact_speed * 1.6))
 			sea.impact_cooldown = 0.85
 			sea._say("Mạn thuyền va vào vật cản!", 1.8)
 		sea.impact.hit(sea, boat.get_slide_collision(0), before_velocity, forward)

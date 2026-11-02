@@ -37,13 +37,15 @@ Vietnamese, keep code comments in short English.
   + append to its catalog, no code change.
 - Signals between nodes (past-tense names); node refs via `@export` + NodePath,
   not long `get_node("../..")` chains.
-- Pure logic lives in `systems/` (no nodes): `GridInventory`, `KitchenLogic`,
-  `MenuPlan`, `DayRating`, `SaveSystem`, `Story`, `BoatCondition`,
-  `PhoneReports`, `CatchRoll`, `FishOrders`, `MarketStock`, `OrderPicker`,
-  `TableBill`, `StaffRoster`, `QuestLog`.
+- Pure logic lives in `systems/` (no nodes): `GridInventory`, `DayRating`,
+  `SaveSystem`, `Story`, `BoatCondition`, `CatchRoll`, `LoopCalendar`,
+  `OmenPicker`, `DialogueLibrary`.
 - Every big system has a standalone test scene in `scenes/test/` (F6).
-- Vietnamese for all player-facing text. Money is shown as "70k".
-- Notices are speech, not system text: `SeaHud.flash_message` / the
+- Vietnamese for all player-facing text. No money / upgrades in the horror build.
+- Horror build: NEO is gone (no "NEO: ..." / "[WARN]" lines, no hologram);
+  lines go to the `SpeechStrip` ("Bảo: ..." named, else Rin), at most short
+  emotional ones in Rin's voice. Old 2D rule, kept for reference:
+  `SeaHud.flash_message` / the
   restaurant's `_show_message` show a `SpeechLine` bubble over the speaker,
   Rin talking to himself by default ("Sóng to quá... phải nâng cấp thuyền"),
   "Bảo: ..." / "Cô Năm: ..." over them; "NEO: ..." / "[...]" is NEO, the AI
@@ -70,16 +72,16 @@ Vietnamese, keep code comments in short English.
 - Test scenes print `PASS ...` / `FAIL ...` lines; the runner counts them.
 - Whole game: `tools/run_bot.sh` (`tools/bot/game_bot.gd`: New Game → ending
   through the real scenes, prints a line per day + minutes of human play,
-  exit ≠ 0 on STUCK / SAVE MISMATCH / no ending; `POLICY=balanced` for the
-  other upgrade order). Run it after changing pacing, the day flow or saves;
-  it reads scene internals (`_closer`, `_menu_panel`...), keep it in sync.
+  exit ≠ 0 on STUCK / SAVE MISMATCH / no ending; no upgrades, so no POLICY).
+  Run it after changing pacing, the day flow or saves;
+  it reads scene internals (`tools/bot/game_bot_3d.gd`), keep it in sync.
 - Playtest builds: `tools/export.sh` (runs the tests, then the presets in
   `export_presets.cfg` → `build/mac/RinTheFisher.zip`, `build/windows/
   RinTheFisher.exe`; needs export templates for this exact Godot version,
   in ~/Library/Application Support/Godot/export_templates/<version>; macOS
   universal needs `import_etc2_astc` on, already set in project.godot).
   Hand out `PLAYTEST.md` with it.
-- Debug keys (debug builds): sea 1-3 boat (3D: reloads the scene; in the rod fight: switches the drawn boat live), F2 open the fog; restaurant F1
+- Debug keys (horror build): sea F2 opens the fog; F7 palette, F8 PSX, F10 view. Old (removed): sea 1-3 boat; restaurant F1
   fish, F2 beer; both F3 play this scene's cutscenes one by one, F4 toggle
   Nhịp Sóng (`CutsceneDebug`); anywhere F9 = `DebugJumpMenu`: jump to any
   day's night / restaurant or any cutscene, state rebuilt by `StoryTimeline`
@@ -113,8 +115,17 @@ Vietnamese, keep code comments in short English.
   `focus_mode = FOCUS_NONE` so Space can't press them.
 
 ## Map of the game
-- Autoloads: `GameState` (money, day, storage, upgrades, flags, boat_hp,
-  rating, last_catch, pantry, staff, play_seconds), `Sfx`, `DayClock` (display-only time of day: driven by
+- **Removed in the horror build (PLAN §10 H4):** money, upgrades (`UpgradeData`,
+  phone shop, Sửa quán), daily challenges + achievements, Xóm Đèn Review /
+  rivals, fish orders + regulars, today's dish (`DailyTrend`), storage +
+  spoiling, the phone app (Rin's Catch, J, M map, map pins), NEO, `QuestTracker`,
+  Nhịp Sóng (`WaveMark` / `WavePower`, C), staff / Vy hiring, the cat, weather,
+  night events, nets (Q), sea places with dialogs (shrine, hut, lighthouse;
+  the raft stays as scenery), the 2D restaurant / sea / cutscene classes, the
+  cooking overlay + shift receipt. Bullets below that describe these are history.
+- Autoloads: `GameState` (day, story_flags, last_rating, boat_hp,
+  caught_species, best_sizes, day_history (`earned` only for the ending card),
+  resume_at, trip_notes, play_seconds), `Sfx`, `DayClock` (display-only time of day: driven by
   `LampOil` at sea and by shift progress in the restaurant; `running` = night
   trip in progress), `SceneRouter` (`go_to(path, fade_color)`).
 - Flow: main menu → (New Game: `scenes/intro/intro_scene.tscn`, cutscene

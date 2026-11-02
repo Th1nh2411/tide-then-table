@@ -184,25 +184,16 @@ static func _shell(host: Node3D, depth: float, mid_z: float, width: float) -> vo
 	for x in range(-18, 19, 6):
 		box(host, Vector3(x, -0.08, L.FRONT_Z + 0.2 + L.ROAD_DEPTH * 0.5), Vector3(2.0, 0.02, 0.15), "8e8c79")
 
-## Lanterns and planters appear with the decor upgrade.
+## Street trees at both ends (no decor upgrades any more).
 static func _decor(host: Node3D) -> void:
 	for x: float in [-17.0, 17.0]:
 		RestaurantBatchVisuals.add(host, "sidewalk_tree", Vector3(x, 0, L.CURB_PROP_Z))
-	var decor_level := GameState.get_upgrade_level("decor")
-	if decor_level > 0:
-		for x in L.DECOR_LANTERNS:
-			box(host, Vector3(x, 2.25, L.BACK_Z + 1.2), Vector3(0.04, 0.40, 0.04), "402751")
-			box(host, Vector3(x, 2.02, L.BACK_Z + 1.2), Vector3(0.33, 0.28, 0.33), "de9e41")
-	if decor_level > 1:
-		for x in L.DECOR_PLANTERS:
-			RestaurantBatchVisuals.add(host, "plant_pot", Vector3(x, 0, L.PLANTER_Z))
 
 static func add_tables(host: Node3D, start_index: int) -> void:
 	_tables(host,start_index)
 
 static func _tables(host: Node3D, start_index := 0) -> void:
-	var seats: UpgradeData = host.seats_upgrade
-	var table_count := clampi(int(GameState.get_upgrade_value(seats)), 1, L.TABLES.size()) if seats else 4
+	var table_count := L.table_count()
 	for i in range(start_index,table_count):
 		var p: Vector3 = L.TABLES[i]
 		var table: Node3D = TABLE_PILOT.instantiate()
@@ -262,7 +253,7 @@ static func _tables(host: Node3D, start_index := 0) -> void:
 
 ## Food cart, kitchen sign, Cô Năm's counter, Bảo, plate pass and beer keg (no grill).
 static func _kitchen(host: Node3D) -> void:
-	RestaurantBatchVisuals.upgrade(host, "kitchen", ["food_cart_0", "food_cart_1", "food_cart_2"], L.GRILL_POSITION)
+	RestaurantBatchVisuals.add(host, "food_cart_0", L.GRILL_POSITION)
 	solid_block(host, L.GRILL_POSITION + Vector3(0, 0.7, 0), Vector3(2.8, 1.3, 1.25))
 	box(host, L.KITCHEN_BOARD_POSITION + Vector3(0, 0.7, 0), Vector3(1.2, 1.3, 0.1), "884b2b", true)
 	# Cô Năm keeps her grocery counter separate from the kitchen.

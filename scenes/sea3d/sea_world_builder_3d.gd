@@ -1,9 +1,9 @@
 class_name SeaWorldBuilder3D
 extends RefCounted
-## Builds the 3D sea's static world, places, boat and phone-map snapshot, and
+## Builds the 3D sea's static world, places (scenery only) and boat, and
 ## animates the decorative bits each frame.
 ## Host (SeaScene3D) fields written: bubble_spots, wake_marks,
-## submerged, whirlpool_marks, rin_figure, boat_lamp, map_boat_proxy.
+## submerged, whirlpool_marks, rin_figure, boat_lamp.
 
 static var _materials: Dictionary = {}
 
@@ -82,10 +82,6 @@ static func build_environment(sea: SeaScene3D) -> void:
 	env.fog_enabled = true
 	env.fog_light_color = Color("172038")
 	env.fog_density = 0.018
-	if sea.weather:
-		env.ambient_light_energy *= sea.weather.night_brightness
-		if sea.weather.rain:
-			env.fog_density = 0.028
 	world_env.environment = env
 	sea.add_child(world_env)
 	var moon := DirectionalLight3D.new()
@@ -207,38 +203,6 @@ static func _solid_footprint(sea: SeaScene3D, visual: Node3D) -> void:
 	body.add_child(collider)
 	sea.add_child(body)
 
-static func build_map_adapter(sea: SeaScene3D) -> void:
-	# PhoneMap expects 2D map coordinates and a Node2D boat. Small proxies
-	# preserve its existing pin/legend UI while the sea world itself is 3D.
-	var rocks: Array = []
-	for rock in SeaLayout3D.rocks():
-		rocks.append({"pos": SeaLayout3D.to_map(rock["pos"]), "radius": float(rock["radius"]) * SeaLayout3D.PX_PER_UNIT, "color": Color("577277")})
-	var places: Array = [
-		{"pos": SeaLayout3D.to_map(sea.RAFT_POS), "label": "Bè tôm hùm anh Út"},
-		{"pos": SeaLayout3D.to_map(sea.SHRINE_POS), "label": "Miếu Cá Ông"},
-		{"pos": SeaLayout3D.to_map(sea.LIGHTHOUSE_POS), "label": "Hải đăng Đá Canh Đêm"},
-		{"pos": SeaLayout3D.to_map(sea.HUT_POS), "label": "Gò Vỏ Ốc"},
-		{"pos": SeaLayout3D.to_map(sea.START), "label": "Bến Xóm Đèn"},
-	]
-	PhoneMap._snap = {
-		"size": SeaLayout3D.MAP_PX,
-		"zones": [
-			{"rect": SeaLayout3D.OPEN_RECT, "color": Color(0.1, 0.28, 0.48), "fog": false, "name": "Khơi xa"},
-			{"rect": SeaLayout3D.REEF_RECT, "color": Color(0.16, 0.45, 0.6), "fog": false, "name": "Rạn đá"},
-			{"rect": SeaLayout3D.NEAR_RECT, "color": Color(0.35, 0.68, 0.78), "fog": false, "name": "Gần bờ"},
-		] + ([{"rect": SeaLayout3D.FOG_RECT, "color": Color(0.2, 0.32, 0.38), "fog": true, "name": "Sương"}] if Story.is_fog_open() else []),
-		"land": [Rect2(0, SeaLayout3D.SHORE_PX, SeaLayout3D.MAP_PX.x, SeaLayout3D.MAP_PX.y - SeaLayout3D.SHORE_PX)],
-		"rocks": rocks,
-		"dock": SeaLayout3D.to_map(sea.START),
-		"whirlpool": SeaLayout3D.to_map(sea.WHIRLPOOL_POS),
-		"places": places,
-		"range_y": lerpf(SeaLayout3D.SHORE_PX, SeaLayout3D.DEEP_PX, sea.boat_data.max_depth) if sea.boat_data.max_depth < 1.0 else -INF,
-	}
-	sea.map_boat_proxy = Node2D.new()
-	sea.map_boat_proxy.add_to_group("boat")
-	sea.add_child(sea.map_boat_proxy)
-	sea.map_boat_proxy.position = SeaLayout3D.to_map(sea.boat.position)
-
 static func build_boat(sea: SeaScene3D) -> void:
 	var boat_id := sea.boat_data.id
 	if boat_id == "thuyen_thung":
@@ -304,7 +268,7 @@ static func pose_rower(sea: SeaScene3D) -> void:
 	var side := down.cross(Vector3.UP).normalized() if absf(down.y) < 0.99 else Vector3.RIGHT
 	sea.paddle.transform = Transform3D(Basis(side, -down, side.cross(-down)), top)
 
-## Bob, whirlpool, net buoys, wake and the follow camera.
+## Bob, whirlpool, wake and the follow camera.
 static func animate(sea: SeaScene3D, delta: float, forward: Vector3, forward_speed: float) -> void:
 	var t := sea.elapsed
 	pose_rower(sea)
@@ -320,9 +284,6 @@ static func animate(sea: SeaScene3D, delta: float, forward: Vector3, forward_spe
 		var a := TAU * float(i) / float(sea.whirlpool_marks.size()) + t * 0.65
 		sea.whirlpool_marks[i].position = sea.WHIRLPOOL_POS + Vector3(cos(a) * 2.3, 0.16, sin(a) * 2.3)
 		sea.whirlpool_marks[i].rotation.y = -a
-	for i in range(sea.nets.size()):
-		var net_node: Node3D = sea.nets[i]["node"]
-		net_node.position.y = sin(t * 2.0 + float(i)) * 0.06
 	var boat := sea.boat
 	var behind := Vector3.BACK.rotated(Vector3.UP, boat.rotation.y)
 	for i in range(sea.wake_marks.size()):
