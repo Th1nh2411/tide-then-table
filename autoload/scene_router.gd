@@ -58,6 +58,9 @@ func _input(event: InputEvent) -> void:
 	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F8 and OS.is_debug_build():
 		_toggle_psx_look()
 		get_viewport().set_input_as_handled()
+	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F10 and OS.is_debug_build():
+		_toggle_first_person()
+		get_viewport().set_input_as_handled()
 	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F9 and OS.is_debug_build():
 		_toggle_debug_jump()
 		get_viewport().set_input_as_handled()
@@ -97,6 +100,17 @@ func _toggle_psx_look() -> void:
 	look = PsxLook3D.new()
 	look.name = "PsxLook"
 	add_child(look)
+
+
+## F10 (debug): trial first-person view in the 3D restaurant / sea (FirstPersonView3D).
+func _toggle_first_person() -> void:
+	var view := get_node_or_null("FirstPersonView")
+	if view:
+		view.queue_free()
+		return
+	view = FirstPersonView3D.new()
+	view.name = "FirstPersonView"
+	add_child(view)
 
 
 func go_to(scene_path: String, fade_color: Color = Color.BLACK) -> void:

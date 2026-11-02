@@ -129,6 +129,11 @@ chỉnh ở đâu. Việc còn lại: `PLAN.md` → "Việc còn lại". Art: `A
   (`PersonBlocker`, r 0,24) nên Rin không đi xuyên Bảo, Cô Năm, khách, nhân viên; tắt khi
   người đó bị ẩn (ghế trống, cutscene). Rig chỉ về Idle khi cả physics frame lẫn idle frame
   đều không còn đẩy nó (cutscene đi bằng tween idle, gameplay bằng physics).
+- **Góc nhìn thứ nhất thử (F10, debug):** `FirstPersonView3D` đặt camera ở mắt Rin, chuột
+  xoay (Alt hoặc mở bảng = hiện con trỏ). Quán: thành `demo_camera` nên WASD đi theo hướng
+  nhìn, E vẫn theo khoảng cách. Biển: nhìn xoay theo thúng, đèn thuyền thành đèn cầm tay
+  rọi theo hướng nhìn, cột đèn ẩn. Thân Rin ẩn khỏi camera này (layer 20) nhưng vẫn đổ
+  bóng. Cutscene và cảnh quăng cần trả lại camera game. Tắt là trả lại như cũ.
 - **PSX thử (F8, debug):** `PsxLook3D` vẽ thế giới 3D thẳng ở `pixel_res` 640x360 bằng
   SubViewport theo camera game, phóng nearest dưới UI; material thường thành
   `psx_vertex.gdshader` (rung đỉnh `snap_res` 320x180, texture nearest). Tắt là trả lại như cũ.
