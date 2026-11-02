@@ -140,6 +140,7 @@ func _ready() -> void:
 	RestaurantSetup3D.open_day(self)
 	StreetEnds3D.build(self)
 	RestaurantOmens3D.build(self)
+	RamGuest3D.attach(self)  # rằm only: anh Út and his ginger tea
 	_play_arrival.call_deferred()
 	Sfx.ambience("street")
 	Sfx.bed("street")

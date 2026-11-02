@@ -3,9 +3,9 @@ extends RefCounted
 ## The horror build's day loop (pure): GameState.day 1..NIGHTS is mùng 9 ..
 ## rằm tháng Bảy. Each night Rin picks a street end; with no omen tonight the
 ## right pick is the dock (a fisherman goes out), with an omen it is home.
-## Right = next day (or the ending after the last night); wrong = back to
-## mùng 9 with only Rin's notebook ("note_*"), first-time tips ("tip_*") and
-## the loop count kept.
+## Right = next day; wrong = back to mùng 9 with only Rin's notebook
+## ("note_*"), first-time tips ("tip_*") and the loop count kept. The last
+## night (rằm) has no omen: RamNight judges it (anh Út's tea, the raft).
 
 const FIRST_LUNAR := 9
 const NIGHTS := 7
@@ -50,10 +50,12 @@ static func take_result() -> Result:
 	last_choice = str(choice)
 	if choice != "out" and choice != "home":
 		return Result.NONE
+	if RamNight.is_ram(GameState.day):
+		return Result.RESET if RamNight.current(choice == "out") == RamNight.Ending.LOOP else Result.END
 	var omen := GameState.has_flag(OMEN_FLAG)
 	if (choice == "out") == omen:
 		return Result.RESET
-	return Result.END if GameState.day >= NIGHTS else Result.NEXT
+	return Result.NEXT
 
 
 static func next_day() -> void:

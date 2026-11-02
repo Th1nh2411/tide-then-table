@@ -3,6 +3,8 @@ extends Control
 ## the lines then give way to a short card about the run (EndingStats) and a
 ## thank-you for playtesters, as a taped newspaper clipping (RunClipping)
 ## with a "CÒN TIẾP" stamp. Any key / click after that returns to the main menu.
+## After đêm rằm (RamNight.ending_id()) the lines are that ending's card,
+## shown as narration; the drowned ending is on a dark page.
 
 const MAIN_MENU_PATH: String = "res://scenes/main_menu/main_menu.tscn"
 
@@ -20,6 +22,8 @@ const MAIN_MENU_PATH: String = "res://scenes/main_menu/main_menu.tscn"
 @export var fish_catalog: FishCatalog
 
 var _can_leave: bool = false
+var _narration := false
+var _dark := false
 
 @onready var _lines_box: VBoxContainer = %LinesBox
 @onready var _to_be_continued: Label = %ToBeContinuedLabel
@@ -40,16 +44,34 @@ func _ready() -> void:
 	home.modulate.a = 0.0
 	_hint_label.set_meta("home", home)
 	_hint_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_use_ram_card()
 	_play()
+
+
+## Đêm rằm's ending card instead of the old lines.
+func _use_ram_card() -> void:
+	var id := RamNight.ending_id()
+	if id == "":
+		return
+	var card: RamLinesData = RamFx3D.LINES
+	_narration = true
+	lines = card.card_drowned if id == "drowned" else card.card_true
+	_to_be_continued.text = card.card_title_drowned if id == "drowned" else card.card_title_true
+	if id == "drowned":
+		_dark = true
+		($White as ColorRect).color = Color("0d1114")
+		_to_be_continued.add_theme_color_override("font_color", Color("9fe6e0"))
 
 
 func _play() -> void:
 	await get_tree().create_timer(1.0).timeout
 	for text in lines:
 		var label := Label.new()
-		label.text = "Rin: " + text
+		label.text = text if _narration else "Rin: " + text
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.theme_type_variation = &"InkLabel"
+		if _dark:
+			label.add_theme_color_override("font_color", Color("d8d2c4"))
 		label.modulate.a = 0.0
 		_lines_box.add_child(label)
 		await _fade_in(label)

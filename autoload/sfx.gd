@@ -52,6 +52,10 @@ const SOUNDS := {
 	"whisper": [{"w": "noise", "lp": 0.9, "d": 1.5, "v": 0.09, "a": 0.3, "swell": 0.23},
 		{"at": 0.2, "w": "noise", "lp": 0.6, "d": 1.1, "v": 0.05, "a": 0.2, "swell": 0.31}],
 	"static": [{"w": "noise", "lp": 0.95, "d": 0.45, "v": 0.24, "a": 0.01}, {"at": 0.05, "w": "square", "f": [60, 60], "d": 0.3, "v": 0.05}],
+	# Đêm rằm (H7): tea poured into a cup; a temple bell; something heavy dragged over planks.
+	"tea": [{"w": "noise", "lp": 0.45, "d": 0.7, "v": 0.12, "a": 0.08}, {"at": 0.6, "w": "tri", "f": [1900, 1800], "d": 0.06, "v": 0.08}],
+	"bell": [{"w": "sine", "f": [196, 194], "d": 2.6, "v": 0.32}, {"at": 0.0, "w": "sine", "f": [523, 520], "d": 1.4, "v": 0.08}],
+	"drag": [{"w": "noise", "lp": 0.1, "d": 1.4, "v": 0.3, "a": 0.3, "swell": 0.6}, {"at": 0.0, "w": "sine", "f": [70, 55], "d": 1.2, "v": 0.18}],
 }
 const LOOPS := {
 	"heartbeat": [{"w": "sine", "f": [70, 45], "d": 0.14, "v": 0.6}, {"at": 0.22, "w": "sine", "f": [60, 40], "d": 0.16, "v": 0.45},

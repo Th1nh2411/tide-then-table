@@ -4,7 +4,7 @@ extends Node3D
 ## the water some way out from the dock, with something floating in it — a
 ## bottle, a rope, a diary page. Rowing there and pressing E picks it up and
 ## shows it up close (PaperReader; CLUES, one per day). Kept in Rin's notebook
-## ("note_clue_<day>", survives loop resets). Not added on omen nights.
+## ("note_clue_<day>", survives loop resets). Not added on omen nights or rằm.
 
 const CLUES: LinesData = preload("res://data/story/clues.tres")
 const REACH := 2.6
@@ -21,7 +21,7 @@ var _time := 0.0
 
 
 static func attach(owner: SeaScene3D) -> NightErrand3D:
-	if GameState.has_flag(LoopCalendar.OMEN_FLAG):
+	if GameState.has_flag(LoopCalendar.OMEN_FLAG) or RamNight.is_ram():
 		return null
 	var errand := NightErrand3D.new()
 	errand.name = "NightErrand"
