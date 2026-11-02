@@ -4,7 +4,8 @@ extends Control
 ## thank-you for playtesters, as a taped newspaper clipping (RunClipping)
 ## with a "CÒN TIẾP" stamp. Any key / click after that returns to the main menu.
 ## After đêm rằm (RamNight.ending_id()) the lines are that ending's card,
-## shown as narration; the drowned ending is on a dark page.
+## shown as narration over that ending's painting (EndingPainting, lower
+## third, outlined); the painting dims for the run card.
 
 const MAIN_MENU_PATH: String = "res://scenes/main_menu/main_menu.tscn"
 
@@ -24,6 +25,7 @@ const MAIN_MENU_PATH: String = "res://scenes/main_menu/main_menu.tscn"
 var _can_leave: bool = false
 var _narration := false
 var _dark := false
+var _painting: EndingPainting
 
 @onready var _lines_box: VBoxContainer = %LinesBox
 @onready var _to_be_continued: Label = %ToBeContinuedLabel
@@ -61,16 +63,29 @@ func _use_ram_card() -> void:
 		_dark = true
 		($White as ColorRect).color = Color("0d1114")
 		_to_be_continued.add_theme_color_override("font_color", Color("9fe6e0"))
+	_painting = EndingPainting.add(self, id)
+	if _painting:
+		_dark = true
+		($White as ColorRect).color = Color.BLACK
+		var box := $CenterContainer as Control
+		box.anchor_top = 0.62  # the lines sit over the painting's lower third
+		box.anchor_bottom = 1.0
+		EndingPainting.outline(_to_be_continued, Color("9fe6e0") if id == "drowned" else Color("f3e3c0"))
 
 
 func _play() -> void:
-	await get_tree().create_timer(1.0).timeout
+	if _painting:
+		await _painting.fade_in()
+	else:
+		await get_tree().create_timer(1.0).timeout
 	for text in lines:
 		var label := Label.new()
 		label.text = text if _narration else "Rin: " + text
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.theme_type_variation = &"InkLabel"
-		if _dark:
+		if _painting:
+			EndingPainting.outline(label, Color("ece6d8"))
+		elif _dark:
 			label.add_theme_color_override("font_color", Color("d8d2c4"))
 		label.modulate.a = 0.0
 		_lines_box.add_child(label)
@@ -92,6 +107,11 @@ func _show_run_card() -> void:
 	for child in _lines_box.get_children():
 		child.queue_free()
 	_to_be_continued.hide()  # the clipping's stamp says it now
+	if _painting:
+		await _painting.dim()
+		($CenterContainer as Control).anchor_top = 0.0
+		($CenterContainer as Control).anchor_bottom = 1.0
+		EndingPainting.outline(_hint_label, Color("ece6d8"))
 	_lines_box.modulate.a = 1.0
 	var total := fish_catalog.fish.size() if fish_catalog else 0
 	var clipping := RunClipping.new()

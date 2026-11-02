@@ -81,11 +81,11 @@ static func take_result() -> Result:
 		return Result.RESET if RamNight.current(went_out) == RamNight.Ending.LOOP else Result.END
 	var omen := GameState.has_flag(OMEN_FLAG)
 	if omen and went_out:
-		GameState.set_flag(MISSED_FLAG, str(GameState.story_flags.get(OmenPicker.ID_FLAG, "")))
+		_remember_miss(str(GameState.story_flags.get(OmenPicker.ID_FLAG, "")))
 		return Result.RESET
 	if not omen and (not went_out or fish < MIN_FISH):
 		last_calm_miss = true
-		GameState.set_flag(MISSED_FLAG, MISSED_CALM)
+		_remember_miss(MISSED_CALM)
 		return Result.RESET
 	GameState.set_flag(SHOP_FISH_FLAG, fish if went_out else 0)
 	if omen:
@@ -100,6 +100,12 @@ static func take_result() -> Result:
 static func dread_level(day: int = -1) -> float:
 	var d := GameState.day if day < 0 else day
 	return clampf(float(d - 1) / float(NIGHTS - 1), 0.0, 1.0)
+
+
+## The last miss, plus "note_missed_<id>" so Rin's notebook keeps every hint heard.
+static func _remember_miss(id: String) -> void:
+	GameState.set_flag(MISSED_FLAG, id)
+	GameState.set_flag(MISSED_FLAG + "_" + id)
 
 
 static func missed() -> String:

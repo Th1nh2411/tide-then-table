@@ -37,6 +37,7 @@ func _exit_tree() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if _scene and event.is_action_pressed("notebook") and not get_tree().paused: RinNotebook.open(_scene)
 	var motion := event as InputEventMouseMotion
 	if motion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		var speed := GameSettings.mouse_speed()  # sensitivity + invert Y (Cài đặt)

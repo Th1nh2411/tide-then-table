@@ -6,7 +6,7 @@ extends CanvasLayer
 ## is shown once (story flag "tip_<id>", saved). One at a time, in the order
 ## the rules were added. Subclasses add rules in `_add_rules()`.
 ## Hidden while the game is paused, except rules made for paused screens
-## (the hold window). Text stays short: the full guide is HelpPanel.
+## (the hold window). Text stays short: the key list lives in Cài đặt (SettingsPanel).
 ## Look: a stepped pixel ring (ink + gold) on the target, a red arrow, and
 ## the words on a small yellow paper tag ("TagPanel") pinned with a push
 ## pin (stickers/pin.png), bobbing gently.
