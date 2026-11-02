@@ -55,19 +55,37 @@ func _ready() -> void:
 
 
 func has_sound(sound: String) -> bool:
-	return _streams.has(sound)
+	return _streams.has(sound) or SfxEnvRecipes.SOUNDS.has(sound) or SfxEnvRecipes.LOOPS.has(sound)
+
+
+## Footstep on "wood" / "sand" / "dirt" (SfxEnvRecipes.STEPS), a random variation.
+func step(surface: String) -> void:
+	var names: Array = SfxEnvRecipes.STEPS.get(surface, [])
+	if not names.is_empty():
+		play(String(names.pick_random()), 0.08)
+
+
+## The stream of a sound; village-map sounds (SfxEnvRecipes) are built on
+## first use so startup stays fast.
+func _stream(sound: String) -> AudioStreamWAV:
+	if not _streams.has(sound):
+		if SfxEnvRecipes.SOUNDS.has(sound):
+			_streams[sound] = SfxSynth.build(SfxEnvRecipes.SOUNDS[sound])
+		else:
+			_streams[sound] = SfxSynth.build(SfxEnvRecipes.LOOPS[sound], true)
+	return _streams[sound]
 
 
 ## One-shot; a little pitch jitter so repeats don't sound robotic.
 func play(sound: String, jitter: float = 0.05) -> void:
-	if not _streams.has(sound):
+	if not has_sound(sound):
 		push_warning("Unknown sound: " + sound)
 		return
 	if silent:
 		return
 	var player := _pool[_next]
 	_next = (_next + 1) % _pool.size()
-	player.stream = _streams[sound]
+	player.stream = _stream(sound)
 	player.pitch_scale = 1.0 + randf_range(-jitter, jitter)
 	player.play()
 
@@ -75,11 +93,11 @@ func play(sound: String, jitter: float = 0.05) -> void:
 ## One-shot at an exact pitch, `semitones` above / below the recipe (the
 ## fishing rhythm game plays a little tune this way).
 func play_note(sound: String, semitones: float) -> void:
-	if silent or not _streams.has(sound):
+	if silent or not has_sound(sound):
 		return
 	var player := _pool[_next]
 	_next = (_next + 1) % _pool.size()
-	player.stream = _streams[sound]
+	player.stream = _stream(sound)
 	player.pitch_scale = pow(2.0, semitones / 12.0)
 	player.play()
 
@@ -87,10 +105,10 @@ func play_note(sound: String, semitones: float) -> void:
 ## One-shot placed in the 3D world at `at` (under `host`, freed when done),
 ## so the player hears where it comes from. Silent when headless.
 func play_at(sound: String, at: Vector3, host: Node3D, pitch: float = 1.0, unit_size: float = 6.0) -> void:
-	if silent or not _streams.has(sound) or host == null or not host.is_inside_tree():
+	if silent or not has_sound(sound) or host == null or not host.is_inside_tree():
 		return
 	var player := AudioStreamPlayer3D.new()
-	player.stream = _streams[sound]
+	player.stream = _stream(sound)
 	player.pitch_scale = pitch
 	player.unit_size = unit_size
 	player.max_distance = 80.0
@@ -124,7 +142,7 @@ func hold(sound: String, on: bool) -> void:
 		if not on:
 			return
 		var player := AudioStreamPlayer.new()
-		player.stream = _streams[sound]
+		player.stream = _stream(sound)
 		add_child(player)
 		_holds[sound] = player
 	var looping: AudioStreamPlayer = _holds[sound]
@@ -146,7 +164,7 @@ func ambience(sound: String) -> void:
 	if sound == "":
 		_ambience.stop()
 		return
-	_ambience.stream = _streams[sound]
+	_ambience.stream = _stream(sound)
 	_ambience.play()
 
 
@@ -163,7 +181,7 @@ func set_muted(on: bool, save: bool = true) -> void:
 ## Silence everything (before quitting: SceneRouter.quit_game).
 ## The horror bed under the ambience (HorrorBed: tape hiss, vinyl crackle,
 ## broken radio, glitches, drone): "room", "street", "sea", "sea_dark"
-## (đêm âm), or "" to stop.
+## (đêm âm), village map "house" / "lane" / "waterfront", or "" to stop.
 func bed(mix_name: String) -> void:
 	if mix_name == _bed_name:
 		return

@@ -4,6 +4,9 @@ extends RefCounted
 ## old tape hissing, a vinyl record crackling, a broken radio drifting
 ## through static, glitches that drop or stutter the sound, and a low,
 ## slightly detuned drone. Each place mixes the layers differently (MIXES).
+## Village-map mixes also layer environment loops (SfxEnvRecipes.LOOPS)
+## under the horror layers: "env" = [[loop, volume, muffle]], muffle 0 = clear,
+## small values (0.05..0.2) = heard through a wall.
 ## Pure logic: build(name) returns a looping AudioStreamWAV.
 
 const RATE := 22050
@@ -15,10 +18,24 @@ const MIXES := {
 	"sea": {"hiss": 0.045, "crackle": 0.06, "radio": 0.07, "glitch": 0.7, "drone": 0.06},
 	# Đêm âm: more radio and glitches, a louder drone pitched lower.
 	"sea_dark": {"hiss": 0.06, "crackle": 0.04, "radio": 0.12, "glitch": 1.0, "drone": 0.11, "drone_hz": 41.0},
+	# Village map. Inside Rin's house: the dusk outside, muffled by the walls.
+	"house": {"hiss": 0.04, "crackle": 0.13, "radio": 0.0, "glitch": 0.25, "drone": 0.045,
+		"env": [["insects", 0.9, 0.18], ["wind_palms", 0.7, 0.08]]},
+	# The lane between houses: cicadas, wind in the palms, a village far off.
+	"lane": {"hiss": 0.03, "crackle": 0.07, "radio": 0.03, "glitch": 0.4, "drone": 0.03,
+		"env": [["insects", 0.8, 0.0], ["wind_palms", 0.6, 0.0], ["village_night", 0.8, 0.0]]},
+	# The waterfront: water under the pier, wind off the sea.
+	"waterfront": {"hiss": 0.035, "crackle": 0.06, "radio": 0.04, "glitch": 0.5, "drone": 0.05,
+		"env": [["pier_lap", 1.0, 0.0], ["wind_palms", 0.7, 0.0]]},
 }
 
 
 static func build(mix_name: String) -> AudioStreamWAV:
+	return _to_wav(render(mix_name))
+
+
+## Raw (unclamped) samples of a mix, for peak checks.
+static func render(mix_name: String) -> PackedFloat32Array:
 	var mix: Dictionary = MIXES.get(mix_name, MIXES["room"])
 	var n := int(SECONDS * RATE)
 	var out := PackedFloat32Array()
@@ -29,9 +46,26 @@ static func build(mix_name: String) -> AudioStreamWAV:
 	_crackle(out, float(mix["crackle"]), rng)
 	_radio(out, float(mix["radio"]), rng)
 	_drone(out, float(mix["drone"]), float(mix.get("drone_hz", 55.0)))
+	var env: Array = mix.get("env", [])
+	for layer: Array in env:
+		_env(out, String(layer[0]), float(layer[1]), float(layer[2]))
 	_glitch(out, float(mix["glitch"]), rng)
 	_fade_seam(out, int(0.05 * RATE))
-	return _to_wav(out)
+	return out
+
+
+## An environment loop (SfxEnvRecipes.LOOPS) tiled over the bed, optionally
+## low-passed (`muffle` > 0) as if heard through a wall.
+static func _env(out: PackedFloat32Array, loop_name: String, volume: float, muffle: float) -> void:
+	var src := SfxSynth.render(SfxEnvRecipes.LOOPS[loop_name], true)
+	var lift := 1.0 if muffle <= 0.0 else 1.6  # walls eat level too: give some back
+	var low := 0.0
+	for i in out.size():
+		var s := src[i % src.size()]
+		if muffle > 0.0:
+			low += (s - low) * muffle
+			s = low
+		out[i] += s * volume * lift
 
 
 ## Tape hiss: bright noise whose level wobbles slowly (worn tape, wow).
