@@ -71,9 +71,10 @@ chỉnh ở đâu. Việc còn lại: `PLAN.md` → "Việc còn lại". Art: `A
   A* theo `TABLE_COLLISION_SIZE` / `TABLE_NAV_SIZE`; helper `table_offset()`. Bảo đứng mép
   trái xe bếp, Cô Năm mép trái quầy; bảng thực đơn cạnh lối vào.
 - **Mặt bằng:** nâng cấp `seats` hiện tên "Mặt bằng" (450k/1.200k, 4 → 6 → 8 bàn, giữ ID
-  save). Ban đầu rào thấp chặn gian chưa thuê; mỗi cấp mở thêm gian bên trái (2 bàn),
-  dời ranh giới, mở sàn và cập nhật A*. Hủy preview không trừ tiền. Ranh giới/sàn:
-  `RestaurantLease3D`.
+  save). Gian chưa thuê là vỉa hè công cộng bình thường (không rào, đi qua được); mỗi cấp
+  thêm 2 bàn ở gian bên trái và cập nhật A*. Hủy preview không trừ tiền. Ô xanh xem trước:
+  `RestaurantLease3D.preview`. Cây vỉa hè và cột đèn dây đứng ở mép vỉa hè
+  (`RestaurantLayout3D.CURB_PROP_Z`), không dưới lòng đường.
 - **Sửa quán:** `RenovationPreview3D` xem trước bàn/gian thuê, trang trí (đèn lồng, chậu
   cây), bếp (xe đẩy cấp 0–2) và tủ lạnh (cấp 0–2) dạng bóng mờ; Xác nhận mới giữ.
 - **Khách ngồi:** SitDown → SitIdle → StandUp đúng ghế (clip tạo lúc chạy,

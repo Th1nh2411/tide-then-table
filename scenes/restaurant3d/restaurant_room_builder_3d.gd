@@ -71,7 +71,6 @@ static func build(host: Node3D) -> void:
 	var mid_z := (L.FRONT_Z + L.BACK_Z) * 0.5
 	var width := L.ROOM_X * 2.0
 	_shell(host, depth, mid_z, width)
-	RestaurantLease3D.build(host)
 	_decor(host)
 	_tables(host)
 	_kitchen(host)
@@ -165,7 +164,6 @@ static func _shell(host: Node3D, depth: float, mid_z: float, width: float) -> vo
 	for x in range(int(width)):
 		for z in range(int(depth)):
 			var tile := box(host, Vector3(x - L.ROOM_X + 0.5, -0.02, z + L.BACK_Z + 0.5), Vector3(0.96, 0.05, 0.96), "8e8c79" if (x + z) % 3 == 0 else "797e73")
-			tile.name = "LeaseTile_%d_%d" % [x,z]
 			tile.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	box(host, Vector3(0, L.WALL_H * 0.5, L.BACK_Z - 0.2), Vector3(width, L.WALL_H, 0.3), "b6a183", true)
 	box(host, Vector3(0, 0.4, L.BACK_Z - 0.02), Vector3(width, 0.8, 0.1), "577277")
@@ -189,7 +187,7 @@ static func _shell(host: Node3D, depth: float, mid_z: float, width: float) -> vo
 ## Lanterns and planters appear with the decor upgrade.
 static func _decor(host: Node3D) -> void:
 	for x: float in [-17.0, 17.0]:
-		RestaurantBatchVisuals.add(host, "sidewalk_tree", Vector3(x, 0, 9.25))
+		RestaurantBatchVisuals.add(host, "sidewalk_tree", Vector3(x, 0, L.CURB_PROP_Z))
 	var decor_level := GameState.get_upgrade_level("decor")
 	if decor_level > 0:
 		for x in L.DECOR_LANTERNS:

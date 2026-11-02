@@ -16,6 +16,7 @@ const FIXED: Array[Rect2] = [
 	Rect2(RestaurantLayout3D.BOARD_POSITION.x-.75, RestaurantLayout3D.BOARD_POSITION.z-.06, 1.5, .12), # menu board
 	Rect2(8.2, -4.7, 3.6, 0.8),     # grocery counter
 	Rect2(-1.95, -7.6, 0.9, 0.8),    # fridge
+	Rect2(2.6, RestaurantLayout3D.CURB_PROP_Z-.2, .4, .4), # string-light pole
 ]
 
 static var shared: FloorGrid3D
@@ -42,12 +43,6 @@ func _init(tables: Array) -> void:
 		_block(Rect2(table.x - TABLE_SIZE.x * 0.5, table.z - TABLE_SIZE.y * 0.5, TABLE_SIZE.x, TABLE_SIZE.y))
 	for rect in FIXED:
 		_block(rect)
-	var left := RestaurantLayout3D.lease_left(GameState.get_upgrade_level("seats"))
-	for x in SIZE.x:
-		for y in SIZE.y:
-			var p := ORIGIN+Vector2(x+.5,y+.5)*CELL
-			if p.y < RestaurantLayout3D.PUBLIC_WALK_Z+.3 and (p.x < left+.3 or p.x > RestaurantLayout3D.LEASE_RIGHT-.3):
-				astar.set_point_solid(Vector2i(x,y),true)
 
 
 ## True when the point sits on furniture (with padding).

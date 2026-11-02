@@ -65,8 +65,6 @@ func apply() -> bool:
 	var service_room := room as RestaurantScene3D
 	if service_room and last_seat_change:
 		RestaurantRoomBuilder3D.add_tables(service_room,service_room.guests.size())
-	var lease := room.get_node_or_null("RestaurantLease") as RestaurantLease3D
-	if lease: lease.refresh()
 	close()
 	finished.emit(true)
 	return true

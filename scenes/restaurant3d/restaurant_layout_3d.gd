@@ -18,6 +18,8 @@ const COUNTER_POSITION := Vector3(10.0, 0, -4.3)
 const DECOR_LANTERNS: Array[float] = [-16.0, -12.0, -8.0, -4.0, 0.0, 4.0, 8.0, 12.0, 16.0]
 const DECOR_PLANTERS: Array[float] = [-18.5, 18.5]
 const PLANTER_Z := 7.3
+## Street trees and the string-light pole stand on the pavement edge, not the road.
+const CURB_PROP_Z := 7.7
 const BOARD_POSITION := Vector3(6.2, 0, 5.8)
 const KITCHEN_BOARD_POSITION := Vector3(5.8, 0, -1.7)
 const PASS_POSITION := Vector3(-0.8, 0, -4.3)

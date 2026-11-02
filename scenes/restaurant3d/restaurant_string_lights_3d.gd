@@ -2,7 +2,7 @@ class_name RestaurantStringLights3D
 extends RefCounted
 ## One supported festoon cable from the wall over the tables to a curb-side pole.
 const START := Vector3(-7.5,4.0,-7.65)
-const END := Vector3(-7.5,4.2,8.75)
+const END := Vector3(-7.5,4.2,RestaurantLayout3D.CURB_PROP_Z)
 const SAG := .65
 
 static func cable_point(t: float) -> Vector3:
@@ -42,9 +42,11 @@ static func build(host: Node3D) -> void:
 	_rod(root,START+Vector3(0,0,-.18),START,.045,metal).name = "WallAnchor"
 	_rod(root,Vector3(END.x,0,END.z),END,.065,metal).name = "CurbPole"
 	_rod(root,Vector3(END.x,0,END.z),Vector3(END.x,.18,END.z),.16,_material("797e73"))
+	RestaurantRoomBuilder3D.solid_block(root,Vector3(END.x,1.0,END.z),Vector3(.3,2.0,.3))
 	for i in 24:
 		_rod(root,cable_point(float(i)/24),cable_point(float(i+1)/24),.014,wire)
-	for i in 9:
+	# Bulbs end before the pole (last at z 6.5).
+	for i in 8:
 		var z := -5.4+float(i)*1.7
 		var t := (z-START.z)/(END.z-START.z)
 		var at := cable_point(t)

@@ -28,7 +28,7 @@ func _run() -> void:
 	await get_tree().process_frame
 	var lane := Vector3(-5.5,0,1.8)
 	check(room.guests.size()==4 and RestaurantLayout3D.TABLES[0].z>RestaurantLayout3D.GRILL_POSITION.z+2,"Initial four tables sit directly in front of the food cart")
-	check(FloorGrid3D.get_shared(room.TABLES).blocked_at(lane),"Unrented bay is closed to navigation")
+	check(not FloorGrid3D.get_shared(room.TABLES).blocked_at(lane) and room.get_node_or_null("RestaurantLease")==null,"Unrented bay is open public pavement (no fence)")
 	var paired := true
 	for i in room.guests.size():
 		var guest := room.guests[i] as PersonRig3D
@@ -38,14 +38,14 @@ func _run() -> void:
 	check(paired,"Two guests sit opposite each other across the short width of every table")
 	var r := _renovation(room)
 	r.set_level(room.seats_upgrade,1)
-	check(r.ghosts.get_child_count()>0 and GameState.get_upgrade_level("seats")==0 and FloorGrid3D.get_shared(room.TABLES).blocked_at(lane),"Preview shows new floor/tables without unlocking or buying the bay")
+	check(r.ghosts.get_child_count()>0 and GameState.get_upgrade_level("seats")==0,"Preview shows new floor/tables without buying the bay")
 	r.cancel()
 	check(GameState.money==5000 and GameState.get_upgrade_level("seats")==0,"Cancel leaves the lease and money unchanged")
 	r.open();r.set_level(room.seats_upgrade,1)
 	var cost := r.total_cost()
 	check(r.apply() and cost==450 and GameState.money==5000-cost,"First lease upgrade charges the existing 450k once")
 	check(room.guests.size()==6 and room.orders.size()==6 and room.table_plates.size()==6,"Purchase opens all six table slots immediately")
-	check(not FloorGrid3D.get_shared(room.TABLES).blocked_at(lane) and (room.get_node("RestaurantLease") as RestaurantLease3D)._level==1,"Purchase moves the boundary, opens the floor and rebuilds navigation")
+	check(FloorGrid3D.get_shared(room.TABLES).blocked_at(Vector3(-4,0,0)),"Purchase rebuilds navigation around the new tables")
 	var collision := false
 	for node in room.find_children("*","StaticBody3D",true,false):
 		if (node as Node3D).global_position.distance_to(Vector3(-4,.8,0))<.01: collision = true
