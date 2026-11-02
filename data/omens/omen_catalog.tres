@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="OmenCatalog" format=3]
+
+[ext_resource type="Script" path="res://data/resources/omen_catalog.gd" id="1_catalog"]
+[ext_resource type="Script" path="res://data/resources/omen_data.gd" id="2_omen"]
+[ext_resource type="Resource" path="res://data/omens/mam_cung.tres" id="3_mam_cung"]
+[ext_resource type="Resource" path="res://data/omens/led_chao.tres" id="4_led_chao"]
+[ext_resource type="Resource" path="res://data/omens/xe_khong_nguoi.tres" id="5_xe_khong_nguoi"]
+[ext_resource type="Resource" path="res://data/omens/vang_ma.tres" id="6_vang_ma"]
+[ext_resource type="Resource" path="res://data/omens/tien_le.tres" id="7_tien_le"]
+[ext_resource type="Resource" path="res://data/omens/goi_ten.tres" id="8_goi_ten"]
+[ext_resource type="Resource" path="res://data/omens/hoa_dang.tres" id="9_hoa_dang"]
+[ext_resource type="Resource" path="res://data/omens/hai_dang.tres" id="10_hai_dang"]
+[ext_resource type="Resource" path="res://data/omens/bong_cau_tau.tres" id="11_bong_cau_tau"]
+
+[resource]
+script = ExtResource("1_catalog")
+omens = Array[ExtResource("2_omen")]([ExtResource("3_mam_cung"), ExtResource("4_led_chao"), ExtResource("5_xe_khong_nguoi"), ExtResource("6_vang_ma"), ExtResource("7_tien_le"), ExtResource("8_goi_ten"), ExtResource("9_hoa_dang"), ExtResource("10_hai_dang"), ExtResource("11_bong_cau_tau")])
+chance = 0.5
+first_day = 2
+last_day = 6
+customs_min = 1
+customs_max = 2
+customs_on_omen_night = 1

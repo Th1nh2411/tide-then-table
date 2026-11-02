@@ -1,9 +1,10 @@
 extends Node
 ## Integration bot for the horror build's day loop (PLAN §10): bedroom ->
-## restaurant -> dock end -> night at sea -> bedroom, mùng 9 to rằm, then the
-## ending. Once (on day 2) it takes the home end on a calm night to check the
-## reset to mùng 9. Travel and minigame skill are scripted; scenes, service,
-## bills, story and transitions are real.
+## restaurant -> street end -> (night at sea) -> bedroom, mùng 9 to rằm, then
+## the ending. Perfect info: on omen nights (OmenPicker) it takes the home
+## end, otherwise the dock. Once (day 2 of the first loop) it picks the wrong
+## end to check the reset to mùng 9. Travel and minigame skill are scripted;
+## scenes, service, bills, story and transitions are real.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
 const BEDROOM := "res://scenes/home3d/bedroom_scene_3d.tscn"
@@ -159,6 +160,7 @@ func _run() -> void:
 	GameState.reset()
 	SceneRouter.go_to(BEDROOM)
 	var reset_checked := false
+	var expect_reset := ""
 	for step: int in range(20):
 		var room: Node = await _until_any([BEDROOM, END])
 		if not room:
@@ -171,28 +173,53 @@ func _run() -> void:
 			print("RUN ENDING | 3D | day %d | loops %d" % [GameState.day, LoopCalendar.loops()])
 			get_tree().quit(1 if _failed else 0)
 			return
-		print("HOME | %s | loops %d" % [LoopCalendar.date_text(GameState.day), LoopCalendar.loops()])
+		if expect_reset != "":
+			if GameState.day != 1 or LoopCalendar.loops() != 1:
+				_fail(expect_reset + " did not reset to mùng 9")
+				return
+			print("LOOP RESET | %s -> %s" % [expect_reset, LoopCalendar.date_text(GameState.day)])
+			expect_reset = ""
+		var omen := OmenPicker.tonight()
+		if GameState.has_flag(LoopCalendar.OMEN_FLAG) != (omen != null):
+			_fail("omen flags out of sync")
+			return
+		var customs := OmenPicker.customs(OmenPicker.CATALOG, LoopCalendar.loops(), GameState.day)
+		print("HOME | %s | loops %d | omen %s | customs %s" % [LoopCalendar.date_text(GameState.day), LoopCalendar.loops(),
+			omen.id if omen else "-", ",".join(customs)])
 		room.leave()
 		var quan: Node = await _until(QUAN)
 		if not quan:
 			return
-		var test_reset := not reset_checked and GameState.day == 2
-		await _service(quan, test_reset)
-		if test_reset:
+		if omen and not _omen_shown(quan, omen):
+			return
+		var go_home := omen != null
+		if not reset_checked and GameState.day == 2:
 			reset_checked = true
-			room = await _until(BEDROOM)
-			if not room:
-				return
-			if GameState.day != 1 or LoopCalendar.loops() != 1:
-				_fail("home on a calm night did not reset to mùng 9")
-				return
-			print("LOOP RESET | home on a calm night -> %s" % LoopCalendar.date_text(GameState.day))
+			go_home = not go_home
+			expect_reset = "out on an omen night" if omen else "home on a calm night"
+		await _service(quan, go_home)
+		if go_home:
 			continue
 		var sea: Node = await _until(SEA)
 		if not sea:
 			return
+		if omen and omen.where == OmenData.Where.DOCK and not sea.has_node("DockOmens"):
+			_fail("no dock omen props")
+			return
 		await _night(sea)
 	_fail("no ending after 20 days")
+
+## The restaurant built tonight's omen props (the dock's are checked at sea).
+func _omen_shown(quan: Node, omen: OmenData) -> bool:
+	var props := quan.get_node_or_null("Omens") as RestaurantOmens3D
+	var ok := props != null
+	if ok and omen.id == "mam_cung":
+		ok = (props.get_node("Offering") as OmenOffering3D).eaten
+	elif ok and omen.id == "led_chao":
+		ok = (props.get_node("LedSign") as OmenLedSign3D).items.has(omen.text)
+	if not ok:
+		_fail("omen %s not shown" % omen.id)
+	return ok
 
 func _fail(reason: String) -> void:
 	_failed = true

@@ -2,7 +2,8 @@ class_name BedroomScene3D
 extends Node3D
 ## Rin's room, where every day of the loop starts (horror build, PLAN §10).
 ## On arrival it judges last night's street-end choice (LoopCalendar): next
-## day, back to mùng 9, or the ending; then autosaves. Rin walks (first
+## day, back to mùng 9, or the ending; picks tonight's omen (OmenPicker);
+## then autosaves. Rin walks (first
 ## person, FirstPersonView3D) to read the paper under the door and leaves
 ## through the door with E ("Ra quán").
 
@@ -34,6 +35,7 @@ func _ready() -> void:
 		LoopCalendar.next_day()
 	elif result == LoopCalendar.Result.RESET:
 		LoopCalendar.reset_loop()
+	OmenPicker.start_day()
 	_calendar = BedroomBuilder3D.build(self)
 	_calendar.text = LoopCalendar.date_text(GameState.day).replace(" tháng", "\ntháng")
 	player = CharacterBody3D.new()

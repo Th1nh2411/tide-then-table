@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OmenData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/omen_data.gd" id="1_omen"]
+
+[resource]
+script = ExtResource("1_omen")
+id = "mam_cung"
+where = 0
+title = "Mâm cúng bị ăn dở"
+text = ""
+calm_text = ""
+co_nam_line = "Ủa... ai ăn mâm cúng của cô vầy nè? Cô mới bày hồi chiều mà."
+custom = true

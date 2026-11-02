@@ -25,5 +25,6 @@ static func build_tools(sea: SeaScene3D) -> void:
 	cinematic.hidden_figure = sea.rin_figure
 	sea.cinematic = cinematic
 	sea.add_child(cinematic)
+	DockOmens3D.build(sea)
 	sea.camera.position = sea.boat.position + SeaScene3D.CAMERA_OFFSET
 	sea.camera.look_at(sea.boat.position + Vector3(0, .65, -SeaScene3D.CAMERA_LOOK_AHEAD))

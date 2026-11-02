@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="OmenData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/omen_data.gd" id="1_omen"]
+
+[resource]
+script = ExtResource("1_omen")
+id = "tien_le"
+where = 1
+title = "Tiền lẻ rơi trên đường ra bến"
+text = ""
+calm_text = ""
+co_nam_line = ""
