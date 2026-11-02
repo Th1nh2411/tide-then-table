@@ -6,6 +6,11 @@ extends Resource
 
 @export var title: String = "BẢN TIN NGỦ QUÊN"
 @export_multiline var pages: Array[String] = []
+## Extra item on the morning after Rin stayed home on a calm night (the loop
+## reset): one more fisherman missing. Read, never said by Rin.
+@export_multiline var missing_item: String = ""
+## Story flag set for that morning (cleared when the next day starts).
+const MISSING_FLAG := "news_missing"
 
 
 func page(day: int) -> String:

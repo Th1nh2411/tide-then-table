@@ -13,10 +13,13 @@ const CAT_DIALOGUES := [
 ]
 
 const CO_NAM: LinesData = preload("res://data/story/co_nam.tres")
+## Gossip on the morning a fisherman went missing (NewsData.MISSING_FLAG).
+const CO_NAM_MISSING := "Nghe gì chưa con? Đêm qua lại một người đi biển không về. Thúng trôi vô bến, trống trơn."
 
 var host: Node3D
 var _co_nam_line := 0
 var _co_nam_omen_said := false
+var _co_nam_missing_said := false
 
 
 func _init(owner: Node3D) -> void:
@@ -33,7 +36,11 @@ func interact() -> void:
 			host.cat_dialogue.play(dialogue)
 		return
 	if at.distance_to(L.COUNTER_POSITION) < 2.1:
-		# Tonight's omen first, if she has a word about it.
+		# The news first (one more missing), then tonight's omen, then her usual talk.
+		if GameState.has_flag(NewsData.MISSING_FLAG) and not _co_nam_missing_said:
+			_co_nam_missing_said = true
+			host._show_note("%s: %s" % [CO_NAM.speaker, CO_NAM_MISSING])
+			return
 		var omen := OmenPicker.tonight()
 		if omen and omen.co_nam_line != "" and not _co_nam_omen_said:
 			_co_nam_omen_said = true

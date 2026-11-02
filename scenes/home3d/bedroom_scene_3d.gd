@@ -62,10 +62,10 @@ func _ready() -> void:
 	text = OnScreenText.new()
 	add_child(text)
 	if result == LoopCalendar.Result.RESET:
-		# Stayed home on a calm night: nothing seen, only the news of one more missing.
-		var after := "...Lại mùng 9? Báo sáng nay... thêm một người mất tích." if LoopCalendar.last_choice == "home" \
-			else "...Hộc... hộc... Chỉ là mơ... Lại mùng 9?"
-		NightmareWake3D.play(self, after)
+		# Stayed home on a calm night: the morning paper and the street tell what happened.
+		if LoopCalendar.last_choice == "home":
+			GameState.set_flag(NewsData.MISSING_FLAG)
+		NightmareWake3D.play(self, "Hộc... hộc...")
 	GameState.resume_at = "home"
 	SaveSystem.autosave("home")
 	Sfx.ambience("sea")
@@ -105,7 +105,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		leave()
 	elif _near(BedroomBuilder3D.PAPER):
 		get_viewport().set_input_as_handled()
-		text.say("%s — %s\n%s" % [NEWS.title, LoopCalendar.date_text(GameState.day), NEWS.page(GameState.day)], 6.0)
+		var page := NEWS.page(GameState.day)
+		if GameState.has_flag(NewsData.MISSING_FLAG):
+			page = NEWS.missing_item + "\n" + page
+		text.say("%s — %s\n%s" % [NEWS.title, LoopCalendar.date_text(GameState.day), page], 7.0)
 
 
 ## Called from _ready while the fade into this room is still running.

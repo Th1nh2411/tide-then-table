@@ -58,6 +58,7 @@ static func take_result() -> Result:
 
 static func next_day() -> void:
 	GameState.story_flags.erase(OMEN_FLAG)
+	GameState.story_flags.erase(NewsData.MISSING_FLAG)
 	GameState.advance_day(0.0)
 
 

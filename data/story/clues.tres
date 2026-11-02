@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="LinesData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/lines_data.gd" id="1_lines"]
+
+[resource]
+script = ExtResource("1_lines")
+speaker = ""
+lines = Array[String](["Chai thư: \"Thằng cháu... nếu mày đọc được thì đừng ra khơi đêm không trăng. — Ông Tư\"", "Một khúc dây neo trôi dạt: bị cắt gọn bằng dao, buộc nút kiểu dân bè.", "Trang nhật ký gác đèn: \"Đêm 14, đèn xanh ngoài bè. Không phải sương.\"", "Chai thư thứ hai: \"Ông thấy nó kéo thúng người ta vô sương. Ông không dám nói với ai.\"", "Một tấm ván trôi, sơn chữ \"BÈ TÔM HÙM\". Mép ván dính thứ gì sẫm màu.", "Trang cuối nhật ký gác đèn: \"Nó biết tôi thấy. Nếu tôi không về, hãy tìm dưới bè...\""])
