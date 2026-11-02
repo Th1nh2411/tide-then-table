@@ -22,7 +22,7 @@ static func delete_save(path: String = SAVE_PATH) -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
-## Off for the rest of the session after a debug jump (DebugJumpMenu), so a
+## Off for the rest of the session (tests, bots), so a
 ## made-up state never overwrites the real save.
 static var autosave_off: bool = false
 

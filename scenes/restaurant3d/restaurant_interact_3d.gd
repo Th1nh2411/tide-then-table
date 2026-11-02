@@ -1,9 +1,8 @@
 class_name RestaurantInteract3D
 extends RefCounted
-## What E does in the 3D restaurant, by where Rin stands: menu board, the
-## cat, the fridge (store the market bag), Cô Năm's counter, tables (serve
-## the carried plate / clean), the plate table, the grill and the beer tap
-## (CookingOverlay for the oldest waiting dish there).
+## What E does in the 3D restaurant, by where Rin stands: the cat, Cô Năm
+## (she talks, CO_NAM lines), tables (serve the carried plate / clean), the
+## plate table and the beer keg (a tower straight into Rin's hands).
 
 const L = preload("res://scenes/restaurant3d/restaurant_layout_3d.gd")
 const CAT_DIALOGUES := [
@@ -13,7 +12,10 @@ const CAT_DIALOGUES := [
 	preload("res://data/dialogues/cat_mark.tres"),
 ]
 
+const CO_NAM: LinesData = preload("res://data/story/co_nam.tres")
+
 var host: Node3D
+var _co_nam_line := 0
 
 
 func _init(owner: Node3D) -> void:
@@ -22,9 +24,6 @@ func _init(owner: Node3D) -> void:
 
 func interact() -> void:
 	var at: Vector3 = host.player.position
-	if host.planning_panel.visible and at.distance_to(L.BOARD_POSITION) < 2.2:
-		host._toggle_planning()
-		return
 	if host.modal_open():
 		return
 	if host.cat_node and at.distance_to(host.cat_node.position) < 1.3:
@@ -32,16 +31,9 @@ func interact() -> void:
 		if dialogue:
 			host.cat_dialogue.play(dialogue)
 		return
-	if host.bag.has_goods() and host.bag.near_fridge(at):
-		host.bag.store(host.market_stock, host.menu.dishes)
-		Sfx.play("bag")
-		host._show_note("Cất vô tủ lạnh xong.")
-		return
 	if at.distance_to(L.COUNTER_POSITION) < 2.1:
-		host._open_market()
-		return
-	if at.distance_to(L.BOARD_POSITION) < 2.2 and not host.shift_running and not host.shift_over:
-		host._toggle_planning()
+		host._show_note(CO_NAM.line(_co_nam_line))
+		_co_nam_line += 1
 		return
 	if not host.shift_running:
 		return
@@ -62,22 +54,21 @@ func interact() -> void:
 	_cook_here(at)
 
 
-## At the grill / beer tap: start the oldest waiting dish made there.
+## At the beer keg: the oldest waiting beer goes straight into Rin's hands.
 func _cook_here(at: Vector3) -> void:
-	var at_grill: bool = at.distance_to(L.GRILL_POSITION) < 2.4
-	var at_beer: bool = at.distance_to(L.BEER_POSITION) < 1.7
-	if not at_grill and not at_beer:
+	if at.distance_to(L.BEER_POSITION) >= 1.7:
 		return
 	for i: int in range(host.orders.size()):
 		var order: Dictionary = host.orders[i]
 		if order.is_empty() or bool(order.get("cooked", false)):
 			continue
 		var dish: DishData = order["dish"]
-		if (at_beer and dish.instant_serve) or (at_grill and not ChefBao.cooks(dish) and not dish.instant_serve):
+		if dish.instant_serve:
 			host.cooking_table = i
-			host.cooking_overlay.start(dish)
+			Sfx.play("clink")
+			on_cooking_finished(dish, CookingGameBase.Result.PERFECT, 1.0)
 			return
-	host._show_note("Chưa có món đang chờ tại đây.")
+	host._show_note("Chưa bàn nào gọi bia.")
 
 
 func on_cooking_finished(_dish: DishData, _result: CookingGameBase.Result, multiplier: float) -> void:

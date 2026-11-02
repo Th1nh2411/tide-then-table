@@ -26,13 +26,13 @@ const GRILL_POSITION := RestaurantLayout3D.GRILL_POSITION
 const BEER_POSITION := RestaurantLayout3D.BEER_POSITION
 const MEAL_SECONDS := 5.0
 
+## Opens the shift as soon as Rin arrives (tests that drive the shift turn it off).
+@export var auto_open := true
 @export var menu: DishCatalog
 @export var kitchen_upgrade: UpgradeData
 @export var fridge_upgrade: UpgradeData
 @export var seats_upgrade: UpgradeData
 @export var decor_upgrade: UpgradeData
-@export var arrival_cutscenes: Array[Cutscene] = []
-@export var after_shift_cutscenes: Array[Cutscene] = []
 @export var fish_catalog: FishCatalog
 @export var staff_catalog: StaffCatalog
 
@@ -73,7 +73,6 @@ var interaction: RestaurantInteract3D
 var shift: RestaurantShift3D
 var shop: RestaurantShop3D
 var debug_keys: RestaurantDebug3D
-var story_bridge
 var cooking_overlay: CookingOverlay
 var staff_workers: Array[Dictionary]:
 	get: return crew.workers
@@ -144,20 +143,16 @@ func _ready() -> void:
 	_sync_staff()
 	RestaurantSetup3D.build_ui(self)
 	RestaurantSetup3D.build_tools(self)
+	RestaurantSetup3D.open_day(self)
 	StreetEnds3D.build(self)
-	RestaurantSetup3D.open_planning(self)
-	story_bridge = load("res://scenes/story3d/story_bridge_3d.tscn").instantiate()
-	add_child(story_bridge)
-	story_bridge.stage_kind = "restaurant"
 	_play_arrival.call_deferred()
 	Sfx.ambience("street")
 
+## No cutscenes in the horror build: the shift simply opens when Rin arrives.
 func _play_arrival() -> void:
 	planning_panel.hide()
-	await story_bridge.play_eligible(arrival_cutscenes)
-	_apply_arrival_choice()
-	if Guide.once("menu3d"):
-		_show_note("Rin: E ở bảng thực đơn để lên món.")
+	if auto_open and not shift_over:
+		_open_shift()
 
 # --- Crew (Bảo + helpers) ---
 func _sync_staff() -> void:
@@ -306,11 +301,3 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_FOCUS_IN:
 		if mover:
 			mover.on_focus(what == NOTIFICATION_APPLICATION_FOCUS_IN)
-
-func _apply_arrival_choice() -> void:
-	if not GameState.story_flags.has(ArrivalCutscenes.HIRE_VY_FLAG):
-		return
-	GameState.story_flags.erase(ArrivalCutscenes.HIRE_VY_FLAG)
-	var vy: StaffData = staff_roster.catalog.find("vy")
-	if vy != null and staff_roster.hire(vy):
-		_show_note("Vy vào làm từ hôm nay!")

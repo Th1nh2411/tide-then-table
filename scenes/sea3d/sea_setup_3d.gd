@@ -7,11 +7,6 @@ const FISHING_OVERLAY := "res://scenes/fishing3d/fishing_overlay_3d.tscn"
 
 
 static func build_tools(sea: SeaScene3D) -> void:
-	var story_scene := load("res://scenes/story3d/story_bridge_3d.tscn") as PackedScene
-	if story_scene:
-		sea.story_bridge = story_scene.instantiate()
-		sea.add_child(sea.story_bridge)
-		sea.story_bridge.set("stage_kind", "sea")
 	var packed := load(FISHING_OVERLAY) as PackedScene
 	if packed:
 		var overlay := packed.instantiate() as CanvasLayer

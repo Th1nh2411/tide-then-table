@@ -4,10 +4,6 @@
 [ext_resource type="Resource" path="res://data/fish/fish_catalog.tres" id="2"]
 [ext_resource type="Resource" path="res://data/upgrades/boat_upgrade.tres" id="3"]
 [ext_resource type="Resource" path="res://data/weather/weather_catalog.tres" id="4"]
-[ext_resource type="Resource" path="res://data/cutscenes/fog_omen.tres" id="5"]
-[ext_resource type="Resource" path="res://data/cutscenes/cat_arrival.tres" id="6"]
-[ext_resource type="Resource" path="res://data/cutscenes/wave_faint.tres" id="7"]
-[ext_resource type="Script" path="res://data/resources/cutscene.gd" id="8"]
 
 [sub_resource type="CylinderShape3D" id="BoatCollision"]
 radius = 0.75
@@ -18,7 +14,6 @@ script = ExtResource("1")
 fish_catalog = ExtResource("2")
 boat_upgrade = ExtResource("3")
 weather_catalog = ExtResource("4")
-trip_end_cutscenes = Array[ExtResource("8")]([ExtResource("7"), ExtResource("6"), ExtResource("5")])
 
 [node name="Boat" type="CharacterBody3D" parent="."]
 motion_mode = 1

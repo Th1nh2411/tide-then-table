@@ -7,7 +7,8 @@ extends RefCounted
 
 const SEA_SCENE := "res://scenes/sea3d/sea_scene_3d.tscn"
 const BEDROOM_SCENE := "res://scenes/home3d/bedroom_scene_3d.tscn"
-const SHIFT_SECONDS := 180.0
+## Short shifts: one day of the loop should take a few minutes.
+const SHIFT_SECONDS := 120.0
 const TUNINGS := [
 	preload("res://data/restaurant/service_day1.tres"),
 	preload("res://data/restaurant/service_day2.tres"),
@@ -50,7 +51,8 @@ func open_shift() -> void:
 	host.seconds_left = SHIFT_SECONDS
 	host.spawn_clock = host.tuning.first_spawn_delay
 	host.goals.start_shift()
-	host._show_note("Bảo nấu món thường. E ở bàn nhận món; nướng và rót bia do Rin làm. T: đóng sớm.")
+	if Guide.once("shift_h2"):
+		host._show_note("Rin: Bảo nấu, mình bưng. Bia lấy ở thùng. T: đóng sớm.")
 
 
 func tick(delta: float) -> void:
@@ -85,14 +87,9 @@ func close_early() -> void:
 	host._show_note("Rin: đóng cửa, phục vụ nốt khách đang ngồi.")
 
 
-## Something left to sell: planned portions, a regular coming, or market goods.
+## The fixed menu never runs out (RestaurantService3D.FIXED_MENU).
 func has_stock() -> bool:
-	if not host.plan.is_sold_out() or not host.regular_queue.is_empty():
-		return true
-	for dish: DishData in host.menu.dishes:
-		if dish.is_market_dish() and dish.unlock_day <= GameState.day and host.market_stock.portions(dish) > 0:
-			return true
-	return false
+	return true
 
 
 ## Skip the shift (leave() returns the planned fish and releases today's regulars).
@@ -119,8 +116,6 @@ func leave(to_dock: bool) -> void:
 		host.plan.clear(GameState.storage)
 		for visit: Dictionary in host.regular_visits:
 			FishOrders.release(visit)
-	if host.shift_over:
-		await host.story_bridge.play_eligible(host.after_shift_cutscenes)
 	host.bag.store(host.market_stock, host.menu.dishes)
 	GameState.resume_at = "home"
 	if to_dock:

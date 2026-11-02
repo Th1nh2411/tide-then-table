@@ -149,8 +149,9 @@ func _process(delta: float) -> void:
 	for i in _stars.size():
 		_stars[i].modulate.a = 1.0 if i < GameState.last_rating else 0.25
 	var modal: bool = room.modal_open()
-	menu_button.visible = not running and not over and not modal
-	renovate_button.visible = not running and not modal
+	# Horror build: no menu planning, no renovation.
+	menu_button.visible = false
+	renovate_button.visible = false
 	renovate_button.position.y = 30.0 if menu_button.visible else 6.0
 	close_button.visible = running and room.seconds_left > 0.0 and not modal
 	sail_button.visible = false  # leaving is a walk to a street end (StreetEnds3D)

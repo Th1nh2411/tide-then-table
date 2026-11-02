@@ -7,7 +7,7 @@ func _ready() -> void:
 	call_deferred("_run")
 func _room() -> RestaurantScene3D:
 	var room := load("res://scenes/restaurant3d/restaurant_scene_3d.tscn").instantiate() as RestaurantScene3D
-	room.arrival_cutscenes.clear()
+	room.auto_open = false
 	add_child(room)
 	room.set_process(false)
 	room.set_physics_process(false)

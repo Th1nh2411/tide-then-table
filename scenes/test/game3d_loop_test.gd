@@ -45,8 +45,6 @@ func _run() -> void:
 	SceneRouter.fade_duration = 0.01
 	GameState.reset()
 	GameState.money = 1000
-	for cutscene: Cutscene in StoryTimeline.load_all():
-		GameState.set_flag("dlg_" + cutscene.id)
 	SceneRouter.go_to(SEA)
 	var sea: Node = await _scene(SEA)
 	if not sea:
@@ -84,13 +82,7 @@ func _run() -> void:
 	if not quan:
 		return
 	_check(quan is Node3D, "bedroom door routes to native 3D restaurant")
-	var dish: DishData = null
-	for candidate: DishData in quan.menu.dishes:
-		if ChefBao.cooks(candidate) and candidate.kitchen_level == 0 and candidate.ingredients.has(fish.id):
-			dish = candidate
-			break
-	_check(dish != null and quan.plan.add_portion(dish, GameState.storage), "caught fish reserves a real menu portion")
-	quan._open_shift()
+	_check(quan.shift_running, "the shift opens by itself when Rin arrives (no menu planning)")
 	quan._spawn_order()
 	var table: int = -1
 	for i: int in range(quan.orders.size()):
@@ -98,15 +90,22 @@ func _run() -> void:
 			table = i
 			break
 	if table < 0:
-		_check(false, "guest orders a menu portion")
+		_check(false, "guest orders from the fixed menu")
 		get_tree().quit(1)
 		return
-	quan._tick_bao(0.0)
-	quan._tick_bao(20.0)
-	_check(bool(quan.orders[table].get("cooked", false)), "Bao cooks the ordered dish")
-	quan.player.position = quan.PASS_POSITION
-	quan._interact()
-	_check(quan.carrying_table == table, "E at pass picks up cooked plate")
+	var dish: DishData = quan.orders[table]["dish"]
+	_check(RestaurantService3D.FIXED_MENU.dishes.has(dish), "guest orders from the fixed menu")
+	if dish.instant_serve:
+		quan.player.position = quan.BEER_POSITION
+		quan._interact()
+		_check(quan.carrying_table == table, "E at the keg puts the beer tower in Rin's hands")
+	else:
+		quan._tick_bao(0.0)
+		quan._tick_bao(20.0)
+		_check(bool(quan.orders[table].get("cooked", false)), "Bao cooks the ordered dish")
+		quan.player.position = quan.PASS_POSITION
+		quan._interact()
+		_check(quan.carrying_table == table, "E at pass picks up cooked plate")
 	var before: int = GameState.money
 	quan.player.position = quan.TABLES[table] + Vector3(0, 0, 1.2)
 	quan._interact()

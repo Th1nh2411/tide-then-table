@@ -28,6 +28,7 @@ func _run() -> void:
 	StaffPathing3D.step(node, tables, to, 100.0)
 	_ok(node.position.distance_to(to) < 0.01, "staff reaches target in one big step")
 	var room = load("res://scenes/restaurant3d/restaurant_scene_3d.tscn").instantiate()
+	room.auto_open = false
 	add_child(room)
 	await get_tree().process_frame
 	var traffic: CustomerTraffic3D = null

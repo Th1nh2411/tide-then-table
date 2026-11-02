@@ -260,11 +260,10 @@ static func _tables(host: Node3D, start_index := 0) -> void:
 		ready.visible = false
 		host.ready_plates.append(ready)
 
-## Grill, kitchen sign, Cô Năm's counter, Bảo, plate pass and beer tap.
+## Food cart, kitchen sign, Cô Năm's counter, Bảo, plate pass and beer keg (no grill).
 static func _kitchen(host: Node3D) -> void:
 	RestaurantBatchVisuals.upgrade(host, "kitchen", ["food_cart_0", "food_cart_1", "food_cart_2"], L.GRILL_POSITION)
 	solid_block(host, L.GRILL_POSITION + Vector3(0, 0.7, 0), Vector3(2.8, 1.3, 1.25))
-	RestaurantBatchVisuals.add(host, "charcoal_grill", L.GRILL_POSITION + Vector3(-2.25, 0, 0))
 	box(host, L.KITCHEN_BOARD_POSITION + Vector3(0, 0.7, 0), Vector3(1.2, 1.3, 0.1), "884b2b", true)
 	# Cô Năm keeps her grocery counter separate from the kitchen.
 	RestaurantBatchVisuals.add(host, "grocery_counter", L.COUNTER_POSITION)

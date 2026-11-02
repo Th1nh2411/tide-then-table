@@ -24,10 +24,6 @@ func _process(_delta: float) -> void:
 	var scene: Node = get_tree().current_scene
 	if not scene:
 		return
-	var bridge: Variant = scene.get("story_bridge")
-	if bridge is StoryBridge3D and bridge.playing:
-		bridge._skipping = true
-		bridge._dialogue._advanced.emit()
 	if scene.scene_file_path == SEA:
 		if scene.new_catch_card and scene.new_catch_card.visible:
 			scene.new_catch_card._next()
@@ -90,18 +86,8 @@ func _night(sea: Node) -> void:
 	sea._end_trip(false)
 
 func _service(quan: Node, go_home: bool = false) -> void:
-	for i: int in range(120):
-		await get_tree().process_frame
-		if not quan.story_bridge.playing:
-			break
-	quan.plan.auto_fill(quan.menu.dishes, GameState.storage)
-	if not quan._has_stock():
-		if go_home:
-			quan._go_home()
-		else:
-			quan._sail_without_shift()
-		return
-	quan._open_shift()
+	await _frames(3)
+	quan._open_shift()  # normally opens on arrival; a no-op then
 	quan.cooking_overlay.result_seconds = 0.01
 	for turn: int in range(200):
 		if quan.shift_over:
@@ -137,7 +123,8 @@ func _service(quan: Node, go_home: bool = false) -> void:
 				quan._finish_meal(table)
 				quan._clean_table(table)
 		await _frames(1)
-		if not quan._has_stock() and quan.orders.all(func(order: Dictionary) -> bool: return order.is_empty()):
+		# The fixed menu never runs out: serve a while, then close once the tables are empty.
+		if turn >= 40 and quan.orders.all(func(order: Dictionary) -> bool: return order.is_empty()):
 			quan._end_shift()
 			break
 	if not quan.shift_over:

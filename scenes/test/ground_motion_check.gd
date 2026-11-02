@@ -99,7 +99,7 @@ func _run() -> void:
 	fast_render.queue_free()
 	GameState.reset()
 	var room = load("res://scenes/restaurant3d/restaurant_scene_3d.tscn").instantiate()
-	room.arrival_cutscenes.clear()
+	room.auto_open = false
 	add_child(room)
 	await get_tree().process_frame
 	room.planning_panel.hide()

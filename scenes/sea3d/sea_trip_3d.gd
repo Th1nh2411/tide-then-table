@@ -2,7 +2,7 @@ class_name SeaTrip3D
 extends RefCounted
 ## A night trip's start and end in the 3D sea: the night-start lines, lamp
 ## oil (clock + NEO warnings at 25% / 10%), unloading at the dock, ending the
-## trip (tow fee, towed boats paid, cutscenes, back to the bedroom: the night
+## trip (tow fee, towed boats paid, back to the bedroom: the night
 ## counts as "went out" for LoopCalendar), the whirlpool
 ## ending and Rin fainting in a fight.
 
@@ -74,8 +74,6 @@ static func end_trip(sea: SeaScene3D, towed: bool, rescue_fee: int = -1) -> void
 		GameState.trip_notes.append("Rin được kéo thuyền về bến trong đêm.")
 	DayClock.stop()
 	GameState.finish_sea_day(DayClock.current_minutes, towed, sea.hold.items.duplicate())
-	if sea.story_bridge and not sea.trip_end_cutscenes.is_empty():
-		await sea.story_bridge.call("play_eligible", sea.trip_end_cutscenes)
 	LoopCalendar.choose(true)
 	SceneRouter.go_to(BEDROOM_SCENE)
 

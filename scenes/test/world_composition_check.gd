@@ -8,7 +8,7 @@ func _ready() -> void:
 func _run() -> void:
 	GameState.reset()
 	var room = load("res://scenes/restaurant3d/restaurant_scene_3d.tscn").instantiate()
-	room.arrival_cutscenes.clear()
+	room.auto_open = false
 	add_child(room)
 	room.set_process(false)
 	room.set_physics_process(false)

@@ -33,8 +33,7 @@ static func build_tools(host: RestaurantScene3D) -> void:
 	var tracker := QuestTracker.new()
 	tracker.catalog = host.fish_catalog
 	tracker.origin = Vector2(6, 56)
-	tracker.hidden_when = func() -> bool: return host.modal_open() or host.panels.summary_visible() \
-		or (host.story_bridge != null and host.story_bridge.playing)
+	tracker.hidden_when = func() -> bool: return host.modal_open() or host.panels.summary_visible()
 	host.add_child(tracker)
 	var wave := WavePower.new()
 	wave.seconds = 4.0
@@ -51,18 +50,10 @@ static func build_tools(host: RestaurantScene3D) -> void:
 
 
 ## Today's plan (dish slots grow with the kitchen) and the planning panel, opened.
-static func open_planning(host: RestaurantScene3D) -> void:
-	var plan := MenuPlan.new(3 + mini(DishBook.kitchen_level(), 2))
-	plan.kitchen_level = DishBook.kitchen_level()
-	host.plan = plan
-	(host.get_node("WorldMenuBoard") as WorldMenuBoard3D).bind(plan, host.menu)
+## Horror build: no menu planning. An empty MenuPlan keeps older code paths
+## harmless (nothing reserved, nothing to return); orders come from
+## RestaurantService3D.FIXED_MENU.
+static func open_day(host: RestaurantScene3D) -> void:
+	host.plan = MenuPlan.new(3)
+	(host.get_node("WorldMenuBoard") as WorldMenuBoard3D).bind(host.plan, host.menu)
 	DayClock.set_progress(0.0, DayClock.shop_open_hour, DayClock.shop_close_hour)
-	DailyTrend.ensure(null, host.menu)
-	var panel: MenuPanel3D = host.planning_panel
-	panel.setup(plan, host.menu, host.market_stock, host._has_stock, RestaurantPanels3D.ui_theme(),
-		RestaurantPanels3D.panel_style())
-	panel.shop_requested.connect(host._open_market)
-	panel.open_requested.connect(host._open_shift)
-	panel.renovate_requested.connect(host._open_renovation)
-	panel.sail_requested.connect(host._sail_without_shift)
-	panel.open()

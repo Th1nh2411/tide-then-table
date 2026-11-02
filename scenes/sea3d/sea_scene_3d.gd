@@ -18,7 +18,6 @@ const OIL_BURN_PER_SECOND: float = 100.0 / 240.0
 @export var fish_catalog: FishCatalog
 @export var boat_upgrade: UpgradeData
 @export var weather_catalog: WeatherCatalog
-@export var trip_end_cutscenes: Array[Cutscene] = []
 
 @onready var boat: CharacterBody3D = $Boat
 @onready var boat_visual: Node3D = $Boat/BoatVisual
@@ -58,7 +57,6 @@ var status_until := 0.0
 var _said: Array[Array] = []
 var rng := RandomNumberGenerator.new()
 var overlay: CanvasLayer
-var debug_cutscene_index := 0
 var hud_view: SeaHudView3D
 ## Current Rin / NEO line (hidden; hud_view's speech strip shows it).
 var message: Label
@@ -77,7 +75,6 @@ var phone_app: PhoneApp
 var nets: Array[Dictionary] = []
 var net_haul_count := 0
 var net_haul: Array[Array] = []
-var story_bridge: Node
 var map_boat_proxy: Node2D
 var poi_dialog: PoiDialog
 var poi_busy := false

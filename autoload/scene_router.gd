@@ -63,23 +63,6 @@ func _input(event: InputEvent) -> void:
 	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F10 and OS.is_debug_build():
 		_toggle_first_person()
 		get_viewport().set_input_as_handled()
-	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F9 and OS.is_debug_build():
-		_toggle_debug_jump()
-		get_viewport().set_input_as_handled()
-
-
-## F9 (debug): jump to any day / night / cutscene (DebugJumpMenu).
-func _toggle_debug_jump() -> void:
-	var menu := get_node_or_null("DebugJumpMenu") as DebugJumpMenu
-	if menu:
-		if menu.visible:  # hidden = a jump in progress, leave it be
-			menu.close()
-		return
-	if _is_transitioning:
-		return
-	menu = DebugJumpMenu.new()
-	menu.name = "DebugJumpMenu"
-	add_child(menu)
 
 
 ## F7 (debug): see the whole game in the art palette (PalettePreview).

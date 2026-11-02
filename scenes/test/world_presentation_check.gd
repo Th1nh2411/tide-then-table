@@ -17,7 +17,7 @@ func _ready() -> void:
 func _run() -> void:
 	GameState.reset()
 	var room = load("res://scenes/restaurant3d/restaurant_scene_3d.tscn").instantiate()
-	room.arrival_cutscenes.clear()
+	room.auto_open = false
 	add_child(room)
 	await get_tree().process_frame
 	var stools: Array[Node] = room.find_children("PilotStool_*", "Node3D", true, false)

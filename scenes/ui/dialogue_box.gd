@@ -1,13 +1,12 @@
 class_name DialogueBox
 extends CanvasLayer
-## Conversation box, Nine Sols style: the speaker's big bust in a bottom
-## corner (DialoguePortrait: Rin on the left, everyone else on the right) and
-## a paper speech note ("StripPanel") with a tail pointing at them, the name on
-## a yellow paper tag; lines without a speaker are narration on a torn
-## parchment strip ("JournalPanel", taped, a little crooked, DREDGE journal). Text types out letter by letter.
+## Conversation as subtitles (horror build): plain text centred at the
+## bottom of the screen, "Bảo: ..." with the speaker's name in their colour,
+## no portrait, no paper box; narration is the same text in grey. Text
+## types out letter by letter.
 ## E / Space / click: finish the line, then next line; Esc: skip the rest.
-## The game is paused while it's open. A speaker may carry a mood for the
-## portrait art: "Rin (vui): ..." / `speak "Rin (vui)" "..."`. Text may use
+## The game is paused while it's open. A speaker's "(mood)" is dropped
+## ("Rin (vui): ..." shows "Rin:"). Text may use
 ## {pet} (the cat's name). Usage: `await play_lines(lines)`,
 ## `await play(dialogue)` (also marks it seen), `await choose(options)`.
 
@@ -24,20 +23,13 @@ signal skipped
 	"Mèo": Color("be772b"),
 }
 @export var default_color: Color = Color("a53030")
-## Speakers whose portrait sits on the left (the rest face them from the right).
-@export var left_speakers: PackedStringArray = ["rin"]
-@export var portrait_size: float = 256.0
-@export var bubble_width: float = 300.0
-## Must match the paper of the "StripPanel" frame (the tail is drawn in it).
-@export var bubble_color: Color = Color("e7d5b3")
-@export var ink_color: Color = Color("090a14")
-## Narration strip: resting tilt (degrees) and how far it slides in.
-@export var narration_tilt: float = 0.0
+@export var ink_color: Color = Color("efe6d2")
+@export var narration_color: Color = Color("b9b3a6")
+## How far a new line slides up as it appears.
 @export var enter_pixels: float = 14.0
 
 var _name_label: Label
 var _text_label: Label
-var _portrait: DialoguePortrait
 var _bubble: PanelContainer
 var _name_tag: PanelContainer
 var _back: Control
@@ -49,7 +41,6 @@ var hold_pause: bool = false
 var _skip: bool = false
 var _opened_pause: bool = false
 var _has_speaker: bool = false
-var _on_right: bool = false
 var _time: float = 0.0
 var _enter: float = 1.0  # 0 -> 1 slide-in of the bubble when the box opens
 
@@ -84,26 +75,16 @@ func play_lines(lines: Array[Dictionary]) -> void:
 ## Shows one line without waiting (cutscenes call this, then await_advance()).
 func show_line(speaker: String, text: String) -> void:
 	_open()
-	var mood := ""
+	# "Rin (vui)": the mood was for portraits; subtitles show the name only.
 	var paren := speaker.find("(")
 	if paren > 0 and speaker.ends_with(")"):
-		mood = DialoguePortrait.slug(speaker.substr(paren + 1, speaker.length() - paren - 2))
 		speaker = speaker.left(paren).strip_edges()
-	var is_cat := speaker == "{pet}" or speaker == "Mèo"
 	speaker = CutsceneScript.fill(speaker)
-	var id := "cat" if is_cat else DialoguePortrait.slug(speaker)
 	_has_speaker = speaker != ""
-	_on_right = not left_speakers.has(id)
-	_name_label.text = speaker
+	_name_label.text = speaker + ":"
 	_name_tag.visible = _has_speaker
-	_name_tag.set_meta("band", speaker_colors.get(speaker, default_color))
-	_name_tag.queue_redraw()
-	_portrait.visible = _has_speaker
-	if _has_speaker:
-		_portrait.set_speaker(id, mood, _on_right)
-	_bubble.theme_type_variation = &"StripPanel" if _has_speaker else &"JournalPanel"
-	_bubble.rotation_degrees = 0.0 if _has_speaker else narration_tilt
-	_text_label.add_theme_color_override("font_color", ink_color)
+	_name_label.add_theme_color_override("font_color", speaker_colors.get(speaker, default_color))
+	_text_label.add_theme_color_override("font_color", ink_color if _has_speaker else narration_color)
 	_text_label.text = CutsceneScript.fill(text)
 	_text_label.visible_characters = 0
 	Sfx.play("blip")
@@ -180,32 +161,20 @@ func _process(delta: float) -> void:
 	if _typing():
 		_text_label.visible_characters = mini(_text_label.text.length(),
 			_text_label.visible_characters + maxi(1, roundi(chars_per_second * real)))
-	_portrait.talking = _typing()
 	_layout()
 	_front.queue_redraw()
 
 
-## Bubble beside the portrait, growing upwards from the bottom.
+## Subtitle line centred at the bottom; the speaker's name sits just above it.
 func _layout() -> void:
 	var view := _back.get_viewport_rect().size
-	_portrait.size = Vector2(portrait_size, portrait_size)
-	_portrait.position = Vector2(view.x - portrait_size - 6.0 if _on_right else 6.0, view.y - portrait_size + 6.0)
-	var left := 60.0
-	var right := view.x - 60.0
-	if _has_speaker:
-		left = view.x - portrait_size - bubble_width if _on_right else portrait_size + 2.0
-		right = left + bubble_width
-	_bubble.custom_minimum_size.x = right - left
+	_bubble.custom_minimum_size.x = view.x - 120.0
 	_bubble.reset_size()  # wrapped text settles its height after a frame
 	var ease_in := 1.0 - pow(1.0 - _enter, 3.0)
-	_bubble.position = Vector2(left, view.y - 22.0 - _bubble.size.y + (1.0 - ease_in) * enter_pixels)
-	_bubble.pivot_offset = _bubble.size * 0.5
+	_bubble.position = Vector2(60.0, view.y - 18.0 - _bubble.size.y + (1.0 - ease_in) * enter_pixels)
 	_bubble.modulate.a = ease_in
 	_name_tag.reset_size()
-	var tag_x := _bubble.position.x + 12.0
-	if _on_right:
-		tag_x = _bubble.position.x + _bubble.size.x - 14.0 - _name_tag.size.x
-	_name_tag.position = Vector2(tag_x, _bubble.position.y - _name_tag.size.y + 4.0)
+	_name_tag.position = Vector2((view.x - _name_tag.size.x) * 0.5, _bubble.position.y - _name_tag.size.y + 2.0)
 	_name_tag.modulate.a = ease_in
 
 
@@ -236,35 +205,19 @@ func _unhandled_input(event: InputEvent) -> void:
 			_advanced.emit()
 
 
-## Stepped dark band at the bottom (no gradient) so the paper reads anywhere.
+## No band behind the words: the outline keeps them readable.
 func _draw_back() -> void:
-	var view := _back.get_viewport_rect().size
-	var ink := Color("090a14")
-	for step: Array in [[120.0, 0.18], [84.0, 0.32], [48.0, 0.46]]:
-		var h: float = step[0]
-		_back.draw_rect(Rect2(0, view.y - h, view.x, h), Color(ink, float(step[1]) - (0.0 if step[0] == 120.0 else 0.14)))
+	pass
 
 
-## The bubble's tail towards the speaker's mouth, and the "next" arrow.
+## The small "next" arrow once the line has finished typing.
 func _draw_front() -> void:
+	if _typing() or _choice_count > 0:
+		return
 	var r := Rect2(_bubble.position, _bubble.size)
-	if _has_speaker:
-		var side := -1.0 if _on_right else 1.0
-		var edge := r.end.x if _on_right else r.position.x
-		var base_a := Vector2(edge + side * 1.0, r.position.y + 14.0)
-		var base_b := Vector2(edge + side * 1.0, r.position.y + 28.0)
-		var tip := Vector2(edge - side * 16.0, r.position.y + 10.0)
-		_front.draw_colored_polygon(PackedVector2Array([base_a, tip, base_b]), bubble_color)
-		_front.draw_line(base_a, tip, ink_color, 2.0)
-		_front.draw_line(tip, base_b, ink_color, 2.0)
-	else:
-		# Taped to the screen like a page torn from Rin's journal.
-		UiStickers.draw(_front, "tape", r.position + Vector2(14, 1), Color(1, 1, 1, _bubble.modulate.a))
-		UiStickers.draw(_front, "tape", Vector2(r.end.x - 16, r.position.y - 1), Color(1, 1, 1, _bubble.modulate.a))
-	if not _typing() and _choice_count == 0:
-		var bounce := 1.5 if fmod(_time, 0.8) < 0.4 else 0.0
-		var at := (r.end - Vector2(16.0, 11.0 - bounce)).round()
-		_front.draw_colored_polygon(PackedVector2Array([at, at + Vector2(7, 0), at + Vector2(3.5, 5)]), Color("a53030"))
+	var bounce := 1.5 if fmod(_time, 0.8) < 0.4 else 0.0
+	var at := Vector2(r.get_center().x - 3.5, r.end.y - 2.0 + bounce).round()
+	_front.draw_colored_polygon(PackedVector2Array([at, at + Vector2(7, 0), at + Vector2(3.5, 5)]), ink_color)
 
 
 func _build() -> void:
@@ -273,10 +226,8 @@ func _build() -> void:
 	_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_back.draw.connect(_draw_back)
 	add_child(_back)
-	_portrait = DialoguePortrait.new()
-	add_child(_portrait)
 	_bubble = PanelContainer.new()
-	_bubble.theme_type_variation = &"StripPanel"
+	_bubble.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	add_child(_bubble)
 	var pad := MarginContainer.new()  # text room inside the paper
 	pad.add_theme_constant_override("margin_left", 6)
@@ -289,27 +240,27 @@ func _build() -> void:
 	pad.add_child(box)
 	_text_label = Label.new()
 	_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_text_label.add_theme_font_size_override("font_size", 11)
+	_text_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_text_label.add_theme_font_size_override("font_size", 12)
+	_text_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+	_text_label.add_theme_constant_override("outline_size", 4)
 	_text_label.custom_minimum_size.y = 34
 	box.add_child(_text_label)
 	_choices = VBoxContainer.new()
 	_choices.add_theme_constant_override("separation", 0)
 	_choices.hide()
 	box.add_child(_choices)
-	# Name on a small yellow paper tag, Paytone in ink.
+	# Speaker name above the line, in their colour (no tag paper).
 	_name_tag = PanelContainer.new()
-	_name_tag.theme_type_variation = &"TagPanel"
+	_name_tag.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	_name_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_name_tag)
 	_name_label = Label.new()
 	_name_label.theme_type_variation = &"TitleLabel"
 	_name_label.add_theme_font_size_override("font_size", 10)
-	_name_label.add_theme_color_override("font_color", ink_color)
-	_name_label.add_theme_constant_override("outline_size", 0)
+	_name_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+	_name_label.add_theme_constant_override("outline_size", 4)
 	_name_tag.add_child(_name_label)
-	_name_tag.draw.connect(func() -> void:  # speaker colour band on the tag
-		var band: Color = _name_tag.get_meta("band", default_color)
-		_name_tag.draw_rect(Rect2(2, 2, 2, _name_tag.size.y - 6), band))
 	_front = Control.new()
 	_front.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_front.mouse_filter = Control.MOUSE_FILTER_IGNORE

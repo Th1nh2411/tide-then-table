@@ -2,6 +2,9 @@ class_name RestaurantService3D
 extends RefCounted
 ## Table orders of a shift: spawn, serve, bill, lose, close. State lives on the host
 ## (RestaurantScene3D: orders, dirty_tables, carrying_table, counters); this holds the rules.
+## Horror build: guests order from FIXED_MENU, always available (no planning, no stock).
+
+const FIXED_MENU: FixedMenuData = preload("res://data/restaurant/fixed_menu.tres")
 
 var host: Node3D
 
@@ -9,12 +12,7 @@ func _init(owner: Node3D) -> void:
 	host = owner
 
 func spawn_order() -> void:
-	var available: Array = host.plan.available_dishes()
-	for dish in host.menu.dishes:
-		if dish.is_market_dish() and dish.unlock_day <= GameState.day and host.market_stock.portions(dish) > 0:
-			available.append(dish)
-	if available.is_empty() and host.regular_queue.is_empty():
-		return
+	var available: Array = FIXED_MENU.dishes.duplicate()
 	var free: Array[int] = []
 	for i in range(host.orders.size()):
 		if host.orders[i].is_empty() and not host.dirty_tables[i]:
@@ -37,11 +35,6 @@ func spawn_order() -> void:
 	var dish: DishData = available[host.rng.randi_range(0, available.size() - 1)]
 	var items: Array[InventoryItem] = []
 	var freshness := 100.0
-	if dish.is_market_dish():
-		host.market_stock.take(dish)
-		freshness = host.market_stock.last_freshness
-	else:
-		items = host.plan.take_portion(dish)
 	var decor_level := GameState.get_upgrade_level("decor")
 	var rich_chance: float = host.tuning.rich_chance_by_decor[clampi(decor_level, 0, host.tuning.rich_chance_by_decor.size() - 1)]
 	var rich: bool = host.rng.randf() < rich_chance

@@ -27,14 +27,12 @@ func build() -> void:
 	layer.layer = 1
 	host.add_child(layer)
 	card = ChallengeCard3D.new()
-	card.hidden_when = func() -> bool: return host.story_bridge == null or host.story_bridge.playing \
-		or host.planning_panel.visible or host.panels.market_panel.visible or host.is_renovating() \
-		or host.panels.summary_visible()
+	card.hidden_when = func() -> bool: return true  # no daily challenges in the horror build (H4 removes them)
 	layer.add_child(card)
 	toast = AchievementToast.new()
 	host.add_child(toast)
 	var guide := Guide.new()
-	guide.blocked = func() -> bool: return host.modal_open() or (host.story_bridge != null and host.story_bridge.playing)
+	guide.blocked = func() -> bool: return host.modal_open()
 	host.add_child(guide)
 	guide.add("challenges3d", "Làm xong để nhận thưởng",func() -> bool: return card.visible and host.shift_running,
 		func() -> Vector2: return Vector2(card.position.x - 4.0, card.position.y + 10.0))

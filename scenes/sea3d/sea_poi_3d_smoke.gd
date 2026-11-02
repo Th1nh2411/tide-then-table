@@ -54,7 +54,6 @@ func _run() -> void:
 	sea.poi_dialog._answered.emit(0)
 	await get_tree().process_frame
 	_check(sea._is_towing(), "Ghe chết máy tow state")
-	sea.trip_end_cutscenes.clear()
 	var tow_money := GameState.money
 	sea._end_trip(false)
 	_check(GameState.money == tow_money + 80 and not GameState.trip_notes.is_empty(), "tow reward at dock")

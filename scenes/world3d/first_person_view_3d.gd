@@ -4,8 +4,8 @@ extends Node
 ## start; F10 in debug builds toggles it): a camera at Rin's eyes, mouse look, his
 ## own body hidden from it. Restaurant: it becomes the host's `demo_camera`,
 ## so WASD already walks where he looks. Sea: the look turns with the boat and
-## the boat lamp follows it like a hand lamp. Cutscenes and the cast
-## cinematic get the game camera back while they play. Hold Alt (or open a
+## the boat lamp follows it like a hand lamp. The cast cinematic gets the
+## game camera back while it plays. Hold Alt (or open a
 ## panel) for the mouse cursor. Removing the node restores everything.
 
 const HIDDEN_LAYER := 1 << 19  # Rin's own mesh: drawn for others, not for this camera
@@ -21,8 +21,6 @@ var _pitch := -0.15
 var _hidden: Array[VisualInstance3D] = []
 var _lamp: SpotLight3D
 var _lamp_home := Transform3D()
-var _cutscene := false
-var _links: Array = []  # [StoryBridge3D, started callable, finished callable]
 
 
 func _ready() -> void:
@@ -53,7 +51,7 @@ func _process(_delta: float) -> void:
 		_attach(scene)
 	if _scene == null:
 		return
-	var handed_back := _cutscene or (_scene is SeaScene3D and (_scene as SeaScene3D).fishing)
+	var handed_back := _scene is SeaScene3D and (_scene as SeaScene3D).fishing
 	if handed_back:
 		if _camera.current and is_instance_valid(_game_camera):
 			_game_camera.make_current()
@@ -70,13 +68,6 @@ func _attach(scene: Node) -> void:
 	if not (_walks(scene) or scene is SeaScene3D):
 		return
 	_scene = scene
-	for bridge in scene.find_children("*", "Node", true, false):
-		if bridge is StoryBridge3D:
-			var on_start := _on_cutscene.bind(true)
-			var on_end := _on_cutscene.bind(false)
-			(bridge as StoryBridge3D).started.connect(on_start)
-			(bridge as StoryBridge3D).finished.connect(on_end)
-			_links.append([bridge, on_start, on_end])
 	if _walks(scene):
 		_game_camera = scene.get("demo_camera")
 		scene.set("demo_camera", _camera)
@@ -110,12 +101,6 @@ func _detach() -> void:
 	if is_instance_valid(_scene):
 		if _walks(_scene) and is_instance_valid(_game_camera):
 			_scene.set("demo_camera", _game_camera)
-	for link: Array in _links:
-		if is_instance_valid(link[0]):
-			var bridge := link[0] as StoryBridge3D
-			bridge.started.disconnect(link[1])
-			bridge.finished.disconnect(link[2])
-	_links.clear()
 	for mesh in _hidden:
 		if is_instance_valid(mesh):
 			mesh.layers &= ~HIDDEN_LAYER
@@ -128,7 +113,6 @@ func _detach() -> void:
 		_game_camera.make_current()
 	_scene = null
 	_game_camera = null
-	_cutscene = false
 	# Rest card, menus and the 2D scenes need the cursor.
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
@@ -141,12 +125,6 @@ func _hide_meshes(root: Node) -> void:
 		var mesh := node as VisualInstance3D
 		mesh.layers = HIDDEN_LAYER
 		_hidden.append(mesh)
-
-
-func _on_cutscene(_cutscene_res: Cutscene, playing: bool) -> void:
-	_cutscene = playing
-	if playing and is_instance_valid(_game_camera):
-		_game_camera.make_current()  # the stage frames its shots from the game camera
 
 
 func _update_mouse(handed_back: bool) -> void:
