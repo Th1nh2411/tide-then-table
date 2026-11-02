@@ -30,6 +30,8 @@ var oil := 100.0
 var oil_capacity := 100.0
 var oil_low_sent := false
 var oil_critical_sent := false
+## Extra oil burn on top of the weather's (đêm âm: DarkNight3D).
+var oil_burn_scale := 1.0
 # Same layout as the 2D sea (SeaLayout3D); shoals are rolled each night (SeaShoals3D).
 var START: Vector3 = SeaLayout3D.to_world(SeaLayout3D.DOCK_PX)
 var SHRINE_POS: Vector3 = SeaLayout3D.to_world(SeaLayout3D.SHRINE_PX)
@@ -135,7 +137,7 @@ func _physics_process(delta: float) -> void:
 	SeaWorldBuilder3D.animate(self, delta, forward, forward_speed)
 	impact.apply(self, delta)
 	_update_night_events(delta)
-	var oil_scale := weather.oil_burn_scale if weather else 1.0
+	var oil_scale := (weather.oil_burn_scale if weather else 1.0) * oil_burn_scale
 	if not _at_dock():
 		_spend_oil(delta * OIL_BURN_PER_SECOND * oil_scale)
 	if GameState.boat_hp <= 0.0:

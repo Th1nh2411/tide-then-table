@@ -13,6 +13,8 @@ const MIXES := {
 	"room": {"hiss": 0.05, "crackle": 0.16, "radio": 0.0, "glitch": 0.3, "drone": 0.05},
 	"street": {"hiss": 0.035, "crackle": 0.1, "radio": 0.05, "glitch": 0.5, "drone": 0.035},
 	"sea": {"hiss": 0.045, "crackle": 0.06, "radio": 0.07, "glitch": 0.7, "drone": 0.06},
+	# Đêm âm: more radio and glitches, a louder drone pitched lower.
+	"sea_dark": {"hiss": 0.06, "crackle": 0.04, "radio": 0.12, "glitch": 1.0, "drone": 0.11, "drone_hz": 41.0},
 }
 
 
@@ -26,7 +28,7 @@ static func build(mix_name: String) -> AudioStreamWAV:
 	_hiss(out, float(mix["hiss"]), rng)
 	_crackle(out, float(mix["crackle"]), rng)
 	_radio(out, float(mix["radio"]), rng)
-	_drone(out, float(mix["drone"]))
+	_drone(out, float(mix["drone"]), float(mix.get("drone_hz", 55.0)))
 	_glitch(out, float(mix["glitch"]), rng)
 	_fade_seam(out, int(0.05 * RATE))
 	return _to_wav(out)
@@ -86,12 +88,12 @@ static func _radio(out: PackedFloat32Array, volume: float, rng: RandomNumberGene
 
 
 ## Low drone: two sines a few cents apart beat slowly against each other.
-static func _drone(out: PackedFloat32Array, volume: float) -> void:
+static func _drone(out: PackedFloat32Array, volume: float, hz: float = 55.0) -> void:
 	if volume <= 0.0:
 		return
 	for i in out.size():
 		var t := float(i) / RATE
-		var s := sin(TAU * 55.0 * t) + 0.8 * sin(TAU * 55.7 * t) + 0.3 * sin(TAU * 82.4 * t)
+		var s := sin(TAU * hz * t) + 0.8 * sin(TAU * hz * 1.0127 * t) + 0.3 * sin(TAU * hz * 1.498 * t)
 		out[i] += s * volume * (0.7 + 0.3 * sin(TAU * t / SECONDS))
 
 

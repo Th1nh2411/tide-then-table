@@ -41,6 +41,14 @@ const SOUNDS := {
 	"tick": [{"w": "square", "f": [2400, 2200], "d": 0.012, "v": 0.05}],
 	"flop": [{"w": "noise", "lp": 0.35, "d": 0.05, "v": 0.26}, {"at": 0.1, "w": "noise", "lp": 0.35, "d": 0.04, "v": 0.16}],
 	"stamp": [{"w": "noise", "lp": 0.1, "d": 0.1, "v": 0.35}, {"at": 0.0, "w": "sine", "f": [180, 70], "d": 0.13, "v": 0.45}],
+	# Đêm âm (DarkNight3D): knuckles on a wet hull, three times; breathy
+	# whisper; a burst of radio static.
+	"knock3": [{"w": "sine", "f": [150, 80], "d": 0.09, "v": 0.55}, {"at": 0.0, "w": "noise", "lp": 0.25, "d": 0.05, "v": 0.35},
+		{"at": 0.42, "w": "sine", "f": [145, 78], "d": 0.09, "v": 0.5}, {"at": 0.42, "w": "noise", "lp": 0.25, "d": 0.05, "v": 0.3},
+		{"at": 0.84, "w": "sine", "f": [140, 75], "d": 0.12, "v": 0.6}, {"at": 0.84, "w": "noise", "lp": 0.25, "d": 0.06, "v": 0.38}],
+	"whisper": [{"w": "noise", "lp": 0.9, "d": 1.5, "v": 0.09, "a": 0.3, "swell": 0.23},
+		{"at": 0.2, "w": "noise", "lp": 0.6, "d": 1.1, "v": 0.05, "a": 0.2, "swell": 0.31}],
+	"static": [{"w": "noise", "lp": 0.95, "d": 0.45, "v": 0.24, "a": 0.01}, {"at": 0.05, "w": "square", "f": [60, 60], "d": 0.3, "v": 0.05}],
 }
 const LOOPS := {
 	"heartbeat": [{"w": "sine", "f": [70, 45], "d": 0.14, "v": 0.6}, {"at": 0.22, "w": "sine", "f": [60, 40], "d": 0.16, "v": 0.45},
@@ -169,7 +177,8 @@ func set_muted(on: bool, save: bool = true) -> void:
 
 ## Silence everything (before quitting: SceneRouter.quit_game).
 ## The horror bed under the ambience (HorrorBed: tape hiss, vinyl crackle,
-## broken radio, glitches, drone): "room", "street", "sea", or "" to stop.
+## broken radio, glitches, drone): "room", "street", "sea", "sea_dark"
+## (đêm âm), or "" to stop.
 func bed(mix_name: String) -> void:
 	if mix_name == _bed_name:
 		return

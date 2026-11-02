@@ -60,6 +60,26 @@ static func end_trip(sea: SeaScene3D, towed: bool, rescue_fee: int = -1) -> void
 	if sea.ending:
 		return
 	sea.ending = true
+	_go_home(sea, towed, rescue_fee)
+
+
+## Đêm âm (DarkNight3D): the light dies, hands take the boat; he never
+## reaches the dock. Counts as "went out" on an omen night -> loop reset.
+static func taken_by_the_sea(sea: SeaScene3D) -> void:
+	if sea.ending:
+		return
+	sea.ending = true
+	var dark := DarkNight3D.active(sea)
+	if dark:
+		await dark.play_taken()
+	if not is_instance_valid(sea) or not sea.is_inside_tree():
+		return
+	GameState.trip_notes.append("Rin không về tới bến.")
+	_go_home(sea, false)
+
+
+## Tow fees, towed boats, the day's record, then the bedroom judges the night.
+static func _go_home(sea: SeaScene3D, towed: bool, rescue_fee: int = -1) -> void:
 	for event: Dictionary in sea.night_events:
 		if event["towing"]:
 			if towed:

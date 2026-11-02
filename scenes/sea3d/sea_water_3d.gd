@@ -43,6 +43,19 @@ static func build(sea: SeaScene3D) -> SeaWater3D:
 	return water
 
 
+## Overrides shader colours by uniform name (đêm âm: DarkNightLook).
+func set_palette(colors: Dictionary) -> void:
+	var m := material_override as ShaderMaterial
+	for uniform: String in colors:
+		m.set_shader_parameter(uniform, colors[uniform])
+
+
+## A colour set by set_palette; transparent black while the shader default is used.
+func shader_color(uniform: String) -> Color:
+	var value: Variant = (material_override as ShaderMaterial).get_shader_parameter(uniform)
+	return value if value is Color else Color(0, 0, 0, 0)
+
+
 func _process(_delta: float) -> void:
 	if boat:
 		var m := material_override as ShaderMaterial
