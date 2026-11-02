@@ -8,8 +8,9 @@ static func prepare(visual: RinPilotVisual, seat_height: float) -> bool:
 	var player := visual.animation
 	if player.has_animation("SitDown") and player.has_animation("SitIdle") and player.has_animation("StandUp"): return true
 	var sk := visual.skeleton
-	if sk.find_bone("Thigh.L") < 0 or not player.has_animation("Idle"): return false
-	var key := str(player.get_animation("Idle").get_instance_id())+":"+str(seat_height)
+	if visual.bone("Thigh.L") < 0 or not player.has_animation("Idle"): return false
+	# PSX models share one Idle clip but not their bone lengths: key by model too.
+	var key := str(player.get_animation("Idle").get_instance_id())+":"+visual.model.scene_file_path+":"+str(seat_height)
 	if not _cache.has(key):
 		var previous := player.assigned_animation
 		var time := player.current_animation_position if not previous.is_empty() else 0.0
@@ -29,18 +30,15 @@ static func prepare(visual: RinPilotVisual, seat_height: float) -> bool:
 		var parent := sk.get_bone_parent(hips)
 		target[hips].origin = sk.get_bone_global_pose(parent).affine_inverse()*global_hip.origin if parent >= 0 else global_hip.origin
 		for side_: String in ["L","R"]:
-			var thigh := sk.find_bone("Thigh."+side_)
-			var shin := sk.find_bone("Shin."+side_)
-			var foot := sk.find_bone("Foot."+side_)
-			var a := visual.to_local(sk.to_global(sk.get_bone_global_pose(thigh).origin))
-			var b := visual.to_local(sk.to_global(sk.get_bone_global_pose(shin).origin))
-			var c := visual.to_local(sk.to_global(sk.get_bone_global_pose(foot).origin))
-			var angle := acos(clampf((desired_hip-(b.distance_to(c)+c.y))/maxf(a.distance_to(b),.001),-.3,.8))
-			target[thigh].basis = idle[thigh].basis*Basis(Vector3.RIGHT,-angle)
-			target[shin].basis = idle[shin].basis*Basis(Vector3.RIGHT,angle)
+			var thigh := visual.bone("Thigh."+side_)
+			var shin := visual.bone("Shin."+side_)
+			var foot := visual.bone("Foot."+side_)
+			var angle := _fit_leg(visual,sk,[hips,thigh,shin,foot],idle,target[hips].origin)
+			target[thigh].basis = idle[thigh].basis*_pitch(sk,thigh,-angle)
+			target[shin].basis = idle[shin].basis*_pitch(sk,shin,angle)
 			for part: String in ["UpperArm.","Forearm."]:
-				var arm := sk.find_bone(part+side_)
-				if arm >= 0: target[arm].basis = idle[arm].basis*Basis(Vector3.RIGHT,-.35 if part=="UpperArm." else -1.15)
+				var arm := visual.bone(part+side_)
+				if arm >= 0: target[arm].basis = idle[arm].basis*_pitch(sk,arm,-.35 if part=="UpperArm." else -1.15)
 		var clips: Dictionary = {}
 		var root := player.get_node(player.root_node)
 		var path := str(root.get_path_to(sk))
@@ -56,6 +54,35 @@ static func prepare(visual: RinPilotVisual, seat_height: float) -> bool:
 		if not player.has_animation(name_): player.get_animation_library("").add_animation(name_,_cache[key][name_])
 	return true
 
+## Knee bend that puts the seated foot back at its standing height (bisection:
+## more bend lifts the foot). bones = [hips, thigh, shin, foot]; idle pose kept.
+static func _fit_leg(visual: RinPilotVisual, sk: Skeleton3D, bones: Array, idle: Array[Transform3D], hips_at: Vector3) -> float:
+	var hips: int = bones[0]; var thigh: int = bones[1]; var shin: int = bones[2]; var foot: int = bones[3]
+	var ground := visual.to_local(sk.to_global(sk.get_bone_global_pose(foot).origin)).y
+	var thigh_pitch := _pitch(sk,thigh,1.0)
+	var shin_pitch := _pitch(sk,shin,1.0)
+	var lo := 0.0
+	var hi := 1.75
+	for step in 16:
+		var mid := (lo+hi)*.5
+		sk.set_bone_pose_position(hips,hips_at)
+		sk.set_bone_pose_rotation(thigh,(idle[thigh].basis*Basis(thigh_pitch.get_rotation_quaternion().get_axis(),-mid)).get_rotation_quaternion())
+		sk.set_bone_pose_rotation(shin,(idle[shin].basis*Basis(shin_pitch.get_rotation_quaternion().get_axis(),mid)).get_rotation_quaternion())
+		sk.force_update_all_bone_transforms()
+		if visual.to_local(sk.to_global(sk.get_bone_global_pose(foot).origin)).y > ground: hi = mid
+		else: lo = mid
+	for bone: int in [hips,thigh,shin]:
+		sk.set_bone_pose_position(bone,idle[bone].origin)
+		sk.set_bone_pose_rotation(bone,idle[bone].basis.get_rotation_quaternion())
+	sk.force_update_all_bone_transforms()
+	return (lo+hi)*.5
+
+## Rotation about the body's side axis (X), in the bone's own (idle) frame,
+## so retargeted rigs whose bone axes differ bend the same way.
+static func _pitch(sk: Skeleton3D, bone: int, angle: float) -> Basis:
+	var axis := sk.get_bone_global_pose(bone).basis.orthonormalized().inverse()*Vector3.RIGHT
+	return Basis(axis.normalized(),angle)
+
 static func _clip(path: String, sk: Skeleton3D, idle: Array[Transform3D], target: Array[Transform3D], length_: float, times: Array, weights: Array, breathing: bool) -> Animation:
 	var clip := Animation.new()
 	clip.length = length_
@@ -68,6 +95,7 @@ static func _clip(path: String, sk: Skeleton3D, idle: Array[Transform3D], target
 			for i in times.size():
 				var pose: Transform3D = idle[bone].interpolate_with(target[bone],float(weights[i]))
 				if breathing and sk.get_bone_name(bone)=="Chest" and i==1: pose.basis *= Basis(Vector3.RIGHT,.012)
-				var value: Variant = pose.origin if type_==Animation.TYPE_POSITION_3D else pose.basis.get_rotation_quaternion() if type_==Animation.TYPE_ROTATION_3D else pose.basis.get_scale()
+				# The mixer scales position tracks by motion_scale (retargeted rigs).
+				var value: Variant = pose.origin/sk.motion_scale if type_==Animation.TYPE_POSITION_3D else pose.basis.get_rotation_quaternion() if type_==Animation.TYPE_ROTATION_3D else pose.basis.get_scale()
 				clip.track_insert_key(track,float(times[i]),value)
 	return clip

@@ -12,9 +12,10 @@ static func wait(node: Node, seconds: float) -> void:
 	await node.get_tree().create_timer(RamNight.secs(seconds), true).timeout
 
 
-## A person drawn as a pale, see-through, self-lit ghost. Returns the shared
+## A person drawn as a pale, see-through, self-lit ghost (default: one of the
+## drowned, `PersonRig3D` "drowned" alternates the two pack models). Returns the shared
 ## material (tween its albedo alpha to fade the ghost).
-static func ghost(parent: Node3D, pos: Vector3, variant: String = "guest") -> StandardMaterial3D:
+static func ghost(parent: Node3D, pos: Vector3, variant: String = "drowned") -> StandardMaterial3D:
 	var holder := Node3D.new()
 	parent.add_child(holder)
 	holder.position = pos
@@ -24,6 +25,11 @@ static func ghost(parent: Node3D, pos: Vector3, variant: String = "guest") -> St
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.albedo_color = Color(GHOST_HEX, 0.42)
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	# Keep the body's own texture under the pale tint.
+	var visual := rig.get_node_or_null("PsxPilot") as PsxCharacterVisual
+	if visual:
+		material.albedo_texture = visual.body_texture()
+		material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	for node in rig.find_children("*", "MeshInstance3D", true, false):
 		var mesh := node as MeshInstance3D
 		mesh.material_override = material

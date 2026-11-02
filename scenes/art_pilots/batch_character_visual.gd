@@ -1,6 +1,8 @@
 class_name BatchCharacterVisual
 extends RinPilotVisual
 ## Weighted inferred batch mesh; shares the gameplay hand and motion API.
+## Unused since NPCs moved to `PsxCharacterVisual`; kept (with assets/models/ready
+## characters) as the fallback while the PSX pack licence is unverified.
 
 var asset_id: String = "bao"
 

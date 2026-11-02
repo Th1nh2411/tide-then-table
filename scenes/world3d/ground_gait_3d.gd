@@ -31,12 +31,15 @@ static func carry_walk(player: AnimationPlayer) -> String:
 static func _arm_track(path: NodePath) -> bool:
 	if path.get_subname_count() == 0: return false
 	var bone := String(path.get_subname(0))
+	# Humanoid-profile rigs (PSX NPCs): LeftShoulder / LeftUpperArm / LeftLowerArm / LeftHand.
+	if (bone.begins_with("Left") or bone.begins_with("Right")) and not ("Leg" in bone or "Foot" in bone or "Toes" in bone):
+		return true
 	return bone.begins_with("Clavicle.") or bone.begins_with("Shoulder.") or bone.begins_with("UpperArm.") or bone.begins_with("Forearm.") or bone.begins_with("LowerArm.") or bone.begins_with("Hand.") or bone.begins_with("Wrist.") or bone.begins_with("Fingers.") or bone.begins_with("Thumb.")
 
 ## Ground speed of the backward-moving support foot, measured in the visual's metres.
 static func speed(visual: RinPilotVisual, clip: String) -> float:
 	var animation := visual.animation.get_animation(clip)
-	var key := animation.get_instance_id()
+	var key := _key(visual,animation)
 	if _speeds.has(key): return _speeds[key]
 	var player := visual.animation
 	var previous := player.assigned_animation
@@ -47,7 +50,7 @@ static func speed(visual: RinPilotVisual, clip: String) -> float:
 	var extent := 0.0
 	var heights: Dictionary = {}
 	for foot: String in ["Foot.L","Foot.R"]:
-		var bone := visual.skeleton.find_bone(foot)
+		var bone := visual.bone(foot)
 		if bone < 0: continue
 		var points: Array[Vector3] = []
 		var low := Vector3(INF,INF,INF)
@@ -82,4 +85,8 @@ static func speed(visual: RinPilotVisual, clip: String) -> float:
 
 static func foot_heights(visual: RinPilotVisual, clip: String, foot: String) -> Vector2:
 	speed(visual,clip)
-	return _heights.get(visual.animation.get_animation(clip).get_instance_id(),{}).get(foot,Vector2.ZERO)
+	return _heights.get(_key(visual,visual.animation.get_animation(clip)),{}).get(foot,Vector2.ZERO)
+
+## Clips are shared between PSX models of different sizes: measure per model.
+static func _key(visual: RinPilotVisual, animation: Animation) -> String:
+	return str(animation.get_instance_id()) + ":" + visual.model.scene_file_path

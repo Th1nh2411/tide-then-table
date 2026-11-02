@@ -77,7 +77,7 @@ func _ready() -> void:
 	_check(visual.animation.assigned_animation == "Cast" and wind_up.distance_to(visual.hand_position("L")) > 0.15, "Cast compatibility clip moves the wrist")
 	_check(actor.arms[1].to_global(Vector3(0, -0.6, 0)).distance_to(actor.to_global(visual.hand_position("L"))) < 0.01, "Rod stays attached to the new wrist")
 	var bao := PersonRig3D.build(self, "bao")
-	_check(bao.get_node_or_null("BatchPilot") is BatchCharacterVisual, "Batch character adapter remains available")
+	_check(bao.get_node_or_null("PsxPilot") is PsxCharacterVisual, "NPCs use the PSX pack visual")
 	actor.queue_free()
 	source.queue_free()
 	bao.queue_free()

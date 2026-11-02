@@ -56,8 +56,8 @@ func drive_ground_motion(distance: float, delta: float, carrying: bool) -> void:
 	if moving:
 		clip = "Walk"
 		if carrying:
-			clip = "CarryWalk" if not self is BatchCharacterVisual and animation.has_animation("CarryWalk") else GroundGait3D.carry_walk(animation)
-		elif not self is BatchCharacterVisual and distance/delta > 2.25 and animation.has_animation("CharacterArmature|Run"):
+			clip = "CarryWalk" if animation.has_animation("CarryWalk") else GroundGait3D.carry_walk(animation)
+		elif distance/delta > 2.25 and animation.has_animation("CharacterArmature|Run"):
 			clip = "CharacterArmature|Run"
 		native_speed = GroundGait3D.speed(self,clip)
 	var old_clip := animation.current_animation
@@ -93,6 +93,21 @@ func hand_basis(tag: String) -> Basis:
 
 func hand_rest_basis(tag: String) -> Basis:
 	return (global_transform.affine_inverse() * skeleton.global_transform * skeleton.get_bone_global_rest(_hand_bone(tag))).basis.orthonormalized()
+
+## Bone index by game name ("Foot.L"); humanoid-profile rigs (PSX NPCs) use
+## their profile name ("LeftFoot") instead.
+func bone(name_: String) -> int:
+	var index := skeleton.find_bone(name_)
+	if index >= 0 or name_.length() < 3 or name_[-2] != ".":
+		return index
+	const PARTS := {"Foot": "Foot", "Thigh": "UpperLeg", "UpperLeg": "UpperLeg",
+		"Shin": "LowerLeg", "LowerLeg": "LowerLeg", "UpperArm": "UpperArm",
+		"Forearm": "LowerArm", "LowerArm": "LowerArm", "Hand": "Hand",
+		"Wrist": "Hand", "Clavicle": "Shoulder", "Shoulder": "Shoulder"}
+	var part := name_.left(-2)
+	if not PARTS.has(part):
+		return -1
+	return skeleton.find_bone(("Left" if name_.ends_with("L") else "Right") + str(PARTS[part]))
 
 func _hand_bone(tag: String) -> int:
 	var index := skeleton.find_bone("Hand." + tag)

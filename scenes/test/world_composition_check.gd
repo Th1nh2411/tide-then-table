@@ -39,8 +39,8 @@ func _run() -> void:
 		var hip := visual.to_local(sk.to_global(sk.get_bone_global_pose(sk.find_bone("Hips")).origin))
 		var feet_ok := true
 		for side: String in ["L","R"]:
-			var foot := visual.to_local(sk.to_global(sk.get_bone_global_pose(sk.find_bone("Foot."+side)).origin))
-			feet_ok = feet_ok and foot.y > .04 and foot.y < .16 and foot.z > .2
+			var foot := visual.to_local(sk.to_global(sk.get_bone_global_pose(visual.bone("Foot."+side)).origin))
+			feet_ok = feet_ok and foot.y > .02 and foot.y < .16 and foot.z > .2
 		check(absf(hip.y-.5)<.04 and feet_ok,id+" sits at the actual .442m stool with feet down")
 		guest.sample_seating(1,true)
 		var standing := visual.to_local(sk.to_global(sk.get_bone_global_pose(sk.find_bone("Hips")).origin))

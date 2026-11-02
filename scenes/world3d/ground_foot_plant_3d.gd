@@ -10,11 +10,11 @@ func _init(owner: RinPilotVisual) -> void:
 	visual = owner
 	skeleton = visual.skeleton
 	for side: String in ["L","R"]:
-		var upper := skeleton.find_bone("UpperLeg."+side)
-		var lower := skeleton.find_bone("LowerLeg."+side)
-		if upper < 0: upper = skeleton.find_bone("Thigh."+side)
-		if lower < 0: lower = skeleton.find_bone("Shin."+side)
-		var foot := skeleton.find_bone("Foot."+side)
+		var upper := visual.bone("UpperLeg."+side)
+		var lower := visual.bone("LowerLeg."+side)
+		if upper < 0: upper = visual.bone("Thigh."+side)
+		if lower < 0: lower = visual.bone("Shin."+side)
+		var foot := visual.bone("Foot."+side)
 		if upper < 0 or lower < 0 or foot < 0: continue
 		var local := visual.to_local(skeleton.to_global(skeleton.get_bone_global_pose(foot).origin))
 		legs.append({"upper":upper,"lower":lower,"foot":foot,"name":"Foot."+side,"height":local.y,"planted":false,"anchor":Vector3.ZERO})

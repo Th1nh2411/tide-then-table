@@ -1,21 +1,21 @@
 class_name PersonRig3D
 extends Node3D
-## Shared gameplay/cutscene actor API backed by weighted inferred character meshes.
+## Shared gameplay/cutscene actor API. Rin keeps his own rig; everyone else is
+## a PSX pack model (`PsxCharacterVisual.CAST` maps variant ids to models).
 
-const SKIN := "ad7757"
-const DARK := "202e37"
-## Supported story/gameplay actor IDs; palette now comes from the finished model.
+## Supported story/gameplay actor IDs ("guest" / "drowned" pick one of a pool).
 const LOOKS := {
-	"rin": {"shirt": "e9dfc5", "hat": DARK, "glasses": true},
-	"bao": {"shirt": "c97649", "hat": "394a50", "apron": true},
-	"vy": {"shirt": "d9648a", "hat": "394a50"},
-	"co_nam": {"shirt": "468232", "hat": "394a50", "bun": true},
-	"vy_sau": {}, "ong_tam": {}, "guest_1": {}, "guest_2": {}, "guest_3": {},
-	"guest_rich": {}, "guest_regular": {}, "staff": {},
-	"guest": {"shirt": "7a4841", "hat": "394a50"},
+	"rin": {}, "bao": {}, "co_nam": {}, "guest_rich": {}, "chu_hai": {},
+	"ong_tam": {}, "ong_tu": {}, "vy": {}, "vy_sau": {}, "staff": {},
+	"guest_1": {}, "guest_2": {}, "guest_3": {}, "guest_4": {}, "guest_5": {},
+	"guest_6": {}, "guest_7": {}, "guest_8": {}, "guest_9": {},
+	"guest_regular": {}, "drowned_m": {}, "drowned_f": {},
+	"guest": {}, "drowned": {},
 }
+const GUEST_POOL := 9
 
 static var _guest_sequence: int = 0
+static var _drowned_sequence: int = 0
 var current_variant: String = ""
 var _cat_visual: Node3D
 var kind: String = ""
@@ -49,17 +49,25 @@ static func build(parent: Node3D, kind_: String, shirt: String = "") -> PersonRi
 	else:
 		var variant := kind_
 		if kind_ == "guest":
-			variant = "guest_%d" % ((_guest_sequence % 3) + 1)
-			_guest_sequence += 1
+			variant = next_guest_variant()
+		elif kind_ == "drowned":
+			variant = "drowned_m" if _drowned_sequence % 2 == 0 else "drowned_f"
+			_drowned_sequence += 1
 		rig.current_variant = variant if variant in LOOKS else "guest_1"
 		rig._build_rin_pilot()
-	if kind_ != "guest":
+	if kind_ != "guest" and kind_ != "drowned":
 		rig.add_to_group("person_" + kind_)
 	if kind_ != "rin":
 		rig._add_blocker()
 	# Grounds the person where no lamp casts a real shadow.
 	ContactShadow3D.attach(rig, 0.36, 0.8)
 	return rig
+
+
+## Next look from the guest pool (odd ids are men, even ids women).
+static func next_guest_variant() -> String:
+	_guest_sequence += 1
+	return "guest_%d" % (((_guest_sequence - 1) % GUEST_POOL) + 1)
 
 
 ## Walk cycle: `speed` 0..1 scales the swing, `clock` is the step time.
@@ -130,9 +138,9 @@ func _build_rin_pilot() -> void:
 	if current_variant == "rin":
 		_pilot = load("res://scenes/art_pilots/rin_pilot.tscn").instantiate() as RinPilotVisual
 	else:
-		var visual := BatchCharacterVisual.new()
+		var visual := PsxCharacterVisual.new()
 		visual.asset_id = current_variant
-		visual.name = "BatchPilot"
+		visual.name = "PsxPilot"
 		_pilot = visual
 	add_child(_pilot)
 	# Preserve the old arms[] attachment contract. A casting rod still uses its
@@ -271,11 +279,11 @@ func get_variant() -> String:
 	return current_variant
 
 func set_variant(id: String) -> void:
-	if id == current_variant or not (id in LOOKS) or id in ["rin", "guest"]:
+	if id == current_variant or not (id in LOOKS) or id in ["rin", "guest", "drowned"]:
 		return
-	if _pilot is BatchCharacterVisual:
+	if _pilot is PsxCharacterVisual:
 		current_variant = id
-		(_pilot as BatchCharacterVisual).load_variant(id)
+		(_pilot as PsxCharacterVisual).load_variant(id)
 		var hips := _pilot.skeleton.get_bone_global_rest(_pilot.skeleton.find_bone("Hips")).origin.y
 		plate.position = Vector3(0, 1.0, 0.47) * hips / 0.92
 		_update_pilot_motion()

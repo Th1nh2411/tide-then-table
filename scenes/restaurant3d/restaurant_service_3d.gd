@@ -25,7 +25,10 @@ func spawn_order() -> void:
 	var dish: DishData = party.next_dish()
 	host.orders[table] = {"dish": dish, "patience": PATIENCE, "initial_patience": PATIENCE,
 		"cooked": false, "party": party}
-	host.guests[table].call("set_variant", "guest_%d" % (1 + table % 3))
+	host.guests[table].call("set_variant", PersonRig3D.next_guest_variant())
+	var partner := (host.guests[table] as Node).get_meta("seating_partner", null) as PersonRig3D
+	if partner:
+		partner.set_variant(PersonRig3D.next_guest_variant())
 	host.guests[table].visible = true
 	host.order_labels[table].text = party.label(dish)
 	host._show_note("Bàn %d gọi %s." % [table + 1, dish.display_name])
