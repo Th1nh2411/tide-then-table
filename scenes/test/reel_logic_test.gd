@@ -1,8 +1,9 @@
 extends Node
 ## Standalone test for ReelLogic (run with F6): bite timing (sooner at a
-## shoal), the hook window, the reel fight (holding all the time snaps the
-## line, easing off when the line is tight lands even the strongest fish,
-## never reeling never lands), stronger fish fight harder.
+## shoal), the hook window, the reel fight on đêm âm (holding all the time
+## snaps the line, easing off when the line is tight lands even the strongest
+## fish, never reeling never lands), stronger fish fight harder; calm nights
+## have no fail state (never snaps, every fight over within ~15 s).
 
 const STEP := 1.0 / 60.0
 
@@ -17,6 +18,7 @@ func _ready() -> void:
 	_window(tuning)
 	_strength()
 	_fights(tuning)
+	_calm_fights(tuning)
 	print("REEL LOGIC TEST ", "PASS" if _failures == 0 else "FAIL")
 	get_tree().quit(1 if _failures else 0)
 
@@ -77,12 +79,29 @@ func _fights(tuning: ReelTuning) -> void:
 	_check("never reeling never lands", never == 20)
 
 
+func _calm_fights(tuning: ReelTuning) -> void:
+	var snapped := 0
+	var slowest := 0.0
+	for seed_value in range(20):
+		for policy: String in ["hold", "smart", "never"]:
+			var result: Array = _fight(tuning, 1.0, tuning.cast_max + 2.0, seed_value, policy, true)
+			if result[0] == ReelLogic.Outcome.SNAPPED:
+				snapped += 1
+			slowest = maxf(slowest, float(result[1]) if result[0] == ReelLogic.Outcome.LANDED else 999.0)
+	print("    calm: slowest fight %.1f s" % slowest)
+	_check("calm night: the line never snaps, whatever Rin does", snapped == 0)
+	_check("calm night: every fight is over within ~15 s", slowest <= 15.0)
+	_check("calm night: tension stays under the cap", tuning.calm_tension_cap < 1.0)
+
+
 ## [outcome, seconds]. "hold" = always reeling, "smart" = reel while the line
 ## is not too tight (the bot's policy), "never" = never reel.
-func _fight(tuning: ReelTuning, strength: float, distance: float, seed_value: int, policy: String) -> Array:
+func _fight(tuning: ReelTuning, strength: float, distance: float, seed_value: int, policy: String,
+		calm: bool = false) -> Array:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
 	var reel := ReelLogic.new(tuning, strength, distance, rng)
+	reel.calm = calm
 	var t := 0.0
 	while t < 60.0:
 		var held := policy == "hold" or (policy == "smart" and reel.tension < (0.45 if reel.running else 0.75))

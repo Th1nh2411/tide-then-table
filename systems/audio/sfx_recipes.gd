@@ -1,0 +1,77 @@
+class_name SfxRecipes
+extends RefCounted
+## Every sound recipe of the game (SfxSynth segments), read by the Sfx
+## autoload as Sfx.SOUNDS / Sfx.LOOPS.
+
+## name -> segments (see SfxSynth). Short and quiet on purpose.
+const SOUNDS := {
+	# Waking from a nightmare: a sharp breath in, a shaky breath out.
+	"gasp": [{"w": "noise", "lp": 0.35, "d": 0.42, "v": 0.5, "a": 0.18},
+		{"at": 0.5, "w": "noise", "lp": 0.2, "d": 0.7, "v": 0.3, "a": 0.05}],
+	"click": [{"w": "square", "f": [1200, 900], "d": 0.03, "v": 0.08}],
+	"blip": [{"w": "square", "f": [660, 660], "d": 0.025, "v": 0.04}],
+	"pop": [{"w": "sine", "f": [500, 1100], "d": 0.07, "v": 0.2}],
+	"nibble": [{"w": "sine", "f": [520, 760], "d": 0.06, "v": 0.22}],
+	"bite": [{"w": "noise", "lp": 0.35, "d": 0.2, "v": 0.22}, {"at": 0.0, "w": "sine", "f": [420, 140], "d": 0.18, "v": 0.3}],
+	"catch": [{"w": "sine", "f": [523, 523], "d": 0.07, "v": 0.25}, {"w": "sine", "f": [659, 659], "d": 0.07, "v": 0.25},
+		{"w": "sine", "f": [784, 784], "d": 0.07, "v": 0.25}, {"w": "sine", "f": [1047, 1047], "d": 0.22, "v": 0.25}],
+	"ok": [{"w": "sine", "f": [659, 659], "d": 0.07, "v": 0.22}, {"w": "sine", "f": [880, 880], "d": 0.16, "v": 0.22}],
+	"miss": [{"w": "tri", "f": [420, 180], "d": 0.3, "v": 0.3}],
+	"splash": [{"w": "noise", "lp": 0.25, "d": 0.4, "v": 0.3, "a": 0.02}],
+	"bump": [{"w": "noise", "lp": 0.08, "d": 0.18, "v": 0.3}, {"at": 0.0, "w": "sine", "f": [110, 50], "d": 0.2, "v": 0.4}],
+	"coins": [{"w": "square", "f": [1319, 1319], "d": 0.05, "v": 0.1}, {"w": "square", "f": [1760, 1760], "d": 0.16, "v": 0.1}],
+	"grumble": [{"w": "square", "f": [190, 120], "d": 0.32, "v": 0.1}],
+	"clink": [{"w": "tri", "f": [2300, 2100], "d": 0.09, "v": 0.18}],
+	"flip": [{"w": "noise", "lp": 0.6, "d": 0.08, "v": 0.2}, {"w": "noise", "lp": 0.85, "d": 0.25, "v": 0.08}],
+	"bag": [{"w": "noise", "lp": 0.7, "d": 0.12, "v": 0.18}],
+	"whoosh": [{"w": "noise", "lp": 0.12, "d": 1.6, "v": 0.6, "a": 0.7}],
+	"pluck": [{"w": "tri", "f": [440, 440], "d": 0.2, "v": 0.22}],
+	# Shift receipt: printer tick per line, rubber stamp thump.
+	"print": [{"w": "noise", "lp": 0.5, "d": 0.04, "v": 0.07}, {"w": "square", "f": [880, 880], "d": 0.015, "v": 0.03}],
+	# Camera shutter: two bright clicks, then a short film wind (new catch, posts, records).
+	"shutter": [{"w": "noise", "lp": 0.92, "d": 0.022, "v": 0.32}, {"at": 0.0, "w": "square", "f": [2600, 1900], "d": 0.012, "v": 0.07},
+		{"at": 0.06, "w": "noise", "lp": 0.85, "d": 0.03, "v": 0.26}, {"at": 0.06, "w": "square", "f": [2200, 1600], "d": 0.012, "v": 0.06},
+		{"at": 0.12, "w": "noise", "lp": 0.45, "d": 0.16, "v": 0.07, "a": 0.04}],
+	# Rod fight: reel click, line snapping, wheel tick, fish slapping on the deck.
+	"reel": [{"w": "noise", "lp": 0.9, "d": 0.012, "v": 0.09}, {"at": 0.0, "w": "square", "f": [1900, 1500], "d": 0.012, "v": 0.035}],
+	"snap": [{"w": "noise", "lp": 0.95, "d": 0.04, "v": 0.38}, {"at": 0.02, "w": "tri", "f": [1100, 160], "d": 0.28, "v": 0.22}],
+	"tick": [{"w": "square", "f": [2400, 2200], "d": 0.012, "v": 0.05}],
+	"flop": [{"w": "noise", "lp": 0.35, "d": 0.05, "v": 0.26}, {"at": 0.1, "w": "noise", "lp": 0.35, "d": 0.04, "v": 0.16}],
+	"stamp": [{"w": "noise", "lp": 0.1, "d": 0.1, "v": 0.35}, {"at": 0.0, "w": "sine", "f": [180, 70], "d": 0.13, "v": 0.45}],
+	# Đêm âm (DarkNight3D): knuckles on a wet hull, three times; breathy
+	# whisper; a burst of radio static.
+	"knock3": [{"w": "sine", "f": [150, 80], "d": 0.09, "v": 0.55}, {"at": 0.0, "w": "noise", "lp": 0.25, "d": 0.05, "v": 0.35},
+		{"at": 0.42, "w": "sine", "f": [145, 78], "d": 0.09, "v": 0.5}, {"at": 0.42, "w": "noise", "lp": 0.25, "d": 0.05, "v": 0.3},
+		{"at": 0.84, "w": "sine", "f": [140, 75], "d": 0.12, "v": 0.6}, {"at": 0.84, "w": "noise", "lp": 0.25, "d": 0.06, "v": 0.38}],
+	"whisper": [{"w": "noise", "lp": 0.9, "d": 1.5, "v": 0.09, "a": 0.3, "swell": 0.23},
+		{"at": 0.2, "w": "noise", "lp": 0.6, "d": 1.1, "v": 0.05, "a": 0.2, "swell": 0.31}],
+	"static": [{"w": "noise", "lp": 0.95, "d": 0.45, "v": 0.24, "a": 0.01}, {"at": 0.05, "w": "square", "f": [60, 60], "d": 0.3, "v": 0.05}],
+	# Đêm rằm (H7): tea poured into a cup; a temple bell; something heavy dragged over planks.
+	"tea": [{"w": "noise", "lp": 0.45, "d": 0.7, "v": 0.12, "a": 0.08}, {"at": 0.6, "w": "tri", "f": [1900, 1800], "d": 0.06, "v": 0.08}],
+	"bell": [{"w": "sine", "f": [196, 194], "d": 2.6, "v": 0.32}, {"at": 0.0, "w": "sine", "f": [523, 520], "d": 1.4, "v": 0.08}],
+	"drag": [{"w": "noise", "lp": 0.1, "d": 1.4, "v": 0.3, "a": 0.3, "swell": 0.6}, {"at": 0.0, "w": "sine", "f": [70, 55], "d": 1.2, "v": 0.18}],
+	# A voice far off calling a name, two drawn-out syllables ("...Rin... ơi..."),
+	# breathy; played in the world (Sfx.play_at), pitch picks the voice.
+	"call": [{"w": "tri", "f": [300, 330], "d": 0.42, "v": 0.16, "a": 0.08}, {"at": 0.0, "w": "noise", "lp": 0.3, "d": 0.4, "v": 0.05, "a": 0.08},
+		{"at": 0.55, "w": "tri", "f": [320, 210], "d": 0.95, "v": 0.14, "a": 0.12}, {"at": 0.55, "w": "noise", "lp": 0.25, "d": 0.9, "v": 0.05, "a": 0.1}],
+	# Calm-night false sounds (CalmNightSounds3D): never the đêm âm knock3.
+	# A fish slapping the water; the paddle knocking the thúng once; a bobber twitch.
+	"slap": [{"w": "noise", "lp": 0.55, "d": 0.06, "v": 0.3}, {"at": 0.05, "w": "noise", "lp": 0.2, "d": 0.35, "v": 0.14, "a": 0.02}],
+	"tock": [{"w": "tri", "f": [520, 390], "d": 0.06, "v": 0.3}, {"at": 0.0, "w": "noise", "lp": 0.6, "d": 0.03, "v": 0.15}],
+	"plip": [{"w": "sine", "f": [900, 1500], "d": 0.05, "v": 0.14}, {"at": 0.03, "w": "noise", "lp": 0.4, "d": 0.12, "v": 0.06}],
+	# Wind through paper; coins on planks (subtle omens' second tells at the waterfront).
+	"gust": [{"w": "noise", "lp": 0.35, "d": 1.4, "v": 0.22, "a": 0.5, "swell": 0.5}],
+	"coins_wood": [{"w": "tri", "f": [2100, 2050], "d": 0.06, "v": 0.12}, {"at": 0.12, "w": "tri", "f": [1900, 1880], "d": 0.05, "v": 0.09},
+		{"at": 0.3, "w": "tri", "f": [2300, 2280], "d": 0.08, "v": 0.07}, {"at": 0.0, "w": "noise", "lp": 0.3, "d": 0.05, "v": 0.08}],
+}
+const LOOPS := {
+	"heartbeat": [{"w": "sine", "f": [70, 45], "d": 0.14, "v": 0.6}, {"at": 0.22, "w": "sine", "f": [60, 40], "d": 0.16, "v": 0.45},
+		{"at": 0.9, "w": "sine", "f": [50, 50], "d": 0.01, "v": 0.0}],
+	"rain": [{"w": "noise", "lp": 0.55, "d": 2.0, "v": 0.12, "a": 0.0, "swell": 1.0}],
+	"sizzle": [{"w": "noise", "lp": 0.85, "d": 1.0, "v": 0.08}],
+	# Line under high tension: a thin whine.
+	"strain": [{"w": "tri", "f": [1180, 1220], "d": 0.5, "v": 0.035}],
+	"pour": [{"w": "noise", "lp": 0.3, "d": 1.0, "v": 0.1}],
+	"sea": [{"w": "noise", "lp": 0.015, "d": 6.0, "v": 0.35, "a": 0.0, "swell": 3.0}],
+	"street": [{"w": "noise", "lp": 0.04, "d": 4.0, "v": 0.14, "a": 0.0, "swell": 2.0}],
+}

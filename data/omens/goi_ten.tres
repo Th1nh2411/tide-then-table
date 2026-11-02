@@ -10,3 +10,5 @@ title = "Tiếng gọi tên Rin lúc khuya"
 text = "Từ phía bến vọng lên: \"...Rin ơi...\""
 calm_text = "Nhà ai xa xa gọi: \"Tèo ơi! Vô ăn cơm!\""
 co_nam_line = ""
+subtlety = 0.1
+missed_hint = "Người già dặn: tháng này nghe ai gọi tên mình từ phía nước thì đừng dạ, đừng đi."

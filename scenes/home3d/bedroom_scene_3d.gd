@@ -10,7 +10,16 @@ extends Node3D
 const WATERFRONT := "res://scenes/home3d/waterfront_scene_3d.tscn"
 const ENDING := RamEpilogue3D.SCENE
 const NEWS: NewsData = preload("res://data/story/news.tres")
+const KIENG: NoteData = preload("res://data/story/kieng_note.tres")
 const REACH := 1.3
+## E picks what Rin looks at among these (eye-height points).
+const SPOTS := {
+	"door": BedroomBuilder3D.DOOR + Vector3(0, 1.1, 0),
+	"paper": BedroomBuilder3D.PAPER,
+	"note": BedroomBuilder3D.NOTE,
+}
+const PROMPTS := {"door": "E  Ra ngoài", "paper": "E  Đọc báo", "note": "E  Đọc giấy"}
+const LOOK_DOT := 0.55
 
 @export var walk_speed := 1.6
 
@@ -96,25 +105,56 @@ func _physics_process(_delta: float) -> void:
 func _process(_delta: float) -> void:
 	if leaving:
 		return
-	if _near(BedroomBuilder3D.DOOR):
-		text.prompt("E  Ra ngoài")
-	elif _near(BedroomBuilder3D.PAPER):
-		text.prompt("E  Đọc báo")
-	else:
-		text.prompt("")
+	text.prompt(PROMPTS.get(target(), ""))
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
 	if key == null or not key.pressed or key.echo or key.physical_keycode != KEY_E or leaving or waking:
 		return
-	if _near(BedroomBuilder3D.DOOR):
-		get_viewport().set_input_as_handled()
-		leave()
-	elif _near(BedroomBuilder3D.PAPER):
-		get_viewport().set_input_as_handled()
-		var page := NEWS.page(GameState.day)
-		PaperReader.read(self, "newspaper", NEWS.title, "%s — %s" % [LoopCalendar.date_text(GameState.day), page])
+	var what := target()
+	if what == "":
+		return
+	get_viewport().set_input_as_handled()
+	match what:
+		"door":
+			leave()
+		"paper":
+			read_paper()
+		"note":
+			read_note()
+
+
+## What E acts on: the closest thing in reach Rin is looking at
+## ("door", "paper", "note" or "").
+func target() -> String:
+	var best := ""
+	var best_dot := LOOK_DOT
+	var forward := -demo_camera.global_basis.z
+	for what: String in SPOTS:
+		var at: Vector3 = SPOTS[what]
+		if not _near(at):
+			continue
+		var dot := forward.dot((at - demo_camera.global_position).normalized())
+		if dot > best_dot:
+			best = what
+			best_dot = dot
+	return best
+
+
+## The morning paper; on mùng 9 after a wrong night, one vague line more.
+func read_paper() -> void:
+	var page := "%s — %s" % [LoopCalendar.date_text(GameState.day), NEWS.page(GameState.day)]
+	PaperReader.read(self, "newspaper", NEWS.title, page, paper_hint())
+
+
+## The boxed line on the mùng 9 paper after a wrong night ("" otherwise).
+func paper_hint() -> String:
+	return NEWS.hint(LoopCalendar.missed()) if GameState.day == 1 else ""
+
+
+func read_note() -> void:
+	PaperReader.read(self, "note", KIENG.title, KIENG.body())
 
 
 func _gate_closed() -> void:

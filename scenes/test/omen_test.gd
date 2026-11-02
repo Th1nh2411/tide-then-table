@@ -2,7 +2,8 @@ extends Node
 ## Standalone test for OmenPicker (run with F6): no omen on the first or the
 ## last night, about half of the other nights carry one, never the same omen
 ## two nights running, same result for the same (loop, day), the flags the
-## bedroom sets, and the catalog's data.
+## bedroom sets, and the catalog's data; obvious omens only on early days,
+## every subtle omen has a second tell elsewhere, every omen a reset hint.
 
 const LOOPS := 200
 
@@ -16,6 +17,8 @@ func _ready() -> void:
 	var omen_nights := 0
 	var middle_nights := 0
 	var seen: Dictionary = {}
+	var early_ok := true
+	var late_subtle := false
 	for loop: int in range(LOOPS):
 		var previous := ""
 		for day: int in range(1, LoopCalendar.NIGHTS + 1):
@@ -31,6 +34,10 @@ func _ready() -> void:
 				omen_nights += 1 if id != "" else 0
 			if id != "":
 				seen[id] = true
+				var picked := catalog.find(id)
+				if day <= catalog.early_last_day and picked.subtlety > catalog.early_max_subtlety:
+					early_ok = false
+				late_subtle = late_subtle or catalog.is_subtle(picked)
 			previous = id
 	var rate := float(omen_nights) / float(middle_nights)
 	failures += _check("mùng 9 never has an omen", first_ok)
@@ -38,6 +45,9 @@ func _ready() -> void:
 	failures += _check("never the same omen two nights running", repeat_ok)
 	failures += _check("omen rate %.2f is about half" % rate, rate >= 0.4 and rate <= 0.6)
 	failures += _check("every omen shows up", seen.size() == catalog.omens.size())
+	failures += _check("days 1-%d only pick obvious omens" % catalog.early_last_day, early_ok)
+	failures += _check("subtle omens show up later", late_subtle)
+	failures += _check_tells(catalog)
 	failures += _check("same loop + day -> same omen",
 		OmenPicker.pick(catalog, 3, 4) == OmenPicker.pick(catalog, 3, 4))
 	var differs := false
@@ -105,6 +115,31 @@ func _check_customs(catalog: OmenCatalog) -> int:
 	GameState.set_flag(LoopCalendar.OMEN_FLAG)
 	states_ok = states_ok and OmenPicker.state("vang_ma", catalog) == "omen"
 	failures += _check("state(): normal / hidden custom / omen", states_ok)
+	return failures
+
+
+## Each subtle omen is told twice: its prop, plus a line heard elsewhere —
+## on the evening waterfront (with a sound) for restaurant / street omens,
+## from Cô Năm at the restaurant for dock omens. Every omen has a hint for
+## the paper after a reset, and subtlety is set on every one.
+func _check_tells(catalog: OmenCatalog) -> int:
+	var tells_ok := true
+	var hints_ok := true
+	var levels: Dictionary = {}
+	for omen in catalog.omens:
+		levels[omen.subtlety] = true
+		hints_ok = hints_ok and omen.missed_hint != ""
+		if omen.echo_sound != "" and not Sfx.has_sound(omen.echo_sound):
+			tells_ok = false
+		if not catalog.is_subtle(omen):
+			continue
+		if omen.where == OmenData.Where.DOCK:
+			tells_ok = tells_ok and omen.co_nam_line != ""
+		else:
+			tells_ok = tells_ok and omen.echo_line != "" and omen.echo_sound != ""
+	var failures := _check("every subtle omen has a second tell elsewhere", tells_ok)
+	failures += _check("every omen has a vague hint for the paper", hints_ok)
+	failures += _check("subtlety is set per omen (several levels)", levels.size() >= 4)
 	return failures
 
 

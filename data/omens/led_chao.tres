@@ -10,3 +10,5 @@ title = "Bảng LED hiện món không có"
 text = "CHÁO TRẮNG"
 calm_text = ""
 co_nam_line = ""
+subtlety = 0.2
+missed_hint = "Người già dặn: tháng này quán bày ra món không ai nấu thì tối đó ở nhà."

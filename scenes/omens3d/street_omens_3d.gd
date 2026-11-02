@@ -11,6 +11,13 @@ extends Node3D
 const WIND_X := OmenJossFire3D.WIND_X
 const FIRE_POSITION := Vector3(9.0, 0, 7.55)
 const CALL_X := 13.0  # Rin is "walking to an end" past this |x|
+## Where the voices come from (Sfx.play_at): the omen's from beyond the
+## street's end towards the dock, the neighbour's from a house up the far end.
+const DOCK_VOICE := Vector3(30.0, 1.6, 8.0)
+const HOUSE_VOICE := Vector3(-26.0, 2.0, -6.0)
+## Near silence first, then the voice (s into the duck).
+const CALL_DUCK := 1.8
+const CALL_AFTER := 1.0
 
 var host: RestaurantScene3D
 var _ribbons: Array[MeshInstance3D] = []
@@ -67,8 +74,12 @@ func _maybe_call() -> void:
 	_called = true
 	var omen := OmenPicker.tonight()
 	if omen and omen.id == "goi_ten":
-		_text.say(omen.text, 4.0)
+		Sfx.duck(CALL_DUCK)
+		create_tween().tween_callback(func() -> void:
+			Sfx.play_at("call", DOCK_VOICE, self, 0.92, 10.0)
+			_text.say(omen.text, 4.0)).set_delay(CALL_AFTER)
 	else:
 		var calm := OmenPicker.CATALOG.find("goi_ten")
 		if calm:
+			Sfx.play_at("call", HOUSE_VOICE, self, 1.3, 10.0)
 			_text.say(calm.calm_text, 4.0)

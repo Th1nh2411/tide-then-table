@@ -177,7 +177,11 @@ func _run() -> void:
 			if GameState.day != 1 or LoopCalendar.loops() != 1:
 				_fail(expect_reset + " did not reset to mùng 9")
 				return
-			print("LOOP RESET | %s -> %s" % [expect_reset, LoopCalendar.date_text(GameState.day)])
+			var hint: String = room.NEWS.hint(LoopCalendar.missed())
+			if hint == "" or room.paper_hint() != hint:
+				_fail("no hint on the mùng 9 paper after '%s'" % expect_reset)
+				return
+			print("LOOP RESET | %s -> %s | paper: %s" % [expect_reset, LoopCalendar.date_text(GameState.day), hint])
 			expect_reset = ""
 		var omen := OmenPicker.tonight()
 		if GameState.has_flag(LoopCalendar.OMEN_FLAG) != (omen != null):

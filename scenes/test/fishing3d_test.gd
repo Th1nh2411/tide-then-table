@@ -3,7 +3,8 @@ extends Node
 ## (run with F6): cast lands the bobber in reach, an early click reels in, a
 ## late click loses the bite, a hooked fish reels in and is held, no cast
 ## while holding, E while looking at the basket drops it in, holding the
-## reel too long snaps the line, nothing bites in the pier water.
+## reel too long snaps the line on đêm âm only (a calm night lands it within
+## ~15 s), nothing bites in the pier water.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
 const STEP := 1.0 / 30.0
@@ -32,7 +33,7 @@ func _run() -> void:
 		return
 	_rod.set_process(false)  # this test steps it by hand
 	var shoal: SeaShoals3D.Shoal = _sea.shoals[_sea._nearest_school_index()]
-	shoal.fish_left = 3
+	shoal.fish_left = 5
 	_sea.boat.global_position = shoal.pos + Vector3(0, 0, 8.0)
 	_cast_and_land(shoal.pos)
 	_check("a cast lands the bobber on the water and waits", _rod.state == Fishing3D.State.WAITING
@@ -47,7 +48,7 @@ func _run() -> void:
 	_check("too late: the fish is gone, the bobber waits again", _rod.state == Fishing3D.State.WAITING and not _rod.rod.mark.visible)
 	_rod.force_bite()
 	_rod.press()
-	_check("a click in the window hooks the fish (one leaves the shoal)", _rod.state == Fishing3D.State.REELING and shoal.fish_left == 2)
+	_check("a click in the window hooks the fish (one leaves the shoal)", _rod.state == Fishing3D.State.REELING and shoal.fish_left == 4)
 	var fish := _rod.fish
 	_reel_smart()
 	_check("reeling with care lands it, held in front of the view", _rod.state == Fishing3D.State.HOLDING
@@ -66,9 +67,20 @@ func _run() -> void:
 	_rod.force_bite()
 	_rod.hook()
 	_rod.hold_override = true
+	var held := _ticks(20.0, Fishing3D.State.REELING)
+	_rod.hold_override = false
+	_check("calm night: holding the reel never snaps, the fish is in within ~15 s",
+		_rod.state == Fishing3D.State.HOLDING and held <= 15.0)
+	_rod.drop_in_basket()
+	GameState.set_flag(LoopCalendar.OMEN_FLAG)  # đêm âm from the next hook on
+	_cast_and_land(shoal.pos)
+	_rod.force_bite()
+	_rod.hook()
+	_rod.hold_override = true
 	_ticks(20.0, Fishing3D.State.REELING)
 	_rod.hold_override = false
-	_check("holding the reel too long snaps the line", _rod.state == Fishing3D.State.IDLE and _rod.basket.count() == 1)
+	GameState.story_flags.erase(LoopCalendar.OMEN_FLAG)
+	_check("đêm âm: holding the reel too long snaps the line", _rod.state == Fishing3D.State.IDLE and _rod.basket.count() == 2)
 	_check_aim()
 	_sea.boat.global_position = _sea.START
 	_cast_and_land(_sea.START + Vector3(0, 0, -7.0))
@@ -106,12 +118,16 @@ func _reel_smart() -> void:
 	_rod.hold_override = false
 
 
-## Ticks for `seconds`, or until the state leaves `while_state` if given.
-func _ticks(seconds: float, while_state: int = -1) -> void:
+## Ticks for `seconds`, or until the state leaves `while_state` if given;
+## returns the seconds ticked.
+func _ticks(seconds: float, while_state: int = -1) -> float:
+	var ticked := 0.0
 	for i in range(int(seconds / STEP)):
 		if while_state >= 0 and _rod.state != while_state:
-			return
+			return ticked
 		_rod.tick(STEP)
+		ticked += STEP
+	return ticked
 
 
 func _look_at(point: Vector3) -> void:

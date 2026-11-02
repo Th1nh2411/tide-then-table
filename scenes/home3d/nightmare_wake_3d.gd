@@ -11,11 +11,18 @@ extends CanvasLayer
 const LYING := Vector3(-0.95, -0.85, -0.15)
 const LYING_PITCH := 1.25  # looking up at the ceiling
 
+## Gasp -> eyes open -> sitting up -> control back (s); with dark_seconds or
+## knock_dark_seconds this is the whole wake (total_seconds()).
+const OPEN_SECONDS := 0.12
+const BEFORE_SIT := 0.35
+const AFTER_SIT := 0.6
+
 @export var dark_seconds := 1.4
 @export var sit_up_seconds := 0.75
-## Longer black when someone knocks: the knocks, then a silence.
-@export var knock_dark_seconds := 3.2
-@export var knock_at := 0.5
+## Longer black when someone knocks: near silence, the knocks at the door,
+## then a silence. The whole wake stays under 5 s.
+@export var knock_dark_seconds := 2.7
+@export var knock_at := 0.8
 
 var room: BedroomScene3D
 var line := ""
@@ -45,18 +52,24 @@ func _ready() -> void:
 	Sfx.hold("heartbeat", true)
 	var tween := create_tween()
 	if knocks:
+		Sfx.duck(knock_at + 0.9)
 		tween.tween_interval(knock_at)
-		tween.tween_callback(func() -> void: Sfx.play("knock3", 0.0))
+		tween.tween_callback(func() -> void: Sfx.play_at("knock3", BedroomBuilder3D.DOOR + Vector3(0, 1.1, 0), room, 1.0, 3.0))
 		tween.tween_interval(knock_dark_seconds - knock_at)
 	else:
 		tween.tween_interval(dark_seconds)
 	tween.tween_callback(func() -> void: Sfx.play("gasp", 0.0))
-	tween.tween_property(_black, "color:a", 0.0, 0.12)
-	tween.tween_interval(0.35)
+	tween.tween_property(_black, "color:a", 0.0, OPEN_SECONDS)
+	tween.tween_interval(BEFORE_SIT)
 	tween.tween_callback(func() -> void: _shake = 1.0)
 	tween.tween_method(_sit_up, 0.0, 1.0, sit_up_seconds).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_interval(0.6)
+	tween.tween_interval(AFTER_SIT)
 	tween.tween_callback(_done)
+
+
+## Seconds from the black screen to Rin moving again.
+func total_seconds() -> float:
+	return (knock_dark_seconds if knocks else dark_seconds) + OPEN_SECONDS + BEFORE_SIT + sit_up_seconds + AFTER_SIT
 
 
 func _process(delta: float) -> void:

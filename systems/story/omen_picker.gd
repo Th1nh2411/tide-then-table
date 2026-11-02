@@ -1,7 +1,8 @@
 class_name OmenPicker
 extends RefCounted
 ## Picks tonight's omen (pure, PLAN §10 H5): at most one per night, none on
-## the first or the last night, never the same omen two nights running.
+## the first or the last night, never the same omen two nights running,
+## obvious ones only on early days (OmenCatalog.allowed: subtlety).
 ## Deterministic per (loop count, day): the same day of the same loop always
 ## gets the same omen, so reloads, tests and the bot agree. Stored as story
 ## flags: LoopCalendar.OMEN_FLAG (judged in the bedroom) + ID_FLAG.
@@ -29,7 +30,7 @@ static func _roll(catalog: OmenCatalog, loop: int, day: int, previous: String) -
 	var choices: Array[OmenData] = []
 	var total := 0.0
 	for omen in catalog.omens:
-		if omen.id != previous and omen.weight > 0.0:
+		if omen.id != previous and omen.weight > 0.0 and catalog.allowed(omen, day):
 			choices.append(omen)
 			total += omen.weight
 	var at := rng.randf() * total

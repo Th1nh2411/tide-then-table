@@ -30,6 +30,7 @@ func _ready() -> void:
 	WaterfrontBuilder3D.build(self, evening)
 	if evening:
 		RamShore3D.attach(self)  # rằm: the village releases hoa đăng
+		OmenEcho3D.attach(self, WaterfrontBuilder3D.PIER_POST + Vector3(0, 1.0, 0))  # a subtle omen's second tell
 	var start := WaterfrontBuilder3D.EVENING_START if evening else WaterfrontBuilder3D.MORNING_START
 	player = Walker3D.make_player(self, start)
 	demo_camera = Camera3D.new()

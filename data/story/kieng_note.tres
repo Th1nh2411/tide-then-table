@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="NoteData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/note_data.gd" id="1_note"]
+
+[resource]
+script = ExtResource("1_note")
+title = "Những điều kiêng"
+lines = Array[String](["Đêm trăng yên thì ra khơi, đừng để quán thiếu cá.", "Đi biển về phải có ba con cá trong giỏ, đừng về tay không.", "Thấy lạ ở quán, ngoài phố hay ở bến thì đừng xuống thúng.", "Mâm cúng mà bị đụng tới thì ở nhà.", "Ai gọi tên lúc khuya thì đừng dạ.", "Tiền rơi ngoài đường đừng lượm."])
+signature = "Bà dặn. Tháng Bảy, nhớ kỹ."

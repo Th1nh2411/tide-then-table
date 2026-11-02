@@ -45,3 +45,11 @@ extends Resource
 @export var extra_line := 3.0
 ## Seconds at full tension before the line snaps.
 @export var snap_seconds := 0.6
+
+@export_group("Calm night")
+## Calm nights have no fail state (research 4.2): tension never passes this
+## (below full, so the line cannot snap); pulling at the cap wins no line.
+@export_range(0.0, 0.99) var calm_tension_cap := 0.9
+## ...and the fish is in by this many seconds whatever Rin does: the line
+## out can only shrink towards zero over this time.
+@export var calm_max_seconds := 14.0

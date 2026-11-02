@@ -10,6 +10,9 @@ const HEIGHT := 2.6
 const DOOR := Vector3(1.5, 0, -2.0)
 const PAPER := Vector3(1.4, 0.01, -1.55)
 const CALENDAR := Vector3(-0.6, 1.5, -1.93)  # wall face is at z -1.95
+## "Những điều kiêng": grandmother's note pinned left of the door.
+const NOTE := Vector3(0.45, 1.42, -1.935)
+const NOTE_SIZE := Vector2(0.3, 0.41)
 const START := Vector3(-0.7, 0, 0.9)
 ## Floor beside the bed, by the pillow end (wet footprints end here).
 const BEDSIDE := Vector3(-1.0, 0, 1.15)
@@ -44,6 +47,11 @@ static func build(host: Node3D) -> Label3D:
 	# Tear-off calendar: a red-topped block on the wall, the date in big ink.
 	B.box(host, CALENDAR, Vector3(0.36, 0.45, 0.02), "3a3026")
 	HorrorMaterials.picture(host, "calendar_sheet", CALENDAR + Vector3(0, 0, 0.012), Vector2(0.34, 0.425))
+	# The note: a yellowed page on a red pin, its title in ink.
+	HorrorMaterials.picture(host, "paper_diary_page", NOTE, NOTE_SIZE).rotation.z = 0.04
+	B.box(host, NOTE + Vector3(0, NOTE_SIZE.y * 0.5 - 0.03, 0.01), Vector3(0.025, 0.025, 0.02), "a8262c")
+	var heading := B.label(host, "Những điều kiêng", NOTE + Vector3(0, 0.13, 0.004), 18, "27324a")
+	heading.pixel_size = 0.0015
 	var date := B.label(host, "", CALENDAR + Vector3(0, -0.03, 0.016), 34, "2a2230")
 	date.pixel_size = 0.003
 	return date

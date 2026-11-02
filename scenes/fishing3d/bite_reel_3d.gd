@@ -42,6 +42,7 @@ static func hook(f: Fishing3D) -> bool:
 		return false
 	f.reel = ReelLogic.new(f.tuning, ReelLogic.strength_of(f.fish, f.size),
 		FishingSpot3D.flat_distance(f.sea, f.target), f.sea.rng)
+	f.reel.calm = not GameState.has_flag(LoopCalendar.OMEN_FLAG)  # snaps on đêm âm only
 	f.state = Fishing3D.State.REELING
 	Sfx.play("bite")
 	return true

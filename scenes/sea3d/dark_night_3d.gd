@@ -24,6 +24,16 @@ const WHISPERS: Array[String] = ["...về đi...", "...đừng ra xa...", "...h�
 @export var figure_angle_max_deg := 60.0
 @export var figure_reach_scale := 0.9
 @export var blink_seconds := 0.15
+## Knocks: near silence first (Sfx.duck), then the knuckles on the hull side
+## facing the raft (a 3D sound), this many seconds into the duck.
+@export var knock_duck_seconds := 1.7
+@export var knock_after := 1.0
+@export_group("Dread by day")
+## LoopCalendar.dread_level(): below this (mùng 9-10) only sounds, no figures.
+@export var figures_from_dread := 0.3
+## Below this (before 13 tháng Bảy) figures keep at least far_figure_distance away.
+@export var close_from_dread := 0.6
+@export var far_figure_distance := 15.0
 @export_group("Taken")
 ## Seconds away from the dock (not fishing / visiting) before the sea takes him.
 @export var taken_after_seconds := 60.0
@@ -128,15 +138,15 @@ func play_taken() -> void:
 
 func _haunt() -> void:
 	if _events.is_empty():
-		_events = ["knock", "figure", "whisper", "swim", "static"]
+		_events = event_pool()
 		if _cycles > 0:
 			_events.shuffle()
 		_cycles += 1
 	var event: String = _events.pop_front()
 	match event:
 		"knock":
-			Sfx.play("knock3", 0.0)
-			_say_once("knock", "Ai... gõ mạn thúng vậy?", 2.5)
+			Sfx.duck(knock_duck_seconds)
+			create_tween().tween_callback(_knock).set_delay(knock_after)
 		"whisper":
 			Sfx.play("whisper", 0.1)
 			sea._say(WHISPERS[_rng.randi() % WHISPERS.size()], 2.0)
@@ -148,13 +158,37 @@ func _haunt() -> void:
 			_spawn_figure(DarkNightFigure3D.Kind.STAND if event == "figure" else DarkNightFigure3D.Kind.SWIM)
 
 
+## Tonight's haunting events; early in the loop (dread) only sounds.
+func event_pool() -> Array[String]:
+	if LoopCalendar.dread_level() < figures_from_dread:
+		return ["knock", "whisper", "static"]
+	return ["knock", "figure", "whisper", "swim", "static"]
+
+
+## Knuckles on the hull, on the side facing the raft.
+func _knock() -> void:
+	if taken:
+		return
+	var to_raft := sea.RAFT_POS - sea.boat.global_position
+	to_raft.y = 0.0
+	Sfx.play_at("knock3", sea.boat.global_position + to_raft.normalized() * 0.9 + Vector3(0, 0.2, 0), sea, 1.0, 3.0)
+	_say_once("knock", "Ai... gõ mạn thúng vậy?", 2.5)
+
+
+## How far out a figure stands: at the lamp's edge, or far off early in the loop.
+func figure_distance(lamp_reach: float) -> float:
+	if LoopCalendar.dread_level() < close_from_dread:
+		return maxf(lamp_reach, far_figure_distance)
+	return lamp_reach
+
+
 func _spawn_figure(kind: DarkNightFigure3D.Kind) -> void:
 	var camera := get_viewport().get_camera_3d()
 	var forward := -camera.global_basis.z if camera else Vector3.FORWARD.rotated(Vector3.UP, sea.boat.rotation.y)
 	forward.y = 0.0
 	var side := 1.0 if _rng.randf() < 0.5 else -1.0
 	var angle := deg_to_rad(_rng.randf_range(figure_angle_min_deg, figure_angle_max_deg)) * side
-	var reach: float = sea.boat_lamp.spot_range * figure_reach_scale if is_instance_valid(sea.boat_lamp) else 12.0
+	var reach := figure_distance(sea.boat_lamp.spot_range * figure_reach_scale if is_instance_valid(sea.boat_lamp) else 12.0)
 	var figure := DarkNightFigure3D.new()
 	figure.kind = kind
 	var dir := forward.normalized().rotated(Vector3.UP, angle)

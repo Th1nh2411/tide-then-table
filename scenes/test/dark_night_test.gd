@@ -27,6 +27,7 @@ func _run() -> void:
 	_check(DarkNight3D.active(calm) == null, "calm night has no đêm âm")
 	_check(is_equal_approx(calm.oil_burn_scale, 1.0), "calm night burns oil normally")
 	_check(Sfx._bed_name == "sea", "calm night plays the 'sea' bed")
+	_check_false_sounds(calm)
 	calm.queue_free()
 	await get_tree().process_frame
 	# Omen night, went out anyway: đêm âm.
@@ -35,6 +36,7 @@ func _run() -> void:
 	var sea := await _open_sea()
 	var dark := DarkNight3D.active(sea)
 	_check(dark != null, "omen night adds đêm âm")
+	_check(sea.get_node_or_null(CalmNightSounds3D.NODE_NAME) == null, "no calm-night false sounds on đêm âm")
 	if dark == null:
 		_finish()
 		return
@@ -44,6 +46,14 @@ func _run() -> void:
 	_check(is_equal_approx(sea.oil_burn_scale, dark.oil_burn_scale) and dark.oil_burn_scale > 1.0, "oil burns faster")
 	_check(Sfx._bed_name == DarkNight3D.BED and HorrorBed.MIXES.has(DarkNight3D.BED), "đêm âm plays the 'sea_dark' bed")
 	_check(dark.find_child("RedMoon", false, false) != null, "red moon is up")
+	# Dread grows by day: mùng 10 only sounds; figures far off until 13 tháng Bảy.
+	GameState.day = 2
+	_check(not dark.event_pool().has("figure") and not dark.event_pool().has("swim"), "mùng 10: only sounds")
+	GameState.day = 3
+	_check(dark.event_pool().has("figure") and dark.figure_distance(5.0) >= dark.far_figure_distance, "day 3: figures, but far off")
+	GameState.day = 5
+	_check(is_equal_approx(dark.figure_distance(5.0), 5.0), "13 tháng Bảy: figures come to the lamp's edge")
+	GameState.day = 3
 	# Haunting: a figure at the edge of the light vanishes when looked at.
 	dark._spawn_figure(DarkNightFigure3D.Kind.STAND)
 	var figure: DarkNightFigure3D = dark.find_children("*", "DarkNightFigure3D", false, false)[0]
@@ -65,6 +75,27 @@ func _run() -> void:
 		"bedroom judged it RESET: back to mùng 9")
 	_check(_reset_rule(), "omen + went out = RESET")
 	_finish()
+
+
+## Calm nights: rare harmless sounds (25-60 s apart), never the đêm âm knock.
+func _check_false_sounds(calm: SeaScene3D) -> void:
+	var sounds := calm.get_node_or_null(CalmNightSounds3D.NODE_NAME) as CalmNightSounds3D
+	_check(sounds != null, "calm night has false sounds")
+	if sounds == null:
+		return
+	var gaps_ok := true
+	for day: int in [1, 4, 7]:
+		GameState.day = day
+		for i in range(50):
+			var gap := sounds.next_gap()
+			gaps_ok = gaps_ok and gap >= 25.0 and gap <= 60.0
+	GameState.day = 1
+	_check(gaps_ok, "false sounds are rare: one every 25-60 s")
+	for kind: String in CalmNightSounds3D.KINDS:
+		sounds.play(kind)
+	var recipes_ok := Sfx.has_sound("slap") and Sfx.has_sound("tock") and Sfx.has_sound("plip")
+	_check(sounds.played.size() == CalmNightSounds3D.KINDS.size() and not sounds.played.has("knock3")
+		and recipes_ok and Sfx.SOUNDS["tock"] != Sfx.SOUNDS["knock3"], "each false sound plays, none is the knock")
 
 
 ## LoopCalendar's rule straight, without a scene in between.

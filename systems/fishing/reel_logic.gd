@@ -5,7 +5,8 @@ extends RefCounted
 ## and the fish comes closer; releasing lets tension fall. The fish makes
 ## runs (stronger for big / rare fish) that pull tension up and, released,
 ## take line. Full tension for snap_seconds = the line snaps; distance 0 =
-## landed. Numbers in ReelTuning.
+## landed. On a calm night (`calm`) the line cannot snap and the fight ends
+## within calm_max_seconds; snapping is for đêm âm only. Numbers in ReelTuning.
 
 enum Outcome { FIGHTING, LANDED, SNAPPED }
 
@@ -21,6 +22,10 @@ var tension := 0.0
 var over := 0.0
 ## True while the fish makes a run.
 var running := false
+## Calm night: no snap, fight capped in time (set by BiteReel3D.hook).
+var calm := false
+## Seconds since the hook.
+var elapsed := 0.0
 var _run_left := 0.0
 var _gap := 1.0
 var _rng: RandomNumberGenerator
@@ -62,15 +67,23 @@ func progress() -> float:
 ## One step of the fight; `reeling` = the button is held.
 func step(delta: float, reeling: bool) -> Outcome:
 	_step_runs(delta)
+	elapsed += delta
 	var pull := strength if running else 0.0
-	if reeling:
+	var capped := calm and tension >= tuning.calm_tension_cap
+	if reeling and capped:
+		# Too tight on a calm night: the fish just holds, no line won.
+		tension = tuning.calm_tension_cap
+	elif reeling:
 		tension += (tuning.rise + tuning.rise_by_strength * strength + tuning.run_tension * pull) * delta
 		distance -= tuning.reel_speed * (tuning.reel_speed_in_run if running else 1.0) * delta
 	else:
 		tension += (tuning.run_tension * tuning.run_tension_released * pull - tuning.fall) * delta
 		distance += tuning.run_line * pull * delta
-	tension = clampf(tension, 0.0, 1.0)
+	tension = clampf(tension, 0.0, tuning.calm_tension_cap if calm else 1.0)
 	distance = minf(distance, start_distance + tuning.extra_line)
+	if calm:
+		# The fish tires: the line out can only shrink to 0 by calm_max_seconds.
+		distance = minf(distance, start_distance * (1.0 - elapsed / maxf(tuning.calm_max_seconds, 0.1)))
 	over = over + delta if tension >= 1.0 else 0.0
 	if over > tuning.snap_seconds:
 		return Outcome.SNAPPED

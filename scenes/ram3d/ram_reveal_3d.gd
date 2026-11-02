@@ -4,12 +4,16 @@ extends RefCounted
 ## the lobster raft. Under its green lamp, anh Út drags a body wrapped in net
 ## to the far edge and drops it into the fog; Rin's lamp flickers on him, he
 ## turns and sees Rin. Rin rows back into the dark. -> RamEpilogue3D (true).
+## Sound: near silence as the raft comes into view; when he looks up, the one
+## moment of full silence in the game (bed and ambience off, SILENCE s).
 
 const RAFT_TOP := 0.62
+const SILENCE := 1.5
 
 
 static func play(ram: RamSea3D) -> void:
 	var sea := ram.sea
+	Sfx.duck(1.6)
 	sea.ending = true
 	sea.boat.velocity = Vector3.ZERO
 	sea.yaw_velocity = 0.0
@@ -47,8 +51,10 @@ static func play(ram: RamSea3D) -> void:
 	await drop.finished
 	Sfx.play("splash")
 	body.visible = false
-	await RamFx3D.wait(ram, 1.0)
-	# He looks up, straight at Rin's lamp.
+	await RamFx3D.wait(ram, 0.4)
+	# He looks up, straight at Rin's lamp: nothing at all to hear.
+	Sfx.duck(SILENCE + 0.3, 0.0)
+	await RamFx3D.wait(ram, SILENCE)
 	Sfx.hold("heartbeat", true)
 	await _flash(ram, flash, 0.2)
 	await RamFx3D.say_lines(ram.text, RamFx3D.LINES.ut_seen, 2.4)

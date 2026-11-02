@@ -8,6 +8,8 @@ extends Node3D
 ##   Đêm) burn warm yellow; on its night they burn green.
 ## - "bong_cau_tau": a lamp hangs lit on the post at the pier head; on its
 ##   night the lamp is out and a dark figure stands by the post.
+## - "tien_le" (a street omen): on its night the trail of small notes goes on
+##   along the pier planks (its second tell, with OmenEcho3D's line).
 
 const LANTERNS := 5
 const LANTERN_SPEED := 0.22
@@ -60,6 +62,8 @@ func _ready() -> void:
 		_beacons.append(OmenProps3D.sphere(self, at, 0.45, beacon_hex, 6.0))
 		OmenProps3D.light(self, at, beacon_hex, 2.0, 9.0)
 	_build_pier_head(pier_post, OmenPicker.is_tonight("bong_cau_tau"))
+	if OmenPicker.is_tonight("tien_le"):
+		_build_notes(rng)
 
 
 func _build_pier_head(post: Vector3, figure: bool) -> void:
@@ -70,6 +74,14 @@ func _build_pier_head(post: Vector3, figure: bool) -> void:
 		return
 	OmenProps3D.box(self, post + Vector3(0, 0.8, 0.14), Vector3(0.14, 0.18, 0.14), "3a3226")
 	ConceptModel3D.spawn(self, "drowned_figure", post + Vector3(-0.8, 0, 0.1), 1.72, PI)
+
+
+## Small notes dropped along the pier, from the shore out towards its head.
+func _build_notes(rng: RandomNumberGenerator) -> void:
+	for i: int in range(6):
+		var at := Vector3(pier_post.x - 1.0 + sin(i * 1.3) * 0.4, 0.125, 1.2 - i * 1.5)
+		var note := OmenProps3D.glow_box(self, at, Vector3(0.2, 0.004, 0.1), "9cc79a" if i % 2 else "d9a0b4", 0.4)
+		note.rotation.y = rng.randf() * TAU
 
 
 func _process(delta: float) -> void:

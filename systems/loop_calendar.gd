@@ -23,6 +23,11 @@ const MIN_FISH := 3
 const SHOP_FISH_FLAG := "shop_fish"
 const NO_FISH_FLAG := "bao_no_fish"
 const KEPT_PREFIXES: Array[String] = ["note_", "tip_"]
+## What the last wrong night missed (kept through resets, "note_"): the omen
+## id, or MISSED_CALM for a calm night at home / short of fish. The mùng 9
+## paper prints a vague hint about it (NewsData.hint_for).
+const MISSED_FLAG := "note_missed"
+const MISSED_CALM := "calm"
 
 enum Result { NONE, NEXT, RESET, END }
 
@@ -76,9 +81,11 @@ static func take_result() -> Result:
 		return Result.RESET if RamNight.current(went_out) == RamNight.Ending.LOOP else Result.END
 	var omen := GameState.has_flag(OMEN_FLAG)
 	if omen and went_out:
+		GameState.set_flag(MISSED_FLAG, str(GameState.story_flags.get(OmenPicker.ID_FLAG, "")))
 		return Result.RESET
 	if not omen and (not went_out or fish < MIN_FISH):
 		last_calm_miss = true
+		GameState.set_flag(MISSED_FLAG, MISSED_CALM)
 		return Result.RESET
 	GameState.set_flag(SHOP_FISH_FLAG, fish if went_out else 0)
 	if omen:
@@ -86,6 +93,17 @@ static func take_result() -> Result:
 	else:
 		GameState.story_flags.erase(NO_FISH_FLAG)
 	return Result.NEXT
+
+
+## 0..1 from the day (mùng 9 = 0, rằm = 1): how close the haunting may come
+## (DarkNight3D, CalmNightSounds3D).
+static func dread_level(day: int = -1) -> float:
+	var d := GameState.day if day < 0 else day
+	return clampf(float(d - 1) / float(NIGHTS - 1), 0.0, 1.0)
+
+
+static func missed() -> String:
+	return str(GameState.story_flags.get(MISSED_FLAG, ""))
 
 
 static func next_day() -> void:

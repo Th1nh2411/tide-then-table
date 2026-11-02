@@ -11,3 +11,5 @@ text = ""
 calm_text = ""
 co_nam_line = "Ủa... ai ăn mâm cúng của cô vầy nè? Cô mới bày hồi chiều mà."
 custom = true
+subtlety = 0.3
+missed_hint = "Người già dặn: tháng này mâm cúng xô lệch thì đừng đi đâu xa."

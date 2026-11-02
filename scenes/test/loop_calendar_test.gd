@@ -74,6 +74,15 @@ func _ready() -> void:
 	failures += _check("reset forgets the tea and the recording", not RamNight.tea_answered() and not GameState.has_flag(RamNight.EXPOSED_FLAG))
 	LoopCalendar.reset_loop()
 	failures += _check("loop count grows", LoopCalendar.loops() == 2)
+	var rising := true
+	for day: int in range(2, LoopCalendar.NIGHTS + 1):
+		rising = rising and LoopCalendar.dread_level(day) > LoopCalendar.dread_level(day - 1)
+	failures += _check("dread: 0 on mùng 9, 1 on rằm, rising by day", is_zero_approx(LoopCalendar.dread_level(1))
+		and is_equal_approx(LoopCalendar.dread_level(LoopCalendar.NIGHTS), 1.0) and rising)
+	LoopCalendar.choose(false)
+	LoopCalendar.take_result()
+	failures += _check("a calm night at home is remembered as missed (kept)", LoopCalendar.missed() == LoopCalendar.MISSED_CALM
+		and LoopCalendar.MISSED_FLAG.begins_with("note_"))
 	GameState.reset()
 	print("LOOP CALENDAR TEST ", "PASS" if failures == 0 else "FAIL")
 	get_tree().quit(1 if failures else 0)

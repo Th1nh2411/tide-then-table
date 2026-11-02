@@ -21,3 +21,5 @@ last_day = 6
 customs_min = 1
 customs_max = 2
 customs_on_omen_night = 1
+early_last_day = 3
+early_max_subtlety = 0.4

@@ -8,6 +8,7 @@ static func build_tools(sea: SeaScene3D) -> void:
 	sea.rod = Fishing3D.attach(sea)
 	DarkNight3D.attach(sea)  # đêm âm: only when tonight has an omen
 	NightErrand3D.attach(sea)  # calm nights: one thing to pick up out there
+	CalmNightSounds3D.attach(sea)  # calm nights: rare harmless sounds, never sure
 	RamSea3D.attach(sea)  # rằm: the tea's drowsiness, or the ghost-lights to the raft
 	sea.camera.position = sea.boat.position + SeaScene3D.CAMERA_OFFSET
 	sea.camera.look_at(sea.boat.position + Vector3(0, .65, -SeaScene3D.CAMERA_LOOK_AHEAD))
