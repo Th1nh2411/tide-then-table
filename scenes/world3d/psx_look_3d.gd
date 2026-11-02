@@ -4,7 +4,8 @@ extends CanvasLayer
 ## builds): the 3D world is drawn natively at `pixel_res` by a SubViewport
 ## that follows the game camera and is shown nearest-upscaled under the UI
 ## (whole pixels, no dropped edges); opaque StandardMaterial3Ds become
-## `psx_vertex` (vertex snap, nearest textures). Removing the node restores
+## `psx_vertex` (nearest textures, optional vertex snap). MSAA on the low-res
+## image keeps edges from crawling as the camera moves. Removing the node restores
 ## every original material and the game's own 3D view.
 
 const VERTEX_SHADER := preload("res://scenes/world3d/psx_vertex.gdshader")
@@ -14,6 +15,8 @@ const META := "psx_original"
 const HIDDEN_3D_SCALE := 0.25
 
 @export var pixel_res := Vector2i(640, 360)
+## PS1 vertex wobble; off by default (it makes edges jitter as the camera moves).
+@export var vertex_snap := false
 @export var snap_res := Vector2(320, 180)
 @export var color_levels := 32.0
 @export var dither := 0.0
@@ -31,7 +34,7 @@ func _ready() -> void:
 	process_priority = 1000  # after the game moved its camera this frame
 	_view = SubViewport.new()
 	_view.size = pixel_res
-	_view.msaa_3d = Viewport.MSAA_DISABLED
+	_view.msaa_3d = Viewport.MSAA_4X
 	_view.positional_shadow_atlas_size = 2048
 	_view.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(_view)
@@ -130,6 +133,7 @@ func _convert(source: Material) -> Material:
 	if base.emission_enabled:
 		var e := base.emission * base.emission_energy_multiplier
 		m.set_shader_parameter("emission", Vector3(e.r, e.g, e.b))
+	m.set_shader_parameter("snap", vertex_snap)
 	m.set_shader_parameter("snap_res", snap_res)
 	_converted[base] = m
 	return m

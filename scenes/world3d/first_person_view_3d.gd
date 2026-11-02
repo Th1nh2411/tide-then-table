@@ -1,7 +1,7 @@
 class_name FirstPersonView3D
 extends Node
-## Trial first-person view (SceneRouter toggles it with F10 in debug builds)
-## for the 3D restaurant and sea: a camera at Rin's eyes, mouse look, his
+## First-person view for the 3D restaurant and sea (SceneRouter adds it at
+## start; F10 in debug builds toggles it): a camera at Rin's eyes, mouse look, his
 ## own body hidden from it. Restaurant: it becomes the host's `demo_camera`,
 ## so WASD already walks where he looks. Sea: the look turns with the boat and
 ## the boat lamp follows it like a hand lamp. Cutscenes and the cast
@@ -127,6 +127,8 @@ func _detach() -> void:
 	_scene = null
 	_game_camera = null
 	_cutscene = false
+	# Rest card, menus and the 2D scenes need the cursor.
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
 ## Rin's own body (not the paddle or a carried plate) leaves this camera's view.

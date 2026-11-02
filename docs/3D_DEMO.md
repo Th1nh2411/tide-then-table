@@ -129,14 +129,16 @@ chỉnh ở đâu. Việc còn lại: `PLAN.md` → "Việc còn lại". Art: `A
   (`PersonBlocker`, r 0,24) nên Rin không đi xuyên Bảo, Cô Năm, khách, nhân viên; tắt khi
   người đó bị ẩn (ghế trống, cutscene). Rig chỉ về Idle khi cả physics frame lẫn idle frame
   đều không còn đẩy nó (cutscene đi bằng tween idle, gameplay bằng physics).
-- **Góc nhìn thứ nhất thử (F10, debug):** `FirstPersonView3D` đặt camera ở mắt Rin, chuột
-  xoay (Alt hoặc mở bảng = hiện con trỏ). Quán: thành `demo_camera` nên WASD đi theo hướng
-  nhìn, E vẫn theo khoảng cách. Biển: nhìn xoay theo thúng, đèn thuyền thành đèn cầm tay
-  rọi theo hướng nhìn, cột đèn ẩn. Thân Rin ẩn khỏi camera này (layer 20) nhưng vẫn đổ
-  bóng. Cutscene và cảnh quăng cần trả lại camera game. Tắt là trả lại như cũ.
+- **Góc nhìn thứ nhất (mặc định):** `FirstPersonView3D` (SceneRouter thêm lúc khởi động; F10
+  debug tắt / bật để so với camera game) đặt camera ở mắt Rin, chuột xoay (Alt hoặc mở bảng
+  = hiện con trỏ; rời cảnh 3D thì trả con trỏ). Quán: thành `demo_camera` nên WASD đi theo
+  hướng nhìn, E vẫn theo khoảng cách. Biển: nhìn xoay theo thúng, đèn thuyền thành đèn cầm
+  tay rọi theo hướng nhìn, cột đèn ẩn. Thân Rin ẩn khỏi camera này (layer 20, không làm tay)
+  nhưng vẫn đổ bóng; đĩa bưng và mái chèo vẫn hiện. Cutscene và cảnh quăng cần trả lại camera game.
 - **PSX thử (F8, debug):** `PsxLook3D` vẽ thế giới 3D thẳng ở `pixel_res` 640x360 bằng
-  SubViewport theo camera game, phóng nearest dưới UI; material thường thành
-  `psx_vertex.gdshader` (rung đỉnh `snap_res` 320x180, texture nearest). Tắt là trả lại như cũ.
+  SubViewport theo camera game (MSAA 4x), phóng nearest dưới UI; material thường thành
+  `psx_vertex.gdshader` (texture nearest + mipmap; rung đỉnh `vertex_snap` tắt mặc định vì làm
+  viền giật: đo khi camera dịch, tắt rung −24% độ giật, thêm MSAA −11% nữa). Tắt là trả lại như cũ.
 - **Bưng đĩa:** đĩa theo vị trí hai cổ tay (Rin và NPC). Hướng cần câu (`hand_basis`) tính
   so với tư thế Idle vì rest pose pilot2 là T-pose.
 

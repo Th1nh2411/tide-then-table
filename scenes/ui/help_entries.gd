@@ -28,7 +28,7 @@ const TABS: Array[Dictionary] = [
 		{"icon": "cart", "title": "Cô Năm", "rows": [
 			["E", "Mở tạp hoá"], ["@leaf", "Rau, bia luôn có"], ["@money", "Mua lô rẻ hơn"]]},
 		{"icon": "meal", "title": "Phục vụ", "rows": [
-			["W A S D", "Đi"], ["Shift", "Chạy"], ["Space", "Lộn"], ["E", "Lấy, đưa món, dọn bàn"]]},
+			["W A S D", "Đi theo hướng nhìn"], ["Shift", "Chạy"], ["Space", "Lộn"], ["E", "Lấy, đưa món, dọn bàn"]]},
 		{"icon": "grill", "title": "Nướng, bia", "rows": [
 			["E", "Lò nướng"], ["Space", "Bấm đúng lúc"], ["E", "Rót bia"], ["Space", "Giữ để rót"]]},
 		{"icon": "house", "title": "Hết ca", "rows": [
@@ -56,6 +56,7 @@ const TABS: Array[Dictionary] = [
 			["@sparkles", "Bọt nhiều = nhiều cá"], ["@boat", "Xa bờ = cá to"],
 			["@lamp", "Đá ngầm: trong tầm đèn"], ["@hot", "Món HOT: giá x1.5"]]},
 		{"icon": "settings", "title": "Phím chung", "rows": [
+			["Chuột", "Nhìn quanh"], ["Alt", "Hiện con trỏ"],
 			["Esc", "Tạm dừng"], ["F11", "Toàn màn hình"], ["@save", "Tự lưu khi ra khơi"]]},
 	]},
 ]

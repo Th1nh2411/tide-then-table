@@ -18,6 +18,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	# Every button in the game squashes when pressed.
 	UiFx.hook_buttons(get_tree())
+	# The 3D restaurant and sea are played through Rin's eyes.
+	_toggle_first_person()
 
 	_fade_rect = ColorRect.new()
 	_fade_rect.color = Color.BLACK
@@ -102,7 +104,8 @@ func _toggle_psx_look() -> void:
 	add_child(look)
 
 
-## F10 (debug): trial first-person view in the 3D restaurant / sea (FirstPersonView3D).
+## First-person view in the 3D restaurant / sea (FirstPersonView3D), on from
+## the start; F10 (debug) turns it off / on to compare with the game camera.
 func _toggle_first_person() -> void:
 	var view := get_node_or_null("FirstPersonView")
 	if view:
