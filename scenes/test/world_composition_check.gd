@@ -48,9 +48,8 @@ func _run() -> void:
 		guest.queue_free()
 	room.queue_free()
 	await get_tree().process_frame
-	for level in [0,2]:
+	for level in [0]:  # one fixed boat now
 		GameState.reset()
-		GameState.upgrade_levels["boat"] = level
 		var sea = load("res://scenes/sea3d/sea_scene_3d.tscn").instantiate()
 		sea.trip_end_cutscenes.clear()
 		add_child(sea)

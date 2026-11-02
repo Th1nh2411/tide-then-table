@@ -1,6 +1,6 @@
 extends Control
 ## Standalone test for SaveSystem (run with F6). Uses a scratch file, so the
-## real save is never touched. Checks round-trip and broken/missing data.
+## real save is never touched. Checks round-trip, broken/missing data and old saves.
 
 const TEST_PATH: String = "user://save_test.json"
 
@@ -16,8 +16,7 @@ func _ready() -> void:
 	_test_round_trip()
 	_test_missing_fields()
 	_test_wrong_types()
-	_test_bad_storage_entries()
-	_test_out_of_range_food()
+	_test_old_save_fields_ignored()
 	_test_corrupted_and_missing_file()
 	SaveSystem.delete_save(TEST_PATH)
 	GameState.reset()
@@ -27,115 +26,67 @@ func _ready() -> void:
 
 func _test_round_trip() -> void:
 	GameState.reset()
-	GameState.money = 1234
 	GameState.day = 6
 	GameState.last_rating = 4
-	GameState.upgrade_levels = {"boat": 2, "rod": 1}
 	GameState.story_flags = {"saw_glowing_fish": true, "fog_omen_day": 4}
-	var item := InventoryItem.new(_fish("cua"), 0.7)
-	item.freshness = 65.0
-	GameState.storage.append(item)
 	GameState.record_catch(_fish("cua"), 3, 1.4)
-	item.size = 1.25
-	GameState.map_pins.append(Vector2(120.5, 640))
-	GameState.weather_id = "rain"
-	GameState.pantry["bia_con_meo"] = 20
-	GameState.pantry["rau_muong_xao_toi"] = [{"units": 4, "fresh": 65.0}]
-	GameState.staff = {"hired": ["vy"], "candidates": ["ti"], "seen": ["vy", "ti"], "ad_day": 4}
-	GameState.resume_at = "restaurant"
+	GameState.resume_at = "home"
 	GameState.play_seconds = 1800.5
-	GameState.orders.append({"who": "Chú Ba", "fish": "cua", "min_kg": 0.5, "reward": 120, "due_day": 7})
-	GameState.add_day_record({"day": 5, "earned": 300, "market": 20, "rating": 4})
-	GameState.stats = {"served_total": 12, "earned_total": 640, "dishes_sold": {"tom_luoc": 3}}
-	GameState.social = {"followers": 52, "tier": 1, "posts": [{"day": 5, "author": "be_na", "name": "Bé Na",
-		"dish": "tom_luoc", "stars": 5, "mood": "happy", "caption": "Sẽ quay lại!", "likes": 31, "hot": false, "tip": true}]}
+	GameState.boat_hp = 55.0
+	GameState.add_day_record({"day": 5, "earned": 300, "rating": 4, "served": 9})
 	_check("save writes file", SaveSystem.save_game(TEST_PATH) and SaveSystem.has_save(TEST_PATH))
 	GameState.reset()
 	_check("load ok", SaveSystem.load_game(TEST_PATH))
-	_check("money", GameState.money == 1234)
 	_check("day", GameState.day == 6)
 	_check("rating", GameState.last_rating == 4)
-	_check("upgrades", GameState.get_upgrade_level("boat") == 2 and GameState.get_upgrade_level("rod") == 1)
+	_check("hull", is_equal_approx(GameState.boat_hp, 55.0))
 	_check("story flag", GameState.has_flag("saw_glowing_fish"))
 	_check("dex counts", int(GameState.caught_species.get("cua", 0)) == 3)
-	_check("weather", GameState.weather_id == "rain")
-	_check("pantry (kept beer)", int(GameState.pantry.get("bia_con_meo", 0)) == 20)
-	var rau: Array = GameState.pantry.get("rau_muong_xao_toi", [])
-	_check("pantry (rau batch with freshness)", rau.size() == 1 and int(rau[0]["units"]) == 4
-		and is_equal_approx(float(rau[0]["fresh"]), 65.0))
-	_check("staff (hired, applicants, ad day)", GameState.staff.get("hired") == ["vy"]
-		and GameState.staff.get("candidates") == ["ti"] and int(GameState.staff.get("ad_day", 0)) == 4)
-	_check("resume point", GameState.resume_at == "restaurant")
+	_check("resume point", GameState.resume_at == "home")
 	_check("play time", is_equal_approx(GameState.play_seconds, 1800.5))
 	var stats := EndingStats.lines(7)
 	_check("ending stats: 3 lines, days + minutes", stats.size() == 3 and stats[0] == "6 ngày · 30 phút")
 	_check("ending stats: catch + earnings", stats[1] == "3 con cá · 1/7 loài" and stats[2].contains("300k"))
-	var sold: Dictionary = GameState.stats.get("dishes_sold", {})
-	_check("lifetime stats (ints after JSON)", GameState.stats.get("served_total") is int
-		and int(GameState.stats["served_total"]) == 12 and int(GameState.stats.get("earned_total", 0)) == 640
-		and sold.get("tom_luoc") is int and int(sold["tom_luoc"]) == 3)
-	var post: Dictionary = XomDenReview.posts()[0] if XomDenReview.posts().size() == 1 else {}
-	_check("social: followers, tier, posts (ints after JSON)", GameState.social.get("followers") is int
-		and XomDenReview.followers() == 52 and XomDenReview.tier() == 1 and post.get("likes") is int
-		and int(post.get("likes", 0)) == 31 and post.get("tip") == true)
-	_check("map pins", GameState.map_pins.size() == 1 and GameState.map_pins[0].is_equal_approx(Vector2(120.5, 640)))
-	_check("orders", GameState.orders.size() == 1 and int(GameState.orders[0]["reward"]) == 120)
 	_check("size record", is_equal_approx(GameState.best_size(_fish("cua")), 1.4))
-	_check("item size", GameState.storage.size() == 1 and is_equal_approx(GameState.storage[0].size, 1.25))
 	_check("day history", GameState.day_history.size() == 1 and int(GameState.day_history[0].get("earned", 0)) == 300)
 	_check("whole numbers stay ints (JSON floats)", GameState.day_history[0].get("earned") is int
 		and GameState.story_flags.get("fog_omen_day") is int)
-	var loaded: InventoryItem = GameState.storage[0] if GameState.storage.size() == 1 else null
-	_check("storage item", loaded != null and loaded.fish.id == "cua"
-		and is_equal_approx(loaded.quality, 0.7) and is_equal_approx(loaded.freshness, 65.0))
+	var data := SaveSystem.to_dict()
+	_check("no money / upgrades / storage in the save", not data.has("money") and not data.has("upgrade_levels")
+		and not data.has("storage") and not data.has("orders") and not data.has("staff") and not data.has("social"))
 
 
 func _test_missing_fields() -> void:
-	_write('{"money": 500}')
+	_write('{"day": 3}')
 	_check("missing fields still load", SaveSystem.load_game(TEST_PATH))
-	_check("missing -> defaults", GameState.money == 500 and GameState.day == 1
-		and GameState.storage.is_empty() and GameState.upgrade_levels.is_empty())
+	_check("missing -> defaults", GameState.day == 3 and GameState.last_rating == GameState.STARTING_RATING
+		and GameState.caught_species.is_empty() and GameState.resume_at == "home")
 
 
 func _test_wrong_types() -> void:
-	_write('{"money": "abc", "day": -3, "storage": "x", "upgrade_levels": [1, 2], "story_flags": 7, "last_rating": 99, "resume_at": "moon"}')
+	_write('{"day": -3, "caught_species": "x", "story_flags": 7, "last_rating": 99, "resume_at": "moon", "boat_hp": 500}')
 	_check("wrong types still load", SaveSystem.load_game(TEST_PATH))
-	_check("bad money -> default", GameState.money == GameState.STARTING_MONEY)
 	_check("negative day -> 1", GameState.day == 1)
-	_check("bad resume -> sea", GameState.resume_at == "sea")
+	_check("bad resume -> home", GameState.resume_at == "home")
 	_check("rating clamped", GameState.last_rating == 5)
-	_check("bad containers ignored", GameState.storage.is_empty() and GameState.upgrade_levels.is_empty()
-		and GameState.story_flags.is_empty())
+	_check("hull clamped", GameState.boat_hp == BoatCondition.MAX_HP)
+	_check("bad containers ignored", GameState.caught_species.is_empty() and GameState.story_flags.is_empty())
 
 
-func _test_bad_storage_entries() -> void:
-	_write('{"storage": [{"fish": "ca_rong"}, 5, {"fish": "cua", "quality": "x", "freshness": 500}]}')
-	SaveSystem.load_game(TEST_PATH)
-	var only: InventoryItem = GameState.storage[0] if GameState.storage.size() == 1 else null
-	_check("unknown fish + junk skipped, bad numbers fixed", only != null and only.fish.id == "cua"
-		and only.quality == 1.0 and only.freshness == 100.0)
+## A save from the cozy build (money, upgrades, storage...) still loads.
+func _test_old_save_fields_ignored() -> void:
+	_write('{"version": 2, "money": 999, "day": 4, "upgrade_levels": {"boat": 2}, "storage": [{"fish": "cua"}], "orders": [1], "pantry": {"bia_con_meo": 3}, "staff": {"hired": ["vy"]}, "stats": {}, "social": {}}')
+	_check("old save loads", SaveSystem.load_game(TEST_PATH))
+	_check("old save keeps the day only", GameState.day == 4 and not SaveSystem.to_dict().has("money"))
 
 
 func _test_corrupted_and_missing_file() -> void:
 	_write("not json {{")
-	GameState.money = 999
+	GameState.day = 5
 	_check("corrupted file -> false", not SaveSystem.load_game(TEST_PATH))
-	_check("corrupted file -> fresh game", GameState.money == GameState.STARTING_MONEY)
+	_check("corrupted file -> fresh game", GameState.day == GameState.STARTING_DAY)
 	SaveSystem.delete_save(TEST_PATH)
 	_check("no file -> false", not SaveSystem.load_game(TEST_PATH))
-
-
-func _test_out_of_range_food() -> void:
-	_write('{"storage": [{"fish": "cua", "quality": -5}, {"fish": "cua", "quality": 999}], "pantry": {"rau_muong_xao_toi": [{"units": 2, "fresh": 500}, {"units": 3, "fresh": -10}, {"units": 0, "fresh": 80}, {"units": 4, "fresh": 40}]}}')
-	SaveSystem.load_game(TEST_PATH)
-	_check("fish quality stays in its valid range", GameState.storage.size() == 2
-		and GameState.storage[0].quality == 0.7 and GameState.storage[1].quality == 1.0)
-	var dish := load("res://data/dishes/rau_muong_xao_toi.tres") as DishData
-	var stock := MarketStock.new(GameState.pantry)
-	_check("spoiled and empty grocery batches skipped", stock.count(dish) == 6)
-	_check("loaded grocery batches use oldest first", stock.freshness(dish) == 40.0)
-	var batches: Array = GameState.pantry.get(dish.id, [])
-	_check("grocery freshness capped at 100", batches.size() == 2 and batches[1]["fresh"] == 100.0)
 
 
 func _write(text: String) -> void:

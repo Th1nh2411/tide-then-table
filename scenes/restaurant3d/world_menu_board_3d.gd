@@ -1,9 +1,7 @@
 class_name WorldMenuBoard3D
 extends Node3D
-## A physical, event-driven menu display using the same approved icons as the UI.
+## The physical menu board: pictures + names of the fixed menu.
 
-var plan: MenuPlan
-var catalog: DishCatalog
 var displayed_dishes: Array[DishData] = []
 var _viewport: SubViewport
 var _grid: GridContainer
@@ -44,19 +42,10 @@ func _ready() -> void:
 	face.material_override = material
 	add_child(face)
 
-func bind(menu_plan: MenuPlan, dishes: DishCatalog) -> void:
-	if plan and plan.changed.is_connected(refresh):
-		plan.changed.disconnect(refresh)
-	plan = menu_plan
-	catalog = dishes
-	plan.changed.connect(refresh)
-	refresh()
-
-func refresh() -> void:
-	displayed_dishes = plan.get_dishes()
-	for dish in catalog.dishes:
-		if dish.on_menu_today() and dish not in displayed_dishes:
-			displayed_dishes.append(dish)
+func show_dishes(dishes: Array[DishData]) -> void:
+	displayed_dishes = dishes.duplicate()
+	if not is_node_ready():
+		await ready
 	for child in _grid.get_children():
 		_grid.remove_child(child)
 		child.queue_free()
@@ -84,9 +73,4 @@ func refresh() -> void:
 		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		caption.add_theme_font_size_override("font_size", 28)
 		card.add_child(caption)
-	if displayed_dishes.is_empty():
-		var empty := Label.new()
-		empty.text = "Lên món hôm nay"
-		empty.add_theme_font_size_override("font_size", 42)
-		_grid.add_child(empty)
 	_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE

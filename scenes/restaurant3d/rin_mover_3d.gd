@@ -2,7 +2,7 @@ class_name RinMover3D
 extends RefCounted
 ## Rin's walking in the 3D restaurant: WASD relative to the camera, carry
 ## speed, Shift runs while stamina lasts (StaminaBar3D over his head), Space
-## rolls (dash) with a cooldown, Nhịp Sóng keeps his real-time speed, and
+## rolls (dash) with a cooldown, and
 ## inputs released when the window loses focus.
 ## Speeds are the host's exports (walk_speed, carry_speed, run_*, stamina_*, roll_*).
 
@@ -16,7 +16,6 @@ var _rest_clock: float = 0.0
 var _bar := StaminaBar3D.new()
 var _dash_cooldown: float = 0.0
 var _dash_direction := Vector3.ZERO
-var _time_scale := 1.0
 
 
 func _init(owner: Node3D) -> void:
@@ -35,10 +34,7 @@ func move(delta: float) -> void:
 	var player: CharacterBody3D = host.player
 	var body: PersonRig3D = host.body
 	var axes := Input.get_vector("turn_left", "turn_right", "throttle_forward", "throttle_back")
-	var rin_scale := 1.0 / maxf(Engine.time_scale, 0.001) if WavePower.rin_unslowed else 1.0
-	# Keep acceleration and momentum in real-time units when Wave Power slows the world.
-	player.velocity *= rin_scale / _time_scale
-	_time_scale = rin_scale
+	var rin_scale := 1.0
 	var camera: Camera3D = host.demo_camera
 	var right := camera.global_basis.x
 	right.y = 0.0

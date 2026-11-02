@@ -79,13 +79,12 @@ func show_line(speaker: String, text: String) -> void:
 	var paren := speaker.find("(")
 	if paren > 0 and speaker.ends_with(")"):
 		speaker = speaker.left(paren).strip_edges()
-	speaker = CutsceneScript.fill(speaker)
 	_has_speaker = speaker != ""
 	_name_label.text = speaker + ":"
 	_name_tag.visible = _has_speaker
 	_name_label.add_theme_color_override("font_color", speaker_colors.get(speaker, default_color))
 	_text_label.add_theme_color_override("font_color", ink_color if _has_speaker else narration_color)
-	_text_label.text = CutsceneScript.fill(text)
+	_text_label.text = text
 	_text_label.visible_characters = 0
 	Sfx.play("blip")
 

@@ -31,7 +31,6 @@ const SOUNDS := {
 	"bag": [{"w": "noise", "lp": 0.7, "d": 0.12, "v": 0.18}],
 	"whoosh": [{"w": "noise", "lp": 0.12, "d": 1.6, "v": 0.6, "a": 0.7}],
 	"pluck": [{"w": "tri", "f": [440, 440], "d": 0.2, "v": 0.22}],
-	"neo": [{"w": "sine", "f": [1175, 1175], "d": 0.05, "v": 0.12}, {"w": "sine", "f": [1568, 1568], "d": 0.09, "v": 0.12}],
 	# Shift receipt: printer tick per line, rubber stamp thump.
 	"print": [{"w": "noise", "lp": 0.5, "d": 0.04, "v": 0.07}, {"w": "square", "f": [880, 880], "d": 0.015, "v": 0.03}],
 	# Camera shutter: two bright clicks, then a short film wind (new catch, posts, records).

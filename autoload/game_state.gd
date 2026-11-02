@@ -1,115 +1,56 @@
 extends Node
-## Global game state: money, current day, storage, upgrades and story flags.
+## Global game state: current day, story flags, hull, catch records.
 ## Autoloaded as `GameState`. Other systems read/write here and listen to signals
 ## instead of holding their own copies of this data.
 
-signal money_changed(new_amount: int)
 signal day_changed(new_day: int)
-## Hired staff / applicants changed (phone "Nhân viên" tab -> StaffCrew).
-signal staff_changed
 
-const STARTING_MONEY: int = 100
 const STARTING_DAY: int = 1
 ## Rating assumed before the first shift (affects day-1 customer frequency).
 const STARTING_RATING: int = 3
-
-var money: int = STARTING_MONEY:
-	set(value):
-		money = value
-		money_changed.emit(money)
 
 var day: int = STARTING_DAY:
 	set(value):
 		day = value
 		day_changed.emit(day)
 
-## Items moved from the boat hold after docking. Holds InventoryItem objects (Phase 5+).
-var storage: Array = []
-
-## upgrade_id -> current level (0 = not upgraded).
-var upgrade_levels: Dictionary = {}
-
-## flag_name -> value. Used by the ending trigger in Phase 9.
+## flag_name -> value: story, loop count, notebook ("note_*"), tips ("tip_*").
 var story_flags: Dictionary = {}
-
-# Result of tonight's sea trip, shown on the rest screen.
-## Displayed time (minutes since midnight) the boat got back to the dock.
-var return_minutes: float = 0.0
-## True if the boat was towed home by a rescue (broken hull / no oil).
-var was_towed: bool = false
-## Items unloaded from the hold this trip (already added to storage).
-var last_catch: Array = []
-## Unloaded at the dock earlier tonight (night goes on); joins last_catch.
-var trip_catch: Array = []
 
 ## Stars (1-5) from the last shift; drives customer frequency the next day.
 var last_rating: int = STARTING_RATING
-## Storage items that spoiled at the last day change (shown at sea).
-var last_spoiled_count: int = 0
 ## Hull condition 0..100 (see BoatCondition). Carries over between days.
 var boat_hp: float = 100.0
-## fish_id -> how many caught in total (the phone's Dex).
+## fish_id -> how many caught in total (fish names, NEW card, ending card).
 var caught_species: Dictionary = {}
 ## Species id -> biggest size caught (CatchRoll size, 1.0 = average).
 var best_sizes: Dictionary = {}
-## One Dictionary per finished shift: day, earned, market, rating, served, left.
+## One Dictionary per finished shift: day, earned, rating, served, left.
+## Money is no longer a currency; `earned` is only counted for the ending card.
 var day_history: Array = []
-## Where "Continue" resumes: "sea" (saved at the start of a night) or
-## "restaurant" (saved on the rest card after a trip). See SaveSystem.
-var resume_at: String = "sea"
-## Weather of the next / current night trip (WeatherData.id), rolled each morning.
-var weather_id: String = "calm"
-## Extra lines for the rest screen from this trip (night events).
+## Where "Continue" resumes ("home" in the horror build).
+var resume_at: String = "home"
+## Extra lines about this trip (night events).
 var trip_notes: Array[String] = []
-## Player's map pins (world positions), see PhoneMap.
-var map_pins: Array[Vector2] = []
-const MAX_PINS: int = 5
-## Active fish orders from regulars (see FishOrders).
-var orders: Array = []
-## Grocery goods kept between days (dish id -> portions), e.g. beer cans.
-## Perishable goods (rau) are thrown away at closing (MarketStock).
-var pantry: Dictionary = {}
-## Restaurant staff (StaffRoster): {"hired", "candidates", "seen": [ids], "ad_day"}.
-var staff: Dictionary = {}
 ## Seconds spent in the game itself (not the main menu / ending), saved.
 ## Shown on the ending's thank-you card.
 var play_seconds: float = 0.0
-## Lifetime restaurant counters (LifetimeStats keys + "dishes_sold"), for
-## achievements and the shift scoreboard. Saved.
-var stats: Dictionary = {}
-## "Xóm Đèn Review" social state (XomDenReview): followers, tier, last posts. Saved.
-var social: Dictionary = {}
 ## History entries kept (older ones are dropped).
 const MAX_HISTORY: int = 14
 
 
 ## Reset everything to a fresh game. Called by "New Game".
 func reset() -> void:
-	money = STARTING_MONEY
 	day = STARTING_DAY
-	storage.clear()
-	upgrade_levels.clear()
 	story_flags.clear()
-	return_minutes = 0.0
-	was_towed = false
-	last_catch.clear()
-	trip_catch.clear()
 	last_rating = STARTING_RATING
-	last_spoiled_count = 0
 	boat_hp = 100.0
 	caught_species.clear()
 	best_sizes.clear()
 	day_history.clear()
-	orders.clear()
-	pantry.clear()
-	staff.clear()
-	map_pins.clear()
-	weather_id = "calm"
-	resume_at = "sea"
+	resume_at = "home"
 	trip_notes.clear()
 	play_seconds = 0.0
-	stats = {}
-	social = {}
 
 
 func _ready() -> void:
@@ -122,35 +63,9 @@ func _process(delta: float) -> void:
 		play_seconds += delta / maxf(Engine.time_scale, 0.001)
 
 
-## Called when the night trip ends: records the return and moves the catch into storage.
-func finish_sea_day(returned_at: float, towed: bool, hold_items: Array) -> void:
-	return_minutes = returned_at
-	was_towed = towed
-	last_catch = trip_catch + hold_items
-	trip_catch.clear()
-	storage.append_array(hold_items)
-
-
-## Mid-night unload at the dock: the catch goes to storage, the trip goes on.
-func unload_catch(items: Array) -> void:
-	trip_catch.append_array(items)
-	storage.append_array(items)
-
-
-## Move to the next day: storage loses `freshness_loss` freshness and
-## anything at 0 spoils and is thrown away. Returns how many spoiled.
-func advance_day(freshness_loss: float) -> int:
-	var kept: Array = []
-	for item: InventoryItem in storage:
-		item.freshness = maxf(item.freshness - freshness_loss, 0.0)
-		if item.freshness > 0.0:
-			kept.append(item)
-	last_spoiled_count = storage.size() - kept.size()
-	storage = kept
-	# Fresh grocery goods (rau) age like the fish; beer keeps.
-	last_spoiled_count += MarketStock.age(pantry, freshness_loss)
+## Next day of the loop (LoopCalendar). Nothing spoils any more.
+func advance_day(_freshness_loss: float = 0.0) -> void:
 	day += 1
-	return last_spoiled_count
 
 
 func record_catch(fish: FishData, count: int, size: float = 1.0) -> void:
@@ -174,37 +89,6 @@ func add_day_record(record: Dictionary) -> void:
 ## the Hướng dẫn screen).
 func is_first_day() -> bool:
 	return day == STARTING_DAY
-
-
-func add_money(amount: int) -> void:
-	money += amount
-
-
-## Returns false (and changes nothing) if the player can't afford it.
-func spend_money(amount: int) -> bool:
-	if amount > money:
-		return false
-	money -= amount
-	return true
-
-
-func get_upgrade_level(upgrade_id: String) -> int:
-	return upgrade_levels.get(upgrade_id, 0)
-
-
-## The upgrade's effect at the player's current level.
-func get_upgrade_value(upgrade: UpgradeData) -> Variant:
-	return upgrade.value_at(get_upgrade_level(upgrade.id))
-
-
-## Buys the next level if affordable. Takes effect from the next day.
-func buy_upgrade(upgrade: UpgradeData) -> bool:
-	var level := get_upgrade_level(upgrade.id)
-	var cost := upgrade.next_cost(level)
-	if cost < 0 or not spend_money(cost):
-		return false
-	upgrade_levels[upgrade.id] = level + 1
-	return true
 
 
 func set_flag(flag_name: String, value: Variant = true) -> void:

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Runs the native 3D loop through its ending, with scratch saves only.
 # Travel and minigame success are scripted: this checks integration, not balance.
-# POLICY=balanced selects kitchen-first upgrades; default is boat-first.
+# No upgrades any more (horror build), so no POLICY.
 cd "$(dirname "$0")/.." || exit 1
 GODOT=${GODOT:-/Applications/Godot.app/Contents/MacOS/Godot}
 bot_scene="res://tools/bot/game_bot_3d.tscn"

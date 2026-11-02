@@ -35,53 +35,8 @@ func _ready() -> void:
 	_check("blocked_by_flag: plays before", DialogueLibrary.can_play(early))
 	GameState.set_flag("grown_up")
 	_check("blocked_by_flag: not after", not DialogueLibrary.can_play(early))
-	# Small talk switches set once the mood flag is set (Vy warming up).
-	var talker := Talker.new()
-	talker.idle_lines.assign(["early"])
-	talker.later_flag = "warm_test"
-	talker.later_idle_lines.assign(["later"])
-	_check("idle lines: early set first", talker.current_idle_lines() == talker.idle_lines)
-	GameState.set_flag("warm_test")
-	_check("idle lines: later set after the flag", talker.current_idle_lines() == talker.later_idle_lines)
-	talker.free()
-	var vy: StaffData = load("res://data/staff/vy.tres")
-	_check("Vy has two moods of small talk", vy.later_flag == "vy_warmed" and not vy.later_idle_lines.is_empty())
-	# Cutscene scripts.
-	var tokens := CutsceneScript.tokenize('speak Rin "Ê! Con đó tao định bán mà!"')
-	_check("tokenize keeps quoted text", tokens.size() == 3 and tokens[2] == "Ê! Con đó tao định bán mà!")
-	_check("tokenize empty quotes", CutsceneScript.tokenize('speak "" "a b"') == PackedStringArray(["speak", "", "a b"]))
-	var commands := CutsceneScript.parse("# comment\nfade_in 1.0\n\nchoice \"A\" yes \"B\" no\nlabel yes\nlabel no")
-	_check("parse skips comments/blank", commands.size() == 4 and commands[0]["cmd"] == "fade_in")
-	_check("labels map", CutsceneScript.labels(commands) == {"yes": 2, "no": 3})
-	GameState.set_flag("pet_name", "Bơ")
-	_check("fill {pet}", CutsceneScript.fill("{pet}: Meo.") == "Bơ: Meo.")
-	GameState.reset()
-	_check("pet default name", CutsceneScript.pet_name() == "Mèo")
-	GameState.reset()
-	_check_quest_log()
 	GameState.reset()
 	print("Dialogue: %s" % ("TẤT CẢ PASS" if _failures == 0 else "%d FAIL" % _failures))
-
-
-func _check_quest_log() -> void:
-	GameState.reset()
-	var main := QuestLog.main_quest()
-	var steps: Array = main["steps"]
-	_check("quest: day 1 = restaurant quest, nothing done", main["title"] == "Quán Rin & Bảo"
-		and not steps.any(func(s: Dictionary) -> bool: return s["done"]))
-	GameState.add_day_record({"day": 1, "earned": 100, "market": 0, "rating": 3})
-	GameState.upgrade_levels["boat"] = 1
-	steps = QuestLog.main_quest()["steps"]
-	_check("quest: first day + Ghe chèo ticked, Ghe máy not", steps[0]["done"] and steps[1]["done"] and not steps[2]["done"])
-	GameState.day = Story.OMEN_DAY
-	Story.check_day()
-	_check("quest: omen -> wait for the fog", QuestLog.main_quest()["title"] == "Ánh sáng trong sương")
-	GameState.day = Story.OMEN_DAY + 1
-	_check("quest: fog open -> go in", QuestLog.main_quest()["title"] == "Vào sương mù")
-	var catalog: FishCatalog = load("res://data/fish/fish_catalog.tres")
-	GameState.orders = [{"who": "Chú Ba", "fish": "ca_mu", "min_kg": 4.0, "reward": 300, "due_day": 9}]
-	var sides := QuestLog.side_quests(catalog)
-	_check("quest: one side quest per fish order", sides.size() == 1 and sides[0].begins_with("Chú Ba"))
 
 
 func _dialogue(id: String, min_day: int, flag: String, once: bool, priority: int) -> Dialogue:

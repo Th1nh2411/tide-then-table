@@ -1,8 +1,7 @@
 class_name RestaurantHud3D
 extends CanvasLayer
-## 3D restaurant HUD, icon first: a wooden plank (day, clock, phase sticker,
-## money counting), a yellow paper tag with the shift's tallies (served, left,
-## takings, market, stars), the order slips on a ticket rail (OrderTicket3D),
+## 3D restaurant HUD, icon first: a wooden plank (day, clock, phase sticker),
+## a yellow paper tag with the shift's tallies (served, left, stars), the order slips on a ticket rail (OrderTicket3D),
 ## and the pinned Đóng sớm button (leaving is a walk to a street end). Words live in
 ## tooltips. Reads the scene each frame; the scene only listens to the signals.
 
@@ -13,7 +12,7 @@ const CONFIRM_SECONDS := 3.0
 const RAIL := Rect2(232, 0, 290, 56)
 const PHASES := {
 	# id: [icon, plate, glyph, words]
-	"plan": ["menu", Color("f2d98a"), Color("090a14"), "Lên thực đơn"],
+	"plan": ["shop", Color("f2d98a"), Color("090a14"), "Chưa mở quán"],
 	"open": ["shop", Color("884b2b"), Color("f2d98a"), "Đang bán"],
 	"closing": ["clock", Color("de9e41"), Color("090a14"), "Sắp đóng cửa"],
 	"over": ["moon", Color("253a5e"), Color("f2d98a"), "Đã đóng cửa"],
@@ -27,13 +26,10 @@ var ticket_row: TicketRail3D
 var close_button: Button
 var _day: Label
 var _time: Label
-var _money: Label
 var _phase: TextureRect
 var _phase_id := ""
 var _served: Label
 var _lost: Label
-var _earned: Label
-var _market: Label
 var _stars: Array[TextureRect] = []
 var _confirm_left: float = 0.0
 
@@ -61,8 +57,6 @@ func _build_plank() -> void:
 	_phase = UiIcons.make("menu", 14, UiIcons.INK, Color("f2d98a"))
 	_phase.mouse_filter = Control.MOUSE_FILTER_PASS
 	row.add_child(_phase)
-	_money = HudChips.stat(row, "money", UiIcons.GOLD, "Tiền", 13)
-	_money.add_theme_color_override("font_color", UiIcons.GOLD)
 
 
 func _build_tally() -> void:
@@ -74,8 +68,6 @@ func _build_tally() -> void:
 	var row: HBoxContainer = parts[1]
 	_served = HudChips.stat(row, "guest", Color("4f8fba"), "Khách đã phục vụ", 11, true, 11)
 	_lost = HudChips.stat(row, "leave", Color("cf573c"), "Khách bỏ về", 11, true, 11)
-	_earned = HudChips.stat(row, "money", Color("de9e41"), "Thu trong ca", 11, true, 11)
-	_market = HudChips.stat(row, "cart", Color("577277"), "Tiền chợ", 11, true, 11)
 	var stars := HBoxContainer.new()
 	stars.add_theme_constant_override("separation", 0)
 	stars.tooltip_text = "Đánh giá"
@@ -125,12 +117,9 @@ func _process(delta: float) -> void:
 	_set_phase(phase)
 	_day.text = str(GameState.day)
 	_time.text = DayClock.get_time_text()
-	HudChips.show_number(_money, GameState.money, "%dk")
 	tally.visible = running or over
 	HudChips.show_number(_served, room.served)
 	HudChips.show_number(_lost, room.lost)
-	HudChips.show_number(_earned, room.earned, "%dk")
-	HudChips.show_number(_market, room.market_spent, "%dk")
 	_lost.add_theme_color_override("font_color", Color("a53030") if room.lost > 0 else HudChips.INK)
 	for i in _stars.size():
 		_stars[i].modulate.a = 1.0 if i < GameState.last_rating else 0.25

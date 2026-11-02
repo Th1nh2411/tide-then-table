@@ -1,25 +1,20 @@
 class_name SeaHudView3D
 extends Control
 ## The 3D sea's HUD, icon first (words in tooltips): a weathered plank top-left
-## with the boat, clock and money, then meters for lamp oil, hull and the
-## hold (fish count), and the two nets (dimmed while out in the water); the
-## E / R action as key caps + an icon bottom-right; Rin / NEO's lines on the
+## with the boat and clock, then meters for lamp oil, hull and the
+## hold (fish count); the E / R action as key caps + an icon bottom-right; Rin's lines on the
 ## paper SpeechStrip bottom-left; on the first night a small key card.
 ## SeaHud3D.update calls `refresh` every frame.
 
-const PLACE_ICONS := {"shrine": "sparkles", "lighthouse": "lamp", "hut": "house", "raft": "shrimp"}
-const NETS := 2
 const SCREEN := Vector2(640, 360)
 
 var speech: SpeechStrip
-var _money: Label
 var _time: Label
 var _boat: Control
 var _oil: MeterBar
 var _hull: MeterBar
 var _hold: MeterBar
 var _fish: Label
-var _nets: Array[TextureRect] = []
 var _prompt: HBoxContainer
 var _prompt_key := ""
 var _keys: PanelContainer
@@ -63,8 +58,6 @@ func _build_plank() -> void:
 	_boat.mouse_filter = Control.MOUSE_FILTER_PASS
 	top.add_child(_boat)
 	_time = HudChips.stat(top, "clock", Color("a4dddb"), "Giờ", 12)
-	_money = HudChips.stat(top, "money", UiIcons.GOLD, "Tiền", 13)
-	_money.add_theme_color_override("font_color", UiIcons.GOLD)
 	var gauges := HBoxContainer.new()
 	gauges.add_theme_constant_override("separation", 6)
 	gauges.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -77,15 +70,6 @@ func _build_plank() -> void:
 	_hold.low = 0.0
 	_fish = HudChips.number(10)
 	(_hold.get_parent() as HBoxContainer).add_child(_fish)
-	var nets := HBoxContainer.new()
-	nets.add_theme_constant_override("separation", 0)
-	nets.tooltip_text = "Lưới (Q)"
-	nets.mouse_filter = Control.MOUSE_FILTER_PASS
-	gauges.add_child(nets)
-	for i in NETS:
-		var net := UiIcons.make("net", 11, UiIcons.CREAM)
-		nets.add_child(net)
-		_nets.append(net)
 
 
 ## First night only: which key does what, as key caps + icons.
@@ -96,7 +80,7 @@ func _key_card() -> PanelContainer:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 2)
 	card.add_child(column)
-	for entry: Array in [["WASD", "boat"], ["E", "hook"], ["Q", "net"], ["Tab", "crate"], ["J", "phone"], ["M", "map"], ["Esc", "pause"]]:
+	for entry: Array in [["WASD", "boat"], ["E", "hook"], ["Tab", "crate"], ["Esc", "pause"]]:
 		var row := _key_row(str(entry[0]), str(entry[1]), Color("3c5e8b"))
 		column.add_child(row)
 	card.position = Vector2(SCREEN.x - 70.0, 6.0)
@@ -122,15 +106,12 @@ func _key_row(key: String, icon: String, color: Color) -> HBoxContainer:
 func refresh(sea: SeaScene3D) -> void:
 	_boat.tooltip_text = sea.boat_data.display_name
 	_time.text = DayClock.get_time_text()
-	HudChips.show_number(_money, GameState.money, "%dk")
 	_oil.set_value(sea.oil / maxf(sea.oil_capacity, 1.0))
 	_hull.set_value(GameState.boat_hp / 100.0)
 	var fill := sea.hold.fill_fraction()
 	_hold.set_value(fill)
 	_hold.color = Color("cf573c") if fill >= 0.8 else Color("73bed3")
 	HudChips.show_number(_fish, sea.hold.items.size())
-	for i in _nets.size():
-		_nets[i].modulate.a = 1.0 if i < NETS - sea.nets.size() else 0.3
 	_keys.visible = GameState.is_first_day() and not sea.fishing
 	_set_prompt(_prompt_spec(sea))
 	if sea.message.text != speech.current:
@@ -144,12 +125,6 @@ func refresh(sea: SeaScene3D) -> void:
 func _prompt_spec(sea: SeaScene3D) -> Array:
 	if sea._at_dock():
 		return [[["E", "crate"], ["R", "house"]], ""]
-	var poi := sea._nearest_poi()
-	if poi.begins_with("event_"):
-		var event := sea.night_events[int(poi.substr(6))]
-		return [[["E", "sparkles" if int(event["kind"]) == NightEvents.Kind.BOTTLE else "boat"]], ""]
-	if poi != "":
-		return [[["E", str(PLACE_ICONS.get(poi, "info"))]], str(SeaHud3D.PLACE_NAMES.get(poi, poi))]
 	return [[["E", "hook"]], ""]
 
 

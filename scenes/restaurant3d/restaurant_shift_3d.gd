@@ -30,24 +30,19 @@ static func pick_tuning() -> ServiceTuning:
 	return current
 
 
-## Seconds to the next guest: decor and yesterday's rating bring them sooner.
+## Seconds to the next guest: yesterday's rating brings them sooner.
 func next_spawn_interval() -> float:
 	var tuning: ServiceTuning = host.tuning
-	var decor_level := GameState.get_upgrade_level("decor")
-	var decor_scale: float = tuning.decor_interval_scale[clampi(decor_level, 0, tuning.decor_interval_scale.size() - 1)]
 	var rating_scale: float = tuning.interval_scale_by_rating[clampi(GameState.last_rating, 0, tuning.interval_scale_by_rating.size() - 1)]
-	return host.rng.randf_range(tuning.min_spawn_interval, tuning.max_spawn_interval) * decor_scale * rating_scale \
-		* RestaurantSocial3D.spawn_scale()
+	return host.rng.randf_range(tuning.min_spawn_interval, tuning.max_spawn_interval) * rating_scale
 
 
 func open_shift() -> void:
-	if host.shift_running or host.shift_over or not has_stock():
+	if host.shift_running or host.shift_over:
 		return
-	host.opening_variety = host.plan.variety_count()
 	host.shift_running = true
 	host.seconds_left = SHIFT_SECONDS
 	host.spawn_clock = host.tuning.first_spawn_delay
-	host.goals.start_shift()
 	if Guide.once("shift_h2"):
 		host._show_note("Rin: Bảo nấu, mình bưng. Bia lấy ở thùng. T: đóng sớm.")
 
@@ -73,7 +68,7 @@ func tick(delta: float) -> void:
 		orders[i]["patience"] = float(orders[i]["patience"]) - delta
 		if float(orders[i]["patience"]) <= 0.0:
 			host._lose_order(i)
-	if (host.seconds_left <= 0.0 or not has_stock()) and orders.all(func(order: Dictionary) -> bool: return order.is_empty()):
+	if host.seconds_left <= 0.0 and orders.all(func(order: Dictionary) -> bool: return order.is_empty()):
 		host._end_shift()
 
 
@@ -84,21 +79,12 @@ func close_early() -> void:
 	host._show_note("Rin: đóng cửa, phục vụ nốt khách đang ngồi.")
 
 
-## The fixed menu never runs out (RestaurantService3D.FIXED_MENU).
-func has_stock() -> bool:
-	return true
-
-
 ## The way out of the street (StreetEnds3D): back to the waterfront for the
 ## evening, where the night's choice is made (WaterfrontScene3D).
 func walk_home() -> void:
 	if host.sailing or host.shift_running:
 		return
 	host.sailing = true
-	if not host.shift_over:
-		host.plan.clear(GameState.storage)
-		for visit: Dictionary in host.regular_visits:
-			FishOrders.release(visit)
 	GameState.resume_at = "home"
 	GameState.set_flag(WaterfrontScene3D.EVENING_FLAG)
 	SceneRouter.go_to(WATERFRONT_SCENE)

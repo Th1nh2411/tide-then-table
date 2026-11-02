@@ -1,8 +1,8 @@
 class_name RestaurantScene3D
 extends Node3D
-## Xóm Đèn restaurant in 3D. Uses the saved inventory, real dishes and shift ledger.
+## Xóm Đèn restaurant in 3D: fixed menu, Bảo cooks, Rin carries, beer at the keg.
 ## Orchestrator: room -> RestaurantRoomBuilder3D, overlay -> RestaurantPanels3D,
-## Bảo + helpers -> RestaurantCrew3D, debug keys -> RestaurantDebug3D, shift
+## Bảo -> RestaurantCrew3D, shift
 ## clock -> RestaurantShift3D, orders -> RestaurantService3D, E -> RestaurantInteract3D,
 ## Rin's walking -> RinMover3D, the street ends -> StreetEnds3D, omen props -> RestaurantOmens3D.
 ## The underscore wrappers stay: tests and the bot call them.
@@ -16,9 +16,6 @@ const WALL_H := RestaurantLayout3D.WALL_H
 const FRONT_Z := RestaurantLayout3D.FRONT_Z
 const ROAD_DEPTH := RestaurantLayout3D.ROAD_DEPTH
 const COUNTER_POSITION := RestaurantLayout3D.COUNTER_POSITION
-const DECOR_LANTERNS := RestaurantLayout3D.DECOR_LANTERNS
-const DECOR_PLANTERS := RestaurantLayout3D.DECOR_PLANTERS
-const PLANTER_Z := RestaurantLayout3D.PLANTER_Z
 const BOARD_POSITION := RestaurantLayout3D.BOARD_POSITION
 const PASS_POSITION := RestaurantLayout3D.PASS_POSITION
 const GRILL_POSITION := RestaurantLayout3D.GRILL_POSITION
@@ -27,13 +24,6 @@ const MEAL_SECONDS := 5.0
 
 ## Opens the shift as soon as Rin arrives (tests that drive the shift turn it off).
 @export var auto_open := true
-@export var menu: DishCatalog
-@export var kitchen_upgrade: UpgradeData
-@export var fridge_upgrade: UpgradeData
-@export var seats_upgrade: UpgradeData
-@export var decor_upgrade: UpgradeData
-@export var fish_catalog: FishCatalog
-@export var staff_catalog: StaffCatalog
 
 ## Rin's ground speeds (m/s). Near the Walk clip's own pace (~1.3) so steps
 ## match the ground; above ~2.25 the Run clip takes over (running, roll).
@@ -50,11 +40,6 @@ const MEAL_SECONDS := 5.0
 @export var roll_seconds: float = 0.6
 @export var roll_speed: float = 4.0
 @export var roll_cooldown: float = 0.8
-var plan: MenuPlan
-var market_stock: MarketStock
-var staff_roster: StaffRoster
-var regular_visits: Array[Dictionary] = []
-var regular_queue: Array[Dictionary] = []
 var player: CharacterBody3D
 var body: PersonRig3D
 var guests: Array[Node3D] = []
@@ -67,43 +52,27 @@ var service: RestaurantService3D
 var mover: RinMover3D
 var interaction: RestaurantInteract3D
 var shift: RestaurantShift3D
-var debug_keys: RestaurantDebug3D
-var cooking_overlay: CookingOverlay
-var staff_workers: Array[Dictionary]:
-	get: return crew.workers
 var shift_running := false
 var shift_over := false
 var seconds_left := SHIFT_SECONDS
 var spawn_clock := 2.0
-var cooking_table := -1
 var carrying_table := -1
 var served := 0
 var lost := 0
+## What the guests paid this shift: no longer money to spend, only counted
+## for the ending's run card (GameState.day_history).
 var earned := 0
-var market_spent := 0
 var step_clock := 0.0
 var sailing := false
-var wages_paid := 0
-var wave_power: WavePower
 var rng := RandomNumberGenerator.new()
 var tuning: ServiceTuning
-var cat_node: PersonRig3D
-var cat_dialogue: DialogueBox
-var opening_variety: int = 0
 var demo_camera: Camera3D
 var dirty_tables: Array[bool] = []
 var table_plates: Array[Node3D] = []
 var ready_plates: Array[Node3D] = []
 var bao_model: PersonRig3D
 var bao_label: Label3D
-## This shift's events (RestaurantService3D fills it; new one at shift start).
-var shift_log := ShiftLog.new()
-## Set at closing by RestaurantGoals3D.finish_shift (challenges, achievements).
-var shift_results: Dictionary = {}
-var goals: RestaurantGoals3D
 var goal_pulse: TargetPulse3D
-## Xóm Đèn Review posts, followers and the weekly ranking at closing.
-var social: RestaurantSocial3D
 
 func _next_spawn_interval() -> float:
 	return shift.next_spawn_interval()
@@ -119,24 +88,11 @@ func _ready() -> void:
 	mover = RinMover3D.new(self)
 	interaction = RestaurantInteract3D.new(self)
 	shift = RestaurantShift3D.new(self)
-	debug_keys = RestaurantDebug3D.new(self)
-	market_stock = MarketStock.new(GameState.pantry)
-	staff_roster = StaffRoster.new(staff_catalog, GameState.staff)
-	if GameState.day >= staff_catalog.unlock_day:
-		staff_roster.arrivals(GameState.day)
-	GameState.staff_changed.connect(_sync_staff)
-	staff_roster.changed.connect(_sync_staff)
-	regular_visits = FishOrders.reserve_for_shift(menu)
-	regular_queue = regular_visits.duplicate()
 	RestaurantRoomBuilder3D.build(self)
 	var traffic := CustomerTraffic3D.new()
 	traffic.host = self
 	add_child(traffic)
-	if PetCat.is_present():
-		cat_node = RestaurantRoomBuilder3D.build_cat(self)
-	_sync_staff()
 	RestaurantSetup3D.build_ui(self)
-	RestaurantSetup3D.build_tools(self)
 	RestaurantSetup3D.open_day(self)
 	StreetEnds3D.build(self)
 	RestaurantOmens3D.build(self)
@@ -149,25 +105,13 @@ func _play_arrival() -> void:
 	if auto_open and not shift_over:
 		_open_shift()
 
-# --- Crew (Bảo + helpers) ---
-func _sync_staff() -> void:
-	crew.sync_staff()
-
-func _dispatch_ready() -> void:
-	crew.dispatch_ready()
-
-func _move_staff(delta: float) -> void:
-	crew.move_staff(delta)
-
+# --- Bảo ---
 func _tick_bao(delta: float) -> void:
 	crew.tick_bao(delta)
 
-func _buy_upgrade(upgrade: UpgradeData) -> void:
-	if GameState.buy_upgrade(upgrade):
-		_show_note("Đã nâng cấp %s." % upgrade.display_name)
-
+## Nothing modal is left in the restaurant (no menu, market or cooking overlay).
 func modal_open() -> bool:
-	return cooking_overlay.is_running()
+	return false
 
 # --- Frame loop ---
 func _open_shift() -> void:
@@ -177,11 +121,6 @@ func _physics_process(delta: float) -> void:
 	if get_tree().paused or mover.focus_lost:
 		mover.stop(delta)
 		return
-	if shift_running:
-		_move_staff(delta)
-	if modal_open():
-		mover.stop(delta)
-		return
 	mover.move(delta)
 
 func _process(delta: float) -> void:
@@ -189,8 +128,6 @@ func _process(delta: float) -> void:
 	# The next goal pulses softly instead of text over tables and stations.
 	if goal_pulse:
 		goal_pulse.set_target(null if modal_open() else RestaurantGoal3D.target(self))
-	if cat_node:
-		cat_node.rotation.y = sin(Time.get_ticks_msec() / 650.0) * 0.06
 	panels.tick(delta)
 	if not shift_running or get_tree().paused:
 		return
@@ -200,9 +137,6 @@ func _process(delta: float) -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
 	if key == null or not key.pressed or key.echo or get_tree().paused:
-		return
-	if debug_keys.handle(key):
-		get_viewport().set_input_as_handled()
 		return
 	if key.physical_keycode == KEY_E:
 		_interact()
@@ -247,9 +181,6 @@ func _walk_home() -> void:
 
 func _show_note(words: String) -> void:
 	panels.say(words)
-
-func _has_stock() -> bool:
-	return shift.has_stock()
 
 func _panel_style() -> StyleBoxFlat:
 	return RestaurantPanels3D.panel_style()

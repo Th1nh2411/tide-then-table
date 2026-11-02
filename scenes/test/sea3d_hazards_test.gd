@@ -1,6 +1,6 @@
 extends Node
 ## 3D sea parity with the 2D hazards and fog: submerged rocks seen only in
-## the lamp's reach, night-start lines queued, omen [WARN], fog clouds.
+## the lamp's reach, lines queued, the glowing fish line, fog clouds.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
 
@@ -32,21 +32,22 @@ func _ready() -> void:
 			if shoal.pos.distance_to(r["pos"]) < float(r["radius"]):
 				clear = false
 	check(clear, "no shoal spawns on a submerged rock")
-	check(sea.message.text.begins_with("NEO: Chào anh Rin"), "first night opens with NEO's hello")
-	check(not sea._said.is_empty(), "later night-start lines wait in the queue")
+	sea._say("Một.", 2.0)
+	sea._say("Hai.", 2.0)
+	check(sea.message.text == "Một." and not sea._said.is_empty(), "a second line waits in the queue")
 	sea.status_until = 0.0
 	sea._next_line()
-	check(sea.message.text != "" and not sea.message.text.begins_with("NEO: Chào"), "next queued line shows after the first ends")
+	check(sea.message.text == "Hai.", "next queued line shows after the first ends")
 	check(sea.find_children("*", "SeaFog3D", false, false).is_empty(), "no fog before the omen")
 	var omen_fish := load("res://data/fish/ca_thu_phat_sang.tres") as FishData
 	sea._said.clear()
 	sea.status_until = 0.0
 	sea._next_line()
 	sea._store_catch(omen_fish, 1.0, 1, 1.0)
-	var warned := sea.message.text.begins_with("[WARN]")
+	var warned := sea.message.text.contains("phát sáng")
 	for line: Array in sea._said:
-		warned = warned or str(line[0]).begins_with("[WARN]")
-	check(warned, "glowing mackerel triggers NEO's [WARN] line")
+		warned = warned or str(line[0]).contains("phát sáng")
+	check(warned, "glowing mackerel makes Rin wonder")
 	sea.queue_free()
 	await get_tree().process_frame
 	# Omen yesterday -> fog open today.

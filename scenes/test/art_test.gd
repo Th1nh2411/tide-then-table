@@ -36,14 +36,6 @@ func _ready() -> void:
 	failures += _check("3-row sheet: busy falls back to facing", small["rows"] == 3 and small["row"] == Art.ROW_DOWN)
 	failures += _check("2x art (128x256) has the same layout",
 		Art.person_frame(Vector2(128, 256), Vector2i.LEFT, false, false, 0.0, 0.0)["rows"] == 4)
-	failures += _check("diagonal keeps a matching facing",
-		StreetPerson.facing_for(Vector2(1, 1), Vector2i.DOWN) == Vector2i.DOWN
-		and StreetPerson.facing_for(Vector2(1, -1), Vector2i.RIGHT) == Vector2i.RIGHT)
-	failures += _check("diagonal from an unrelated facing turns sideways",
-		StreetPerson.facing_for(Vector2(-1, -1), Vector2i.DOWN) == Vector2i.LEFT)
-	failures += _check("straight moves use the main axis",
-		StreetPerson.facing_for(Vector2(0.2, 1), Vector2i.LEFT) == Vector2i.DOWN
-		and StreetPerson.facing_for(Vector2.ZERO, Vector2i.UP) == Vector2i.UP)
 	var half := Art.IDLE_BREATH * 0.5
 	failures += _check("idle breathes: standing, then breathing in, eyes shut at each blink",
 		Art.idle_column(Art.IDLE_BLINK_LENGTH + 0.01) == 0 and Art.idle_column(half + 0.05) == 1

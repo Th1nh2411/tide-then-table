@@ -90,7 +90,7 @@ func _process(delta: float) -> void:
 		_was_fishing = false
 		_after_catch = true
 		_catch_timer = taken_after_catch_seconds
-	if (sea.hold_ui and sea.hold_ui.visible) or (sea.phone_app and sea.phone_app.visible):
+	if sea.hold_ui and sea.hold_ui.visible:
 		return
 	if not sea._at_dock():
 		away_seconds += delta
@@ -145,7 +145,7 @@ func _haunt() -> void:
 		"static":
 			Sfx.play("static")
 			_blink()
-			_say_once("static", "NEO: [ERR] Mất định vị... anh Rin, quay—", 2.5)
+			_say_once("static", "Cái gì... rè rè trong tai vậy?", 2.5)
 		"figure", "swim":
 			_spawn_figure(DarkNightFigure3D.Kind.STAND if event == "figure" else DarkNightFigure3D.Kind.SWIM)
 

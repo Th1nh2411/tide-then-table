@@ -1,17 +1,10 @@
 class_name RestaurantInteract3D
 extends RefCounted
-## What E does in the 3D restaurant, by where Rin stands: the cat, Cô Năm
+## What E does in the 3D restaurant, by where Rin stands: Cô Năm
 ## (she talks, CO_NAM lines), tables (serve the carried plate / clean), the
 ## plate table and the beer keg (a tower straight into Rin's hands).
 
 const L = preload("res://scenes/restaurant3d/restaurant_layout_3d.gd")
-const CAT_DIALOGUES := [
-	preload("res://data/dialogues/cat_first.tres"),
-	preload("res://data/dialogues/cat_warm.tres"),
-	preload("res://data/dialogues/cat_omen.tres"),
-	preload("res://data/dialogues/cat_mark.tres"),
-]
-
 const CO_NAM: LinesData = preload("res://data/story/co_nam.tres")
 ## Gossip on the morning a fisherman went missing (NewsData.MISSING_FLAG).
 const CO_NAM_MISSING := "Nghe gì chưa con? Đêm qua lại một người đi biển không về. Thúng trôi vô bến, trống trơn."
@@ -28,13 +21,6 @@ func _init(owner: Node3D) -> void:
 
 func interact() -> void:
 	var at: Vector3 = host.player.position
-	if host.modal_open():
-		return
-	if host.cat_node and at.distance_to(host.cat_node.position) < 1.3:
-		var dialogue := DialogueLibrary.pick(CAT_DIALOGUES) as Dialogue
-		if dialogue:
-			host.cat_dialogue.play(dialogue)
-		return
 	if at.distance_to(L.COUNTER_POSITION) < 2.1:
 		# The news first (one more missing), then tonight's omen, then her usual talk.
 		if GameState.has_flag(NewsData.MISSING_FLAG) and not _co_nam_missing_said:
@@ -78,32 +64,19 @@ func _cook_here(at: Vector3) -> void:
 			continue
 		var dish: DishData = order["dish"]
 		if dish.instant_serve:
-			host.cooking_table = i
 			Sfx.play("clink")
-			on_cooking_finished(dish, CookingGameBase.Result.PERFECT, 1.0)
+			beer_poured(i)
 			return
 	host._show_note("Chưa bàn nào gọi bia.")
 
 
-func on_cooking_finished(_dish: DishData, _result: CookingGameBase.Result, multiplier: float) -> void:
-	var table: int = host.cooking_table
-	host.cooking_table = -1
+## A beer tower for `table`: into Rin's hands if they are free.
+func beer_poured(table: int) -> void:
 	if table < 0 or host.orders[table].is_empty():
 		return
 	host.orders[table]["cooked"] = true
-	host.orders[table]["multiplier"] = multiplier
-	var visit: Dictionary = host.orders[table].get("visit", {})
-	if not visit.is_empty():
-		visit["cooked"] = true
-	# Rin made it himself, so it goes straight into his hands (cooking needs empty hands).
 	if host.carrying_table < 0:
 		host.carrying_table = table
 		host._show_note("Đem %s tới bàn %d." % [host.orders[table]["dish"].display_name, table + 1])
 	else:
-		host._show_note("Món bàn %d đã xong!" % (table + 1))
-	host._dispatch_ready()
-
-
-func on_cooking_spilled(dish: DishData) -> void:
-	if dish.is_market_dish():
-		host.market_stock.spill(dish, 1)
+		host._show_note("Bia bàn %d đã xong!" % (table + 1))

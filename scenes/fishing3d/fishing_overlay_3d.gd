@@ -24,7 +24,6 @@ var _count: int = 0
 var trip_stun: float = 0.0
 var _fainted: bool = false
 var _hold: HoldUI
-var wave_power: WavePower
 ## FishData.Zone of the next rod cast (sea backdrop); -1 = the fish's own.
 var zone: int = -1
 
@@ -39,10 +38,6 @@ func _ready() -> void:
 	_minigame.catch_size_changed.connect(_on_catch_size_changed)
 	# The container supplies viewport mouse input, and holds keyboard focus.
 	_container.focus_mode = Control.FOCUS_ALL
-	wave_power = WavePower.new()
-	wave_power.process_mode = Node.PROCESS_MODE_ALWAYS
-	wave_power.can_use = func() -> bool: return active and _minigame.is_running()
-	add_child(wave_power)
 
 
 func start_catch(fish_data: FishData, zone_scale: float = 1.0, size: float = 1.0, count: int = 1, school: int = 6) -> void:
@@ -109,7 +104,7 @@ func _process(_delta: float) -> void:
 
 func _controls_held() -> bool:
 	for action in [&"throttle_forward", &"throttle_back", &"turn_left", &"turn_right",
-			&"cast", &"interact", &"drop_net", &"open_hold"]:
+			&"cast", &"interact", &"open_hold"]:
 		if Input.is_action_pressed(action):
 			return true
 	return false

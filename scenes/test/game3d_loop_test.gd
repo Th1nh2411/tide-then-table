@@ -45,7 +45,6 @@ func _run() -> void:
 	SaveSystem.autosave_off = true
 	SceneRouter.fade_duration = 0.01
 	GameState.reset()
-	GameState.money = 1000
 	SceneRouter.go_to(SEA)
 	var sea: Node = await _scene(SEA)
 	if not sea:
@@ -71,13 +70,13 @@ func _run() -> void:
 	sea.boat.position = sea.START
 	sea.boat.velocity = Vector3.ZERO
 	sea._unload()
-	_check(sea.hold.items.is_empty() and GameState.storage.size() == 1, "dock unload transfers caught fish to pantry storage")
+	_check(sea.hold.items.is_empty(), "dock unload empties the hold")
 	sea._end_trip(false)
 	var room: Node = await _scene(BEDROOM)
 	if not room:
 		return
-	_check(GameState.resume_at == "home" and GameState.last_catch.size() == 1 and GameState.day == 2,
-		"docking wakes Rin in his room on the next day, catch kept")
+	_check(GameState.resume_at == "home" and GameState.day == 2 and GameState.caught_species.has(fish.id),
+		"docking wakes Rin in his room on the next day, catch remembered")
 	room.leave()
 	var morning: Node = await _scene(WATERFRONT)
 	if not morning:
@@ -112,23 +111,23 @@ func _run() -> void:
 		quan.player.position = quan.PASS_POSITION
 		quan._interact()
 		_check(quan.carrying_table == table, "E at pass picks up cooked plate")
-	var before: int = GameState.money
 	quan.player.position = quan.TABLES[table] + Vector3(0, 0, 1.2)
 	quan._interact()
-	_check(str(quan.orders[table].get("phase", "")) == "eating" and GameState.money == before,
-		"E serves table; money waits until guests finish eating")
+	_check(str(quan.orders[table].get("phase", "")) == "eating" and quan.earned == 0,
+		"E serves table; the bill waits until guests finish eating")
 	quan._finish_meal(table)
-	_check(GameState.money > before and quan.dirty_tables[table], "finished meal pays and leaves dirty table")
+	for i: int in range(4):  # extra lines / rounds of the same party
+		if quan.dirty_tables[table]:
+			break
+		quan.orders[table]["cooked"] = true
+		quan.orders[table]["phase"] = "eating"
+		quan._finish_meal(table)
+	_check(quan.earned > 0 and quan.dirty_tables[table], "the party pays (counted, not money) and leaves a dirty table")
 	quan._clean_table(table)
 	_check(not quan.dirty_tables[table], "table can be cleaned for next guest")
 	quan._end_shift()
-	_check(quan.shift_over and GameState.day_history.size() == 1, "closing records real shift ledger and summary")
-	var cost: int = quan.kitchen_upgrade.next_cost(GameState.get_upgrade_level("kitchen"))
-	var upgrade_money: int = GameState.money
-	quan._buy_upgrade(quan.kitchen_upgrade)
-	_check(GameState.get_upgrade_level("kitchen") == 1 and GameState.money == upgrade_money - cost,
-		"restaurant upgrade spends money once and persists level")
-	var saved_money: int = GameState.money
+	_check(quan.shift_over and GameState.day_history.size() == 1 and int(GameState.day_history[0]["earned"]) == quan.earned,
+		"closing records the shift for the ending card")
 	quan._walk_home()
 	var evening: Node = await _scene(WATERFRONT)
 	if not evening:
@@ -138,12 +137,11 @@ func _run() -> void:
 	sea = await _scene(SEA)
 	if not sea:
 		return
-	_check(GameState.day == 2 and GameState.money == saved_money, "the thúng goes to sea the same night, money kept")
+	_check(GameState.day == 2, "the thúng goes to sea the same night")
 	_check(SaveSystem.save_game(SAVE), "3D loop can save to isolated scratch slot")
 	var saved_day: int = GameState.day
-	GameState.money = 0
-	GameState.upgrade_levels.clear()
-	_check(SaveSystem.load_game(SAVE) and GameState.day == saved_day and GameState.money == saved_money
-		and GameState.get_upgrade_level("kitchen") == 1, "save/load retains 3D earnings, day and upgrades")
+	GameState.day = 1
+	_check(SaveSystem.load_game(SAVE) and GameState.day == saved_day and GameState.day_history.size() == 1,
+		"save/load retains the day and the shift record")
 	SaveSystem.delete_save(SAVE)
 	get_tree().quit(1 if _failures else 0)
