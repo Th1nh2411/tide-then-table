@@ -16,6 +16,7 @@ const CO_NAM: LinesData = preload("res://data/story/co_nam.tres")
 
 var host: Node3D
 var _co_nam_line := 0
+var _co_nam_omen_said := false
 
 
 func _init(owner: Node3D) -> void:
@@ -32,6 +33,12 @@ func interact() -> void:
 			host.cat_dialogue.play(dialogue)
 		return
 	if at.distance_to(L.COUNTER_POSITION) < 2.1:
+		# Tonight's omen first, if she has a word about it.
+		var omen := OmenPicker.tonight()
+		if omen and omen.co_nam_line != "" and not _co_nam_omen_said:
+			_co_nam_omen_said = true
+			host._show_note("%s: %s" % [CO_NAM.speaker, omen.co_nam_line])
+			return
 		host._show_note(CO_NAM.line(_co_nam_line))
 		_co_nam_line += 1
 		return

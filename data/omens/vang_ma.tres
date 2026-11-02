@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OmenData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/omen_data.gd" id="1_omen"]
+
+[resource]
+script = ExtResource("1_omen")
+id = "vang_ma"
+where = 1
+title = "Vàng mã bay ngược gió về phía bến"
+text = ""
+calm_text = ""
+co_nam_line = ""
+custom = true

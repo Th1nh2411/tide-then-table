@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="OmenData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/omen_data.gd" id="1_omen"]
+
+[resource]
+script = ExtResource("1_omen")
+id = "goi_ten"
+where = 1
+title = "Tiếng gọi tên Rin lúc khuya"
+text = "Từ phía bến vọng lên: \"...Rin ơi...\""
+calm_text = "Nhà ai xa xa gọi: \"Tèo ơi! Vô ăn cơm!\""
+co_nam_line = ""
