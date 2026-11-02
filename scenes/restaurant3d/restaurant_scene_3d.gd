@@ -144,6 +144,7 @@ func _ready() -> void:
 	_sync_staff()
 	RestaurantSetup3D.build_ui(self)
 	RestaurantSetup3D.build_tools(self)
+	StreetEnds3D.build(self)
 	RestaurantSetup3D.open_planning(self)
 	story_bridge = load("res://scenes/story3d/story_bridge_3d.tscn").instantiate()
 	add_child(story_bridge)
@@ -285,6 +286,9 @@ func _sail_without_shift() -> void:
 
 func _sail() -> void:
 	shift.sail()
+
+func _go_home() -> void:
+	shift.go_home()
 
 func _show_note(words: String) -> void:
 	panels.say(words)

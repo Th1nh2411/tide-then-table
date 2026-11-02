@@ -9,7 +9,7 @@ extends RefCounted
 const SAVE_PATH: String = "user://save.json"
 ## 2: + orders, map pins, weather, resume point (older saves load fine).
 const SAVE_VERSION: int = 2
-const RESUME_POINTS: Array[String] = ["sea", "restaurant"]
+const RESUME_POINTS: Array[String] = ["sea", "restaurant", "home"]
 const FISH_CATALOG_PATH: String = "res://data/fish/fish_catalog.tres"
 
 
@@ -28,7 +28,7 @@ static var autosave_off: bool = false
 
 
 ## Autosave unless the run was started with `-- --no-autosave` (tests).
-## `resume_at`: where Continue will start ("sea" or "restaurant").
+## `resume_at`: where Continue will start ("home" in the horror build; "sea" / "restaurant" older saves).
 static func autosave(resume_at: String) -> void:
 	GameState.resume_at = resume_at
 	if not autosave_off and not OS.get_cmdline_user_args().has("--no-autosave"):

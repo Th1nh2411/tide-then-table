@@ -191,7 +191,7 @@ func refresh() -> void:
 	else:
 		_open_pulse.pause()
 		open_button.scale = Vector2.ONE
-	sail_button.visible = not stocked
+	sail_button.visible = false  # leaving is a walk to a street end (StreetEnds3D)
 	_update_revenue()
 	if editing_slot < 0:
 		_update_title()

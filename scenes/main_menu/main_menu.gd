@@ -5,6 +5,8 @@ extends Control
 const SEA_SCENE_PATH: String = "res://scenes/sea3d/sea_scene_3d.tscn"
 const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
 const INTRO_SCENE_PATH: String = "res://scenes/intro/intro_scene.tscn"
+## Horror build: every day (new game, continue) starts in Rin's room.
+const BEDROOM_SCENE_PATH: String = "res://scenes/home3d/bedroom_scene_3d.tscn"
 const SWAY_DEGREES: float = 0.8
 
 @onready var _continue_button: Button = %ContinueButton
@@ -124,7 +126,7 @@ func _on_continue_pressed() -> void:
 		_new_game_button.theme_type_variation = &"AccentButton"
 		_new_game_button.grab_focus()
 		return
-	SceneRouter.go_to(RESTAURANT_SCENE_PATH if GameState.resume_at == "restaurant" else SEA_SCENE_PATH)
+	SceneRouter.go_to(BEDROOM_SCENE_PATH)
 
 
 func _on_new_game_pressed() -> void:
@@ -138,7 +140,7 @@ func _on_new_game_pressed() -> void:
 		UiFx.pop_in(_status_label)
 		return
 	GameState.reset()
-	SceneRouter.go_to(INTRO_SCENE_PATH)  # Rin calls Bảo, then the first night at sea
+	SceneRouter.go_to(BEDROOM_SCENE_PATH)  # mùng 9, Rin wakes in his room
 
 
 func _saved_day() -> int:

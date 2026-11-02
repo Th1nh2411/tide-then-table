@@ -3,7 +3,7 @@ extends Node
 ## Travel and minigame skill are scripted; no player's save is read or written.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
-const REST := "res://scenes/rest/rest_scene.tscn"
+const BEDROOM := "res://scenes/home3d/bedroom_scene_3d.tscn"
 const QUAN := "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
 const SAVE := "user://test_game3d_loop.json"
 var _failures: int = 0
@@ -74,16 +74,16 @@ func _run() -> void:
 	sea._unload()
 	_check(sea.hold.items.is_empty() and GameState.storage.size() == 1, "dock unload transfers caught fish to pantry storage")
 	sea._end_trip(false)
-	var rest: Node = await _scene(REST)
-	if not rest:
+	var room: Node = await _scene(BEDROOM)
+	if not room:
 		return
-	_check(GameState.resume_at == "restaurant" and GameState.last_catch.size() == 1,
-		"rest card retains catch and restaurant resume point")
-	rest._wake_button.pressed.emit()
+	_check(GameState.resume_at == "home" and GameState.last_catch.size() == 1 and GameState.day == 2,
+		"docking wakes Rin in his room on the next day, catch kept")
+	room.leave()
 	var quan: Node = await _scene(QUAN)
 	if not quan:
 		return
-	_check(quan is Node3D, "rest card routes to native 3D restaurant")
+	_check(quan is Node3D, "bedroom door routes to native 3D restaurant")
 	var dish: DishData = null
 	for candidate: DishData in quan.menu.dishes:
 		if ChefBao.cooks(candidate) and candidate.kitchen_level == 0 and candidate.ingredients.has(fish.id):
@@ -128,7 +128,7 @@ func _run() -> void:
 	sea = await _scene(SEA)
 	if not sea:
 		return
-	_check(GameState.day == 2 and GameState.money == saved_money, "next night preserves money and advances day exactly once")
+	_check(GameState.day == 2 and GameState.money == saved_money, "dock end of the street goes to sea the same night, money kept")
 	_check(SaveSystem.save_game(SAVE), "3D loop can save to isolated scratch slot")
 	var saved_day: int = GameState.day
 	GameState.money = 0

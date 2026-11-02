@@ -2,9 +2,11 @@ class_name RestaurantShift3D
 extends RefCounted
 ## The 3D restaurant's shift clock: open the shift, tick it (clock, Bảo,
 ## guests arriving, eating and running out of patience), close early (T),
-## and leave for the sea (advance the day). Balance: ServiceTuning by day.
+## and leave by a street end: the dock (night at sea) or home (sleep); the
+## bedroom judges the night (LoopCalendar). Balance: ServiceTuning by day.
 
 const SEA_SCENE := "res://scenes/sea3d/sea_scene_3d.tscn"
+const BEDROOM_SCENE := "res://scenes/home3d/bedroom_scene_3d.tscn"
 const SHIFT_SECONDS := 180.0
 const TUNINGS := [
 	preload("res://data/restaurant/service_day1.tres"),
@@ -93,25 +95,36 @@ func has_stock() -> bool:
 	return false
 
 
-## Skip the shift: return the planned fish, release today's regulars.
+## Skip the shift (leave() returns the planned fish and releases today's regulars).
 func sail_without_shift() -> void:
-	host.plan.clear(GameState.storage)
-	for visit: Dictionary in host.regular_visits:
-		FishOrders.release(visit)
 	FishOrders.expire_after_shift(host.fish_catalog)
 	sail()
 
 
+## The dock end of the street: tonight at sea (the day turns in the bedroom).
 func sail() -> void:
-	if host.sailing or (not host.shift_over and has_stock()):
+	await leave(true)
+
+
+## The home end of the street: sleep, no night at sea.
+func go_home() -> void:
+	await leave(false)
+
+
+func leave(to_dock: bool) -> void:
+	if host.sailing or host.shift_running:
 		return
 	host.sailing = true
+	if not host.shift_over:
+		host.plan.clear(GameState.storage)
+		for visit: Dictionary in host.regular_visits:
+			FishOrders.release(visit)
 	if host.shift_over:
 		await host.story_bridge.play_eligible(host.after_shift_cutscenes)
 	host.bag.store(host.market_stock, host.menu.dishes)
-	var fridge: UpgradeData = host.fridge_upgrade
-	var freshness_loss := float(GameState.get_upgrade_value(fridge)) if fridge else 35.0
-	GameState.advance_day(freshness_loss)
-	FishOrders.roll_new_order(host.rng, host.fish_catalog)
-	GameState.resume_at = "sea"
-	SceneRouter.go_to(SEA_SCENE)
+	GameState.resume_at = "home"
+	if to_dock:
+		SceneRouter.go_to(SEA_SCENE)
+	else:
+		LoopCalendar.choose(false)
+		SceneRouter.go_to(BEDROOM_SCENE)

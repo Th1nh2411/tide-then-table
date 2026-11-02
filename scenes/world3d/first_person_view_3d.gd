@@ -1,6 +1,6 @@
 class_name FirstPersonView3D
 extends Node
-## First-person view for the 3D restaurant and sea (SceneRouter adds it at
+## First-person view for the 3D bedroom, restaurant and sea (SceneRouter adds it at
 ## start; F10 in debug builds toggles it): a camera at Rin's eyes, mouse look, his
 ## own body hidden from it. Restaurant: it becomes the host's `demo_camera`,
 ## so WASD already walks where he looks. Sea: the look turns with the boat and
@@ -60,14 +60,14 @@ func _process(_delta: float) -> void:
 	elif not _camera.current:
 		_camera.make_current()
 	_update_mouse(handed_back)
-	if _scene is RestaurantScene3D:
-		_follow_restaurant(_scene as RestaurantScene3D)
+	if _walks(_scene):
+		_follow_walker(_scene)
 	elif _scene is SeaScene3D:
 		_follow_sea(_scene as SeaScene3D)
 
 
 func _attach(scene: Node) -> void:
-	if not (scene is RestaurantScene3D or scene is SeaScene3D):
+	if not (_walks(scene) or scene is SeaScene3D):
 		return
 	_scene = scene
 	for bridge in scene.find_children("*", "Node", true, false):
@@ -77,15 +77,17 @@ func _attach(scene: Node) -> void:
 			(bridge as StoryBridge3D).started.connect(on_start)
 			(bridge as StoryBridge3D).finished.connect(on_end)
 			_links.append([bridge, on_start, on_end])
-	if scene is RestaurantScene3D:
-		var room := scene as RestaurantScene3D
-		_game_camera = room.demo_camera
-		room.demo_camera = _camera
+	if _walks(scene):
+		_game_camera = scene.get("demo_camera")
+		scene.set("demo_camera", _camera)
 		_camera.far = 80.0
-		_yaw = 0.0  # facing the shop front (-Z)
-		for child in room.body.get_children():
-			if child is RinPilotVisual:
-				_hide_meshes(child)
+		# Restaurant: facing the shop front (-Z); bedroom: towards the door.
+		_yaw = float(scene.get("start_yaw")) if scene is BedroomScene3D else 0.0
+		var body := scene.get("body") as Node
+		if body:
+			for child in body.get_children():
+				if child is RinPilotVisual:
+					_hide_meshes(child)
 	else:
 		var sea := scene as SeaScene3D
 		_game_camera = sea.camera
@@ -106,8 +108,8 @@ func _attach(scene: Node) -> void:
 
 func _detach() -> void:
 	if is_instance_valid(_scene):
-		if _scene is RestaurantScene3D and is_instance_valid(_game_camera):
-			(_scene as RestaurantScene3D).demo_camera = _game_camera
+		if _walks(_scene) and is_instance_valid(_game_camera):
+			_scene.set("demo_camera", _game_camera)
 	for link: Array in _links:
 		if is_instance_valid(link[0]):
 			var bridge := link[0] as StoryBridge3D
@@ -156,8 +158,16 @@ func _update_mouse(handed_back: bool) -> void:
 		Input.mouse_mode = mode
 
 
-func _follow_restaurant(room: RestaurantScene3D) -> void:
-	_camera.global_position = room.player.global_position + EYE_RESTAURANT
+## Scenes where Rin walks with WASD relative to `demo_camera` (restaurant, bedroom).
+func _walks(scene: Node) -> bool:
+	return scene is RestaurantScene3D or scene is BedroomScene3D
+
+
+func _follow_walker(room: Node) -> void:
+	var player := room.get("player") as Node3D
+	if player == null:
+		return
+	_camera.global_position = player.global_position + EYE_RESTAURANT
 	_camera.global_rotation = Vector3(_pitch, _yaw, 0)
 
 

@@ -555,7 +555,7 @@ Mảnh phụ: Bảo kể Út trả tiền ướt; mèo không lại gần bàn �
 
 | Phase | Nội dung | Ghi chú |
 |---|---|---|
-| H1 — Khung 3 nơi + vòng lặp | Phòng ngủ 3D (dựng bằng code), lịch bloc + báo qua khe cửa, cửa → "Ra quán"; hai đầu phố ở quán (về ngủ / ra bến); cập bến → phòng ngủ; ngày mới / reset về mùng 9 theo đúng-sai; autosave ở phòng ngủ | Thay thẻ nghỉ + nút "Ra khơi"; bot đi theo vòng mới |
+| H1 — Khung 3 nơi + vòng lặp ✅ | Phòng ngủ 3D (dựng bằng code), lịch bloc + báo qua khe cửa, cửa → "Ra quán"; hai đầu phố ở quán (về ngủ / ra bến); cập bến → phòng ngủ; ngày mới / reset về mùng 9 theo đúng-sai; autosave ở phòng ngủ | Xong: `LoopCalendar` (pure, test `loop_calendar_test`), `BedroomScene3D` + `BedroomBuilder3D`, `NewsData` (`data/story/news.tres`), `StreetEnds3D` (trái VỀ NHÀ, phải RA BẾN; không dùng trong ca), `OnScreenText` (chữ trần trên màn hình). Chơi mới / tiếp tục → phòng ngủ; chỉ autosave ở phòng ngủ; nút "Ra khơi" ẩn; ra bến không tăng ngày. Bot: mùng 9 → cố ý về nhà ngày 2 → reset → rằm → kết. Chưa có điềm (H5) nên mọi đêm "ra bến" là đúng |
 | H2 — Quán gọn | Bỏ thực đơn, nướng, tạp hoá, tủ lạnh, Sửa quán; món cố định + bia E; Cô Năm chỉ thoại | Giữ khách / Bảo / bàn / dọn |
 | H3 — Thoại phụ đề | `DialogueBox` → phụ đề không portrait; bỏ phát cutscene, mốc cốt truyện thành sự kiện trong thế giới | Giữ `Dialogue` .tres |
 | H4 — Dọn hệ thống | Ẩn / gỡ thử thách, Review, đối thủ, kho cá, đơn cá, món hot; điện thoại chỉ còn bản đồ + nâng cấp + NEO | |

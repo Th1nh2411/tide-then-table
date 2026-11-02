@@ -153,7 +153,7 @@ func _process(delta: float) -> void:
 	renovate_button.visible = not running and not modal
 	renovate_button.position.y = 30.0 if menu_button.visible else 6.0
 	close_button.visible = running and room.seconds_left > 0.0 and not modal
-	sail_button.visible = over and not room.is_renovating()
+	sail_button.visible = false  # leaving is a walk to a street end (StreetEnds3D)
 	if not close_button.visible:
 		_confirm_left = 0.0
 		close_button.text = "Đóng sớm"

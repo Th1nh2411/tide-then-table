@@ -103,7 +103,8 @@ func _run() -> void:
 		await get_tree().physics_frame
 	Input.action_release("turn_left")
 	print("PASS Rin moves after summary" if room.player.position.distance_to(after_walk) > 0.3 else "FAIL Rin moves after summary")
-	print("PASS evening buttons" if room.hud.sail_button.visible and room.hud.renovate_button.visible else "FAIL evening buttons")
+	var ends := room.get_node("StreetEnds") as StreetEnds3D
+	print("PASS evening: street ends open, no sail button" if ends.can_leave() and not room.hud.sail_button.visible and room.hud.renovate_button.visible else "FAIL evening: street ends open, no sail button")
 	var ledger_size: int = GameState.day_history.size()
 	var closing_money: int = GameState.money
 	room._end_shift()

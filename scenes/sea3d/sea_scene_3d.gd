@@ -6,7 +6,7 @@ extends Node3D
 ## rod/net/hold -> SeaCatch3D, HUD/navigation -> SeaHud3D, steering ->
 ## SeaBoatMover3D, oil / unload / trip end -> SeaTrip3D, debug keys -> SeaDebug3D.
 
-const REST_SCENE := SeaTrip3D.REST_SCENE
+const REST_SCENE := SeaTrip3D.BEDROOM_SCENE
 const ENDING_SCENE := SeaTrip3D.ENDING_SCENE
 const FISHING_OVERLAY := SeaSetup3D.FISHING_OVERLAY
 const ROD_UPGRADE := preload("res://data/upgrades/rod_upgrade.tres")
@@ -115,8 +115,7 @@ func _ready() -> void:
 	DayClock.start_night()
 	DailyTrend.ensure()
 	var fog_tonight := Story.check_day()
-	GameState.resume_at = "sea"
-	SaveSystem.autosave("sea")
+	# Saves happen in the bedroom only (horror build): a night is judged on docking.
 	Sfx.ambience("sea")
 	_night_start_lines(fog_tonight)
 	_update_hud()

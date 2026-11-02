@@ -1,9 +1,12 @@
 extends Node
-## Integration bot for the native 3D loop. Travel and minigame skill are scripted.
-## Uses real catches, stock, service, bills, upgrades, story and scene transitions.
+## Integration bot for the horror build's day loop (PLAN §10): bedroom ->
+## restaurant -> dock end -> night at sea -> bedroom, mùng 9 to rằm, then the
+## ending. Once (on day 2) it takes the home end on a calm night to check the
+## reset to mùng 9. Travel and minigame skill are scripted; scenes, service,
+## bills, story and transitions are real.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
-const REST := "res://scenes/rest/rest_scene.tscn"
+const BEDROOM := "res://scenes/home3d/bedroom_scene_3d.tscn"
 const QUAN := "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
 const END := "res://scenes/ending/ending_scene.tscn"
 var _ticks: int = 0
@@ -16,7 +19,7 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	_ticks += 1
-	if _ticks > 12000:
+	if _ticks > 40000:
 		_fail("watchdog")
 	var scene: Node = get_tree().current_scene
 	if not scene:
@@ -36,12 +39,15 @@ func _frames(count: int) -> void:
 		await get_tree().process_frame
 
 func _until(path: String) -> Node:
+	return await _until_any([path])
+
+func _until_any(paths: Array[String]) -> Node:
 	for i: int in range(600):
 		var scene: Node = get_tree().current_scene
-		if scene and scene.scene_file_path == path and not SceneRouter._is_transitioning:
+		if scene and paths.has(scene.scene_file_path) and not SceneRouter._is_transitioning:
 			return scene
 		await get_tree().process_frame
-	_fail("scene " + path)
+	_fail("scene " + str(paths))
 	return null
 
 func _finish_fishing(sea: Node) -> void:
@@ -83,14 +89,17 @@ func _night(sea: Node) -> void:
 	sea._unload()
 	sea._end_trip(false)
 
-func _service(quan: Node) -> void:
+func _service(quan: Node, go_home: bool = false) -> void:
 	for i: int in range(120):
 		await get_tree().process_frame
 		if not quan.story_bridge.playing:
 			break
 	quan.plan.auto_fill(quan.menu.dishes, GameState.storage)
 	if not quan._has_stock():
-		quan._sail_without_shift()
+		if go_home:
+			quan._go_home()
+		else:
+			quan._sail_without_shift()
 		return
 	quan._open_shift()
 	quan.cooking_overlay.result_seconds = 0.01
@@ -143,7 +152,10 @@ func _service(quan: Node) -> void:
 	print("DAY %d | served %d | lost %d | money %dk | boat %d | kitchen %d" % [GameState.day,
 		quan.served, quan.lost, GameState.money, GameState.get_upgrade_level("boat"), GameState.get_upgrade_level("kitchen")])
 	_roundtrip()
-	quan._sail()
+	if go_home:
+		quan._go_home()
+	else:
+		quan._sail()
 
 func _roundtrip() -> void:
 	var expected: Dictionary = SaveSystem.to_dict()
@@ -158,27 +170,42 @@ func _run() -> void:
 	SaveSystem.autosave_off = true
 	SceneRouter.fade_duration = 0.01
 	GameState.reset()
-	SceneRouter.go_to(SEA)
-	for night: int in range(12):
-		var sea: Node = await _until(SEA)
-		if not sea:
+	SceneRouter.go_to(BEDROOM)
+	var reset_checked := false
+	for step: int in range(20):
+		var room: Node = await _until_any([BEDROOM, END])
+		if not room:
 			return
-		if Story.is_fog_open() and sea.WHIRLPOOL_POS.z >= SeaLayout3D.reach_z(sea.boat_data.max_depth):
-			sea.boat.position = sea.WHIRLPOOL_POS
-			await _until(END)
-			print("RUN ENDING | 3D | day %d | money %dk" % [GameState.day, GameState.money])
+		if room.scene_file_path == BEDROOM and room.leaving:
+			room = await _until(END)  # the last night ends straight from the bedroom
+			if not room:
+				return
+		if room.scene_file_path == END:
+			print("RUN ENDING | 3D | day %d | loops %d" % [GameState.day, LoopCalendar.loops()])
 			get_tree().quit(1 if _failed else 0)
 			return
-		await _night(sea)
-		var rest: Node = await _until(REST)
-		if not rest:
-			return
-		rest._wake_button.pressed.emit()
+		print("HOME | %s | loops %d" % [LoopCalendar.date_text(GameState.day), LoopCalendar.loops()])
+		room.leave()
 		var quan: Node = await _until(QUAN)
 		if not quan:
 			return
-		await _service(quan)
-	_fail("no ending after 12 days")
+		var test_reset := not reset_checked and GameState.day == 2
+		await _service(quan, test_reset)
+		if test_reset:
+			reset_checked = true
+			room = await _until(BEDROOM)
+			if not room:
+				return
+			if GameState.day != 1 or LoopCalendar.loops() != 1:
+				_fail("home on a calm night did not reset to mùng 9")
+				return
+			print("LOOP RESET | home on a calm night -> %s" % LoopCalendar.date_text(GameState.day))
+			continue
+		var sea: Node = await _until(SEA)
+		if not sea:
+			return
+		await _night(sea)
+	_fail("no ending after 20 days")
 
 func _fail(reason: String) -> void:
 	_failed = true

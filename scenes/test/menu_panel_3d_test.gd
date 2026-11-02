@@ -64,7 +64,7 @@ func _run() -> void:
 	room.market_stock = MarketStock.new(GameState.pantry)
 	panel.market_stock = room.market_stock
 	panel.refresh()
-	_check(panel.open_button.disabled and panel.sail_button.visible, "empty menu blocks start, offers sail")
+	_check(panel.open_button.disabled and not panel.sail_button.visible, "empty menu blocks start; leaving is a street end, no sail button")
 	room._open_shift()
 	_check(not room.shift_running, "_open_shift refuses with empty menu")
 	get_tree().quit()
