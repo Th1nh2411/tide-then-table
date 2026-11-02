@@ -487,78 +487,47 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng)
 
 ---
 
-## 10. Hướng kinh dị (ĐỀ XUẤT, chờ người dùng duyệt — chưa code)
+## 10. Bản kinh dị (nhánh `try-horror-1st`) — thiết kế đã chốt 02/11
 
-> Bàn 02/11. Chưa có gì trong mục này được làm, trừ hai bản thử: PSX (F8) và góc nhìn thứ nhất (F10).
-> Mục này đụng tới §8 ("thế giới song song", "cốt truyện ngoài cảnh kết") → cần người dùng chốt trước khi code.
+> Game mới dựng trên bản 3D: góc nhìn thứ nhất, kể chuyện kinh dị dân gian chỉ bằng **3 nơi**:
+> phòng ngủ, quán vỉa hè, bến / biển đêm. Phần dưới thay cho đề xuất cũ của §10.
+> §8 "thế giới song song / cốt truyện ngoài cảnh kết" được mở cho nhánh này.
 
-### Ý chính
+### Vòng một ngày
 
-Kinh dị dân gian Việt, kể **chỉ bằng cảnh biển đêm và quán vỉa hè**. Ban ngày vẫn ấm áp như hiện tại; sau 23:00 và ngoài biển đêm thì "luật" đổi. Sự tương phản ấm → rợn là điểm mạnh nhất, giữ được Bảo, Vy, Cô Năm, mèo, ông Tư, Nhịp Sóng.
+1. **Phòng ngủ** (cảnh mới): Rin tỉnh dậy, đi tới cửa phòng → hiện lựa chọn **"Ra quán"** (E).
+2. **Quán** (15:00 → khuya): khách tự tới, tự gọi món; Bảo nấu; Rin bưng và dọn bàn. Con phố có **hai đầu**:
+   - một đầu **về nhà ngủ** → phòng ngủ, sang ngày mới;
+   - một đầu **ra bến** → biển đêm.
+3. **Bến / biển đêm**: câu cá, đi trong đêm, gặp chuyện rợn, tìm manh mối. Cập bến là **tự về phòng ngủ** (mờ dần), sang ngày mới.
 
-- **Một quyết định mỗi đêm (kiểu Exit 8):** đầu đêm, ở bến Xóm Đèn, Rin đọc điềm báo rồi chọn **E: ra khơi** hoặc **R: về nhà ngủ**.
-- **Một quyết định lớn ở cuối:** uống thuốc an thần hay không → chọn kết.
-- Không thêm minigame mới. Khách lạ và thuốc là chất liệu kể chuyện, không phải luật chơi riêng.
+Quyết định mỗi đêm (kiểu Exit 8) chính là **đi đầu phố nào** sau ca: về ngủ hay ra bến, dựa trên điềm báo trong ca và ngoài phố.
 
-### Góc nhìn
+### Đã chốt
 
-| Phần | Góc nhìn |
-|---|---|
-| Ca quán 15:00–23:00 | Từ trên (như hiện tại) |
-| Quán sau 23:00, bến lúc chọn, cả chuyến biển đêm | Thứ nhất (mắt Rin, không thấy tay; đồ cầm và mái chèo vẫn hiện) |
-| Cutscene | Camera cutscene như hiện tại |
+- **Góc nhìn thứ nhất** ở cả 3 nơi (đã có `FirstPersonView3D`), không thấy tay Rin; PSX look (F8) giữ để dùng cho không khí.
+- **Không cutscene, không portrait.** Thoại là **chữ thẳng trên màn hình** (phụ đề: "Bảo: ..."), nhân vật nói trước mặt Rin. Các mốc đang nằm trong cutscene (Nhịp Sóng, mèo, Vy, intro) chuyển thành sự việc + thoại trong thế giới.
+- **Quán:** bỏ màn lên thực đơn. Chỉ còn **vài món cố định** (2–3 món của Bảo + bia). Khách tự gọi; Bảo nấu xong món nào thì để lên bàn kê, Rin đem món đó ra đúng bàn. **Bia luôn có**: E ở thùng bia là cầm tháp bia (không minigame, không mua). **Bỏ nướng** (lò than, GrillGame).
+- **Cô Năm:** đến gần chỉ nói chuyện (lời đồn, điềm báo), không bán gì. Bỏ tạp hoá, tủ lạnh, túi hàng.
+- **Câu cá chỉ phục vụ cốt truyện:** cá không thành món, không thành tiền. Cá thường để "đời thường"; cá dị biến / cá của người chết là manh mối và điềm.
+- **Tiền giữ đơn giản:** chỉ kiếm ở quán, chỉ dùng nâng cấp thuyền / đèn (đi xa hơn, vào sương). Bỏ: Sửa quán, thử thách, thành tựu, Review / xếp hạng / đối thủ, kho cá + hư hỏng, đơn đặt cá, món hot.
 
-Chuyển camera xuống mắt Rin chính là tín hiệu "luật đã đổi". PSX look bật cho phần góc nhìn thứ nhất.
+### Phase
 
-### Điềm báo và đêm âm
-
-**Đêm bình thường:** biển như hiện tại.
-**Đêm có điềm:** nếu ra khơi → **đêm âm**.
-
-| | Đêm bình thường | Đêm có điềm |
+| Phase | Nội dung | Ghi chú |
 |---|---|---|
-| Ra khơi | Chuyến câu như hiện tại | Đêm âm: nguy hiểm, cá đắt + manh mối về ông Tư |
-| Ở nhà | Mất thu nhập (đơn cá khách quen hỏng, mai mua hải sản đắt ở chợ) | An toàn; sáng sau nghe tin có người mất tích |
+| H1 — Khung 3 nơi | Phòng ngủ 3D (dựng bằng code), cửa → "Ra quán"; hai đầu phố ở quán (về ngủ / ra bến); cập bến → phòng ngủ; ngày mới khi ngủ; autosave ở phòng ngủ | Thay thẻ nghỉ + nút "Ra khơi"; bot đi theo vòng mới |
+| H2 — Quán gọn | Bỏ thực đơn, nướng, tạp hoá, tủ lạnh, Sửa quán; món cố định + bia E; Cô Năm chỉ thoại | Giữ khách / Bảo / bàn / dọn |
+| H3 — Thoại phụ đề | `DialogueBox` → phụ đề không portrait; bỏ phát cutscene, mốc cốt truyện thành sự kiện trong thế giới | Giữ `Dialogue` .tres |
+| H4 — Dọn hệ thống | Ẩn / gỡ thử thách, Review, đối thủ, kho cá, đơn cá, món hot; điện thoại chỉ còn bản đồ + nâng cấp + NEO | |
+| H5 — Điềm báo | Điềm trong ca và ngoài phố (data `.tres`), chọn theo đêm | Một điềm / đêm, công bằng |
+| H6 — Đêm âm + khách lạ | Biến thể biển khi ra bến đêm có điềm; khách lạ sau khuya | |
+| H7 — Kết | Đêm cuối: thuốc an thần (uống / không) → 2 kết | |
 
-Không có lựa chọn nào "đúng tuyệt đối": người gan cố ý ra khơi đêm có điềm để theo câu chuyện. Mỗi đêm **tối đa một** điềm; điềm phải công bằng (để ý là thấy).
+Mỗi phase xong: chạy test + bot, cập nhật mục này, dừng chờ duyệt.
 
-**Điềm ở quán (trong ca, trước 23:00):** khách quen kể thấy thúng không người trôi; Cô Năm thắp nhang sớm; mèo không chịu xuống khỏi tủ lạnh, nhìn bàn trống; Bảo làm vỡ bát; bảng LED nháy món không có trong thực đơn; một xe máy dừng trước quán, không ai bước xuống.
+### Còn mở
 
-**Điềm ở bến (lúc chọn):** đèn hải đăng Đá Canh Đêm đổi màu; nước lặng như gương, không gợn; một bóng đèn bến tắt; có người đứng ở đầu cầu tàu rồi biến mất; nghe tiếng gõ mạn thúng ba lần; trăng đỏ.
-
-**Đêm âm (cùng map biển, đổi bằng dữ liệu + uniform):** sương dày, nước và trời đổi màu (uniform `sea_water.gdshader` + panorama), trăng đỏ; dầu đèn hao nhanh hơn; ngoài vùng đèn có thứ di chuyển, gõ vào thúng; cá dị biến + **"cá của người chết"** (rất đắt); POI nói khác (ông Tám biết nhiều hơn ông nói, miếu Cá Ông có nhang mới thắp); manh mối về ông Tư (chai thư, nhật ký người gác đèn).
-
-**Hậu quả ở quán:** sau một đêm âm, sau 23:00 có **khách lạ**: không bóng, không nói, gọi đúng loại cá Rin câu tối qua. Rin phục vụ như thường (không có luật riêng). Khách lạ để lại đồ vật / câu nói là manh mối. Bảo, Vy, NEO không thấy họ ("camera không ghi được ai ngồi bàn 3").
-
-### Dàn ý 5 đêm (bản nháp)
-
-| Đêm | Ca quán | Bến / biển | Ghi chú cốt truyện |
-|---|---|---|---|
-| 1 | Bình thường, ấm (dạy chơi) | Không điềm. Ra khơi như cũ | Giới thiệu bến, đèn dầu, ông Tư mất tích hai năm trước |
-| 2 | Khách quen kể chuyện thúng không người | Điềm nhẹ (nước lặng). Chọn lần đầu | Ra khơi → đêm âm đầu tiên, ngắn; ở nhà → sáng nghe tin |
-| 3 | Nếu có đêm âm: khách lạ đầu tiên sau 23:00 | Không điềm (người chơi phải học là không phải đêm nào cũng có) | `wave_faint` giữ nguyên (Rin ngất ở bến, Bảo tìm thấy) → bác sĩ kê thuốc an thần |
-| 4 | Vy xin việc; mèo nhìn bàn trống | Điềm rõ (hải đăng đổi màu) | `fog_omen` giữ nguyên; khách lạ nói về "ông già chèo thúng" |
-| 5 | Quán vắng, Bảo đưa thuốc | Cổng sương mở; trước khi ra khơi: **uống thuốc hay không** | Uống: Rin ngủ, sương đóng, quên ông Tư (kết lặng, buồn). Không uống: vào sương, gặp ông Tư, ông là "khách cuối ca" chưa từng tới quán |
-
-Số manh mối gom được (đêm âm + khách lạ) đổi chi tiết của kết "không uống".
-
-### Hệ thống
-
-- **Giữ:** câu cần + lưới, khoang, dầu đèn, sửa thuyền, nướng, bia, Bảo, Cô Năm (chợ), Vy, mèo, Nhịp Sóng, đơn cá khách quen, món hot, cutscene, NEO.
-- **Ẩn trong bản kinh dị:** thử thách ngày, thành tựu, Xóm Đèn Review / xếp hạng / đối thủ, Sửa quán nhiều cấp (giữ cấp 0–1).
-- **Mới:** lựa chọn ở bến đầu đêm (dùng lại E / R); dữ liệu điềm báo (`OmenData` .tres + catalog, chọn theo đêm); biến thể đêm âm của biển (màu, sương, dầu, cá, thoại POI); khách lạ (biến thể `Customer` 3D: không bóng, sau 23:00); hải sản dự phòng ở chợ Cô Năm; lựa chọn thuốc + 2 kết; âm thanh rợn trong `Sfx` (gõ mạn, gọi tên, xe máy dừng); góc nhìn thứ nhất bản thật (E theo tâm màn hình thay vì gần nhất).
-
-### Thứ tự làm (nếu duyệt)
-
-1. Lựa chọn ở bến + ở nhà (bỏ chuyến) + hải sản dự phòng ở chợ. Bot: thêm chính sách "ở nhà".
-2. Điềm báo (data) ở bến và trong ca.
-3. Đêm âm (biến thể biển) + cá của người chết.
-4. Góc nhìn thứ nhất bản thật cho bến, biển đêm, quán sau 23:00 (tương tác theo tâm màn hình).
-5. Khách lạ sau 23:00.
-6. Đêm 5: thuốc + 2 kết. Ẩn các hệ thống không dùng.
-
-### Câu hỏi còn mở
-
-- Bản kinh dị **thay** game hiện tại hay là **chế độ / nhánh** riêng?
-- Có jumpscare / có "thua" (mất khoang, Rin ngất, mất một ngày) hay chỉ rợn tâm lý?
-- Giữ 5 đêm hay kéo dài (7 đêm, mỗi đêm một điềm)?
+- Có "thua" (mất tiền, Rin ngất, mất một ngày) hay chỉ rợn tâm lý?
+- Số đêm (5 hay 7).
+- Vy, nhân viên, mèo, Nhịp Sóng giữ ở mức nào sau H3.
