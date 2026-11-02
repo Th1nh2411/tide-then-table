@@ -3,28 +3,22 @@ extends RefCounted
 ## One-time wiring of the 3D restaurant's UI and tools (called from
 ## RestaurantScene3D._ready, in this order): panels + HUD + goals + social +
 ## pause menu + phone, then the cat's dialogue box, quest tracker, Nhịp Sóng
-## and the cooking overlay, then today's menu plan and the planning panel.
+## and the cooking overlay, then the day (open_day).
 
 
 static func build_ui(host: RestaurantScene3D) -> void:
 	host.panels.build()
-	host.planning_panel = host.panels.planning
 	var hud := RestaurantHud3D.new()
 	host.hud = hud
 	host.add_child(hud)
 	hud.setup(host, RestaurantPanels3D.ui_theme(), RestaurantPanels3D.panel_style())
-	hud.menu_requested.connect(host._toggle_planning)
-	hud.renovate_requested.connect(host._open_renovation)
 	hud.close_requested.connect(host._close_early)
-	hud.sail_requested.connect(host._sail)
 	host.goals = RestaurantGoals3D.new(host)
 	host.goals.build()
 	host.social = RestaurantSocial3D.new(host)
 	host.social.build()
 	host.add_child(load("res://scenes/ui/pause_menu.tscn").instantiate())
 	host.add_child(load("res://scenes/ui/phone_app.tscn").instantiate())
-	host.bag.build_fridge(host)
-	host.panels.refresh_market()
 
 
 static func build_tools(host: RestaurantScene3D) -> void:

@@ -46,7 +46,6 @@ func open_shift() -> void:
 	if host.shift_running or host.shift_over or not has_stock():
 		return
 	host.opening_variety = host.plan.variety_count()
-	host.planning_panel.hide()
 	host.shift_running = true
 	host.seconds_left = SHIFT_SECONDS
 	host.spawn_clock = host.tuning.first_spawn_delay
@@ -116,7 +115,6 @@ func leave(to_dock: bool) -> void:
 		host.plan.clear(GameState.storage)
 		for visit: Dictionary in host.regular_visits:
 			FishOrders.release(visit)
-	host.bag.store(host.market_stock, host.menu.dishes)
 	GameState.resume_at = "home"
 	if to_dock:
 		SceneRouter.go_to(SEA_SCENE)

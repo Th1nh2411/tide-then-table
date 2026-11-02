@@ -66,6 +66,9 @@ var _next: int = 0
 var _holds: Dictionary = {}  # name -> AudioStreamPlayer
 var _ambience: AudioStreamPlayer
 var _ambience_name: String = ""
+var _bed: AudioStreamPlayer
+var _bed_name: String = ""
+var _beds: Dictionary = {}  # mix name -> AudioStreamWAV, built on first use
 
 
 func _ready() -> void:
@@ -81,6 +84,9 @@ func _ready() -> void:
 	_ambience = AudioStreamPlayer.new()
 	_ambience.volume_db = -6.0
 	add_child(_ambience)
+	_bed = AudioStreamPlayer.new()
+	_bed.volume_db = -4.0
+	add_child(_bed)
 	var config := ConfigFile.new()
 	if config.load(SETTINGS_PATH) == OK:
 		set_muted(bool(config.get_value("audio", "muted", false)), false)
@@ -162,8 +168,26 @@ func set_muted(on: bool, save: bool = true) -> void:
 
 
 ## Silence everything (before quitting: SceneRouter.quit_game).
+## The horror bed under the ambience (HorrorBed: tape hiss, vinyl crackle,
+## broken radio, glitches, drone): "room", "street", "sea", or "" to stop.
+func bed(mix_name: String) -> void:
+	if mix_name == _bed_name:
+		return
+	_bed_name = mix_name
+	if silent:
+		return
+	if mix_name == "":
+		_bed.stop()
+		return
+	if not _beds.has(mix_name):
+		_beds[mix_name] = HorrorBed.build(mix_name)
+	_bed.stream = _beds[mix_name]
+	_bed.play()
+
+
 func stop_all() -> void:
 	_ambience_name = ""
+	_bed_name = ""
 	for player in find_children("*", "AudioStreamPlayer", false, false):
 		(player as AudioStreamPlayer).stop()
 

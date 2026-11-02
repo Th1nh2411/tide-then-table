@@ -25,8 +25,7 @@ func _run() -> void:
 	room.player.position = room.BOARD_POSITION + Vector3(0, 0, 1.0)
 	room._interact()
 	await get_tree().process_frame
-	_check(not room.planning_panel.visible and not room.hud.menu_button.visible and not room.hud.renovate_button.visible,
-		"no menu planning or renovation")
+	_check(not room.modal_open(), "the menu board opens nothing (no menu planning)")
 	room.player.position = room.COUNTER_POSITION + Vector3(0, 0, 1.2)
 	room._interact()
 	_check(not room.modal_open(), "Cô Năm only talks (no shop opens)")
@@ -53,5 +52,5 @@ func _run() -> void:
 	room._end_shift()
 	await get_tree().process_frame
 	var ends := room.get_node("StreetEnds") as StreetEnds3D
-	_check(room.shift_over and ends.can_leave() and not room.hud.sail_button.visible, "after the shift the street ends are the way out")
+	_check(room.shift_over and ends.can_leave(), "after the shift the street ends are the way out")
 	get_tree().quit()

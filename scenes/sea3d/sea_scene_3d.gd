@@ -114,6 +114,7 @@ func _ready() -> void:
 	var fog_tonight := Story.check_day()
 	# Saves happen in the bedroom only (horror build): a night is judged on docking.
 	Sfx.ambience("sea")
+	Sfx.bed("sea")
 	_night_start_lines(fog_tonight)
 	_update_hud()
 

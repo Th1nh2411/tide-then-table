@@ -2,9 +2,6 @@ extends Control
 ## Main menu: Continue (only if a save exists) / New Game / Hướng dẫn / Quit,
 ## over a living night backdrop (MainMenuBackdrop), with an animated sign title.
 
-const SEA_SCENE_PATH: String = "res://scenes/sea3d/sea_scene_3d.tscn"
-const RESTAURANT_SCENE_PATH: String = "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
-const INTRO_SCENE_PATH: String = "res://scenes/intro/intro_scene.tscn"
 ## Horror build: every day (new game, continue) starts in Rin's room.
 const BEDROOM_SCENE_PATH: String = "res://scenes/home3d/bedroom_scene_3d.tscn"
 const SWAY_DEGREES: float = 0.8

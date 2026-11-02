@@ -1,24 +1,19 @@
 class_name RestaurantPanels3D
 extends RefCounted
-## The restaurant's 2D overlay: note line, planning panel, Cô Năm's market
-## (MarketPanel3D), shift summary, action hint. Looks come from the project
+## The restaurant's 2D overlay: note line, shift summary, action hint. Looks come from the project
 ## theme (assets/ui/game_theme.tres).
 
 var host: Node3D
-var planning: MenuPanel3D
-var market_panel: PanelContainer
 ## Full summary text (the receipt's tooltip; kept for tests / logs).
 var summary_text: Label
 var receipt: ShiftReceipt3D
-var _market: MarketPanel3D
 var _note: SpeechStrip
 var _prompt: PanelContainer
 var _prompt_text: Label
 
 
 ## Flat stand-in for the theme's dark board (square, 2 px ink outline, no
-## blur) for overlays that set a panel override (renovation preview). The
-## planning panel uses the "ChalkPanel" material instead.
+## blur) for overlays that set a panel override.
 static func panel_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color("151d28")
@@ -45,14 +40,6 @@ func build() -> void:
 	var layer := CanvasLayer.new()
 	host.add_child(layer)
 	_build_note(layer)
-	planning = MenuPanel3D.new()
-	layer.add_child(planning)
-	_market = MarketPanel3D.new(host)
-	_market.closed.connect(func() -> void:
-		if not host.shift_running and not host.shift_over:
-			planning.open())
-	market_panel = _market
-	layer.add_child(_market)
 	receipt = ShiftReceipt3D.new()
 	layer.add_child(receipt)
 	summary_text = receipt.summary_text
@@ -117,11 +104,3 @@ func refresh_prompt(camera: Camera3D, blocked: bool) -> void:
 	_prompt.position = Vector2(clampf(screen.x - _prompt.size.x * 0.5, 6.0, maxf(6.0, size.x - _prompt.size.x - 6.0)), clampf(screen.y, 32.0, size.y - 55.0))
 	_prompt.show()
 
-
-func open_market() -> void:
-	planning.hide()
-	_market.open()
-
-
-func refresh_market() -> void:
-	_market.refresh()

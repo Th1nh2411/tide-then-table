@@ -1,6 +1,6 @@
 class_name SeaLayout3D
 extends RefCounted
-## The 2D sea (scenes/sea/sea_scene.tscn, 1920x1280 px) laid out in 3D world
+## The original 2D sea map (1920x1280 px) laid out in 3D world
 ## units. One unit = PX_PER_UNIT map pixels, centred on the map. Pure data:
 ## zones, places, rocks and the depth / boat-range maths. Map coordinates
 ## (phone map, pins) stay in the 2D pixel space.

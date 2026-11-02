@@ -3,13 +3,10 @@ extends CanvasLayer
 ## 3D restaurant HUD, icon first: a wooden plank (day, clock, phase sticker,
 ## money counting), a yellow paper tag with the shift's tallies (served, left,
 ## takings, market, stars), the order slips on a ticket rail (OrderTicket3D),
-## and pinned buttons (Thực đơn, Sửa quán, Đóng sớm, Ra khơi). Words live in
+## and the pinned Đóng sớm button (leaving is a walk to a street end). Words live in
 ## tooltips. Reads the scene each frame; the scene only listens to the signals.
 
-signal menu_requested
-signal renovate_requested
 signal close_requested
-signal sail_requested
 
 const CONFIRM_SECONDS := 3.0
 ## Ticket rail: between the left plank and the right buttons.
@@ -27,10 +24,7 @@ var plank: PanelContainer
 var tally: PanelContainer
 ## The rail holding the order slips (kept under its old name).
 var ticket_row: TicketRail3D
-var menu_button: Button
-var renovate_button: Button
 var close_button: Button
-var sail_button: Button
 var _day: Label
 var _time: Label
 var _money: Label
@@ -52,16 +46,8 @@ func setup(room_node: Node3D, theme: Theme, _style: StyleBoxFlat = null) -> void
 	ticket_row.position = RAIL.position
 	ticket_row.size = RAIL.size
 	add_child(ticket_row)
-	menu_button = _button("Thực đơn", "menu", Vector2(528, 6), theme)
-	menu_button.pressed.connect(func() -> void: menu_requested.emit())
-	renovate_button = _button("Sửa quán", "hammer", Vector2(528, 30), theme)
-	renovate_button.pressed.connect(func() -> void: renovate_requested.emit())
 	close_button = _button("Đóng sớm", "moon", Vector2(528, 6), theme)
 	close_button.pressed.connect(_on_close_pressed)
-	sail_button = _button("Ra khơi", "boat", Vector2(520, 290), theme)
-	sail_button.theme_type_variation = &"SignButton"
-	sail_button.pressed.connect(func() -> void: sail_requested.emit())
-	sail_button.custom_minimum_size = Vector2(110, 30)
 
 
 func _build_plank() -> void:
@@ -149,12 +135,7 @@ func _process(delta: float) -> void:
 	for i in _stars.size():
 		_stars[i].modulate.a = 1.0 if i < GameState.last_rating else 0.25
 	var modal: bool = room.modal_open()
-	# Horror build: no menu planning, no renovation.
-	menu_button.visible = false
-	renovate_button.visible = false
-	renovate_button.position.y = 30.0 if menu_button.visible else 6.0
 	close_button.visible = running and room.seconds_left > 0.0 and not modal
-	sail_button.visible = false  # leaving is a walk to a street end (StreetEnds3D)
 	if not close_button.visible:
 		_confirm_left = 0.0
 		close_button.text = "Đóng sớm"

@@ -102,7 +102,6 @@ func _run() -> void:
 	room.auto_open = false
 	add_child(room)
 	await get_tree().process_frame
-	room.planning_panel.hide()
 	room.player.position = Vector3(0,0,RestaurantLayout3D.BACK_Z+.4)
 	var right: Vector3 = room.demo_camera.global_basis.x
 	var back: Vector3 = room.demo_camera.global_basis.z

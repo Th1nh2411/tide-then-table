@@ -71,7 +71,7 @@ func finish_meal(table: int) -> void:
 	var ingredients: Array[InventoryItem] = order["items"]
 	var visit: Dictionary = order.get("visit", {})
 	var plate := DishShelf.Plate.new(dish, ingredients, float(order["multiplier"]), visit)
-	var variety := MenuPlan.variety_multiplier(host.opening_variety, MenuPanel3D.VARIETY_TABLE)
+	var variety := 1.0  # fixed menu: no variety bonus or penalty
 	# plate_price already applies today's dish; the well-off bonus is applied below.
 	var price := TableBill.plate_price(plate, variety, 1.0)
 	if bool(order.get("rich", false)):

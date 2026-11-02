@@ -60,6 +60,7 @@ func _ready() -> void:
 	GameState.resume_at = "home"
 	SaveSystem.autosave("home")
 	Sfx.ambience("sea")
+	Sfx.bed("room")
 
 
 func _physics_process(_delta: float) -> void:

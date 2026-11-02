@@ -13,7 +13,6 @@ func _run() -> void:
 	add_child(room)
 	room.set_process(false)
 	room.set_physics_process(false)
-	room.planning_panel.hide()
 	for child in room.get_children():
 		if child is CustomerTraffic3D: child.set_process(false)
 	for guest: PersonRig3D in room.guests:

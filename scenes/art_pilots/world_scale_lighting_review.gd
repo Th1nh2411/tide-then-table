@@ -20,7 +20,6 @@ func _run() -> void:
 	add_child(room)
 	room.set_process(false)
 	room.set_physics_process(false)
-	room.planning_panel.hide()
 	for guest in room.guests: guest.visible = true
 	var vy := PersonRig3D.build(room,"vy")
 	vy.position = Vector3(-2.5,0,1.0)

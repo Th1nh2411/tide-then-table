@@ -4,7 +4,7 @@ extends Node3D
 ## Orchestrator: room -> RestaurantRoomBuilder3D, overlay -> RestaurantPanels3D,
 ## Bảo + helpers -> RestaurantCrew3D, debug keys -> RestaurantDebug3D, shift
 ## clock -> RestaurantShift3D, orders -> RestaurantService3D, E -> RestaurantInteract3D,
-## Rin's walking -> RinMover3D, market / renovation -> RestaurantShop3D.
+## Rin's walking -> RinMover3D, the street ends -> StreetEnds3D.
 ## The underscore wrappers stay: tests and the bot call them.
 
 const SEA_SCENE := RestaurantShift3D.SEA_SCENE
@@ -53,8 +53,6 @@ const MEAL_SECONDS := 5.0
 @export var roll_cooldown: float = 0.8
 var plan: MenuPlan
 var market_stock: MarketStock
-var bag := MarketBag3D.new()
-var renovation: RenovationPreview3D
 var staff_roster: StaffRoster
 var regular_visits: Array[Dictionary] = []
 var regular_queue: Array[Dictionary] = []
@@ -64,14 +62,12 @@ var guests: Array[Node3D] = []
 var order_labels: Array[Label3D] = []
 var orders: Array[Dictionary] = []
 var hud: RestaurantHud3D
-var planning_panel: MenuPanel3D
 var panels: RestaurantPanels3D
 var crew: RestaurantCrew3D
 var service: RestaurantService3D
 var mover: RinMover3D
 var interaction: RestaurantInteract3D
 var shift: RestaurantShift3D
-var shop: RestaurantShop3D
 var debug_keys: RestaurantDebug3D
 var cooking_overlay: CookingOverlay
 var staff_workers: Array[Dictionary]:
@@ -124,7 +120,6 @@ func _ready() -> void:
 	mover = RinMover3D.new(self)
 	interaction = RestaurantInteract3D.new(self)
 	shift = RestaurantShift3D.new(self)
-	shop = RestaurantShop3D.new(self)
 	debug_keys = RestaurantDebug3D.new(self)
 	market_stock = MarketStock.new(GameState.pantry)
 	staff_roster = StaffRoster.new(staff_catalog, GameState.staff)
@@ -147,10 +142,10 @@ func _ready() -> void:
 	StreetEnds3D.build(self)
 	_play_arrival.call_deferred()
 	Sfx.ambience("street")
+	Sfx.bed("street")
 
 ## No cutscenes in the horror build: the shift simply opens when Rin arrives.
 func _play_arrival() -> void:
-	planning_panel.hide()
 	if auto_open and not shift_over:
 		_open_shift()
 
@@ -167,27 +162,12 @@ func _move_staff(delta: float) -> void:
 func _tick_bao(delta: float) -> void:
 	crew.tick_bao(delta)
 
-# --- Market / renovation ---
-func _open_market() -> void:
-	panels.open_market()
-
-func _buy_market(dish: DishData, bulk: bool) -> void:
-	shop.buy_market(dish, bulk)
-
-func _open_renovation() -> void:
-	shop.open_renovation()
-
 func _buy_upgrade(upgrade: UpgradeData) -> void:
-	shop.buy_upgrade(upgrade)
+	if GameState.buy_upgrade(upgrade):
+		_show_note("Đã nâng cấp %s." % upgrade.display_name)
 
-func is_renovating() -> bool:
-	return shop.is_renovating()
-
-## Any full panel on screen: Rin freezes, E hints and other buttons step aside.
-## (The end-of-shift summary is a note, not a modal: Rin still walks and the evening buttons stay.)
 func modal_open() -> bool:
-	return planning_panel.visible or panels.market_panel.visible \
-		or is_renovating() or cooking_overlay.is_running()
+	return cooking_overlay.is_running()
 
 # --- Frame loop ---
 func _open_shift() -> void:
@@ -224,11 +204,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if debug_keys.handle(key):
 		get_viewport().set_input_as_handled()
 		return
-	if panels.market_panel.visible:
-		if key.physical_keycode == KEY_ESCAPE or key.physical_keycode == KEY_E:
-			panels.market_panel.hide()
-			get_viewport().set_input_as_handled()
-		return
 	if key.physical_keycode == KEY_E:
 		_interact()
 		get_viewport().set_input_as_handled()
@@ -238,15 +213,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _close_early() -> void:
 	shift.close_early()
-
-func _toggle_planning() -> void:
-	if shift_running or shift_over:
-		return
-	if planning_panel.visible:
-		planning_panel.close()
-	else:
-		panels.market_panel.hide()
-		planning_panel.open()
 
 func _interact() -> void:
 	interaction.interact()
