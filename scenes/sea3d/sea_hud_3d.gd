@@ -1,9 +1,8 @@
 class_name SeaHud3D
 extends RefCounted
-## HUD (SeaHudView3D: icon chips, key caps, speech strip), shared UI (pause,
-## hold), edge navigation and first-time guides of the 3D sea.
-## Host (SeaScene3D) fields written: hud_view, message, new_catch_card,
-## hold_ui, navigation.
+## HUD (SeaHudView3D: icon chips, key caps, speech strip), the pause menu,
+## edge navigation and first-time guides of the 3D sea.
+## Host (SeaScene3D) fields written: hud_view, message, navigation.
 
 static func build_hud(sea: SeaScene3D) -> void:
 	var layer := CanvasLayer.new()
@@ -17,17 +16,9 @@ static func build_hud(sea: SeaScene3D) -> void:
 	layer.add_child(sea.message)
 
 static func build_shared_ui(sea: SeaScene3D) -> void:
-	# Reuse the existing pause and hold scenes.
-	sea.new_catch_card = NewCatchCard.new()
-	sea.add_child(sea.new_catch_card)
 	var pause := load("res://scenes/ui/pause_menu.tscn") as PackedScene
 	if pause:
 		sea.add_child(pause.instantiate())
-	var hold_scene := load("res://scenes/ui/hold_ui.tscn") as PackedScene
-	if hold_scene:
-		sea.hold_ui = hold_scene.instantiate() as HoldUI
-		sea.add_child(sea.hold_ui)
-		sea.hold_ui.setup(sea.hold)
 
 static func update(sea: SeaScene3D) -> void:
 	sea._next_line()
@@ -43,15 +34,12 @@ static func build_navigation(sea: SeaScene3D) -> void:
 	layer.add_child(navigation)
 	sea.navigation = navigation
 	var guide := Guide.new()
-	guide.blocked = func() -> bool: return sea.fishing or sea.ending or (sea.hold_ui and sea.hold_ui.visible)
+	guide.blocked = func() -> bool: return sea.fishing or sea.ending
 	sea.add_child(guide)
 	# No pointer to shoals: the hint is the bubbles themselves.
 	guide.add("sea3d_bubbles", "Tìm bọt khí trên mặt biển", func() -> bool: return not sea.fishing and sea._casts_used_total() == 0,
 		func() -> Vector2: return navigation.call("screen_point", sea.boat.position + Vector3(0, 3.0, 0)),
 		func() -> bool: return sea.fishing or sea._casts_used_total() > 0)
-	guide.add("sea3d_dock", "Về bến dỡ cá", func() -> bool: return not sea.fishing and sea.hold.fill_fraction() >= 0.6,
-		func() -> Vector2: return navigation.call("screen_point", sea.START),
-		func() -> bool: return sea.hold.items.is_empty())
 
 static func navigation_targets(sea: SeaScene3D) -> Array[Dictionary]:
 	var targets: Array[Dictionary] = [{"pos": sea.START, "label": "Bến", "color": "f2d98a"}]

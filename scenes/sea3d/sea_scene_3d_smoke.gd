@@ -10,14 +10,7 @@ func _run() -> void:
 	var sea := (load("res://scenes/sea3d/sea_scene_3d.tscn") as PackedScene).instantiate()
 	add_child(sea)
 	await get_tree().process_frame
-	sea.new_catch_card.queue_free()
-	sea.new_catch_card = null
-	var fish: FishData = sea.fish_catalog.fish[0]
-	sea._on_catch_detailed(fish, true, 1.0, 1, 1.0)
-	var state := GameState
-	var passed: bool = sea.hold.items.size() == 1 and int(state.caught_species.get(fish.id, 0)) == 1
-	sea._unload()
-	passed = passed and sea.hold.items.is_empty()
+	var passed: bool = sea.rod != null and sea.rod.basket.count() == 0 and sea.rod.state == Fishing3D.State.IDLE
 	Input.action_press("throttle_forward")
 	var start_z: float = sea.boat.position.z
 	for i in range(45):

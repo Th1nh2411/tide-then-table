@@ -43,7 +43,10 @@ func _ready() -> void:
 	sea._said.clear()
 	sea.status_until = 0.0
 	sea._next_line()
-	sea._store_catch(omen_fish, 1.0, 1, 1.0)
+	# Landed on the rod (Fishing3D), as the fight's end does it.
+	sea.rod.fish = omen_fish
+	sea.rod.size = 1.0
+	BiteReel3D.land(sea.rod)
 	var warned := sea.message.text.contains("phát sáng")
 	for line: Array in sea._said:
 		warned = warned or str(line[0]).contains("phát sáng")

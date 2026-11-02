@@ -14,6 +14,14 @@ const CHOICE_FLAG := "night_choice"
 ## Set by the omen system (H5) for tonight.
 const OMEN_FLAG := "omen_tonight"
 const LOOP_FLAG := "loop_count"
+## Fish in the basket when Rin docked (set with the "out" choice).
+const CATCH_FLAG := "night_catch"
+## A calm night is only right with this many fish brought home.
+const MIN_FISH := 3
+## For the day after a right night: the fish Bảo has (restaurant tray), and
+## "stayed home on an omen night" (Bảo grumbles, no penalty).
+const SHOP_FISH_FLAG := "shop_fish"
+const NO_FISH_FLAG := "bao_no_fish"
 const KEPT_PREFIXES: Array[String] = ["note_", "tip_"]
 
 enum Result { NONE, NEXT, RESET, END }
@@ -21,6 +29,9 @@ enum Result { NONE, NEXT, RESET, END }
 ## The last choice take_result() judged ("out" / "home" / ""), so the bedroom
 ## can tell how the night went wrong.
 static var last_choice := ""
+## True when the last judged night was calm and went wrong (stayed home or
+## came back short): the bedroom shows the ghosts' visit.
+static var last_calm_miss := false
 
 
 static func lunar_day(day: int) -> int:
@@ -39,28 +50,46 @@ static func loops() -> int:
 	return int(GameState.story_flags.get(LOOP_FLAG, 0))
 
 
-static func choose(went_out: bool) -> void:
+## `fish`: what the basket holds on docking (only counts when going out).
+static func choose(went_out: bool, fish: int = 0) -> void:
 	GameState.set_flag(CHOICE_FLAG, "out" if went_out else "home")
+	GameState.set_flag(CATCH_FLAG, fish if went_out else 0)
 
 
-## Judges last night's choice, if one is pending, and clears it.
+static func shop_fish() -> int:
+	return int(GameState.story_flags.get(SHOP_FISH_FLAG, 0))
+
+
+## Judges last night's choice, if one is pending, and clears it. A right
+## night also leaves SHOP_FISH_FLAG / NO_FISH_FLAG for the next day.
 static func take_result() -> Result:
 	var choice: Variant = GameState.story_flags.get(CHOICE_FLAG, "")
+	var fish := int(GameState.story_flags.get(CATCH_FLAG, 0))
 	GameState.story_flags.erase(CHOICE_FLAG)
+	GameState.story_flags.erase(CATCH_FLAG)
 	last_choice = str(choice)
+	last_calm_miss = false
 	if choice != "out" and choice != "home":
 		return Result.NONE
+	var went_out: bool = choice == "out"
 	if RamNight.is_ram(GameState.day):
-		return Result.RESET if RamNight.current(choice == "out") == RamNight.Ending.LOOP else Result.END
+		return Result.RESET if RamNight.current(went_out) == RamNight.Ending.LOOP else Result.END
 	var omen := GameState.has_flag(OMEN_FLAG)
-	if (choice == "out") == omen:
+	if omen and went_out:
 		return Result.RESET
+	if not omen and (not went_out or fish < MIN_FISH):
+		last_calm_miss = true
+		return Result.RESET
+	GameState.set_flag(SHOP_FISH_FLAG, fish if went_out else 0)
+	if omen:
+		GameState.set_flag(NO_FISH_FLAG)
+	else:
+		GameState.story_flags.erase(NO_FISH_FLAG)
 	return Result.NEXT
 
 
 static func next_day() -> void:
 	GameState.story_flags.erase(OMEN_FLAG)
-	GameState.story_flags.erase(NewsData.MISSING_FLAG)
 	GameState.advance_day(0.0)
 
 

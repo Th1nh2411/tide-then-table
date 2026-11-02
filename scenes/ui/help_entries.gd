@@ -28,8 +28,8 @@ const TABS: Array[Dictionary] = [
 	]},
 	{"tab": "Mẹo", "icon": "sparkles", "groups": [
 		{"icon": "sparkles", "title": "Mẹo", "rows": [
-			["@sparkles", "Bọt nhiều = nhiều cá"], ["@boat", "Xa bờ = cá to"],
-			["@lamp", "Đá ngầm: trong tầm đèn"]]},
+			["@sparkles", "Gần bọt khí cá cắn nhanh"], ["@boat", "Xa bờ = cá to"],
+			["@lamp", "Đá ngầm: trong tầm đèn"], ["@rod", "Dây đỏ là sắp đứt"]]},
 		{"icon": "settings", "title": "Phím chung", "rows": [
 			["Chuột", "Nhìn quanh"], ["Alt", "Hiện con trỏ"],
 			["Esc", "Tạm dừng"], ["F11", "Toàn màn hình"], ["@save", "Tự lưu khi ngủ dậy"]]},

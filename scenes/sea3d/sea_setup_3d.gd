@@ -1,30 +1,11 @@
 class_name SeaSetup3D
 extends RefCounted
-## One-time wiring of the 3D sea's story bridge (cutscenes), the 2D fishing
-## overlay (catch signals, hold) and the cast cinematic + start camera.
-
-const FISHING_OVERLAY := "res://scenes/fishing3d/fishing_overlay_3d.tscn"
+## One-time wiring of the 3D sea: the first-person rod + basket (Fishing3D),
+## the night's story nodes and the start camera.
 
 
 static func build_tools(sea: SeaScene3D) -> void:
-	var packed := load(FISHING_OVERLAY) as PackedScene
-	if packed:
-		var overlay := packed.instantiate() as CanvasLayer
-		sea.overlay = overlay
-		sea.add_child(overlay)
-		overlay.connect("catch_detailed", sea._on_catch_detailed)
-		overlay.connect("catch_finished", sea._on_catch_finished)
-		overlay.connect("rin_fainted", sea._on_rin_fainted)
-		overlay.call("bind_hold", sea.hold_ui)
-	else:
-		push_error("SeaScene3D: fishing overlay unavailable")
-	var cinematic := CastCinematic3D.new()
-	cinematic.sea = sea
-	cinematic.camera = sea.camera
-	cinematic.boat_visual = sea.boat_visual
-	cinematic.hidden_figure = sea.rin_figure
-	sea.cinematic = cinematic
-	sea.add_child(cinematic)
+	sea.rod = Fishing3D.attach(sea)
 	DarkNight3D.attach(sea)  # đêm âm: only when tonight has an omen
 	NightErrand3D.attach(sea)  # calm nights: one thing to pick up out there
 	RamSea3D.attach(sea)  # rằm: the tea's drowsiness, or the ghost-lights to the raft

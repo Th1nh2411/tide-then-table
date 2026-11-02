@@ -7,7 +7,7 @@ extends RefCounted
 const MIN_FISH: int = 3
 const MAX_FISH: int = 6
 const BIG_MAX_FISH: int = 3
-## Most fish the minigame shows at once (same cap as before).
+## Cap on school_count() (bubble density hints; the old minigame showed this many).
 const SCHOOL_CAP: int = 6
 const CLEARANCE_PX: float = 30.0
 const MIN_DISTANCE_PX: float = 120.0
@@ -27,7 +27,7 @@ class Shoal extends RefCounted:
 	var big_shadow: bool = false
 	var featured: FishData
 
-	## Fish shown in the minigame for the next cast.
+	## Fish left, capped (kept for tests / hints).
 	func school_count() -> int:
 		return mini(fish_left, SCHOOL_CAP)
 

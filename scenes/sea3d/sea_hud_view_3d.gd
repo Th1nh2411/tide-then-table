@@ -2,11 +2,13 @@ class_name SeaHudView3D
 extends Control
 ## The 3D sea's HUD, icon first (words in tooltips): a weathered plank top-left
 ## with the boat and clock, then meters for lamp oil, hull and the
-## hold (fish count); the E / R action as key caps + an icon bottom-right; Rin's lines on the
+## basket (fish count); the R action as key caps + an icon bottom-right; Rin's lines on the
 ## paper SpeechStrip bottom-left; on the first night a small key card.
 ## SeaHud3D.update calls `refresh` every frame.
 
 const SCREEN := Vector2(640, 360)
+## Fish that fill the basket meter (it only shows how full the giỏ looks).
+const BASKET_FULL := 8.0
 
 var speech: SpeechStrip
 var _time: Label
@@ -66,7 +68,7 @@ func _build_plank() -> void:
 	_hull = HudChips.meter(gauges, "wrench", Color("c7cfcc"), "Thân thuyền", Color("a8ca58"), 22)
 	_hull.low = 0.3
 	_hull.segments = 4
-	_hold = HudChips.meter(gauges, "fish", Color("73bed3"), "Khoang cá", Color("73bed3"), 22)
+	_hold = HudChips.meter(gauges, "fish", Color("73bed3"), "Giỏ cá", Color("73bed3"), 22)
 	_hold.low = 0.0
 	_fish = HudChips.number(10)
 	(_hold.get_parent() as HBoxContainer).add_child(_fish)
@@ -80,7 +82,7 @@ func _key_card() -> PanelContainer:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 2)
 	card.add_child(column)
-	for entry: Array in [["WASD", "boat"], ["E", "hook"], ["Tab", "crate"], ["Esc", "pause"]]:
+	for entry: Array in [["WASD", "boat"], ["Chuột", "hook"], ["E", "basket"], ["Esc", "pause"]]:
 		var row := _key_row(str(entry[0]), str(entry[1]), Color("3c5e8b"))
 		column.add_child(row)
 	card.position = Vector2(SCREEN.x - 70.0, 6.0)
@@ -108,10 +110,9 @@ func refresh(sea: SeaScene3D) -> void:
 	_time.text = DayClock.get_time_text()
 	_oil.set_value(sea.oil / maxf(sea.oil_capacity, 1.0))
 	_hull.set_value(GameState.boat_hp / 100.0)
-	var fill := sea.hold.fill_fraction()
-	_hold.set_value(fill)
-	_hold.color = Color("cf573c") if fill >= 0.8 else Color("73bed3")
-	HudChips.show_number(_fish, sea.hold.items.size())
+	var fish: int = sea.rod.basket.count() if sea.rod else 0
+	_hold.set_value(clampf(fish / BASKET_FULL, 0.0, 1.0))
+	HudChips.show_number(_fish, fish)
 	_keys.visible = GameState.is_first_day() and not sea.fishing
 	_set_prompt(_prompt_spec(sea))
 	if sea.message.text != speech.current:
@@ -124,8 +125,8 @@ func refresh(sea: SeaScene3D) -> void:
 ## [[key, icon], ...] + optional place name.
 func _prompt_spec(sea: SeaScene3D) -> Array:
 	if sea._at_dock():
-		return [[["E", "crate"], ["R", "house"]], ""]
-	return [[["E", "hook"]], ""]
+		return [[["R", "house"]], ""]
+	return [[], ""]
 
 
 func _set_prompt(spec: Array) -> void:

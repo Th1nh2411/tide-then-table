@@ -11,6 +11,8 @@ const DOOR := Vector3(1.5, 0, -2.0)
 const PAPER := Vector3(1.4, 0.01, -1.55)
 const CALENDAR := Vector3(-0.6, 1.5, -1.93)  # wall face is at z -1.95
 const START := Vector3(-0.7, 0, 0.9)
+## Floor beside the bed, by the pillow end (wet footprints end here).
+const BEDSIDE := Vector3(-1.0, 0, 1.15)
 
 
 static func build(host: Node3D) -> Label3D:

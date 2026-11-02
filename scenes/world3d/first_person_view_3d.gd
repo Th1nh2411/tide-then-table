@@ -4,8 +4,8 @@ extends Node
 ## start; F10 in debug builds toggles it): a camera at Rin's eyes, mouse look, his
 ## own body hidden from it. Restaurant: it becomes the host's `demo_camera`,
 ## so WASD already walks where he looks. Sea: the look turns with the boat and
-## the boat lamp follows it like a hand lamp. The cast cinematic gets the
-## game camera back while it plays. Hold Alt (or open a
+## the boat lamp follows it like a hand lamp; fishing stays in this view
+## (Fishing3D). Hold Alt (or open a
 ## panel) for the mouse cursor. Removing the node restores everything.
 
 const HIDDEN_LAYER := 1 << 19  # Rin's own mesh: drawn for others, not for this camera
@@ -51,13 +51,9 @@ func _process(_delta: float) -> void:
 		_attach(scene)
 	if _scene == null:
 		return
-	var handed_back := _scene is SeaScene3D and (_scene as SeaScene3D).fishing
-	if handed_back:
-		if _camera.current and is_instance_valid(_game_camera):
-			_game_camera.make_current()
-	elif not _camera.current:
+	if not _camera.current:
 		_camera.make_current()
-	_update_mouse(handed_back)
+	_update_mouse()
 	if _walks(_scene):
 		_follow_walker(_scene)
 	elif _scene is SeaScene3D:
@@ -127,8 +123,8 @@ func _hide_meshes(root: Node) -> void:
 		_hidden.append(mesh)
 
 
-func _update_mouse(handed_back: bool) -> void:
-	var busy := handed_back or get_tree().paused or Input.is_key_pressed(KEY_ALT)
+func _update_mouse() -> void:
+	var busy := get_tree().paused or Input.is_key_pressed(KEY_ALT)
 	if _scene is RestaurantScene3D and (_scene as RestaurantScene3D).modal_open():
 		busy = true
 	var mode := Input.MOUSE_MODE_VISIBLE if busy else Input.MOUSE_MODE_CAPTURED
@@ -161,7 +157,7 @@ func _follow_sea(sea: SeaScene3D) -> void:
 	var boat_yaw := sea.boat.global_rotation.y
 	_camera.global_position = rider.global_position + Vector3(0, EYE_SEA, 0)
 	_camera.global_rotation = Vector3(_pitch, boat_yaw + _yaw, 0)
-	if is_instance_valid(_lamp) and not sea.fishing:
+	if is_instance_valid(_lamp):
 		# Hand lamp: shines where Rin looks, a little lower.
 		var aim := Basis.from_euler(Vector3(_pitch - 0.25, boat_yaw + _yaw, 0))
 		_lamp.global_basis = aim

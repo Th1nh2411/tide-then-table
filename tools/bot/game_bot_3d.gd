@@ -3,7 +3,8 @@ extends Node
 ## rằm, then the ending: bedroom -> waterfront (morning) -> restaurant ->
 ## waterfront (evening) -> house (sleep) or thúng (night at sea) -> bedroom.
 ## Perfect info: on omen nights (OmenPicker) it goes into the house to sleep,
-## otherwise down into the thúng. Once (day 2 of the first loop) it picks the
+## otherwise down into the thúng and brings back LoopCalendar.MIN_FISH fish
+## through the real rod (Fishing3D: cast, bite, hook, reel, basket). Once (day 2 of the first loop) it picks the
 ## wrong one to check the reset to mùng 9. On rằm it takes the true path:
 ## refuses anh Út's tea, goes out, follows the ghost-lights to the raft and
 ## plays the dawn epilogue (RamNight). Travel and minigame skill are scripted;
@@ -26,14 +27,6 @@ func _process(_delta: float) -> void:
 	_ticks += 1
 	if _ticks > 40000:
 		_fail("watchdog")
-	var scene: Node = get_tree().current_scene
-	if not scene:
-		return
-	if scene.scene_file_path == SEA:
-		if scene.new_catch_card and scene.new_catch_card.visible:
-			scene.new_catch_card._next()
-		if scene.hold_ui and scene.hold_ui.visible:
-			scene.hold_ui.close()
 
 func _frames(count: int) -> void:
 	for i: int in range(count):
@@ -51,33 +44,55 @@ func _until_any(paths: Array[String]) -> Node:
 	_fail("scene " + str(paths))
 	return null
 
-func _finish_fishing(sea: Node) -> void:
-	var overlay: FishingOverlay3D = sea.overlay
-	if not overlay.active:
-		_fail("fishing did not start")
-		return
-	overlay._minigame.result_seconds = 0.01
-	overlay._minigame._game._finish(true, true)
-	for i: int in range(120):
-		await get_tree().process_frame
-		if not overlay.active and not get_tree().paused:
-			return
-	_fail("fishing did not end")
+## One fish into the basket the way a player does it: cast at `at`, wait for
+## the bite (forced), click in the window, reel while the line is not too
+## tight, look... and E (drop_in_basket). Ticks the rod faster than frames.
+func _catch_one(sea: Node, at: Vector3) -> bool:
+	var rod: Fishing3D = sea.rod
+	var before: int = rod.basket.count()
+	for attempt: int in range(8):
+		if sea.ending or not rod.cast(at):
+			return false
+		while rod.state == Fishing3D.State.CASTING:
+			rod.tick(0.05)
+		rod.force_bite()
+		rod.press()  # the click inside the "!" window
+		var steps := 0
+		while rod.state == Fishing3D.State.REELING and steps < 4000:
+			rod.hold_override = rod.reel.tension < (0.45 if rod.reel.running else 0.75)
+			rod.tick(0.05)
+			steps += 1
+			if steps % 40 == 0:
+				await get_tree().process_frame
+		rod.hold_override = false
+		if rod.state == Fishing3D.State.HOLDING:
+			rod.drop_in_basket()
+			return rod.basket.count() > before
+	return false
 
+## A calm night: fish at the nearest reachable shoals until the basket holds
+## MIN_FISH, then row home (placed at the dock) and end the trip.
 func _night(sea: Node) -> void:
 	var range_z: float = SeaLayout3D.reach_z(sea.boat_data.max_depth)
 	for shoal: SeaShoals3D.Shoal in sea.shoals:
-		var target: Vector3 = shoal.pos
-		if target.z < range_z:
+		if sea.rod.basket.count() >= LoopCalendar.MIN_FISH or sea.ending:
+			break
+		if shoal.pos.z < range_z or shoal.fish_left <= 0:
 			continue
-		sea.cast_cinematic_enabled = false
-		for cast: int in range(shoal.fish_left):
-			sea.boat.position = target
-			sea.boat.velocity = Vector3.ZERO
-			sea._try_fish()
-			await _finish_fishing(sea)
-			sea.boat.position = sea.START
-			sea._unload()
+		sea.boat.position = shoal.pos + Vector3(0, 0, 8.0)
+		sea.boat.velocity = Vector3.ZERO
+		while shoal.fish_left > 0 and sea.rod.basket.count() < LoopCalendar.MIN_FISH and not sea.ending:
+			if not await _catch_one(sea, shoal.pos):
+				break
+		await _frames(1)
+	if sea.ending:
+		return  # đêm âm took him
+	if sea.rod.basket.count() < LoopCalendar.MIN_FISH:
+		_fail("only %d fish tonight" % sea.rod.basket.count())
+		return
+	print("SEA | %s | basket %d" % [LoopCalendar.date_text(GameState.day), sea.rod.basket.count()])
+	sea.boat.position = sea.START
+	sea.boat.velocity = Vector3.ZERO
 	sea._end_trip(false)
 
 func _service(quan: Node) -> void:
@@ -118,7 +133,9 @@ func _service(quan: Node) -> void:
 	if not quan.shift_over:
 		_fail("restaurant failed to drain orders")
 		return
-	print("DAY %d | served %d | lost %d | rating %d" % [GameState.day, quan.served, quan.lost, GameState.last_rating])
+	var tray := quan.get_node(RestaurantFish3D.NODE_NAME) as RestaurantFish3D
+	print("DAY %d | served %d | lost %d | rating %d | fish on the tray %d | %s" % [GameState.day, quan.served, quan.lost,
+		GameState.last_rating, tray.fish_count, " / ".join(tray.lines)])
 	if RamNight.is_ram() and not _refuse_tea(quan):
 		return
 	_roundtrip()
@@ -151,6 +168,10 @@ func _run() -> void:
 		if room.scene_file_path == END:
 			print("RUN ENDING | 3D | day %d | loops %d" % [GameState.day, LoopCalendar.loops()])
 			get_tree().quit(1 if _failed else 0)
+			return
+		var visited: bool = room.has_node(WetFootprints3D.NODE_NAME)
+		if visited != (expect_reset == "home on a calm night"):
+			_fail("wet footprints %s after '%s'" % ["shown" if visited else "missing", expect_reset])
 			return
 		if expect_reset != "":
 			if GameState.day != 1 or LoopCalendar.loops() != 1:
