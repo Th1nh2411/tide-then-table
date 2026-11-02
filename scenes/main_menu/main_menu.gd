@@ -1,126 +1,114 @@
 extends Control
-## Main menu: Continue (only if a save exists) / New Game / Hướng dẫn / Quit,
-## over a living night backdrop (MainMenuBackdrop), with an animated sign title.
+## Main menu of the horror build: the key art (slow push-in, the pier lamp
+## flickers), "RIN" + subtitle in its dark left third, then Tiếp tục (only
+## with a save) / Chơi mới (press twice over a save) / Cài đặt / Thoát.
 
-## Horror build: every day (new game, continue) starts in Rin's room.
+## Every day (new game, continue) starts in Rin's room.
 const BEDROOM_SCENE_PATH: String = "res://scenes/home3d/bedroom_scene_3d.tscn"
-const SWAY_DEGREES: float = 0.8
+## Where the pier lamp sits in the key art (share of width / height).
+const LAMP_AT := Vector2(0.751, 0.462)
+## Push-in: zoom reached after PUSH_SECONDS, then back (ping-pong).
+const PUSH_ZOOM: float = 1.07
+const PUSH_SECONDS: float = 40.0
 
-@onready var _continue_button: Button = %ContinueButton
-@onready var _new_game_button: Button = %NewGameButton
-@onready var _quit_button: Button = %QuitButton
-@onready var _status_label: Label = %StatusLabel
-@onready var _sign: PanelContainer = %Sign
-@onready var _backdrop: Control = %Backdrop
-@onready var _buttons: VBoxContainer = %VBox
-
-## Set after the first "New Game" press when a save exists.
+var _art: TextureRect
+var _lamp: TextureRect
+var _title: Label
+var _subtitle: Label
+var _buttons: VBoxContainer
+var _continue_button: Button
+var _new_game_button: Button
+var _status: Label
+var _settings: SettingsPanel
+## Set after the first "Chơi mới" press when a save exists.
 var _confirm_new_game: bool = false
 var _time: float = 0.0
-var _next_flicker: float = 3.5
+var _next_flicker: float = 2.5
 
 
 func _ready() -> void:
 	Sfx.ambience("sea")
-	_continue_button.pressed.connect(_on_continue_pressed)
-	_new_game_button.pressed.connect(_on_new_game_pressed)
-	_quit_button.pressed.connect(_on_quit_pressed)
-	_dress_buttons()
-	_status_label.text = ""
+	Sfx.bed("sea")
+	MainMenuView.build(self)
+	_settings = SettingsPanel.new()
+	add_child(_settings)
+	_settings.closed.connect(_focus_first)
+	_continue_button = _add_button("Tiếp tục", _on_continue_pressed)
+	_new_game_button = _add_button("Chơi mới", _on_new_game_pressed)
+	_add_button("Cài đặt", _settings.open)
+	_add_button("Thoát", SceneRouter.quit_game)
+	_buttons.add_child(_status)
 	_continue_button.visible = SaveSystem.has_save()
-	var primary := _continue_button if _continue_button.visible else _new_game_button
-	primary.theme_type_variation = &"AccentButton"
-	primary.grab_focus()
-	for child in _buttons.get_children() + %IconRow.get_children():
-		if child is Button:
-			UiFx.hover_lift(child as Button, 0.06)
+	_focus_first()
 	_play_intro()
 
 
-## Icon + one word for the big buttons; help / sound / quit are icon-only.
-func _dress_buttons() -> void:
-	UiIcons.dress(_continue_button, "play", 16, UiIcons.CHALK)
-	UiIcons.dress(_new_game_button, "boat", 18)
-	var help := HelpPanel.new()
-	add_child(help)
-	var row: HBoxContainer = %IconRow
-	var help_button := UiIcons.icon_button("help", "Hướng dẫn")
-	help_button.pressed.connect(help.open)
-	row.add_child(help_button)
-	row.move_child(help_button, 0)
-	var sound := UiIcons.icon_button("sound_off" if Sfx.muted else "sound_on", "Âm thanh")
-	sound.pressed.connect(func() -> void:
-		Sfx.set_muted(not Sfx.muted)
-		sound.icon = UiIcons.sticker("sound_off" if Sfx.muted else "sound_on", 16))
-	row.add_child(sound)
-	row.move_child(sound, 1)
-	UiIcons.dress(_quit_button, "quit", 16)
-	_quit_button.custom_minimum_size = help_button.custom_minimum_size
-	# Edition line: small pictures instead of a sentence (fishing at night, street food).
-	var edition: HBoxContainer = %Edition
-	for id: String in ["moon", "rod", "fish"]:
-		edition.add_child(UiIcons.make(id, 16, UiIcons.SEA))
-	edition.add_child(UiIcons.make("lantern", 16, UiIcons.CHILI))
-	edition.add_child(UiIcons.make("meal", 16, UiIcons.AMBER))
-	var badge := Label.new()
-	badge.theme_type_variation = &"BadgeLabel"
-	badge.add_theme_font_size_override("font_size", 9)
-	badge.text = "3D"
-	edition.add_child(badge)
+## Called by MainMenuView: the nodes it built.
+func set_parts(art: TextureRect, lamp: TextureRect, title: Label, subtitle: Label,
+		buttons: VBoxContainer, status: Label) -> void:
+	_art = art
+	_lamp = lamp
+	_title = title
+	_subtitle = subtitle
+	_buttons = buttons
+	_status = status
 
 
-## Title drops in, then the buttons slide in one by one from the left.
+func _add_button(text: String, action: Callable) -> Button:
+	var button := HorrorUi.button(text, 14)
+	button.custom_minimum_size = Vector2(150, 0)
+	button.pressed.connect(action)
+	_buttons.add_child(button)
+	return button
+
+
+func _focus_first() -> void:
+	(_continue_button if _continue_button.visible else _new_game_button).grab_focus()
+
+
+## Title fades up out of the dark, then the buttons one by one.
 func _play_intro() -> void:
-	var animated: Array[Control] = [%Kicker, _sign, %Edition]
+	var parts: Array[Control] = [_title, _subtitle]
 	for child in _buttons.get_children():
-		if child is Control and (child as Control).visible and not child is Label:
-			animated.append(child as Control)
-	for control in animated:
-		control.modulate.a = 0.0
-	await get_tree().process_frame
-	await get_tree().process_frame  # containers have placed everything
-	UiFx.slide_in(%Kicker, Vector2(0, -10), 0.05)
-	# The sign drops on its chains and swings to rest, a little crooked.
-	UiFx.tilt(_sign, -2.0)
-	_sign.pivot_offset = Vector2(_sign.size.x * 0.5, 0)
-	UiFx.settle(_sign, Vector2(0, -60), 0.1)
-	UiFx.slide_in(%Edition, Vector2(0, 8), 0.3)
-	var i := 0
-	for child in _buttons.get_children():
-		var control := child as Control
-		if control and control.visible and not control is Label:
-			UiFx.slide_in(control, Vector2(-28, 0), 0.4 + 0.07 * i)
-			i += 1
+		parts.append(child as Control)
+	for part in parts:
+		part.modulate.a = 0.0
+	var tween := create_tween()
+	tween.tween_interval(0.4)
+	for part in parts:
+		tween.tween_property(part, "modulate:a", 1.0, 0.9 if part == _title else 0.35)
 
 
-## Sign sway + light spill + a tube-light flicker now and then.
+## Slow push-in + the pier lamp breathing, with a stutter now and then.
 func _process(delta: float) -> void:
 	_time += delta
-	if _time > 1.0:
-		_sign.rotation = deg_to_rad(-2.0 + sin(_time * 0.9) * SWAY_DEGREES)
-	var breath := 0.85 + 0.15 * sin(_time * 1.7)
-	_backdrop.set("title_glow_at", _sign.position + _sign.get_parent().position + _sign.size * Vector2(0.5, 0.55))
-	_backdrop.set("title_glow_strength", breath * 0.6)
+	var t := 0.5 - 0.5 * cos(_time / PUSH_SECONDS * PI)
+	_art.pivot_offset = _art.size * Vector2(0.62, 0.45)
+	_art.scale = Vector2.ONE * lerpf(1.0, PUSH_ZOOM, t)
+	var lamp_size := _art.size.y * 0.42
+	_lamp.size = Vector2.ONE * lamp_size
+	_lamp.position = _art.size * LAMP_AT - _lamp.size * 0.5
+	if _lamp.get_meta("stutter", false):
+		return
+	_lamp.modulate.a = 0.55 + 0.08 * sin(_time * 2.3) + 0.05 * sin(_time * 7.1)
 	if _time >= _next_flicker:
-		_next_flicker = _time + randf_range(4.0, 8.0)
-		_flicker()
+		_next_flicker = _time + randf_range(3.0, 7.0)
+		_stutter()
 
 
-func _flicker() -> void:
+func _stutter() -> void:
+	_lamp.set_meta("stutter", true)
 	var tween := create_tween()
-	tween.tween_property(_sign, "self_modulate", Color(0.55, 0.5, 0.45), 0.05)
-	tween.tween_property(_sign, "self_modulate", Color.WHITE, 0.05)
-	tween.tween_property(_sign, "self_modulate", Color(0.7, 0.65, 0.6), 0.04)
-	tween.tween_property(_sign, "self_modulate", Color(1.15, 1.1, 1.0), 0.08)
-	tween.tween_property(_sign, "self_modulate", Color.WHITE, 0.3)
+	for a: float in [0.15, 0.6, 0.05, 0.5, 0.25, 0.6]:
+		tween.tween_property(_lamp, "modulate:a", a, randf_range(0.03, 0.08))
+	tween.tween_callback(_lamp.set_meta.bind("stutter", false))
 
 
 func _on_continue_pressed() -> void:
 	if not SaveSystem.load_game():
-		_status_label.text = "Bản lưu bị lỗi. Hãy chơi mới."
-		UiFx.shake(_status_label)
+		_status.text = "Bản lưu bị lỗi. Hãy chơi mới."
+		UiFx.shake(_status)
 		_continue_button.hide()
-		_new_game_button.theme_type_variation = &"AccentButton"
 		_new_game_button.grab_focus()
 		return
 	SceneRouter.go_to(BEDROOM_SCENE_PATH)
@@ -131,10 +119,8 @@ func _on_new_game_pressed() -> void:
 	if SaveSystem.has_save() and not _confirm_new_game:
 		_confirm_new_game = true
 		_new_game_button.text = "Bấm lần nữa?"
-		_new_game_button.theme_type_variation = &"AccentButton"
-		_status_label.text = "Xóa bản lưu ngày %d!" % _saved_day()
+		_status.text = "Xoá bản lưu: %s" % LoopCalendar.date_text(_saved_day())
 		UiFx.shake(_new_game_button)
-		UiFx.pop_in(_status_label)
 		return
 	GameState.reset()
 	SceneRouter.go_to(BEDROOM_SCENE_PATH)  # mùng 9, Rin wakes in his room
@@ -143,11 +129,7 @@ func _on_new_game_pressed() -> void:
 func _saved_day() -> int:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(SaveSystem.SAVE_PATH)) == OK and json.data is Dictionary:
-		var day: Variant = json.data.get("day")
+		var day: Variant = (json.data as Dictionary).get("day")
 		if day is float or day is int:
 			return int(day)
-	return 0
-
-
-func _on_quit_pressed() -> void:
-	SceneRouter.quit_game()
+	return 1

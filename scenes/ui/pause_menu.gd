@@ -1,99 +1,62 @@
 class_name PauseMenu
 extends CanvasLayer
-## Esc menu for the sea and the restaurant: resume, then icon buttons for
-## Hướng dẫn (HelpPanel) / sound / main menu / quit (tooltips name them).
-## Runs while paused (PROCESS_MODE_ALWAYS in the scene).
-## Put it BEFORE other overlays in the tree: later nodes get input first, so
-## e.g. the hold window can use Esc to close itself before this opens.
+## Esc menu in every 3D place: Tiếp tục / Cài đặt (SettingsPanel) / Về menu
+## (press twice) / Thoát. The sea and the restaurant add it themselves,
+## SceneRouter adds it to the other 3D scenes. Runs while paused. Built in code.
 
+const GROUP := &"pause_menu"
+const SCENE_PATH := "res://scenes/ui/pause_menu.tscn"
 const MAIN_MENU_PATH: String = "res://scenes/main_menu/main_menu.tscn"
-const SAVE_NOTE: String = "Tự lưu khi ra khơi, về bến"
+const SAVE_NOTE: String = "Tự lưu mỗi sáng khi tỉnh dậy"
 
 var _confirm_menu: bool = false
-
-@onready var _resume_button: Button = %ResumeButton
-@onready var _menu_button: Button = %MenuButton
-@onready var _quit_button: Button = %QuitButton
-@onready var _note_label: Label = %NoteLabel
-@onready var _info: HBoxContainer = %Info
-@onready var _panel: PanelContainer = %Panel
-@onready var _dim: ColorRect = %Dim
-@onready var _icons: HBoxContainer = %IconRow
-
-var _help: HelpPanel
+var _dim: ColorRect
+var _panel: PanelContainer
+var _date: Label
+var _note: Label
+var _resume_button: Button
+var _menu_button: Button
+var _settings: SettingsPanel
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
+	layer = 30
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	_build()
+	_settings = SettingsPanel.new()
+	add_child(_settings)
+	_settings.closed.connect(func() -> void: _panel.show(); _resume_button.grab_focus())
 	hide()
-	_resume_button.pressed.connect(_resume)
-	_menu_button.pressed.connect(_on_menu_pressed)
-	_quit_button.pressed.connect(SceneRouter.quit_game)
-	UiIcons.dress(_resume_button, "play", 14, UiIcons.CHALK)
-	_help = HelpPanel.new()
-	add_child(_help)
-	_help.closed.connect(_resume_button.grab_focus)
-	var help_button := UiIcons.icon_button("help", "Hướng dẫn")
-	help_button.pressed.connect(_help.open)
-	_icons.add_child(help_button)
-	_icons.move_child(help_button, 0)
-	var sound_button := UiIcons.icon_button(_sound_icon(), "Âm thanh")
-	sound_button.pressed.connect(func() -> void:
-		Sfx.set_muted(not Sfx.muted)
-		sound_button.icon = UiIcons.sticker(_sound_icon(), 16))
-	_icons.add_child(sound_button)
-	_icons.move_child(sound_button, 1)
-	for pair: Array in [[_menu_button, "house"], [_quit_button, "quit"]]:
-		var button: Button = pair[0]
-		UiIcons.dress(button, str(pair[1]), 16)
-		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		button.custom_minimum_size = help_button.custom_minimum_size
-	for button in [_resume_button] + _icons.get_children():
-		UiFx.hover_lift(button as Control, 0.06)
-
-
-func _sound_icon() -> String:
-	return "sound_off" if Sfx.muted else "sound_on"
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not event.is_action_pressed("pause"):
+	if not event.is_action_pressed("pause") or _settings.visible:
 		return
 	if visible:
 		get_viewport().set_input_as_handled()
 		_resume()
 	elif not get_tree().paused:
-		# Something else (hold overflow, hold mid-fishing) owns the pause: leave it.
+		# Something else (a paper, a dialogue) owns the pause: leave it.
 		get_viewport().set_input_as_handled()
 		_open()
 
 
 func _open() -> void:
 	_confirm_menu = false
-	_menu_button.theme_type_variation = &""
-	_note_label.text = SAVE_NOTE
-	_note_label.remove_theme_color_override("font_color")
-	_fill_info()
+	_menu_button.text = "Về menu"
+	_note.text = SAVE_NOTE
+	_note.add_theme_color_override("font_color", HorrorUi.DIM)
+	_date.text = LoopCalendar.date_text(GameState.day)
 	get_tree().paused = true
 	show()
+	_panel.show()
 	_resume_button.grab_focus()
 	_dim.modulate.a = 0.0
 	var fade := _dim.create_tween()
 	fade.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	fade.tween_property(_dim, "modulate:a", 1.0, 0.18)
 	UiFx.pop_in(_panel)
-	UiFx.stagger(_icons, 0.05, 0.2)
-	var sign: Control = %Sign
-	UiFx.tilt(sign, -2.5)
-	UiFx.stamp(sign, _panel, 0.12)
-
-
-## Day and time as icon + number.
-func _fill_info() -> void:
-	for child in _info.get_children():
-		_info.remove_child(child)
-		child.queue_free()
-	_info.add_child(UiIcons.pair("calendar", "Ngày %d" % GameState.day, 12, UiIcons.SEA))
-	_info.add_child(UiIcons.pair("clock", DayClock.get_time_text(), 12, UiIcons.SEA))
 
 
 func _resume() -> void:
@@ -101,15 +64,57 @@ func _resume() -> void:
 	get_tree().paused = false
 
 
+func _open_settings() -> void:
+	_panel.hide()
+	_settings.open()
+
+
 ## Two presses: leaving loses everything since this morning's autosave.
 func _on_menu_pressed() -> void:
 	if not _confirm_menu:
 		_confirm_menu = true
-		_menu_button.theme_type_variation = &"AccentButton"
-		_note_label.text = "Bấm lần nữa: mất tiến độ đêm nay"
-		_note_label.add_theme_color_override("font_color", Color("f0a08a"))
+		_menu_button.text = "Bấm lần nữa"
+		_note.text = "Mất tiến độ từ sáng nay"
+		_note.add_theme_color_override("font_color", HorrorUi.BLOOD)
 		UiFx.shake(_menu_button)
 		return
 	get_tree().paused = false
 	hide()
 	SceneRouter.go_to(MAIN_MENU_PATH)
+
+
+func _build() -> void:
+	_dim = ColorRect.new()
+	_dim.color = Color(0, 0, 0, 0.62)
+	_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_dim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(center)
+	_panel = PanelContainer.new()
+	_panel.add_theme_stylebox_override("panel", HorrorUi.panel_style())
+	_panel.custom_minimum_size.x = 170
+	center.add_child(_panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 3)
+	_panel.add_child(box)
+	box.add_child(HorrorUi.label("TẠM DỪNG", 16, HorrorUi.LAMP))
+	_date = HorrorUi.label("", 10, HorrorUi.DIM)
+	box.add_child(_date)
+	var gap := Control.new()
+	gap.custom_minimum_size.y = 6
+	box.add_child(gap)
+	_resume_button = _add_button(box, "Tiếp tục", _resume)
+	_add_button(box, "Cài đặt", _open_settings)
+	_menu_button = _add_button(box, "Về menu", _on_menu_pressed)
+	_add_button(box, "Thoát", SceneRouter.quit_game)
+	_note = HorrorUi.label(SAVE_NOTE, 9, HorrorUi.DIM)
+	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(_note)
+
+
+func _add_button(box: VBoxContainer, text: String, action: Callable) -> Button:
+	var button := HorrorUi.button(text)
+	button.pressed.connect(action)
+	box.add_child(button)
+	return button
