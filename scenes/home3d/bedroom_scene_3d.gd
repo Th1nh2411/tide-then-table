@@ -8,7 +8,7 @@ extends Node3D
 ## through the door with E (out to the waterfront).
 
 const WATERFRONT := "res://scenes/home3d/waterfront_scene_3d.tscn"
-const ENDING := "res://scenes/ending/ending_scene.tscn"
+const ENDING := RamEpilogue3D.SCENE
 const NEWS: NewsData = preload("res://data/story/news.tres")
 const REACH := 1.3
 
@@ -30,8 +30,11 @@ var _calendar: Label3D
 
 
 func _ready() -> void:
+	var was_ram := RamNight.is_ram()
 	var result := LoopCalendar.take_result()
 	if result == LoopCalendar.Result.END:
+		# Rằm judged from here (fallback; the sea normally goes to the epilogue itself).
+		RamNight.finish(RamNight.current(LoopCalendar.last_choice == "out"))
 		leaving = true  # nothing is built; straight on to the ending
 		_go_to_ending()
 		return
@@ -66,6 +69,9 @@ func _ready() -> void:
 		if LoopCalendar.last_choice == "home":
 			GameState.set_flag(NewsData.MISSING_FLAG)
 		NightmareWake3D.play(self, "Hộc... hộc...")
+		if was_ram:
+			# Rằm went by with nothing found: the gate closes for a year.
+			_gate_closed()
 	GameState.resume_at = "home"
 	SaveSystem.autosave("home")
 	Sfx.ambience("sea")
@@ -109,6 +115,16 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if GameState.has_flag(NewsData.MISSING_FLAG):
 			page = NEWS.missing_item + "\n" + page
 		text.say("%s — %s\n%s" % [NEWS.title, LoopCalendar.date_text(GameState.day), page], 7.0)
+
+
+func _gate_closed() -> void:
+	# Over the wake's black screen, before Rin opens his eyes.
+	var over := OnScreenText.new()
+	add_child(over)
+	over.layer = 31
+	Sfx.play("whisper", 0.0)
+	await RamFx3D.say_lines(over, RamFx3D.LINES.gate_closed, 1.5)
+	over.queue_free()
 
 
 ## Called from _ready while the fade into this room is still running.

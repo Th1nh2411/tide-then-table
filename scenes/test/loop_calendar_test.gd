@@ -1,7 +1,7 @@
 extends Node
 ## Standalone test for LoopCalendar (run with F6): lunar dates, the right
 ## street end with and without an omen, reset to mùng 9 keeping only Rin's
-## notebook / tips / loop count, and the ending after the last night.
+## notebook / tips / loop count, and rằm judged by RamNight.
 
 
 func _ready() -> void:
@@ -25,7 +25,18 @@ func _ready() -> void:
 	failures += _check("next day clears the omen", GameState.day == 2 and not GameState.has_flag(LoopCalendar.OMEN_FLAG))
 	GameState.day = LoopCalendar.NIGHTS
 	LoopCalendar.choose(true)
-	failures += _check("last night right -> end", LoopCalendar.take_result() == LoopCalendar.Result.END)
+	failures += _check("rằm, out without the recording -> reset", LoopCalendar.take_result() == LoopCalendar.Result.RESET)
+	LoopCalendar.choose(false)
+	failures += _check("rằm, home -> reset (the gate closes)", LoopCalendar.take_result() == LoopCalendar.Result.RESET)
+	RamNight.set_tea(true)
+	LoopCalendar.choose(false)
+	failures += _check("rằm, drank + home -> reset", LoopCalendar.take_result() == LoopCalendar.Result.RESET)
+	LoopCalendar.choose(true)
+	failures += _check("rằm, drank + out -> end", LoopCalendar.take_result() == LoopCalendar.Result.END)
+	RamNight.set_tea(false)
+	GameState.set_flag(RamNight.EXPOSED_FLAG)
+	LoopCalendar.choose(true)
+	failures += _check("rằm, refused + recorded -> end", LoopCalendar.take_result() == LoopCalendar.Result.END)
 	GameState.money = 999
 	GameState.play_seconds = 120.0
 	GameState.set_flag("note_paper_1")
@@ -36,6 +47,7 @@ func _ready() -> void:
 	failures += _check("reset keeps notes, tips, play time", GameState.has_flag("note_paper_1")
 		and GameState.has_flag("tip_menu3d") and is_equal_approx(GameState.play_seconds, 120.0))
 	failures += _check("reset forgets the rest, counts loops", not GameState.has_flag("wave_mark") and LoopCalendar.loops() == 1)
+	failures += _check("reset forgets the tea and the recording", not RamNight.tea_answered() and not GameState.has_flag(RamNight.EXPOSED_FLAG))
 	LoopCalendar.reset_loop()
 	failures += _check("loop count grows", LoopCalendar.loops() == 2)
 	GameState.reset()

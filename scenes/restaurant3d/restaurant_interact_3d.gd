@@ -20,6 +20,7 @@ var host: Node3D
 var _co_nam_line := 0
 var _co_nam_omen_said := false
 var _co_nam_missing_said := false
+var _co_nam_ram_said := false
 
 
 func _init(owner: Node3D) -> void:
@@ -40,6 +41,10 @@ func interact() -> void:
 		if GameState.has_flag(NewsData.MISSING_FLAG) and not _co_nam_missing_said:
 			_co_nam_missing_said = true
 			host._show_note("%s: %s" % [CO_NAM.speaker, CO_NAM_MISSING])
+			return
+		if RamNight.is_ram() and not _co_nam_ram_said:
+			_co_nam_ram_said = true
+			host._show_note(RamFx3D.LINES.co_nam)
 			return
 		var omen := OmenPicker.tonight()
 		if omen and omen.co_nam_line != "" and not _co_nam_omen_said:

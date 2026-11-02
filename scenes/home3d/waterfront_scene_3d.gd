@@ -28,6 +28,8 @@ var text: OnScreenText
 func _ready() -> void:
 	evening = GameState.has_flag(EVENING_FLAG)
 	WaterfrontBuilder3D.build(self, evening)
+	if evening:
+		RamShore3D.attach(self)  # rằm: the village releases hoa đăng
 	var start := WaterfrontBuilder3D.EVENING_START if evening else WaterfrontBuilder3D.MORNING_START
 	player = Walker3D.make_player(self, start)
 	demo_camera = Camera3D.new()

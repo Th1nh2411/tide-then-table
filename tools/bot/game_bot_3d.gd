@@ -4,7 +4,9 @@ extends Node
 ## waterfront (evening) -> house (sleep) or thúng (night at sea) -> bedroom.
 ## Perfect info: on omen nights (OmenPicker) it goes into the house to sleep,
 ## otherwise down into the thúng. Once (day 2 of the first loop) it picks the
-## wrong one to check the reset to mùng 9. Travel and minigame skill are scripted;
+## wrong one to check the reset to mùng 9. On rằm it takes the true path:
+## refuses anh Út's tea, goes out, follows the ghost-lights to the raft and
+## plays the dawn epilogue (RamNight). Travel and minigame skill are scripted;
 ## scenes, service, bills, story and transitions are real.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
@@ -141,6 +143,8 @@ func _service(quan: Node) -> void:
 		GameState.buy_upgrade(upgrade)
 	print("DAY %d | served %d | lost %d | money %dk | boat %d | kitchen %d" % [GameState.day,
 		quan.served, quan.lost, GameState.money, GameState.get_upgrade_level("boat"), GameState.get_upgrade_level("kitchen")])
+	if RamNight.is_ram() and not _refuse_tea(quan):
+		return
 	_roundtrip()
 	quan._walk_home()
 
@@ -213,12 +217,50 @@ func _run() -> void:
 		if go_home:
 			evening.go_to_sleep()
 			continue
+		if RamNight.is_ram() and not evening.has_node("RamShore"):
+			_fail("rằm evening without the hoa đăng")
+			return
 		evening.go_to_sea()
 		var sea: Node = await _until(SEA)
 		if not sea:
 			return
+		if RamNight.is_ram():
+			await _ram_night(sea)
+			continue
 		await _night(sea)
 	_fail("no ending after 20 days")
+
+## Rằm at the restaurant: anh Út came; the true path refuses his tea.
+func _refuse_tea(quan: Node) -> bool:
+	var ut := quan.get_node_or_null("AnhUt") as RamGuest3D
+	if ut == null:
+		_fail("rằm without anh Út at the restaurant")
+		return false
+	ut.arrive()
+	ut.answer(false)
+	print("RAM | %s | anh Út's ginger tea refused" % LoopCalendar.date_text(GameState.day))
+	return true
+
+## Rằm at sea, the true path: follow the ghost-lights to the raft, see anh Út,
+## then the dawn epilogue. The run loop then finds the ending card.
+func _ram_night(sea: Node) -> void:
+	var ram := RamSea3D.active(sea)
+	if ram == null or ram.drank or ram.trail.is_empty():
+		_fail("rằm sea without the ghost-light trail")
+		return
+	RamNight.speed = 40.0
+	var raft: Vector3 = sea.RAFT_POS
+	sea.boat.position = raft + (sea.START - raft).normalized() * (RamSea3D.REVEAL_DISTANCE - 2.0)
+	sea.boat.velocity = Vector3.ZERO
+	var epilogue: Node = await _until(RamEpilogue3D.SCENE)
+	if not epilogue:
+		return
+	await _until(END)
+	RamNight.speed = 1.0
+	if RamNight.ending_id() != "true":
+		_fail("rằm ended as '%s', expected the true ending" % RamNight.ending_id())
+		return
+	print("RAM ENDING | true | refused the tea, saw anh Út at the raft | clues %d" % NightErrand3D.clue_count())
 
 ## The restaurant built tonight's omen props (the dock's are checked on the waterfront).
 func _omen_shown(quan: Node, omen: OmenData) -> bool:
