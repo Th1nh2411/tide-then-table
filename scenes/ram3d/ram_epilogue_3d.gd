@@ -48,7 +48,7 @@ func _play_true() -> void:
 	for i in GHOSTS:
 		var z := 0.6 - float(i) * 1.55
 		var side := -0.45 if i % 2 == 0 else 0.45
-		var ghost := RamFx3D.ghost(self, Vector3(PIER_X + side, 0.12, z), "ong_tam" if i == GHOSTS - 1 else "guest")
+		var ghost := RamFx3D.ghost(self, Vector3(PIER_X + side, 0.12, z), "ong_tu" if i == GHOSTS - 1 else "drowned")
 		RamFx3D.ghost_holder(ghost).rotation.y = atan2(camera.position.x - PIER_X, camera.position.z - z)
 		ghost.albedo_color.a = 0.0
 		ghosts.append(ghost)

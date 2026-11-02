@@ -154,6 +154,16 @@ Vietnamese, keep code comments in short English.
   of fish beside Bảo's cart, `RestaurantFish3D`) and, after staying home on an
   omen night, `bao_no_fish` (Bảo grumbles). Bảo asks for 3 fish once per shift
   (not on rằm). Omen nights / rằm keep their rules.
+- **People (3D):** every actor is a `PersonRig3D.build(parent, id)` (walk /
+  carry / sit / drive_ground_motion API). Rin keeps his own rig
+  (`RinPilotVisual`, rin_pilot.glb); every NPC is `PsxCharacterVisual`
+  (scenes/story3d): a PSX pack FBX in `assets/models/psx_chars/` (license
+  unverified, see its SOURCE.md), id -> file in `PsxCharacterVisual.CAST`
+  ("guest" / "drowned" pick from a pool). Pack FBX and `clip_source.glb`
+  (batch Idle/Walk/Carry) are humanoid-retargeted on import, bones renamed to
+  profile names ("LeftFoot"); look bones up with `RinPilotVisual.bone("Foot.L")`.
+  New model: copy FBX + PNG, `--import`, `tools/psx_chars/set_retarget_import.py`,
+  `--import`, add to `CAST`. Test `psx_characters_test`.
 - Autoloads: `GameState` (day, story_flags, last_rating, boat_hp,
   caught_species, best_sizes, day_history (`earned` only for the ending card),
   resume_at, trip_notes, play_seconds), `Sfx`, `DayClock` (display-only time of day: driven by

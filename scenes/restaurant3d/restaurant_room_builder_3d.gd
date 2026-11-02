@@ -230,7 +230,6 @@ static func _tables(host: Node3D, start_index := 0) -> void:
 		guest.visible = false
 		var partner := PersonRig3D.build(guest,"guest")
 		partner.name = "SeatingPartner"
-		partner.set_variant("guest_2" if i%2==0 else "guest_1")
 		partner.global_position = host.to_global(RestaurantSeating3D.seat(i,p,true))
 		partner.rotation.y = PI
 		partner.sample_seating(1)

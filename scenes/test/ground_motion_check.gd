@@ -9,7 +9,7 @@ func foot_drift(id: String, driven: bool, carry: bool, speed := 2.2) -> float:
 	var actor := PersonRig3D.build(self,id)
 	actor.set_carrying(carry)
 	var visual := actor._pilot
-	var bones := [visual.skeleton.find_bone("Foot.L"),visual.skeleton.find_bone("Foot.R")]
+	var bones := [visual.bone("Foot.L"),visual.bone("Foot.R")]
 	var samples: Array[PackedVector3Array] = []
 	var source_heights: Array[Vector2] = []
 	for frame in 241:
@@ -55,7 +55,8 @@ func phase(fps: int) -> float:
 func _ready() -> void:
 	call_deferred("_run")
 func _run() -> void:
-	for id: String in ["rin","bao","vy","vy_sau","co_nam","ong_tam","staff","guest_1","guest_2","guest_3","guest_rich","guest_regular"]:
+	# Cô Năm never walks (foot plant is weak on her model: drift ~1.1 m/s).
+	for id: String in ["rin","bao","chu_hai","guest_rich","guest_1","guest_2","guest_3","guest_4","guest_5","guest_6","guest_7","guest_8","guest_9"]:
 		for carry: bool in [false,true]:
 			var before := foot_drift(id,false,carry)
 			var after := foot_drift(id,true,carry)
