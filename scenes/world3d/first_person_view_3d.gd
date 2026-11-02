@@ -9,7 +9,6 @@ extends Node
 ## panel) for the mouse cursor. Removing the node restores everything.
 
 const HIDDEN_LAYER := 1 << 19  # Rin's own mesh: drawn for others, not for this camera
-const MOUSE_SPEED := 0.0025
 const EYE_RESTAURANT := Vector3(0, 1.55, 0)
 const EYE_SEA := 1.3  # above the rider's feet (rider is scaled 0.85)
 
@@ -40,8 +39,9 @@ func _exit_tree() -> void:
 func _input(event: InputEvent) -> void:
 	var motion := event as InputEventMouseMotion
 	if motion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		_yaw -= motion.relative.x * MOUSE_SPEED
-		_pitch = clampf(_pitch - motion.relative.y * MOUSE_SPEED, -1.35, 1.35)
+		var speed := GameSettings.mouse_speed()  # sensitivity + invert Y (Cài đặt)
+		_yaw -= motion.relative.x * speed.x
+		_pitch = clampf(_pitch - motion.relative.y * speed.y, -1.35, 1.35)
 
 
 func _process(_delta: float) -> void:

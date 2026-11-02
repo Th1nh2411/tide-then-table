@@ -30,6 +30,8 @@ func _ready() -> void:
 	add_child(_fade_rect)
 	# Closing the window goes through quit_game() too.
 	get_tree().auto_accept_quit = false
+	# Saved settings: volume, fullscreen, PS1 look (on by default).
+	GameSettings.apply_all()
 
 
 func _notification(what: int) -> void:
@@ -46,19 +48,17 @@ func quit_game() -> void:
 	get_tree().quit()
 
 
-## F11 toggles fullscreen anywhere in the game.
+## F11 toggles fullscreen anywhere in the game (saved like the settings toggle).
 func _input(event: InputEvent) -> void:
 	var key := event as InputEventKey
 	if key and key.pressed and not key.echo and key.physical_keycode == KEY_F11:
-		var fullscreen := DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if fullscreen
-			else DisplayServer.WINDOW_MODE_FULLSCREEN)
+		GameSettings.set_fullscreen(DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_FULLSCREEN)
 		get_viewport().set_input_as_handled()
 	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F7 and OS.is_debug_build():
 		_toggle_palette_preview()
 		get_viewport().set_input_as_handled()
 	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F8 and OS.is_debug_build():
-		_toggle_psx_look()
+		GameSettings.set_psx(not GameSettings.psx())
 		get_viewport().set_input_as_handled()
 	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F10 and OS.is_debug_build():
 		_toggle_first_person()
@@ -76,15 +76,25 @@ func _toggle_palette_preview() -> void:
 	add_child(preview)
 
 
-## F8 (debug): trial PS1 look on the 3D scenes (PsxLook3D).
-func _toggle_psx_look() -> void:
+## PS1 look on the 3D scenes (PsxLook3D), from GameSettings ("Đồ hoạ PS1",
+## F8 in debug builds). Never in headless runs: tests see the real materials.
+func set_psx_look(on: bool) -> void:
 	var look := get_node_or_null("PsxLook")
-	if look:
+	if look and not on:
+		remove_child(look)  # its _exit_tree restores the materials now
 		look.queue_free()
+	elif look == null and on and DisplayServer.get_name() != "headless":
+		look = PsxLook3D.new()
+		look.name = "PsxLook"
+		add_child(look)
+
+
+## Esc works in every 3D place: scenes without their own PauseMenu get one.
+func _ensure_pause_menu() -> void:
+	var scene := get_tree().current_scene
+	if scene == null or not scene is Node3D or not get_tree().get_nodes_in_group(PauseMenu.GROUP).is_empty():
 		return
-	look = PsxLook3D.new()
-	look.name = "PsxLook"
-	add_child(look)
+	scene.add_child(load(PauseMenu.SCENE_PATH).instantiate())
 
 
 ## First-person view in the 3D restaurant / sea (FirstPersonView3D), on from
@@ -115,6 +125,7 @@ func go_to(scene_path: String, fade_color: Color = Color.BLACK) -> void:
 	if error != OK:
 		push_error("SceneRouter: failed to load %s (error %d)" % [scene_path, error])
 	await _fade_to(0.0)
+	_ensure_pause_menu()
 
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_is_transitioning = false
