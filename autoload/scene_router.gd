@@ -55,6 +55,9 @@ func _input(event: InputEvent) -> void:
 	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F7 and OS.is_debug_build():
 		_toggle_palette_preview()
 		get_viewport().set_input_as_handled()
+	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F8 and OS.is_debug_build():
+		_toggle_psx_look()
+		get_viewport().set_input_as_handled()
 	elif key and key.pressed and not key.echo and key.physical_keycode == KEY_F9 and OS.is_debug_build():
 		_toggle_debug_jump()
 		get_viewport().set_input_as_handled()
@@ -83,6 +86,17 @@ func _toggle_palette_preview() -> void:
 	preview = PalettePreview.new()
 	preview.name = "PalettePreview"
 	add_child(preview)
+
+
+## F8 (debug): trial PS1 look on the 3D scenes (PsxLook3D).
+func _toggle_psx_look() -> void:
+	var look := get_node_or_null("PsxLook")
+	if look:
+		look.queue_free()
+		return
+	look = PsxLook3D.new()
+	look.name = "PsxLook"
+	add_child(look)
 
 
 func go_to(scene_path: String, fade_color: Color = Color.BLACK) -> void:

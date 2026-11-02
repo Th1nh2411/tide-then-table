@@ -33,4 +33,4 @@ shape = SubResource("BoatCollision")
 current = true
 fov = 56.0
 near = 0.05
-far = 100.0
+far = 300.0

@@ -28,6 +28,8 @@ var _walk_speed := 0.0
 var _casting_clip := false
 var _distance_driven := false
 var _ground_frame := -1
+var _ground_idle_frame := -1
+var _blocker: CollisionShape3D
 var _seated := false
 var _once_left := 0.0
 
@@ -53,6 +55,8 @@ static func build(parent: Node3D, kind_: String, shirt: String = "") -> PersonRi
 		rig._build_rin_pilot()
 	if kind_ != "guest":
 		rig.add_to_group("person_" + kind_)
+	if kind_ != "rin":
+		rig._add_blocker()
 	# Grounds the person where no lamp casts a real shadow.
 	ContactShadow3D.attach(rig, 0.36, 0.8)
 	return rig
@@ -86,6 +90,7 @@ func drive_ground_motion(displacement: Vector3, delta: float, face_travel := tru
 	if not _pilot or _casting_clip or _seated or delta <= 0.0: return
 	_distance_driven = true
 	_ground_frame = Engine.get_physics_frames()
+	_ground_idle_frame = Engine.get_process_frames()
 	var flat := Vector3(displacement.x,0,displacement.z)
 	if face_travel and flat.length_squared() > 0.000001:
 		var parent_space := get_parent_node_3d().global_basis.inverse()*flat
@@ -173,7 +178,9 @@ func _process(_delta: float) -> void:
 	if _casting_clip or _seated:
 		_sync_pilot_anchors()
 		return
-	if _distance_driven and Engine.get_physics_frames() > _ground_frame + 1:
+	# Movers drive from physics (gameplay) or idle (cutscene tweens); idle only when neither did.
+	if _distance_driven and Engine.get_physics_frames() > _ground_frame + 1 \
+			and Engine.get_process_frames() > _ground_idle_frame + 1:
 		_pilot.drive_ground_motion(0.0,_delta,carrying)
 	var casting := false
 	for i in range(arms.size()):
@@ -222,6 +229,28 @@ func _sync_pilot_anchors() -> void:
 		var wrist := _pilot.hand_position("R" if i == 0 else "L")
 		arms[i].position = wrist - arms[i].basis * Vector3(0, -0.6, 0)
 
+
+## Solid body so Rin (a CharacterBody3D) can't walk through other people;
+## off while the person is hidden (empty seats, cutscene stand-ins).
+func _add_blocker() -> void:
+	if kind == "cat":
+		return
+	var body := StaticBody3D.new()
+	body.name = "PersonBlocker"
+	add_child(body)
+	_blocker = CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.24
+	capsule.height = 1.6
+	_blocker.shape = capsule
+	_blocker.position.y = 0.8
+	body.add_child(_blocker)
+	visibility_changed.connect(_sync_blocker)
+	_sync_blocker()
+
+func _sync_blocker() -> void:
+	if _blocker:
+		_blocker.set_deferred("disabled", not is_visible_in_tree())
 
 func _box(parent: Node3D, pos: Vector3, size: Vector3, hex: String) -> MeshInstance3D:
 	var mesh := MeshInstance3D.new()

@@ -62,7 +62,6 @@ var debug_cutscene_index := 0
 var hud_view: SeaHudView3D
 ## Current Rin / NEO line (hidden; hud_view's speech strip shows it).
 var message: Label
-var wave_marks: Array[MeshInstance3D] = []
 var bubble_spots: Array[BubbleSpot3D] = []
 var submerged: Array[SubmergedRock3D] = []
 var cinematic: CastCinematic3D

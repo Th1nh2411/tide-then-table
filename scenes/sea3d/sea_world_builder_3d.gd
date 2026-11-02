@@ -2,7 +2,7 @@ class_name SeaWorldBuilder3D
 extends RefCounted
 ## Builds the 3D sea's static world, places, boat and phone-map snapshot, and
 ## animates the decorative bits each frame.
-## Host (SeaScene3D) fields written: wave_marks, bubble_spots, wake_marks,
+## Host (SeaScene3D) fields written: bubble_spots, wake_marks,
 ## submerged, whirlpool_marks, rin_figure, boat_lamp, map_boat_proxy.
 
 static var _materials: Dictionary = {}
@@ -98,24 +98,19 @@ static func build_environment(sea: SeaScene3D) -> void:
 	moon.shadow_bias = 0.1
 	moon.shadow_normal_bias = 2.0
 	sea.add_child(moon)
+	SeaBackdrop3D.apply_sky(env, moon)
+	SeaBackdrop3D.build_islands(sea)
 
 static func build_world(sea: SeaScene3D) -> void:
 	var size := SeaLayout3D.size_world()
-	box(sea, Vector3.ZERO, Vector3(size.x, 0.12, size.y), "172038")
-	for z_rect: Array in [[SeaLayout3D.NEAR_RECT, "253a5e", 0.07], [SeaLayout3D.REEF_RECT, "202e37", 0.075]]:
-		var r := SeaLayout3D.rect_world(z_rect[0])
-		box(sea, Vector3(r.get_center().x, float(z_rect[2]), r.get_center().y), Vector3(r.size.x, 0.02, r.size.y), str(z_rect[1]))
+	# Dark seabed under the water surface; zones, waves and foam are SeaWater3D's.
+	box(sea, Vector3(0, -0.6, 0), Vector3(size.x, 0.12, size.y), "0b1222")
+	SeaWater3D.build(sea)
 	if Story.is_fog_open():
-		var fog := SeaLayout3D.rect_world(SeaLayout3D.FOG_RECT)
-		box(sea, Vector3(fog.get_center().x, 0.085, fog.get_center().y), Vector3(fog.size.x, 0.02, fog.size.y), "2d4b52")
 		sea.add_child(SeaFog3D.new())
 	# Land strip behind the dock (the 2D shore).
 	var shore_z: float = SeaLayout3D.to_world(Vector2(0, SeaLayout3D.SHORE_PX)).z
 	solid_box(sea, Vector3(0, 0.2, (shore_z + size.y * 0.5) * 0.5 + 1.5), Vector3(size.x, 0.42, size.y * 0.5 - shore_z - 3.0), "394a50")
-	for i in range(170):
-		var x := float((i * 37) % 150) - 75.0
-		var z := float((i * 53) % 100) - 50.0
-		sea.wave_marks.append(box(sea, Vector3(x, 0.11, z), Vector3(0.3 + 0.2 * (i % 4), 0.015, 0.07), "577277" if i % 3 else "3c5e8b"))
 	# Pier just behind the dock point (built around the old 5 -> START.z offset).
 	var off := Vector3(sea.START.x, 0.0, sea.START.z - 5.0)
 	solid_box(sea, off + Vector3(0, 0.20, 11), Vector3(18, 0.42, 5), "394a50")
@@ -136,9 +131,6 @@ static func build_world(sea: SeaScene3D) -> void:
 		var source_size := Vector3(2.5, 1.2, 2.2) if rock_index % 2 == 0 else Vector3(1.8, 1.5, 1.6)
 		batch_model(sea, rock_id, pos + Vector3(0, 0.02, 0), Vector3(radius * 2.2, 0.95, radius * 1.6) / source_size)
 		rock_index += 1
-		for i in range(5):
-			var angle := float(i) * TAU / 5.0
-			box(sea, pos + Vector3(cos(angle) * radius * 1.7, 0.11, sin(angle) * radius * 1.3), Vector3(0.52, 0.02, 0.08), "819796")
 	for rock in SeaLayout3D.submerged_rocks():
 		var hidden := SubmergedRock3D.new()
 		sea.add_child(hidden)
@@ -162,11 +154,11 @@ static func build_world(sea: SeaScene3D) -> void:
 
 static func build_pois(sea: SeaScene3D) -> void:
 	# Reach points sit in open water. Buildings behind them carry the silhouette.
-	batch_model(sea, "whale_shrine", sea.SHRINE_POS + Vector3(-1.4, 0.02, -0.6))
+	_solid_footprint(sea, batch_model(sea, "whale_shrine", sea.SHRINE_POS + Vector3(-1.4, 0.02, -0.6)))
 	label(sea, "MIẾU CÁ ÔNG", sea.SHRINE_POS + Vector3(-1.4, 2.0, -0.6), 21, "f2d98a")
-	batch_model(sea, "lighthouse", sea.LIGHTHOUSE_POS + Vector3(-1.8, 0.02, -0.6))
+	_solid_footprint(sea, batch_model(sea, "lighthouse", sea.LIGHTHOUSE_POS + Vector3(-1.8, 0.02, -0.6)))
 	label(sea, "ĐÁ CANH ĐÊM", sea.LIGHTHOUSE_POS + Vector3(-1.8, 3.5, -0.6), 20, "e7d5b3")
-	batch_model(sea, "old_man_hut", sea.HUT_POS + Vector3(-1.4, 0.02, -0.5))
+	_solid_footprint(sea, batch_model(sea, "old_man_hut", sea.HUT_POS + Vector3(-1.4, 0.02, -0.5)))
 	label(sea, "GÒ VỎ ỐC", sea.HUT_POS + Vector3(-1.4, 2.3, -0.5), 20, "f2d98a")
 	label(sea, "BÈ TÔM HÙM ANH ÚT", sea.RAFT_POS + Vector3(0, 2.8, 0), 20, "f2d98a")
 	glow(sea, sea.SHRINE_POS + Vector3(-1.4, 2.2, 0.4), "9fe0d0", 1.4, 9.0, true)
@@ -182,6 +174,38 @@ static func build_pois(sea: SeaScene3D) -> void:
 			sea.whirlpool_marks.append(ring)
 		box(sea, sea.WHIRLPOOL_POS + Vector3(0, 0.22, 0), Vector3(0.5, 0.08, 0.5), "e6f6ff")
 		label(sea, "???", sea.WHIRLPOOL_POS + Vector3(0, 1.2, 0), 28, "5ff2e0")
+
+## Invisible collider shaped like the model where it meets the water: the
+## convex outline of its vertices below FOOTPRINT_TOP, as an upright prism
+## (roof eaves higher up don't push the boat away).
+const FOOTPRINT_TOP := 1.2
+
+static func _solid_footprint(sea: SeaScene3D, visual: Node3D) -> void:
+	var outline := PackedVector2Array()
+	for node in visual.find_children("*", "MeshInstance3D", true, false):
+		var mesh := node as MeshInstance3D
+		var to_sea := sea.global_transform.affine_inverse() * mesh.global_transform
+		for surface in mesh.mesh.get_surface_count():
+			var vertices: PackedVector3Array = mesh.mesh.surface_get_arrays(surface)[Mesh.ARRAY_VERTEX]
+			for v in vertices:
+				var p := to_sea * v
+				if p.y < FOOTPRINT_TOP:
+					outline.append(Vector2(p.x, p.z))
+	outline = Geometry2D.convex_hull(outline)
+	if outline.size() < 3:
+		return
+	var points := PackedVector3Array()
+	for p in outline:
+		points.append(Vector3(p.x, -0.3, p.y))
+		points.append(Vector3(p.x, FOOTPRINT_TOP, p.y))
+	var shape := ConvexPolygonShape3D.new()
+	shape.points = points
+	var collider := CollisionShape3D.new()
+	collider.shape = shape
+	var body := StaticBody3D.new()
+	body.name = "Footprint_" + visual.name
+	body.add_child(collider)
+	sea.add_child(body)
 
 static func build_map_adapter(sea: SeaScene3D) -> void:
 	# PhoneMap expects 2D map coordinates and a Node2D boat. Small proxies
@@ -280,15 +304,13 @@ static func pose_rower(sea: SeaScene3D) -> void:
 	var side := down.cross(Vector3.UP).normalized() if absf(down.y) < 0.99 else Vector3.RIGHT
 	sea.paddle.transform = Transform3D(Basis(side, -down, side.cross(-down)), top)
 
-## Bob, wave marks, whirlpool, net buoys, wake and the follow camera.
+## Bob, whirlpool, net buoys, wake and the follow camera.
 static func animate(sea: SeaScene3D, delta: float, forward: Vector3, forward_speed: float) -> void:
 	var t := sea.elapsed
 	pose_rower(sea)
 	sea.boat_visual.position.y = sin(t * 2.5) * 0.06
 	sea.boat_visual.rotation.z = sin(t * 1.8) * 0.025 - sea.yaw_velocity * 0.025
 	sea.boat_visual.rotation.x = sin(t * 2.1) * 0.018 + forward_speed * 0.004
-	for i in range(sea.wave_marks.size()):
-		sea.wave_marks[i].position.y = 0.11 + sin(t * 2.1 + float(i) * 0.7) * 0.012
 	var bubble_range := sea._bubble_range()
 	for spot in sea.bubble_spots:
 		spot.view_range = bubble_range

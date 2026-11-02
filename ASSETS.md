@@ -239,6 +239,20 @@ biển, sương mù, UI, minigame. Cần cái nào trước thì báo để nố
 
 Flow đã chọn và checklist: `docs/ART_PIPELINE.md`; hướng hình ảnh: `ART_PLAN.md`.
 
+### Texture biển đêm — 2026-11-02
+
+Asset mới tạo bằng built-in `image_gen`, chưa tích hợp runtime. Prompt, ảnh nguồn
+và ghi chú kiểm tra nằm cùng thư mục `assets/textures/sea3d/`.
+
+| Asset | Kích thước / palette | Trạng thái |
+|---|---|---|
+| `assets/textures/sea3d/night_sky_panorama_v1.png` | 4096×2048 RGB, equirectangular; navy-indigo `#090a14` → `#172038`, trăng pale-teal | Upscale từ ảnh gen; hai mép gần liền mạch, còn sai khác màu nhỏ; chưa review trong sphere Godot |
+| `assets/textures/sea3d/distant_islands_night_v1.png` | 4096×512 RGBA, nền trong suốt; silhouette `#1b2233`–`#26324a`, cửa sổ vàng ấm | Dải đảo xa, crop nền trong suốt và upscale giữ tỷ lệ; chưa tích hợp |
+
+Màu hex là mục tiêu prompt; màu ảnh gen có sai lệch. Không thay thế asset active.
+
+### Model hiện hành
+
 | Asset | Nguồn/định dạng | Trạng thái |
 |---|---|---|
 | `assets/concepts/rin/lowpoly_turnaround_v1.png` | 1672×941, ảnh gen 3 góc; prompt/provenance cùng thư mục | Mẫu Rin được giữ cho flow Hunyuan |

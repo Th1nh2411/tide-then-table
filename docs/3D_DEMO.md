@@ -57,6 +57,20 @@ chỉnh ở đâu. Việc còn lại: `PLAN.md` → "Việc còn lại". Art: `A
   theo pha nhịp; mái chèo đặt qua hai bàn tay mỗi khung hình.
 - **Camera:** offset theo thuyền `CAMERA_OFFSET` (0, 6.2, 8.4), FOV 56° (`sea_scene_3d.tscn`),
   bám theo hàm mũ (không phụ thuộc FPS).
+- **Mặt nước:** `SeaWater3D` (một plane chia lưới ~0,8 m ở `WATER_Y` 0,1) +
+  `sea_water.gdshader` procedural: ba sóng dài nhấp nhô, gợn nhỏ bẻ normal, đường gợn
+  sáng (thay vạch box cũ), màu vùng khơi → rạn → gần bờ (+ sương) chuyển mềm theo
+  `SeaLayout3D`, bọt ở chỗ vật cắt mặt nước (đá, cầu tàu, bờ; đọc depth), vòng nước quanh
+  thúng + bóng dưới thuyền tự vẽ (decal không in lên nước trong suốt), ánh trăng lấp lánh
+  theo hướng `DirectionalLight3D`. Màu và độ cao sóng là uniform của shader. Nước bị khoét
+  trong lòng thân thuyền (`hull_hole`); bóng + vòng bọt xoay theo thuyền, ghe dài hơn thúng.
+- **Nền trời + đảo xa:** `SeaBackdrop3D`: panorama `assets/textures/sea3d/night_sky_panorama_v1.png`
+  (xoay `sky_rotation` để trăng vẽ trùng hướng đèn trăng; `fog_sky_affect` 0,25), ba dải
+  silhouette `distant_islands_night_v1.png` ở bắc / đông / tây (unshaded, không sương).
+  Camera biển `far` 300 để thấy đảo.
+- **Va chạm địa điểm:** Miếu Cá Ông, hải đăng Đá Canh Đêm, Gò Vỏ Ốc có collider ẩn đúng hình
+  model ở mặt nước (`_solid_footprint`: bao lồi các đỉnh thấp hơn `FOOTPRINT_TOP` 1,2 m,
+  dựng thành lăng trụ; mái hiên không tính); thuyền vẫn vào được tầm ghé 4 m.
 
 ## Quán
 
@@ -111,6 +125,13 @@ chỉnh ở đâu. Việc còn lại: `PLAN.md` → "Việc còn lại". Art: `A
   đất (IK hai xương), nhả khi nhấc chân/đổi trạng thái/quá xa. NPC bưng đĩa dùng
   `GroundCarryWalk` tạo trong RAM (chân Walk + tay Carry). Đường A* được rút gọn theo tầm
   nhìn có kiểm clearance, tăng/giảm tốc, xoay mềm, cache theo đích.
+- **Va chạm người:** mọi `PersonRig3D` trừ Rin và mèo có `StaticBody3D` capsule
+  (`PersonBlocker`, r 0,24) nên Rin không đi xuyên Bảo, Cô Năm, khách, nhân viên; tắt khi
+  người đó bị ẩn (ghế trống, cutscene). Rig chỉ về Idle khi cả physics frame lẫn idle frame
+  đều không còn đẩy nó (cutscene đi bằng tween idle, gameplay bằng physics).
+- **PSX thử (F8, debug):** `PsxLook3D` vẽ thế giới 3D thẳng ở `pixel_res` 640x360 bằng
+  SubViewport theo camera game, phóng nearest dưới UI; material thường thành
+  `psx_vertex.gdshader` (rung đỉnh `snap_res` 320x180, texture nearest). Tắt là trả lại như cũ.
 - **Bưng đĩa:** đĩa theo vị trí hai cổ tay (Rin và NPC). Hướng cần câu (`hand_basis`) tính
   so với tư thế Idle vì rest pose pilot2 là T-pose.
 
