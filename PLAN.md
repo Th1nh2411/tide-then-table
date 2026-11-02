@@ -503,6 +503,45 @@ Lặn biển, thế giới song song, dị biến cơ thể (trừ Nhịp Sóng)
 
 Quyết định mỗi đêm (kiểu Exit 8) chính là **đi đầu phố nào** sau ca: về ngủ hay ra bến, dựa trên điềm báo trong ca và ngoài phố.
 
+### Luật vòng lặp (kiểu Exit 8 / Who's At The Door)
+
+- Game diễn ra **mùng 9 → rằm tháng Bảy âm lịch** (tháng cô hồn): 7 ngày. Bộ đếm = **lịch bloc xé** trên tường phòng ngủ.
+- Mỗi ngày: ca quán ngắn → chọn đầu phố. **Không có gì lạ → ra bến** (đi biển như mọi đêm). **Có điềm → về nhà ngủ** (kiêng ra khơi). Tối đa một điềm / ngày; có ngày không có gì.
+- **Sai = về mùng 9:** ra khơi đêm có điềm → đêm âm, Rin chết ngoài biển, tỉnh dậy mùng 9; ở nhà đêm bình thường → sáng ra báo đưa tin thêm người mất tích, lịch về mùng 9.
+- **Thắng** = qua đủ 7 ngày liên tiếp → đêm rằm (kết). Một ngày cỡ 2–4 phút.
+- Rin nhớ mọi vòng: **sổ tay** (hồn ma đã gặp, manh mối) giữ qua reset; ngày, báo, thế giới thì quay lại.
+- **Bỏ tiền và nâng cấp** (reset làm chúng vô nghĩa): thuyền / đèn cố định.
+
+### Cốt truyện: "Đêm không trăng ở Xóm Đèn"
+
+- **Bề mặt:** cô hồn tháng Bảy và "sương ăn người": gõ mạn thúng, bóng người đầu cầu tàu, khách không bóng.
+- **Sự thật:** không có sương ăn người. **Anh Út, chủ bè tôm hùm** (hiền, hay đùa, khách quen của quán) là kẻ giết người hàng loạt; buôn lậu ngoài vùng sương, giết những ngư dân thấy hắn (ông Tư hai năm trước, người gác đèn năm ngoái, và các ngư dân "mất tích"), cắt dây neo, thả thúng trôi không người, giấu xác dưới bè.
+- **Hồn ma là nạn nhân, không hại Rin:** không xác, không đám, không giỗ → **linh hồn kẹt dưới biển**, chỉ tháng cô hồn mới lên được. Họ **chặn Rin ra khơi đúng những đêm hắn đi săn**: điềm báo = lời cảnh báo. Gõ mạn = quay về; bóng đầu cầu tàu = chắn lối; khách không bóng ngồi đúng chỗ anh Út hay ngồi.
+- **Vòng lặp:** mỗi lần Rin chết, các hồn ma (ông Tư dẫn đầu) kéo Rin về sáng mùng 9. Rin thấy họ nhờ dấu Nhịp Sóng (nay là khả năng thấy người chết).
+- **Hạn chót đêm rằm** (xá tội vong nhân): qua rằm chưa lộ sự thật thì cửa đóng, hồn kẹt thêm một năm.
+- **Bỏ ở nhánh này:** cổng song song, cá Ông là sinh vật, Thâm Lam (cùng lắm là tin đồn).
+
+**Manh mối** (mỗi sáng "Bản tin Ngủ Quên" qua khe cửa; ngày càng xa tin càng sâu):
+
+| Ngày | Manh mối |
+|---|---|
+| Mùng 9 | "Ngư dân thứ ba mất tích trong sương" |
+| Mùng 10 | Các vụ đều vào đêm không trăng |
+| 11 | Dây neo thúng nạn nhân bị cắt gọn, không phải đứt |
+| 12 | Nạn nhân đều bán cá ở cùng một bè trước khi mất tích |
+| 13 | Trang nhật ký người gác đèn: "...đèn xanh ở bè, không phải sương..." |
+| 14 | "Bè tôm hùm mở rộng, chủ bè mua ghe mới"; Cô Năm: "thằng Út dạo này dư tiền" |
+| Rằm | Đêm cuối |
+
+Mảnh phụ: Bảo kể Út trả tiền ướt; mèo không lại gần bàn Út; NEO `[WARN] tín hiệu lạ quanh bè lúc 2:00`.
+
+**Điềm báo (phong tục tháng cô hồn bị lệch):** mâm cúng cô hồn trước quán bị ăn dở; vàng mã bay ngược gió về phía bến; tiếng gọi tên Rin lúc khuya; đồ phơi đêm chưa rút; tiền lẻ rơi trên đường ra bến; đèn hoa đăng trôi ngược vào bờ; đèn hải đăng đổi màu; bóng người đầu cầu tàu; gõ mạn thúng ba lần; mèo nhìn bàn trống.
+
+**Đêm rằm:** anh Út ghé quán mời **trà gừng "cho ấm rồi ra khơi"** (thay thuốc an thần):
+- **Uống** → ngoài biển buồn ngủ, chết → kết xấu: Rin thành một hồn kẹt; cảnh cuối tháng Bảy năm sau, qua mắt hồn Rin, một ngư dân trẻ khác bước vào quán.
+- **Không uống, ra khơi** → hồn ma dẫn tới bè, NEO quay được Út kéo xác → kết thật: tìm được xác dưới bè, đêm rằm cả xóm thả hoa đăng, hồn ma đứng dọc cầu tàu rồi tan, ông Tư đi cuối.
+- **Không uống, ở nhà** → sống, hắn chưa lộ, cửa đóng, hồn còn kẹt → lịch về mùng 9.
+
 ### Đã chốt
 
 - **Góc nhìn thứ nhất** ở cả 3 nơi (đã có `FirstPersonView3D`), không thấy tay Rin; PSX look (F8) giữ để dùng cho không khí.
@@ -510,24 +549,22 @@ Quyết định mỗi đêm (kiểu Exit 8) chính là **đi đầu phố nào**
 - **Quán:** bỏ màn lên thực đơn. Chỉ còn **vài món cố định** (2–3 món của Bảo + bia). Khách tự gọi; Bảo nấu xong món nào thì để lên bàn kê, Rin đem món đó ra đúng bàn. **Bia luôn có**: E ở thùng bia là cầm tháp bia (không minigame, không mua). **Bỏ nướng** (lò than, GrillGame).
 - **Cô Năm:** đến gần chỉ nói chuyện (lời đồn, điềm báo), không bán gì. Bỏ tạp hoá, tủ lạnh, túi hàng.
 - **Câu cá chỉ phục vụ cốt truyện:** cá không thành món, không thành tiền. Cá thường để "đời thường"; cá dị biến / cá của người chết là manh mối và điềm.
-- **Tiền giữ đơn giản:** chỉ kiếm ở quán, chỉ dùng nâng cấp thuyền / đèn (đi xa hơn, vào sương). Bỏ: Sửa quán, thử thách, thành tựu, Review / xếp hạng / đối thủ, kho cá + hư hỏng, đơn đặt cá, món hot.
+- **Không tiền, không nâng cấp** (xem Luật vòng lặp). Bỏ: Sửa quán, thử thách, thành tựu, Review / xếp hạng / đối thủ, kho cá + hư hỏng, đơn đặt cá, món hot.
 
 ### Phase
 
 | Phase | Nội dung | Ghi chú |
 |---|---|---|
-| H1 — Khung 3 nơi | Phòng ngủ 3D (dựng bằng code), cửa → "Ra quán"; hai đầu phố ở quán (về ngủ / ra bến); cập bến → phòng ngủ; ngày mới khi ngủ; autosave ở phòng ngủ | Thay thẻ nghỉ + nút "Ra khơi"; bot đi theo vòng mới |
+| H1 — Khung 3 nơi + vòng lặp | Phòng ngủ 3D (dựng bằng code), lịch bloc + báo qua khe cửa, cửa → "Ra quán"; hai đầu phố ở quán (về ngủ / ra bến); cập bến → phòng ngủ; ngày mới / reset về mùng 9 theo đúng-sai; autosave ở phòng ngủ | Thay thẻ nghỉ + nút "Ra khơi"; bot đi theo vòng mới |
 | H2 — Quán gọn | Bỏ thực đơn, nướng, tạp hoá, tủ lạnh, Sửa quán; món cố định + bia E; Cô Năm chỉ thoại | Giữ khách / Bảo / bàn / dọn |
 | H3 — Thoại phụ đề | `DialogueBox` → phụ đề không portrait; bỏ phát cutscene, mốc cốt truyện thành sự kiện trong thế giới | Giữ `Dialogue` .tres |
 | H4 — Dọn hệ thống | Ẩn / gỡ thử thách, Review, đối thủ, kho cá, đơn cá, món hot; điện thoại chỉ còn bản đồ + nâng cấp + NEO | |
 | H5 — Điềm báo | Điềm trong ca và ngoài phố (data `.tres`), chọn theo đêm | Một điềm / đêm, công bằng |
 | H6 — Đêm âm + khách lạ | Biến thể biển khi ra bến đêm có điềm; khách lạ sau khuya | |
-| H7 — Kết | Đêm cuối: thuốc an thần (uống / không) → 2 kết | |
+| H7 — Kết | Đêm rằm: trà gừng của anh Út (uống / không) → 3 kết | |
 
 Mỗi phase xong: chạy test + bot, cập nhật mục này, dừng chờ duyệt.
 
 ### Còn mở
 
-- Có "thua" (mất tiền, Rin ngất, mất một ngày) hay chỉ rợn tâm lý?
-- Số đêm (5 hay 7).
 - Vy, nhân viên, mèo, Nhịp Sóng giữ ở mức nào sau H3.
