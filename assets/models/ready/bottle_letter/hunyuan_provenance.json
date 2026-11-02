@@ -1,0 +1,53 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-02T07:38:45.413126+00:00",
+  "input": "assets/concepts/horror/bottle_letter.png",
+  "input_sha256": "77c6cc875feae16e4d5b2a07b0612eeb57d530aed785e7bdec465e821b03f2b6",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 2000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 121258,
+    "number_of_vertices": 60623,
+    "time": {
+      "remove background": 1.0314149856567383,
+      "shape generation": 10.309529781341553,
+      "export to trimesh": 0.028003454208374023,
+      "total": 11.371709108352661
+    }
+  },
+  "raw_sha256": "f1585fd44b5b8eed246ea045e6a33989b2d73a71d684a5446fa526c7319a4fdc",
+  "status": "success",
+  "reduced_sha256": "186c830b2946898ef96cd4b8b34f042a84b4e67aa889bdf8265229c5c30d9702",
+  "raw": "bottle_letter_raw.glb",
+  "reduced": "bottle_letter_reduced.glb"
+}

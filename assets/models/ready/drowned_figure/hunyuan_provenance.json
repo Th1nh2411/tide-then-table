@@ -1,0 +1,53 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-02T07:44:25.073820+00:00",
+  "input": "assets/concepts/horror/drowned_figure.png",
+  "input_sha256": "44428ea12b4d480de7fba15b3923bae7e2dd5b124b18e0c9fe440869580aa844",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 2500,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 99164,
+    "number_of_vertices": 49436,
+    "time": {
+      "remove background": 0.9772100448608398,
+      "shape generation": 10.009570598602295,
+      "export to trimesh": 0.02283310890197754,
+      "total": 11.013102769851685
+    }
+  },
+  "raw_sha256": "7cc5ce8bcfc74ff0ebc66a5f35e5c0372dfc9cb444a5823f26681bb8e16ea300",
+  "status": "success",
+  "reduced_sha256": "4df3d9cf3266a1c3c253c031b1450e569a105d57caa9595b9d8e26985cb416f4",
+  "raw": "drowned_figure_raw.glb",
+  "reduced": "drowned_figure_reduced.glb"
+}
