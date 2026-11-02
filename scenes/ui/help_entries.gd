@@ -32,6 +32,6 @@ const TABS: Array[Dictionary] = [
 			["@lamp", "Đá ngầm: trong tầm đèn"], ["@rod", "Dây đỏ là sắp đứt"]]},
 		{"icon": "settings", "title": "Phím chung", "rows": [
 			["Chuột", "Nhìn quanh"], ["Alt", "Hiện con trỏ"],
-			["Esc", "Tạm dừng"], ["F11", "Toàn màn hình"], ["@save", "Tự lưu khi ngủ dậy"]]},
+			["Esc", "Tạm dừng"], ["N", "Sổ tay"],["F11", "Toàn màn hình"], ["@save", "Tự lưu khi ngủ dậy"]]},
 	]},
 ]
