@@ -32,11 +32,11 @@ static func handle(sea: SeaScene3D, key: InputEventKey) -> bool:
 			if sea.boat_upgrade == null:
 				return false
 			GameState.upgrade_levels[sea.boat_upgrade.id] = int(key.physical_keycode - KEY_1)
-			sea.get_tree().reload_current_scene()
+			sea.get_tree().reload_current_scene.call_deferred()
 			return true
 		KEY_F2:
 			# Pretend the omen happened yesterday and reload to open the fog.
 			GameState.set_flag(Story.OMEN_DAY_FLAG, GameState.day - 1)
-			sea.get_tree().reload_current_scene()
+			sea.get_tree().reload_current_scene.call_deferred()
 			return true
 	return false
