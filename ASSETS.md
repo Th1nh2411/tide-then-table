@@ -371,3 +371,19 @@ Chưa approved, chưa tích hợp runtime. Danh sách và ảnh review:
 
 Giữ phong cách PS1 horror/palette theo brief, không ép palette sprite cũ.
 Concept là ảnh đầu vào cho image-to-3D; chưa tạo hay thay model GLB.
+
+## Horror art — brief 3, 2026-11-02
+
+Theo `docs/HORROR_CODEX_BRIEF_3.md`: 13 concept PNG và 4 texture PNG,
+mỗi ảnh có sidecar `.md` ghi prompt, built-in `image_gen`, ngày, nguồn,
+hậu kỳ và SHA-256. Chờ review, chưa tích hợp game.
+Danh sách, ảnh review và kiểm tra texture lặp: `docs/HORROR_CODEX_DELIVERY_3.md`.
+
+| Thư mục | Asset ID | Kích thước / nền |
+|---|---|---|
+| `assets/concepts/horror/` | `bamboo_fence`, `power_pole`, `banana_clump`, `roadside_shrine`, `water_jar`, `fishing_nets_drying`, `neighbour_house_a`, `neighbour_house_b`, `stone_steps` | 1024×1024 RGB, vật thể trọn khung, nền xám nhạt opaque |
+| `assets/concepts/horror/` | `altar_ong_tu`, `hat_hook`, `wooden_wardrobe`, `low_table_tea` | 1024×1024 RGB, nền xám nhạt opaque |
+| `assets/textures/horror/` | `lane_dirt`, `brick_wall_old`, `tiles_cement_floor`, `blue_lime_wall` | 512×512 RGB, texture lặp, xem ảnh review 2×2 |
+
+Palette và phong cách theo horror brief; không thay asset approved/active.
+Chưa tạo model Hunyuan hay sửa scene, script, material hoặc resource runtime.
