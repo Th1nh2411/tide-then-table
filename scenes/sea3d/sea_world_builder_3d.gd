@@ -106,7 +106,8 @@ static func build_world(sea: SeaScene3D) -> void:
 		sea.add_child(SeaFog3D.new())
 	# Land strip behind the dock (the 2D shore).
 	var shore_z: float = SeaLayout3D.to_world(Vector2(0, SeaLayout3D.SHORE_PX)).z
-	solid_box(sea, Vector3(0, 0.2, (shore_z + size.y * 0.5) * 0.5 + 1.5), Vector3(size.x, 0.42, size.y * 0.5 - shore_z - 3.0), "394a50")
+	solid_box(sea, Vector3(0, 0.2, (shore_z + size.y * 0.5) * 0.5 + 1.5), Vector3(size.x, 0.42, size.y * 0.5 - shore_z - 3.0), "394a50", false)
+	SeaShore3D.build(sea, shore_z + 1.5, size.x)
 	# Pier just behind the dock point (built around the old 5 -> START.z offset).
 	var off := Vector3(sea.START.x, 0.0, sea.START.z - 5.0)
 	solid_box(sea, off + Vector3(0, 0.20, 11), Vector3(18, 0.42, 5), "394a50")
@@ -118,6 +119,7 @@ static func build_world(sea: SeaScene3D) -> void:
 	glow(sea, off + Vector3(4.5, 2.4, 11.0), "ffc27a", 1.2, 8.0, false)
 	batch_model(sea, "lighthouse", off + Vector3(-7.8, 0.02, 11.3), Vector3(0.6, 0.95, 0.6))
 	label(sea, "BẾN XÓM ĐÈN", off + Vector3(-2.2, 1.6, 13.1), 30, "e7d5b3")
+	(sea.get_child(sea.get_child_count() - 1) as Label3D).rotation.y = PI  # read from the water
 	var rock_index := 0
 	for rock in SeaLayout3D.rocks():
 		var pos: Vector3 = rock["pos"]

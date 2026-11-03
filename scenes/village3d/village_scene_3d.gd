@@ -15,6 +15,8 @@ extends RestaurantScene3D
 
 ## The gap in the street's east wall (RestaurantRoomBuilder3D reads it).
 var street_exit := VillageLayout3D.EXIT_Z
+## The gap in its west wall: the pavement runs on into the fog (WorldEdgeLoop3D).
+var street_west := StreetFacades3D.WEST_Z
 ## Loaded at night on the pier (back from the sea).
 var night := false
 var leaving := false
@@ -60,7 +62,7 @@ func _ready() -> void:
 	add_child(text)
 	spots = VillageSpots3D.new(self)
 	VillageBuilder3D.build(self)
-	calendar.text = LoopCalendar.date_text(GameState.day).replace(" tháng", "\ntháng")
+	BedroomBuilder3D.set_date(calendar, LoopCalendar.date_text(GameState.day).replace(" tháng", "\ntháng"))
 	VillageAudio3D.prebuild()
 	if night:
 		_start_night()

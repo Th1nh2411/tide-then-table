@@ -215,6 +215,19 @@ Vietnamese, keep code comments in short English.
   = `WaterfrontBuilder3D` pieces at (64, 0, -4.5); room = `BedroomBuilder3D`
   at (61.5, 0, 6.9)); light by phase / zone `VillageLighting3D`, E outside
   the restaurant `VillageSpots3D`, area sound + footsteps `VillageAudio3D`.
+- **World around the village map** (`VillageBuilder3D.build`): one big ground +
+  the bay + islands per phase (`VillageBackdrop3D`, `SeaBackdrop3D.build_islands`
+  returns its material), house rows (`TubeHouse3D`, `StreetFacades3D` (also the
+  restaurant's shop row), `StreetLife3D`), waterfront life (`WaterfrontLife3D`),
+  real edges (`VillageEdges3D`, no invisible-wall-only edge where it shows).
+  Static boxes go through `BoxBatch3D` (one mesh per material). Props by id via
+  `VillageProps3D.place`: the model in `assets/models/ready/<id>/` when it
+  exists, else a stand-in (`VillageStandins3D` / `VillageNature3D`). Fog loop:
+  `WorldEdgeLoop3D` (west pavement x < -20 <-> east shore path x > 81, 25 m
+  into the fog = moved to the other one, same heading; tries per day,
+  `VillageFogSigns3D`); `FallSafety3D` (y < -5) in the village and the sea; sea
+  edge `SeaEdge3D` (no line). PsxLook keeps triplanar tiling (`psx_vertex`
+  `triplanar`). Restaurant HUD = order slips only. Test `world_edges_test`.
 - Sea view matches the restaurant: the boat camera zooms x2 (Rin is 16x32
   on screen, standing, no hat (art plans have no nón lá); `Boat._draw` is 3/4: the deck turns, the
   hull side always faces the bottom of the screen, Rin and the cat stay

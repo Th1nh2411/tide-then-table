@@ -34,8 +34,9 @@ static func build(host: Node3D, evening: bool) -> void:
 
 ## Village ground and the sandy edge of the shore.
 static func build_ground(host: Node3D) -> void:
-	B.box(host, Vector3(0, -0.1, 8.0), Vector3(34, 0.2, 12), "4a4136", true).material_override = HorrorMaterials.tiled("ground_village", 2.0)
-	B.box(host, Vector3(0, -0.12, SHORE_Z + 0.6), Vector3(34, 0.2, 1.4), "8a7a5e", true)
+	# Packed sandy earth, wet sand at the waterline.
+	B.box(host, Vector3(0, -0.1, 8.0), Vector3(34, 0.2, 12), "4a4136", true).material_override = HorrorMaterials.tiled("lane_dirt", 3.0, Color(0.95, 0.88, 0.74))
+	B.box(host, Vector3(0, -0.12, SHORE_Z + 0.6), Vector3(34, 0.2, 1.4), "8a7a5e", true).material_override = HorrorMaterials.tiled("lane_dirt", 2.0, Color(0.8, 0.74, 0.62))
 
 
 ## Rin's house front as a closed block (the village map builds the real room instead).
@@ -63,12 +64,19 @@ static func build_scenery(host: Node3D) -> void:
 	host.add_child(hull)
 	hull.position = THUNG + Vector3(-1.3, WATER_Y - 0.05, -0.4)
 	hull.scale = Vector3(1, 0.75, 1)
+	# Woven bamboo, tarred dark (the bare model reads as a pale disc in a plain hull).
+	var weave := HorrorMaterials.tiled("floor_wood_planks", 0.3, Color(0.42, 0.34, 0.26))
+	for mesh in hull.find_children("*", "MeshInstance3D", true, false):
+		(mesh as MeshInstance3D).material_override = weave
 	# A small lighthouse on the point, and the far one on Đá Canh Đêm: the dock omens use their beacons.
 	SeaWorldBuilder3D.batch_model(host, "lighthouse", NEAR_LIGHTHOUSE, Vector3(0.6, 0.95, 0.6))
 	SeaWorldBuilder3D.batch_model(host, "lighthouse", FAR_LIGHTHOUSE)
-	B.box(host, LANE + Vector3(0.6, 0.8, 0), Vector3(0.08, 1.6, 0.08), "4a3a2e")
-	B.box(host, LANE + Vector3(0.6, 1.5, 0), Vector3(0.05, 0.3, 1.0), "c9b896")
-	var words := B.label(host, "RA QUÁN", LANE + Vector3(0.64, 1.5, 0), 28, "2a2230")
+	# Hand-painted plank on a stake pointing up the lane.
+	var plank := HorrorMaterials.tiled("door_wood_old", 0.6, Color(0.75, 0.7, 0.62))
+	B.box(host, LANE + Vector3(0.6, 0.8, 0), Vector3(0.09, 1.7, 0.09), "4a3a2e").material_override = plank
+	B.box(host, LANE + Vector3(0.6, 1.45, 0), Vector3(0.05, 0.32, 1.1), "c9b896").material_override = plank
+	B.box(host, LANE + Vector3(0.6, 1.45, -0.62), Vector3(0.05, 0.2, 0.2), "c9b896").rotation.x = PI * 0.25
+	var words := B.label(host, "RA QUÁN", LANE + Vector3(0.64, 1.45, 0), 28, "e9dcc0")
 	words.rotation.y = PI * 0.5
 
 
@@ -76,8 +84,9 @@ static func build_scenery(host: Node3D) -> void:
 static func lamp_posts(host: Node3D) -> Array[Vector3]:
 	var bulbs: Array[Vector3] = []
 	for x: float in [-6.0, 4.0]:
-		B.box(host, Vector3(x, 1.4, 3.6), Vector3(0.1, 2.8, 0.1), "394a50")
-		bulbs.append(Vector3(x, 2.7, 3.6))
+		VillageProps3D.place(host, "lamp_post_village", Vector3(x, 0, 3.6), Vector3(0.5, 3.2, 1.0))
+		B.solid_block(host, Vector3(x, 0.6, 3.6), Vector3(0.3, 1.2, 0.3))
+		bulbs.append(Vector3(x, 2.88, 3.6 - 0.7))
 	return bulbs
 
 
@@ -126,10 +135,8 @@ static func _light(host: Node3D, evening: bool) -> void:
 		SeaBackdrop3D.apply_sky(env, moon)
 	else:
 		# Grey dawn after the night: a pale overcast panorama, no sun.
-		var sky_material := PanoramaSkyMaterial.new()
-		sky_material.panorama = load("res://assets/textures/sea3d/sky_dawn_overcast.png") as Texture2D
 		var sky := Sky.new()
-		sky.sky_material = sky_material
+		sky.sky_material = SeaBackdrop3D.panorama_material(load("res://assets/textures/sea3d/sky_dawn_overcast.png") as Texture2D)
 		env.sky = sky
 		env.background_mode = Environment.BG_SKY
 		env.fog_sky_affect = 0.3

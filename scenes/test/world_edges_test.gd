@@ -1,0 +1,156 @@
+extends Node3D
+## The world's edges (PLAN §10 "Hoàn thiện thế giới"): the fog loop at both
+## ends of the village keeps Rin's heading and puts him on ground, never fires
+## on the normal routes, the fall safety net, the sea's edge pushing back, and
+## real blockers (not only invisible walls) at the visible village edges.
+
+var failures := 0
+
+
+func _ready() -> void:
+	call_deferred("_run")
+
+
+func _run() -> void:
+	SaveSystem.autosave_off = true
+	GameState.reset()
+	var village := (load(VillageLayout3D.SCENE) as PackedScene).instantiate() as VillageScene3D
+	add_child(village)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var loop := village.get_node("WorldEdgeLoop") as WorldEdgeLoop3D
+	_check(loop != null, "the village has its fog loop")
+	_loop_checks(village, loop)
+	_route_checks(loop)
+	await _fall_checks(village)
+	_edge_checks(village)
+	village.queue_free()
+	await get_tree().process_frame
+	await _sea_checks()
+	print("WORLD EDGES TEST ", "PASS" if failures == 0 else "FAIL")
+	get_tree().quit(1 if failures else 0)
+
+
+func _loop_checks(village: VillageScene3D, loop: WorldEdgeLoop3D) -> void:
+	var player := village.player
+	var before := WorldEdgeLoop3D.tries()
+	# Walking west out of the street, 25 m into the fog.
+	player.global_position = Vector3(WorldEdgeLoop3D.WEST_MOUTH - loop.loop_depth - 0.2, 0, 5.0)
+	player.rotation.y = -PI * 0.5
+	player.velocity = Vector3(-1.2, 0, 0.1)
+	loop._process(0.0)
+	var p := player.global_position
+	var at := loop.depth_at(p)
+	_check(at.y > 0.0 and at.x < loop.loop_depth, "west fog comes out on the east shore path, still in the fog")
+	_check(is_equal_approx(player.rotation.y, -PI * 0.5) and player.velocity.is_equal_approx(Vector3(-1.2, 0, 0.1)), "heading and speed are kept through the loop")
+	_check(absf((p.z - VillageEdges3D.EAST_Z.x) - (5.0 - StreetFacades3D.WEST_Z.x)) < 0.01, "his place across the path is kept")
+	_check(_ground_under(p), "he lands on ground")
+	_check(_capsule_free(p, player), "he lands clear of walls and props")
+	_check(WorldEdgeLoop3D.tries() == before + 1, "the try is counted")
+	# And back the other way.
+	player.global_position = Vector3(WorldEdgeLoop3D.EAST_MOUTH + loop.loop_depth + 0.3, 0, 3.0)
+	loop._process(0.0)
+	p = player.global_position
+	at = loop.depth_at(p)
+	_check(at.y < 0.0 and at.x < loop.loop_depth and _ground_under(p) and _capsule_free(p, player), "east fog comes out on the west pavement, on ground")
+	loop._process(0.0)
+	_check(loop._signs.has_sign(), "from the second try a wrong thing waits in the fog")
+	player.global_position = Vector3(0, 0, 2.0)
+	loop._process(0.0)
+	_check(not loop._signs.has_sign(), "it is gone once he is out of the fog")
+	_check(village.lighting.haze_density > 0.0 and (village.get_node("RestaurantEnvironment") as WorldEnvironment).environment.fog_density < 0.1, "the fog is back to normal outside")
+
+
+## The everyday routes never reach the fog paths.
+func _route_checks(loop: WorldEdgeLoop3D) -> void:
+	var routes: Array[Vector3] = []
+	for x in range(-19, 20, 2):
+		for z in range(-7, 9, 3):
+			routes.append(Vector3(x, 0, z))  # the street
+	for x in range(20, 48, 3):
+		routes.append(Vector3(x, 0, VillageLayout3D.LANE_Z))  # the lane
+	for x in range(47, 81, 3):
+		for z in range(-2, 10, 3):
+			routes.append(Vector3(x, 0, z))  # the waterfront
+	routes.append(VillageLayout3D.pier_start())
+	routes.append(VillageLayout3D.morning_start())
+	var fired := false
+	for p in routes:
+		if loop.depth_at(p).y != 0.0:
+			fired = true
+	_check(not fired, "street, lane, waterfront, pier and room never count as fog")
+	_check(loop.depth_at(Vector3(-25.0, 0, 5.0)).x < loop.haze_from + 1.5, "the first metres of the west pavement are still clear")
+
+
+func _fall_checks(village: VillageScene3D) -> void:
+	var net := village.get_node("FallSafety") as FallSafety3D
+	_check(net != null, "the village has a fall safety net")
+	village.player.global_position = Vector3(55.0, 0, 3.0)
+	net.check()
+	village.player.global_position = Vector3(55.0, -6.0, 3.0)
+	_check(net.check() and village.player.global_position.is_equal_approx(Vector3(55.0, 0, 3.0)), "falling below -5 puts him back where he last stood")
+	_check(net._black.modulate.a > 0.9, "the screen is black for the move")
+	for i in 60:
+		await get_tree().process_frame
+	_check(net._black.modulate.a < 0.05, "and clears after half a second")
+
+
+## Visible edges have something real standing on them.
+func _edge_checks(village: VillageScene3D) -> void:
+	var fences := 0
+	var houses := village.find_children("EdgeHouses", "Node3D", true, false).size()
+	for node in village.find_children("*bamboo_fence*", "Node3D", true, false):
+		var p := (node as Node3D).global_position
+		if absf(p.x - VillageLayout3D.GROUND_X.x) < 0.5 or absf(p.z - VillageLayout3D.GROUND_Z.y) < 0.5:
+			fences += 1
+	_check(fences >= 6, "fences stand on the waterfront's west and south edges")
+	_check(houses == 1, "houses line the east shore path")
+	_check(village.find_children("StreetFacades", "Node3D", true, false).size() == 1 and village.find_children("OppositeRow", "Node3D", true, false).size() == 1, "house rows close both street ends and the far side of the road")
+	_check(village.find_children("Ground", "Node3D", true, false).size() >= 1, "one big ground lies under the village")
+
+
+func _sea_checks() -> void:
+	var half := SeaLayout3D.size_world() * 0.5
+	var reach := SeaLayout3D.reach_z(0.32)
+	_check(SeaEdge3D.amount(Vector3(0, 0, reach + SeaEdge3D.MARGIN + 1.0), reach, half) == 0.0, "open water is not the edge")
+	_check(SeaEdge3D.amount(Vector3(0, 0, reach), reach, half) == 1.0 and SeaEdge3D.amount(Vector3(half.x - 1.0, 0, 30.0), reach, half) > 0.8, "the reach and the map sides are")
+	var sea := (load(VillageDay3D.SEA) as PackedScene).instantiate() as SeaScene3D
+	add_child(sea)
+	await get_tree().physics_frame
+	sea.boat.position = Vector3(sea.START.x, 0, reach + 0.5)
+	sea.boat.rotation.y = 0.0  # bow to the open sea
+	for i in 90:
+		sea.boat.velocity = Vector3(0, 0, -0.5)
+		SeaEdge3D.step(sea, 1.0 / 60.0)
+		sea.boat.rotation.y += sea.yaw_velocity / 60.0
+	_check(sea.edge_amount > 0.9, "the boat feels the edge")
+	var light := SeaEdge3D.home_light(sea) - sea.boat.position
+	_check(absf(angle_difference(sea.boat.rotation.y, atan2(-light.x, -light.z))) < 1.2, "the bow swings round towards the lighthouse")
+	sea.boat.velocity = Vector3.ZERO
+	SeaEdge3D.step(sea, 0.5)
+	_check(sea.boat.velocity.z > 0.0, "the current pushes back towards the dock")
+	_check(sea.has_node("FallSafety"), "the sea has the fall safety net too")
+	sea.queue_free()
+	await get_tree().process_frame
+
+
+func _ground_under(p: Vector3) -> bool:
+	var ray := PhysicsRayQueryParameters3D.create(p + Vector3.UP * 0.5, p + Vector3.DOWN * 1.0)
+	return not get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
+
+
+func _capsule_free(p: Vector3, player: CharacterBody3D) -> bool:
+	var shape := CapsuleShape3D.new()
+	shape.radius = 0.28
+	shape.height = 1.4
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = shape
+	query.transform = Transform3D(Basis.IDENTITY, p + Vector3.UP * 0.85)
+	query.exclude = [player.get_rid()]
+	return get_world_3d().direct_space_state.intersect_shape(query, 4).is_empty()
+
+
+func _check(ok: bool, words: String) -> void:
+	print(("PASS " if ok else "FAIL ") + words)
+	if not ok:
+		failures += 1
