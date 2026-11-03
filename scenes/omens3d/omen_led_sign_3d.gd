@@ -22,7 +22,7 @@ func _ready() -> void:
 	_label = Label3D.new()
 	_label.font_size = 40
 	_label.pixel_size = 0.005
-	_label.modulate = Color("ff6a3d")
+	_label.modulate = Color("c9683a")  # old LED strip, dim
 	_label.outline_size = 0
 	_label.position = Vector3(0, 0, 0.05)
 	add_child(_label)

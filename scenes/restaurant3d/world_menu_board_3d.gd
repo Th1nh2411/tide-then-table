@@ -14,7 +14,7 @@ func _ready() -> void:
 	add_child(_viewport)
 	var background := ColorRect.new()
 	background.size = Vector2(960, 600)
-	background.color = Color("243b38")
+	background.color = Color("1c2622")
 	_viewport.add_child(background)
 	var title := Label.new()
 	title.text = "THỰC ĐƠN"
@@ -22,7 +22,7 @@ func _ready() -> void:
 	title.size.x = 960
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 56)
-	title.add_theme_color_override("font_color", Color("f2d98a"))
+	title.add_theme_color_override("font_color", Color("c9a45e"))
 	_viewport.add_child(title)
 	_grid = GridContainer.new()
 	_grid.position = Vector2(20, 90)
@@ -38,7 +38,9 @@ func _ready() -> void:
 	var material := StandardMaterial3D.new()
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.albedo_texture = _viewport.get_texture()
-	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
+	# Old board under a weak bulb: dimmer, yellowed (StyleGuide look).
+	material.albedo_color = Color(0.74, 0.66, 0.5)
+	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	face.material_override = material
 	add_child(face)
 

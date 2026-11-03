@@ -26,7 +26,7 @@ var _materials: Array[StandardMaterial3D] = []
 func _ready() -> void:
 	var head_y := 1.62 if kind == Kind.STAND else 0.08
 	if kind == Kind.STAND:
-		ConceptModel3D.spawn(self, "drowned_figure", Vector3.ZERO, 1.72)
+		GhostLook3D.apply(ConceptModel3D.spawn(self, "drowned_figure", Vector3.ZERO, 1.72))
 	else:
 		var head := SphereMesh.new()
 		head.radius = 0.15

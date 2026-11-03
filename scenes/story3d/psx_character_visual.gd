@@ -8,7 +8,8 @@ const DIR := "res://assets/models/psx_chars/"
 const CLIP_SOURCE := DIR + "clip_source.glb"
 const ONE_SHOTS := ["Cast", "SitDown", "StandUp"]
 const SPINE := ["Spine", "Chest", "UpperChest", "Neck", "Head"]
-const DROWNED_TINT := Color(0.55, 0.68, 0.78)
+## The dead (GhostLook3D): drowned figures and ông Tư.
+const GHOSTS := ["drowned_m", "drowned_f", "ong_tu"]
 ## Variant id -> pack model (file name without .fbx). Several ids may share one.
 const CAST := {
 	"bao": "Character_Male_46", "co_nam": "Character_51_Female",
@@ -45,7 +46,14 @@ func load_variant(id: String) -> void:
 	WorldPresentation3D.cast_shadows(model)
 	skeleton = model.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
 	animation = model.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
-	_style_materials(id.begins_with("drowned"))
+	_style_materials()
+	if id in GHOSTS:
+		GhostLook3D.apply(self)
+	elif has_meta(StylePass3D.SKIP):
+		remove_meta(StylePass3D.SKIP)  # was a ghost variant before
+		var drips := get_node_or_null(GhostLook3D.DRIPS)
+		if drips:
+			drips.queue_free()
 	# Own library per model (runtime seat clips are calibrated per skeleton).
 	var library := AnimationLibrary.new()
 	_load_clips()
@@ -71,23 +79,19 @@ func body_texture() -> Texture2D:
 	return null
 
 
-## One styled material per source material (shared by every instance).
-func _style_materials(drowned: bool) -> void:
+## One nearest-filtered material per source material (shared by every
+## instance); StylePass3D grades it like the world.
+func _style_materials() -> void:
 	for mesh: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
 		for surface in mesh.get_surface_override_material_count():
 			var source := mesh.get_active_material(surface) as BaseMaterial3D
 			if source == null:
 				continue
-			var key := "%s:%s:%d:%s" % [model.scene_file_path, mesh.name, surface, drowned]
+			var key := "%s:%s:%d" % [model.scene_file_path, mesh.name, surface]
 			if not _materials.has(key):
 				var material := source.duplicate() as BaseMaterial3D
 				material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 				material.roughness = 0.9
-				if drowned:
-					# Grey-blue, wet sheen.
-					material.albedo_color = DROWNED_TINT
-					material.roughness = 0.55
-					material.metallic_specular = 0.6
 				_materials[key] = material
 			mesh.set_surface_override_material(surface, _materials[key])
 

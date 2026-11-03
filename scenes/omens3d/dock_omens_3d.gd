@@ -75,7 +75,7 @@ func _build_pier_head(post: Vector3, figure: bool) -> void:
 		OmenProps3D.light(self, post + Vector3(0, 0.9, 0.3), "ffb347", 1.0, 4.0)
 		return
 	OmenProps3D.box(self, post + Vector3(0, 0.8, 0.14), Vector3(0.14, 0.18, 0.14), "3a3226")
-	ConceptModel3D.spawn(self, "drowned_figure", post + Vector3(-0.8, 0, 0.1), 1.72, PI)
+	GhostLook3D.apply(ConceptModel3D.spawn(self, "drowned_figure", post + Vector3(-0.8, 0, 0.1), 1.72, PI))
 
 
 ## Small notes dropped along the pier, from the shore out towards its head.

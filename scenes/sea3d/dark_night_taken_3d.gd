@@ -73,7 +73,7 @@ static func _hands(sea: SeaScene3D) -> Array[Node3D]:
 		sea.boat_visual.add_child(hand)
 		hand.position = Vector3(cos(angle) * RIM_RADIUS, -1.6, sin(angle) * RIM_RADIUS)
 		hand.rotation.y = atan2(-cos(angle), -sin(angle))  # +Z towards the boat
-		ConceptModel3D.spawn(hand, "drowned_hand", Vector3(0, -1.0, 0), 1.15)
+		GhostLook3D.apply(ConceptModel3D.spawn(hand, "drowned_hand", Vector3(0, -1.0, 0), 1.15))
 		hands.append(hand)
 	return hands
 

@@ -9,6 +9,7 @@ extends CanvasLayer
 ## every original material and the game's own 3D view.
 
 const VERTEX_SHADER := preload("res://scenes/world3d/psx_vertex.gdshader")
+const VERTEX_SHADER_2S := preload("res://scenes/world3d/psx_vertex_2s.gdshader")
 const SCREEN_SHADER := preload("res://scenes/world3d/psx_screen.gdshader")
 const META := "psx_original"
 ## The hidden full-size 3D render is kept, but drawn at this scale to stay cheap.
@@ -94,13 +95,20 @@ func _exit_tree() -> void:
 
 func _on_node_added(node: Node) -> void:
 	if node is MeshInstance3D:
-		# Builders set materials right after add_child; convert once they have.
-		_apply.call_deferred(node)
+		# Builders set materials right after add_child; convert once they have
+		# (Variant: the node may be freed by then).
+		_apply_later.call_deferred(node)
+
+
+func _apply_later(node: Variant) -> void:
+	if is_instance_valid(node):
+		_apply(node as MeshInstance3D)
 
 
 func _apply(mesh: MeshInstance3D) -> void:
 	if not is_instance_valid(mesh) or mesh.mesh == null or mesh.has_meta(META):
 		return
+	StylePass3D.apply_mesh(mesh)  # the village grade first; this copies its result
 	var saved: Array = [mesh.material_override]
 	for i in mesh.mesh.get_surface_count():
 		saved.append(mesh.get_surface_override_material(i))
@@ -113,8 +121,14 @@ func _apply(mesh: MeshInstance3D) -> void:
 		mesh.set_surface_override_material(i, _convert(mesh.get_active_material(i)))
 
 
-## Opaque, lit StandardMaterial3Ds only; anything else is kept as it is.
+## Opaque, lit StandardMaterial3Ds only; anything else is kept as it is
+## (StylePass3D's graded materials already are this shader: only snap is set).
 func _convert(source: Material) -> Material:
+	var graded := source as ShaderMaterial
+	if graded and (graded.shader == VERTEX_SHADER or graded.shader == VERTEX_SHADER_2S):
+		graded.set_shader_parameter("snap", vertex_snap)
+		graded.set_shader_parameter("snap_res", snap_res)
+		return source
 	var base := source as BaseMaterial3D
 	if base == null or base.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED \
 			or base.shading_mode != BaseMaterial3D.SHADING_MODE_PER_PIXEL:
@@ -122,7 +136,7 @@ func _convert(source: Material) -> Material:
 	if _converted.has(base):
 		return _converted[base]
 	var m := ShaderMaterial.new()
-	m.shader = VERTEX_SHADER
+	m.shader = VERTEX_SHADER if base.cull_mode == BaseMaterial3D.CULL_BACK else VERTEX_SHADER_2S
 	m.set_shader_parameter("albedo_color", base.albedo_color)
 	m.set_shader_parameter("use_tex", base.albedo_texture != null)
 	if base.albedo_texture:
@@ -130,6 +144,8 @@ func _convert(source: Material) -> Material:
 	m.set_shader_parameter("use_vertex_color", base.vertex_color_use_as_albedo)
 	m.set_shader_parameter("uv_scale_offset", Vector4(base.uv1_scale.x, base.uv1_scale.y, base.uv1_offset.x, base.uv1_offset.y))
 	m.set_shader_parameter("roughness", base.roughness)
+	m.set_shader_parameter("triplanar", base.uv1_triplanar)
+	m.set_shader_parameter("triplanar_world", base.uv1_world_triplanar)
 	if base.emission_enabled:
 		var e := base.emission * base.emission_energy_multiplier
 		m.set_shader_parameter("emission", Vector3(e.r, e.g, e.b))
