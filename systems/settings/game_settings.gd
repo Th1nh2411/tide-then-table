@@ -19,6 +19,7 @@ const DEFAULTS: Array[Array] = [
 	["audio", "muted", false],
 	["video", "psx", true],
 	["video", "fullscreen", false],
+	["video", "flash", true],
 ]
 
 ## Tests point this at a scratch file.
@@ -89,6 +90,16 @@ static func psx() -> bool:
 
 static func fullscreen() -> bool:
 	return bool(get_value("video", "fullscreen"))
+
+
+## One-frame flashes / strobing scares (SingleFrameFlash3D); off for
+## photosensitive players ("Hiệu ứng nhấp nháy").
+static func flash_effects() -> bool:
+	return bool(get_value("video", "flash"))
+
+
+static func set_flash_effects(on: bool) -> void:
+	set_value("video", "flash", on)
 
 
 static func set_volume(value: float) -> void:

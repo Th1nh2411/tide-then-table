@@ -16,6 +16,9 @@ const LYING_PITCH := 1.25  # looking up at the ceiling
 const OPEN_SECONDS := 0.12
 const BEFORE_SIT := 0.35
 const AFTER_SIT := 0.6
+## Wrong-night face (jump scare a): when it shows in the black, for how long.
+const FACE_AT := 0.9
+const FACE_SECONDS := 0.3
 
 @export var dark_seconds := 1.4
 @export var sit_up_seconds := 0.75
@@ -27,12 +30,15 @@ const AFTER_SIT := 0.6
 var room: VillageScene3D
 var line := ""
 var knocks := false
+## WrongNightScare3D variant to show in the black first, -1 = none.
+var face := -1
 var _black := ColorRect.new()
 var _shake := 0.0
 
 
-static func play(owner: VillageScene3D, after: String, knock: bool = false) -> NightmareWake3D:
+static func play(owner: VillageScene3D, after: String, knock: bool = false, face_variant: int = -1) -> NightmareWake3D:
 	var wake := NightmareWake3D.new()
+	wake.face = face_variant
 	wake.room = owner
 	wake.line = after
 	wake.knocks = knock
@@ -51,6 +57,8 @@ func _ready() -> void:
 	room.held_pitch = LYING_PITCH
 	Sfx.hold("heartbeat", true)
 	var tween := create_tween()
+	if face >= 0:
+		_face_in_the_dark(tween)
 	if knocks:
 		Sfx.duck(knock_at + 0.9)
 		tween.tween_interval(knock_at)
@@ -67,9 +75,28 @@ func _ready() -> void:
 	tween.tween_callback(_done)
 
 
+## Jump scare (a) after docking on an omen night: in the black, a face over
+## the bed for a moment (WrongNightScare3D), then black again.
+func _face_in_the_dark(tween: Tween) -> void:
+	var scare: Array[WrongNightScare3D] = []
+	Sfx.duck(1.4, 0.0)
+	tween.tween_interval(FACE_AT)
+	tween.tween_callback(func() -> void:
+		var shown := WrongNightScare3D.show_face(room, face)
+		if shown:
+			scare.append(shown)
+			_black.color.a = 0.0)
+	tween.tween_interval(FACE_SECONDS)
+	tween.tween_callback(func() -> void:
+		_black.color.a = 1.0
+		for shown in scare:
+			shown.queue_free())
+
+
 ## Seconds from the black screen to Rin moving again.
 func total_seconds() -> float:
-	return (knock_dark_seconds if knocks else dark_seconds) + OPEN_SECONDS + BEFORE_SIT + sit_up_seconds + AFTER_SIT
+	var face_time := FACE_AT + FACE_SECONDS if face >= 0 else 0.0
+	return face_time + (knock_dark_seconds if knocks else dark_seconds) + OPEN_SECONDS + BEFORE_SIT + sit_up_seconds + AFTER_SIT
 
 
 func _process(delta: float) -> void:

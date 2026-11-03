@@ -32,7 +32,13 @@ static func play(sea: SeaScene3D, speed: float = 1.0) -> void:
 		rise.tween_property(hand, "rotation:x", 0.5, 0.45 * s)
 	await rise.finished
 	await sea.get_tree().create_timer(0.6 * s).timeout
+	# Jump scare (a): a face fills the view, then black at once (not in fast tests).
+	var scared := false
+	if speed <= 1.0:
+		scared = await WrongNightScare3D.at_sea(sea)
 	var veil := _veil(sea)
+	if scared:
+		veil.color.a = 1.0
 	Sfx.play("whoosh")
 	var sink := sea.create_tween().set_parallel()
 	sink.tween_property(sea.boat_visual, "position:y", -2.4, 1.8 * s).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)

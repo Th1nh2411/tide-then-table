@@ -275,6 +275,10 @@ func _box(parent: Node3D, pos: Vector3, size: Vector3, hex: String) -> MeshInsta
 	return mesh
 
 
+## The body (skeleton + animation); null for the cat.
+func visual() -> RinPilotVisual:
+	return _pilot
+
 func get_variant() -> String:
 	return current_variant
 

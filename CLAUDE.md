@@ -165,6 +165,16 @@ Vietnamese, keep code comments in short English.
   keep Rin and her apart). E while looking at her: one line by day
   (`VyTalk3D`, `data/story/vy.tres`, uneasy `vy_late.tres` from day 5).
   Test `vy_staff_test`.
+- **Uncanny visuals (PLAN §10 "Dị bằng hình ảnh"):** toolkit in
+  `scenes/uncanny3d/` (`UncannyActor3D.attach(rig)`: stare_at / freeze /
+  choppy / glitch_face via SkeletonModifier3Ds; `UncannyMoves3D`;
+  `UnseenTrick3D` + pure `UnseenCheck`; `UncannyScene3D`; `SingleFrameFlash3D`
+  obeys `GameSettings.flash_effects()`). What plays when: pure
+  `UncannyDirector` (dose in `data/story/uncanny_dose.tres`, never touches
+  omens), placed by `UncannyVillage3D` / `UncannyShift3D` / `UncannySea3D`.
+  Jump scares: `WrongNightScare3D`, `TuGhostScare3D`, `FakeFishScare3D`, the
+  turn in `RamReveal3D`; never on consecutive days. Look at them in
+  `scenes/test/uncanny_review.tscn`; test `uncanny_test`.
 - **People (3D):** every actor is a `PersonRig3D.build(parent, id)` (walk /
   carry / sit / drive_ground_motion API). Rin keeps his own rig
   (`RinPilotVisual`, rin_pilot.glb); every NPC is `PsxCharacterVisual`

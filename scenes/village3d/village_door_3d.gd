@@ -52,14 +52,16 @@ func toggle() -> void:
 	set_open(not is_open)
 
 
-func set_open(open: bool, animate: bool = true) -> void:
+## `silent`: no creak (UncannyScene3D closes it while Rin is away).
+func set_open(open: bool, animate: bool = true, silent: bool = false) -> void:
 	if open == is_open:
 		return
 	is_open = open
 	if _tween:
 		_tween.kill()
 	var angle := open_angle if open else 0.0
-	Sfx.play("door_open" if open else "door_close", 0.04)
+	if not silent:
+		Sfx.play("door_open" if open else "door_close", 0.04)
 	if not animate or not is_inside_tree():
 		_hinge.rotation.y = angle
 		return
