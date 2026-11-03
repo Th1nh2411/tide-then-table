@@ -18,7 +18,7 @@ var sea: SeaScene3D
 var drank := false
 var text: OnScreenText
 var trail: Array[MeshInstance3D] = []
-var ghosts: Array[StandardMaterial3D] = []
+var ghosts: Array[ShaderMaterial] = []
 var drowse: RamDrowse3D
 var revealing := false
 var _clock := 0.0
@@ -89,7 +89,7 @@ func _process(delta: float) -> void:
 	for ghost in ghosts:
 		var holder := RamFx3D.ghost_holder(ghost)
 		var close := holder.position.distance_to(boat) < 5.0
-		ghost.albedo_color.a = move_toward(ghost.albedo_color.a, 0.0 if close else 0.42, delta * 0.8)
+		RamFx3D.set_ghost_alpha(ghost, move_toward(RamFx3D.ghost_alpha(ghost), 0.0 if close else RamFx3D.GHOST_OPACITY, delta * 0.8))
 	_clock += delta
 	if _clock >= whisper_gap:
 		_clock = 0.0

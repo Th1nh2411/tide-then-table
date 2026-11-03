@@ -38,7 +38,8 @@ func _until(path: String) -> Node:
 
 func _until_any(paths: Array[String], old: Node = null) -> Node:
 	var waited_for_wake := false
-	for i: int in range(600):
+	# 25 s: a đêm âm "taken" ending (~8 s at sea) plus the wake (up to ~6 s) fit.
+	for i: int in range(1500):
 		var scene: Node = get_tree().current_scene
 		if scene and scene != old and paths.has(scene.scene_file_path) and not SceneRouter._is_transitioning:
 			if ready_to_drive(scene):

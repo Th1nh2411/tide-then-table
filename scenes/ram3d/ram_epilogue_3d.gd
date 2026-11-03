@@ -44,13 +44,13 @@ func _play_true() -> void:
 	shore.release_seconds = 1.4
 	add_child(shore)
 	# The dead along the pier, ông Tư at its end by his thúng.
-	var ghosts: Array[StandardMaterial3D] = []
+	var ghosts: Array[ShaderMaterial] = []
 	for i in GHOSTS:
 		var z := 0.6 - float(i) * 1.55
 		var side := -0.45 if i % 2 == 0 else 0.45
 		var ghost := RamFx3D.ghost(self, Vector3(PIER_X + side, 0.12, z), "ong_tu" if i == GHOSTS - 1 else "drowned")
 		RamFx3D.ghost_holder(ghost).rotation.y = atan2(camera.position.x - PIER_X, camera.position.z - z)
-		ghost.albedo_color.a = 0.0
+		RamFx3D.set_ghost_alpha(ghost, 0.0)
 		ghosts.append(ghost)
 	var lines := RamFx3D.LINES.dawn.duplicate()
 	if not lines.is_empty():
@@ -122,5 +122,5 @@ func _fade(rect: ColorRect, alpha: float, seconds: float) -> Tween:
 	return tween
 
 
-func _fade_ghost(ghost: StandardMaterial3D, alpha: float, seconds: float) -> void:
-	create_tween().tween_property(ghost, "albedo_color:a", alpha, RamNight.secs(seconds))
+func _fade_ghost(ghost: ShaderMaterial, alpha: float, seconds: float) -> void:
+	create_tween().tween_property(ghost, "shader_parameter/opacity", alpha, RamNight.secs(seconds))

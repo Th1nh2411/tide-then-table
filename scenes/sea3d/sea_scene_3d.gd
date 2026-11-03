@@ -66,6 +66,7 @@ var poi_busy := false
 var whirlpool_marks: Array[MeshInstance3D] = []
 
 func _ready() -> void:
+	StylePass3D.set_phase("sea")
 	rng.randomize()
 	if boat_data == null:
 		boat_data = load("res://data/boats/thuyen_thung.tres") as BoatData

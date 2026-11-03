@@ -74,6 +74,7 @@ func _appear(camera: Camera3D) -> void:
 	forward = forward.normalized()
 	var feet := camera.global_position - Vector3(0, FirstPersonView3D.EYE_RESTAURANT.y, 0) - forward * behind
 	var material := RamFx3D.ghost(self, Vector3.ZERO, "ong_tu")
+	RamFx3D.set_ghost_alpha(material, 0.9)  # close behind Rin: nearly solid
 	_ghost = RamFx3D.ghost_holder(material)
 	_ghost.global_position = feet
 	var rig := _ghost.get_meta("rig") as PersonRig3D

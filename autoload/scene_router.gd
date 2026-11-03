@@ -18,6 +18,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	# Every button in the game squashes when pressed.
 	UiFx.hook_buttons(get_tree())
+	# Every 3D model gets the shared village look (StyleGuide) as it is built.
+	get_tree().node_added.connect(StylePass3D.on_node_added)
 	# The 3D restaurant and sea are played through Rin's eyes.
 	_toggle_first_person()
 

@@ -5,35 +5,26 @@ extends RefCounted
 ## and lines shown one after another as on-screen text.
 
 const LINES: RamLinesData = preload("res://data/story/ram_lines.tres")
-const GHOST_HEX := "9fe6e0"
+## How solid the rằm visions are (GhostLook3D dithered opacity).
+const GHOST_OPACITY := 0.42
 
 
 static func wait(node: Node, seconds: float) -> void:
 	await node.get_tree().create_timer(RamNight.secs(seconds), true).timeout
 
 
-## A person drawn as a pale, see-through, self-lit ghost (default: one of the
-## drowned, `PersonRig3D` "drowned" alternates the two pack models). Returns the shared
-## material (tween its albedo alpha to fade the ghost).
-static func ghost(parent: Node3D, pos: Vector3, variant: String = "drowned") -> StandardMaterial3D:
+## A person drawn as a see-through ghost in the dead's look (GhostLook3D;
+## default: one of the drowned, `PersonRig3D` "drowned" alternates the two
+## pack models). Returns its own material: fade it with
+## `set_ghost_alpha` / a tween of "shader_parameter/opacity".
+static func ghost(parent: Node3D, pos: Vector3, variant: String = "drowned") -> ShaderMaterial:
 	var holder := Node3D.new()
 	parent.add_child(holder)
 	holder.position = pos
 	var rig := PersonRig3D.build(holder, variant)
-	var material := StandardMaterial3D.new()
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.albedo_color = Color(GHOST_HEX, 0.42)
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	# Keep the body's own texture under the pale tint.
-	var visual := rig.get_node_or_null("PsxPilot") as PsxCharacterVisual
-	if visual:
-		material.albedo_texture = visual.body_texture()
-		material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	var material := GhostLook3D.apply(rig, true, GHOST_OPACITY)
 	for node in rig.find_children("*", "MeshInstance3D", true, false):
-		var mesh := node as MeshInstance3D
-		mesh.material_override = material
-		mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		(node as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for node in rig.find_children("*", "CollisionShape3D", true, false):
 		(node as CollisionShape3D).disabled = true
 	holder.set_meta("rig", rig)
@@ -41,8 +32,16 @@ static func ghost(parent: Node3D, pos: Vector3, variant: String = "drowned") -> 
 	return material
 
 
-static func ghost_holder(material: StandardMaterial3D) -> Node3D:
+static func ghost_holder(material: ShaderMaterial) -> Node3D:
 	return material.get_meta("holder") as Node3D
+
+
+static func ghost_alpha(material: ShaderMaterial) -> float:
+	return GhostLook3D.opacity(material)
+
+
+static func set_ghost_alpha(material: ShaderMaterial, alpha: float) -> void:
+	GhostLook3D.set_opacity(material, alpha)
 
 
 ## A paper lotus lantern (same look as the dock's hoa đăng omen).

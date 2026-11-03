@@ -9,6 +9,7 @@ extends Node
 ## PS1 look copies materials once, so emission can't be changed live).
 
 enum Phase { MORNING, SHIFT, NIGHT }
+const STYLE_PHASES: Array[String] = ["morning", "shift", "night"]
 
 @export var blink_in := 0.35
 @export var blink_out := 0.6
@@ -104,6 +105,8 @@ func _current() -> Environment:
 
 func _apply() -> void:
 	_world.environment = _current()
+	var style_phase: String = STYLE_PHASES[phase]
+	StylePass3D.set_phase(style_phase)  # albedo tint (StyleGuide)
 	match phase:
 		Phase.MORNING:
 			_aim(_sun, Vector3(-35, 140, 0), "c8cfd4", 0.45)

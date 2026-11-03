@@ -25,6 +25,15 @@ Vietnamese, keep code comments in short English.
   `Sfx.SOUNDS` / `LOOPS`, synth `SfxSynth`; every Button clicks; mute in the
   pause menu, saved in user://settings.cfg; silent when headless). Quit via
   `SceneRouter.quit_game()` (stops sounds first, else playbacks leak).
+- One look for every 3D model (PLAN §10 "Đồng bộ style"): numbers in
+  `StyleGuide` (`data/art/style_guide.tres`); `StylePass3D` grades every
+  MeshInstance3D once as it enters the tree (hooked in `SceneRouter`, runs
+  before `PsxLook3D`): new models need nothing. Glowing / see-through /
+  unshaded materials are kept; anything that must stay exact (shiny puddle,
+  eyes) gets meta `style_skip` on the node or a parent. Old bright props:
+  add a worn colour to `StyleGuide.recolor` ("NodePrefix|hex"). The dead
+  (ông Tư, drowned, figures) use `GhostLook3D.apply(node)`. Check with
+  `scenes/art_pilots/style_review.tscn` (windowed; `-- --no-style` = before).
 - 640x360 viewport, stretch `viewport`, integer scaling; default window
   1920x1080 (x3). F11 toggles fullscreen anywhere (`SceneRouter._input`).
   Top-down art uses Stardew-scale 16 px tiles (characters 16x32).

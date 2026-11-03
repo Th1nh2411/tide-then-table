@@ -52,9 +52,10 @@ static func label(parent: Node3D, words: String, pos: Vector3, size: int, hex: S
 static func plate_model(parent: Node3D) -> Node3D:
 	var root := Node3D.new()
 	parent.add_child(root)
-	box(root, Vector3.ZERO, Vector3(0.36, 0.035, 0.3), "e8d9b7")
+	# Chipped melamine plate, grilled seafood (worn tones: StyleGuide).
+	box(root, Vector3.ZERO, Vector3(0.36, 0.035, 0.3), "b3a78c")
 	for i: int in range(3):
-		box(root, Vector3(-0.1 + i * 0.1, 0.045, 0), Vector3(0.075, 0.05, 0.18), "c97649")
+		box(root, Vector3(-0.1 + i * 0.1, 0.045, 0), Vector3(0.075, 0.05, 0.18), "9b5b3d")
 	var beer := RestaurantBatchVisuals.add(root, "beer_tower", Vector3(0, 0.02, 0))
 	beer.name = "BeerTower"
 	beer.visible = false
@@ -137,8 +138,8 @@ static func _shop_light(host: Node3D, pos: Vector3) -> void:
 	host.add_child(lamp)
 	lamp.position = pos
 	lamp.rotation_degrees.x = -90.0
-	lamp.light_color = Color("ffd3a0")
-	lamp.light_energy = 1.5 if RenderingServer.get_current_rendering_method() == "gl_compatibility" else 4.0
+	lamp.light_color = Color("ffc98f")
+	lamp.light_energy = 1.2 if RenderingServer.get_current_rendering_method() == "gl_compatibility" else 3.2
 	lamp.spot_range = 6.5
 	lamp.spot_angle = 52.0
 	lamp.spot_angle_attenuation = 0.6
@@ -148,11 +149,12 @@ static func _shop_light(host: Node3D, pos: Vector3) -> void:
 	lamp.shadow_blur = 2.0
 	# Visible fixture above each light, with its emitting panel below the housing.
 	box(host, pos + Vector3(0, 0.12, 0), Vector3(0.72, 0.12, 0.24), "394a50")
-	var panel := box(host, pos + Vector3(0, 0.045, 0), Vector3(0.6, 0.025, 0.16), "f2d98a")
+	# Old yellowed tube: dim, warm.
+	var panel := box(host, pos + Vector3(0, 0.045, 0), Vector3(0.6, 0.025, 0.16), "c9a971")
 	var material := panel.material_override as StandardMaterial3D
 	material.emission_enabled = true
-	material.emission = Color("ffd3a0")
-	material.emission_energy_multiplier = 0.8
+	material.emission = Color("e0a865")
+	material.emission_energy_multiplier = 0.55
 
 static func _lamp(host: Node3D, pos: Vector3, hex: String, energy: float, range_: float, shadow: bool) -> void:
 	var lamp := OmniLight3D.new()
@@ -260,7 +262,7 @@ static func _tables(host: Node3D, start_index := 0) -> void:
 static func _kitchen(host: Node3D) -> void:
 	RestaurantBatchVisuals.add(host, "food_cart_0", L.GRILL_POSITION)
 	solid_block(host, L.GRILL_POSITION + Vector3(0, 0.7, 0), Vector3(2.8, 1.3, 1.25))
-	box(host, L.KITCHEN_BOARD_POSITION + Vector3(0, 0.7, 0), Vector3(1.2, 1.3, 0.1), "884b2b", true)
+	box(host, L.KITCHEN_BOARD_POSITION + Vector3(0, 0.7, 0), Vector3(1.2, 1.3, 0.1), "5a3d2e", true)
 	# Cô Năm keeps her grocery counter separate from the kitchen.
 	RestaurantBatchVisuals.add(host, "grocery_counter", L.COUNTER_POSITION)
 	solid_block(host, L.COUNTER_POSITION + Vector3(0, 0.75, 0), Vector3(3.6, 1.0, 0.8))

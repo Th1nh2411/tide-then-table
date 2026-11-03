@@ -63,3 +63,4 @@ func _build_bike() -> void:
 	beam.spot_angle = 22.0
 	var puddle := OmenProps3D.box(bike, Vector3(0, 0.006, 0), Vector3(0.9, 0.004, 1.9), "141c24")
 	(puddle.material_override as StandardMaterial3D).roughness = 0.1
+	puddle.set_meta(StylePass3D.SKIP, true)  # wet: keeps its shine

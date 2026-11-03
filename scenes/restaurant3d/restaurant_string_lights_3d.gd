@@ -34,10 +34,11 @@ static func build(host: Node3D) -> void:
 	host.add_child(root)
 	var metal := _material("394a50")
 	var wire := _material("202e37")
-	var warm := _material("ffe3b0")
+	# Cheap old bulbs: yellowed, dim (no clean white festoon).
+	var warm := _material("d9b27a")
 	warm.emission_enabled = true
-	warm.emission = Color("ffd39b")
-	warm.emission_energy_multiplier = 2.0
+	warm.emission = Color("e0a05a")
+	warm.emission_energy_multiplier = 1.2
 	# Visible wall bracket, full-height pole, and concrete foot.
 	_rod(root,START+Vector3(0,0,-.18),START,.045,metal).name = "WallAnchor"
 	_rod(root,Vector3(END.x,0,END.z),END,.065,metal).name = "CurbPole"
@@ -71,8 +72,8 @@ static func build(host: Node3D) -> void:
 			root.add_child(light)
 			light.position = bulb-Vector3.UP*.1
 			light.rotation_degrees.x = -90
-			light.light_color = Color("ffd3a0")
-			light.light_energy = 2.0 if RenderingServer.get_current_rendering_method() == "gl_compatibility" else 5.0
+			light.light_color = Color("ffc285")
+			light.light_energy = 1.6 if RenderingServer.get_current_rendering_method() == "gl_compatibility" else 3.8
 			light.spot_range = 7.0
 			light.spot_angle = 59.0
 			light.spot_angle_attenuation = .6
