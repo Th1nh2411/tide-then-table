@@ -1,7 +1,7 @@
 class_name SubtitleTuning
 extends Resource
-## Numbers of the subtitles (SpeechStrip, DialogueBox, CaptionLayer): typing
-## pace, how long a line stays, the fade, the dead voices' look, captions.
+## Numbers of the subtitles (SpeechStrip, DialogueBox): typing
+## pace, how long a line stays, the fade, the dead voices' look.
 
 @export_group("Typing")
 ## Speaking pace, letters per second (words appear whole).
@@ -30,15 +30,6 @@ extends Resource
 ## Per-letter tremble ([tremble] level / rate, TrembleEffect); ~0.35 px per level.
 @export var dead_shake_level := 2
 @export var dead_shake_rate := 9.0
-
-@export_group("Sound captions")
-@export var caption_color := Color("a3a39b")
-@export var caption_seconds := 3.0
-## Same sound again within this many seconds: no new caption.
-@export var caption_cooldown := 5.0
-## Faux italic slant of the caption font.
-@export var caption_slant := 0.22
-@export var caption_font_size := 10
 
 
 ## How long a typed line of `length` letters stays before it fades.

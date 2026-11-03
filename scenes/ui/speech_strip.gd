@@ -7,7 +7,7 @@ extends Control
 ## E / click / a queued line skip the typing. Dead speakers (SpeakerTable)
 ## tremble in pale blue-grey under the name "...". "Bảo: ..." names Bảo;
 ## other lines get `default_speaker` ("" = none). One line at a time, up to
-## MAX_QUEUE waiting. Sound captions: `caption()` (CaptionLayer).
+## MAX_QUEUE waiting.
 ## It covers its parent's rect on its own, whatever anchors the owner sets.
 
 const MIN_SECONDS := 0.9
@@ -55,7 +55,6 @@ func _ready() -> void:
 	_speaker.add_theme_font_size_override("font_size", font_size - 2)
 	_text.add_theme_font_size_override("normal_font_size", font_size)
 	_text.tuning = tuning
-	CaptionLayer.ensure(get_tree())
 
 
 ## Shows a line (or queues it behind the current one); `seconds` <= 0 keeps
@@ -81,12 +80,6 @@ func say_as(speaker: String, text: String, opts: Dictionary = {}) -> void:
 		_queue.append(line)
 		return
 	_show_now(line)
-
-
-## A sound caption ("[tiếng gõ cửa]"), in its own grey italic style.
-func caption(text: String) -> void:
-	CaptionLayer.ensure(get_tree())
-	CaptionLayer.show_caption(text)
 
 
 func is_typing() -> bool:

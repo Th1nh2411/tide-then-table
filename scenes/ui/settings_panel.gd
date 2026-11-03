@@ -1,7 +1,7 @@
 class_name SettingsPanel
 extends CanvasLayer
 ## "Cài đặt": mouse sensitivity, invert Y, volume, mute, PS1 look, fullscreen,
-## one-frame flashes, sound captions
+## one-frame flashes
 ## (GameSettings, saved at once) + the list of keys. Opened from the main
 ## menu and the pause menu; works while paused; Esc closes. Built in code.
 
@@ -78,7 +78,6 @@ func _build() -> void:
 	_add_toggle(grid, "psx", "Đồ hoạ PS1", GameSettings.set_psx)
 	_add_toggle(grid, "fullscreen", "Toàn màn hình", GameSettings.set_fullscreen)
 	_add_toggle(grid, "flash", "Hiệu ứng nhấp nháy", GameSettings.set_flash_effects)
-	_add_toggle(grid, "sound_captions", "Phụ đề âm thanh", GameSettings.set_sound_captions)
 	columns.add_child(_keys_column())
 	var done := HorrorUi.button("Xong", 12)
 	done.alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -130,8 +129,7 @@ func _row_label(text: String) -> Label:
 func _sync() -> void:
 	var values := {"invert_y": GameSettings.invert_y(), "muted": GameSettings.muted(),
 		"psx": GameSettings.psx(), "fullscreen": GameSettings.fullscreen(),
-		"flash": GameSettings.flash_effects(),
-		"sound_captions": GameSettings.sound_captions()}
+		"flash": GameSettings.flash_effects()}
 	for key: String in _toggles:
 		var button: Button = _toggles[key]
 		var on: bool = values[key]

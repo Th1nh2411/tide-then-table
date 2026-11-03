@@ -6,10 +6,6 @@ extends Node
 ##   Sfx.ambience("sea")          background loop per scene ("" = silence)
 ## Every Button in the game clicks. Mute lives in user://settings.cfg (pause menu).
 
-## A one-shot was asked for (also when headless / muted): CaptionLayer
-## captions story sounds from this.
-signal sound_played(sound: String, at: Vector3, positional: bool)
-
 const SETTINGS_PATH := "user://settings.cfg"
 
 ## name -> segments (see SfxSynth), kept in SfxRecipes.
@@ -85,7 +81,6 @@ func play(sound: String, jitter: float = 0.05) -> void:
 	if not has_sound(sound):
 		push_warning("Unknown sound: " + sound)
 		return
-	sound_played.emit(sound, Vector3.ZERO, false)
 	if silent:
 		return
 	var player := _pool[_next]
@@ -110,8 +105,6 @@ func play_note(sound: String, semitones: float) -> void:
 ## One-shot placed in the 3D world at `at` (under `host`, freed when done),
 ## so the player hears where it comes from. Silent when headless.
 func play_at(sound: String, at: Vector3, host: Node3D, pitch: float = 1.0, unit_size: float = 6.0) -> void:
-	if has_sound(sound):
-		sound_played.emit(sound, at, true)
 	if silent or not has_sound(sound) or host == null or not host.is_inside_tree():
 		return
 	var player := AudioStreamPlayer3D.new()
