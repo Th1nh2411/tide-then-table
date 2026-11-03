@@ -4,7 +4,7 @@ extends Node3D
 ## low right of the view (follows the current camera), bending with line
 ## tension; the bobber and the line (ImmediateMesh, sagging when slack, pale
 ## -> red with tension) out on the water; the "!" over the bobber at a bite;
-## the landed fish held in front of the camera. Placeholder geometry.
+## the landed fish held in front of the camera. Inferred meshes with live rod deformation.
 
 const HOLD := Vector3(0.26, -0.3, -0.42)
 const ROD_LENGTH := 1.25
@@ -17,12 +17,12 @@ const FISH_IN_HAND := Vector3(-0.14, -0.16, -0.5)
 var tension := 0.0
 ## Tip shake (bite), decays by itself.
 var shake := 0.0
-var bobber: MeshInstance3D
+var bobber: Node3D
 var mark: Label3D
 var line_out := false
 var _pivot := Node3D.new()
-var _base: MeshInstance3D
-var _tip_segment := Node3D.new()
+var _rod_model: Node3D
+var _rod_material: ShaderMaterial
 var _tip := Node3D.new()
 var _line := MeshInstance3D.new()
 var _line_mesh := ImmediateMesh.new()
@@ -37,19 +37,25 @@ func _ready() -> void:
 	add_child(_pivot)
 	_pivot.position = HOLD
 	_pivot.rotation = Vector3(0.55, 0.12, 0.0)
-	_base = _box(_pivot, Vector3(0, 0, -ROD_LENGTH * 0.3), Vector3(0.024, 0.024, ROD_LENGTH * 0.6), "6b4a2e")
-	_box(_pivot, Vector3(0, -0.03, 0.02), Vector3(0.05, 0.05, 0.12), "2a2230")  # reel
-	_pivot.add_child(_tip_segment)
-	_tip_segment.position = Vector3(0, 0, -ROD_LENGTH * 0.6)
-	_box(_tip_segment, Vector3(0, 0, -ROD_LENGTH * 0.2), Vector3(0.014, 0.014, ROD_LENGTH * 0.4), "a37a52")
-	_tip_segment.add_child(_tip)
-	_tip.position = Vector3(0, 0, -ROD_LENGTH * 0.4)
+	_rod_model = ConceptModel3D.aligned(_pivot, "fishing_rod", ROD_LENGTH, Vector3.FORWARD, true)
+	var spec := ConceptModel3D.geometry("fishing_rod")
+	var a: Array = spec["axis"]
+	var axis := Vector3(a[0], a[1], a[2])
+	var anchor: Array = spec["anchor"]
+	_rod_material = (_rod_model.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D).material_override
+	_rod_material.set_shader_parameter("bend_axis", axis)
+	_rod_material.set_shader_parameter("bend_origin", Vector3(anchor[0], anchor[1], anchor[2]))
+	_rod_material.set_shader_parameter("bend_length", spec["length"])
+	_rod_material.set_shader_parameter("bend_direction", Basis(Quaternion(axis, Vector3.FORWARD)).inverse() * Vector3.UP)
+	_pivot.add_child(_tip)
+	_tip.position = Vector3(0, 0, -ROD_LENGTH)
 	add_child(_hand)
 	_hand.position = FISH_IN_HAND
 	# World-space pieces: the bobber, the line and the bite mark.
-	bobber = _box(self, Vector3.ZERO, Vector3(0.16, 0.2, 0.16), "e0402f")
+	bobber = Node3D.new()
+	add_child(bobber)
 	bobber.top_level = true
-	_box(bobber, Vector3(0, 0.1, 0), Vector3(0.05, 0.08, 0.05), "efe6d2")
+	ConceptModel3D.aligned(bobber, "fishing_bobber", 0.26, Vector3.UP)
 	bobber.visible = false
 	_line_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_line_mat.vertex_color_use_as_albedo = true
@@ -79,7 +85,9 @@ func _process(delta: float) -> void:
 	shake = maxf(shake - delta * 1.5, 0.0)
 	var jitter := sin(_clock * 55.0) * 0.06 * shake
 	_pivot.rotation.x = 0.55 - tension * 0.25 + jitter
-	_tip_segment.rotation.x = -tension * 0.55 - shake * 0.2
+	var bend := -tension * 0.22 - shake * 0.08
+	_rod_material.set_shader_parameter("bend", bend)
+	_tip.position = Vector3(0, ROD_LENGTH * bend, -ROD_LENGTH)
 	mark.global_position = bobber.global_position + Vector3(0, 1.0 + sin(_clock * 9.0) * 0.06, 0)
 	_draw_line()
 
@@ -137,18 +145,3 @@ func _draw_line() -> void:
 		_line_mesh.surface_set_color(color)
 		_line_mesh.surface_add_vertex(p)
 	_line_mesh.surface_end()
-
-
-static func _box(parent: Node3D, pos: Vector3, size: Vector3, hex: String) -> MeshInstance3D:
-	var node := MeshInstance3D.new()
-	var mesh := BoxMesh.new()
-	mesh.size = size
-	node.mesh = mesh
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(hex)
-	mat.roughness = 0.8
-	node.material_override = mat
-	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	parent.add_child(node)
-	node.position = pos
-	return node

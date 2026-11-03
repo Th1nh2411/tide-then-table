@@ -106,7 +106,7 @@ func _apply() -> void:
 	_world.environment = _current()
 	match phase:
 		Phase.MORNING:
-			_aim(_sun, Vector3(-35, 140, 0), "c8cfd4", 0.6)
+			_aim(_sun, Vector3(-35, 140, 0), "c8cfd4", 0.45)
 			_fill.light_energy = 0.12
 		Phase.SHIFT:
 			_aim(_sun, Vector3(-52, -30, 0), "ffe1b8", 0.7)
@@ -136,7 +136,7 @@ func _morning_env() -> Environment:
 	env.background_mode = Environment.BG_SKY
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("a9b2b8")
-	env.ambient_light_energy = 0.85
+	env.ambient_light_energy = 0.55
 	env.fog_enabled = true
 	env.fog_sky_affect = 0.3
 	env.fog_light_color = Color("98a2aa")

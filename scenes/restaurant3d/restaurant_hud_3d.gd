@@ -111,6 +111,9 @@ func _process(delta: float) -> void:
 			close_button.text = "Đóng sớm"
 	var running: bool = room.shift_running
 	var over: bool = room.shift_over
+	visible = running if room is VillageScene3D else true
+	if not visible:
+		return
 	var phase := "over" if over else ("open" if running else "plan")
 	if running and room.seconds_left <= 0.0:
 		phase = "closing"

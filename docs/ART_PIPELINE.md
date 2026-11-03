@@ -111,3 +111,23 @@ normal đơn vị, checksum nguồn/output và skin weights chuẩn hóa. 11 ng�
 Rin dùng màu portrait 2D approved; preview đặt portrait cạnh model.
 Đã xem từng nhóm ở nhiều góc và cảnh chơi quán ba cấp nâng cấp, ghe và POI.
 Scene review và giới hạn hình học còn lại ghi trong `docs/3D_DEMO.md`.
+
+
+## Model horror online — tích hợp 2026-11-03
+
+25 model đã hoàn tất trên Tencent Hunyuan3D-2.1 Space miễn phí, được review
+3 góc trong Godot, đưa vào `assets/models/ready/` và tích hợp local. Xem
+`HORROR_MODEL_INTEGRATION.md` (ảnh/giới hạn) và `3D_DEMO.md` (runtime hiện tại).
+
+Chuẩn bị lại từ nguồn local, kiểm checksum/ngân sách và tạo metadata tỷ lệ/material:
+
+```bash
+uv run --with trimesh --with pillow python tools/art/prepare_horror_models.py
+```
+
+Tool không inference, không gọi API và backup file thay đổi trước ghi. Bản reduced
+được thêm normals hữu hạn để nhận sáng; không thay đổi vertices/index. Provenance
+giữ checksum nguồn và checksum bản dùng trong game. Source mặc
+định `build/hunyuan_free/` (có thể dùng `--source`); raw/reduced, provenance và license
+được giữ trong từng thư mục model. Material là shader nhận ánh sáng dùng concept
+và texture lặp, không phải UV/PBR bake hay rig. NPC PSX rig không bị thay.

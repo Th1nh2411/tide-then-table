@@ -1,0 +1,66 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-02T09:54:16.177057+00:00",
+  "input": "assets/concepts/horror/banana_clump.png",
+  "input_sha256": "98c59d15bc7a15fbc45a22d148c8af3623ddf592ddf17abbe2f6aa754645bf52",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false,
+    "actual_faces": 3000,
+    "budget_met": true,
+    "review_note": "Compared orthographic geometry previews at three angles; main clump silhouette retained. Runtime review pending.",
+    "tool": "fast-simplification, local CPU",
+    "source_faces": 8008,
+    "cloud_result_backup": "before_fast_simplification/banana_clump_reduced.glb"
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 266788,
+    "number_of_vertices": 131965,
+    "time": {
+      "remove background": 1.032701015472412,
+      "shape generation": 10.553565502166748,
+      "export to trimesh": 0.062082529067993164,
+      "total": 11.650975465774536
+    }
+  },
+  "raw_sha256": "2ad9ded1cfa55c7d33bc9447eb1aff6b55de5898797cc2063e796ab55e98d4a9",
+  "status": "success",
+  "reduced_sha256": "f3e5c656400257fdd1234d7aab540705ae0f438f4ae44f8389bd180596e8805e",
+  "raw": "banana_clump_raw.glb",
+  "reduced": "banana_clump_reduced.glb",
+  "source_reduced_sha256": "10fee0b36bdda8d22dfad42e5be7fded73b5a23def6ca43a8303ca8fc4d8bed6",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "tool": "tools/art/prepare_horror_models.py",
+    "source_directory": "build/hunyuan_free/banana_clump"
+  }
+}

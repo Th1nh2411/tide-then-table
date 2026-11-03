@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import time
 from gradio_client import Client, handle_file
@@ -96,7 +97,9 @@ def main():
                    'reduction': {'target_face_num': args.faces, 'file_type': 'glb', 'reduce_face': True, 'export_texture': False}})
     print('Connecting to official Tencent Space:', args.name, flush=True)
     try:
-        client = Client(SPACE, download_files=str(download_dir), hf_token=False, verbose=False)
+        token = os.environ.get('HF_TOKEN') or False
+        print('Authentication:', 'HF_TOKEN' if token else 'anonymous', flush=True)
+        client = Client(SPACE, download_files=str(download_dir), hf_token=token, verbose=False)
         if not args.reuse_raw:
             print('Submitting shape:', args.image, flush=True)
             result = wait_job(client.submit(image=handle_file(str(args.image.resolve())),
@@ -115,7 +118,13 @@ def main():
         shutil.copy2(returned_file(result[1]), reduced)
         record.update({'status': 'success', 'reduced_sha256': digest(reduced),
                        'raw': raw.name, 'reduced': reduced.name})
+        if 'error' in record:
+            record.setdefault('previous_failures', []).append({
+                'error_type': record.pop('error_type', None),
+                'error': record.pop('error')})
         license_path = ROOT/'assets/models/characters/rin_hunyuan_shape/LICENSE-HUNYUAN.txt'
+        if not license_path.exists():
+            license_path = ROOT/'assets/models/LICENSE-HUNYUAN.txt'
         if license_path.exists() and not (out/'LICENSE-HUNYUAN.txt').exists():
             shutil.copy2(license_path, out/'LICENSE-HUNYUAN.txt')
         print('HUNYUAN_OK', raw, reduced, flush=True)

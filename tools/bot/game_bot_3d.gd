@@ -37,13 +37,26 @@ func _until(path: String) -> Node:
 	return await _until_any([path])
 
 func _until_any(paths: Array[String], old: Node = null) -> Node:
+	var waited_for_wake := false
 	for i: int in range(600):
 		var scene: Node = get_tree().current_scene
 		if scene and scene != old and paths.has(scene.scene_file_path) and not SceneRouter._is_transitioning:
-			return scene
+			if ready_to_drive(scene):
+				if waited_for_wake:
+					print("HOME WAKE | control restored")
+				return scene
+			if not waited_for_wake:
+				print("HOME WAKE | waiting for control after reset")
+			waited_for_wake = true
 		await get_tree().process_frame
 	_fail("scene " + str(paths))
 	return null
+
+
+## A loaded map can still be locked by NightmareWake3D. Aim alone does not
+## mean E was accepted: VillageScene3D._interact correctly ignores it then.
+static func ready_to_drive(scene: Node) -> bool:
+	return not scene is VillageScene3D or not (scene as VillageScene3D).waking
 
 ## One fish into the basket the way a player does it: cast at `at`, wait for
 ## the bite (forced), click in the window, reel while the line is not too

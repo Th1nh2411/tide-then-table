@@ -5,6 +5,7 @@ extends Node
 ## the bed; a right night or an omen night gone wrong has none. No words.
 
 const VILLAGE := "res://scenes/village3d/village_scene_3d.tscn"
+const BOT := preload("res://tools/bot/game_bot_3d.gd")
 
 var _failures := 0
 
@@ -24,6 +25,7 @@ func _run() -> void:
 	_check("short catch: back to mùng 9", GameState.day == 1)
 	_check("short catch: wet footprints on the floor", prints != null and prints.get_child_count() >= 5)
 	_check("short catch: knocks in the black before waking", wake != null and wake.knocks)
+	_check("bot waits for the reset wake before driving the next day", not BOT.ready_to_drive(room))
 	if prints:
 		var first := prints.get_child(0) as Node3D
 		var last := prints.get_child(prints.get_child_count() - 1) as Node3D
@@ -67,6 +69,7 @@ func _run() -> void:
 ## "Những điều kiêng" on the wall by the door: E on it while looking at it.
 func _check_note(room: VillageScene3D) -> void:
 	room.waking = false
+	_check("bot resumes when the wake releases control", BOT.ready_to_drive(room))
 	var note := _room(BedroomBuilder3D.NOTE)
 	room.player.position = Vector3(note.x, 0, note.z + 0.9)
 	room.demo_camera.global_position = room.player.position + Vector3(0, 1.55, 0)

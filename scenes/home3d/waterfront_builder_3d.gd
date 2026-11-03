@@ -39,28 +39,21 @@ static func build_ground(host: Node3D) -> void:
 
 
 ## Rin's house front as a closed block (the village map builds the real room instead).
-static func _house(host: Node3D, evening: bool) -> void:
-	var wall := HorrorMaterials.tiled("wall_plaster_old", 2.2)
-	B.box(host, Vector3(-1.0, 1.6, 12.0), Vector3(7.0, 3.2, 5.0), "8f877a", true).material_override = wall
-	B.box(host, Vector3(-1.0, 3.35, 11.6), Vector3(7.6, 0.25, 5.8), "5b3a2e").material_override = HorrorMaterials.tiled("roof_tin_rusty", 1.4)
-	B.box(host, DOOR + Vector3(0, 1.0, 0.0), Vector3(0.95, 2.0, 0.08), "4a3a2e")
-	HorrorMaterials.picture(host, "door_wood_old", DOOR + Vector3(0, 1.0, -0.045), Vector2(0.95, 2.0), PI)
-	var window := B.box(host, Vector3(1.4, 1.6, 9.46), Vector3(1.0, 0.8, 0.04), "2b2a26")
-	if evening:
-		var glow := window.material_override as StandardMaterial3D
-		glow.albedo_color = Color("e9b36a")
-		glow.emission_enabled = true
-		glow.emission = Color("ffb35a")
-		glow.emission_energy_multiplier = 0.6
+static func _house(host: Node3D, _evening: bool) -> void:
+	ConceptModel3D.sized(host, "rin_house", Vector3(-1.0, 0, 12.0), Vector3(7.0, 3.6, 5.0), PI)
+	B.solid_block(host, Vector3(-1.0, 1.6, 12.0), Vector3(7.0, 3.2, 5.0))
+
 
 
 ## Neighbours, the pier with ông Tư's thúng, the lighthouses and the lane sign.
 static func build_scenery(host: Node3D) -> void:
-	var roof := HorrorMaterials.tiled("roof_tin_rusty", 1.4)
-	# Two dark neighbours down the lane.
-	for x: float in [-8.5, 7.5]:
-		B.box(host, Vector3(x, 1.4, 12.5), Vector3(4.5, 2.8, 4.0), "6f6a60", true).material_override = HorrorMaterials.tiled("blue_lime_wall", 2.2, Color(0.72, 0.76, 0.74))
-		B.box(host, Vector3(x, 2.95, 12.2), Vector3(5.0, 0.2, 4.8), "4b3428").material_override = roof
+	for i in range(2):
+		var x := -8.5 if i == 0 else 7.5
+		ConceptModel3D.sized(host, "neighbour_house_a" if i == 0 else "neighbour_house_b", Vector3(x, 0, 12.5), Vector3(4.5, 2.8, 4.0), PI)
+		B.solid_block(host, Vector3(x, 1.4, 12.5), Vector3(4.5, 2.8, 4.0))
+	ConceptModel3D.fit(host, "fishing_nets_drying", Vector3(-11.8, 0, 7.0), Vector3(3.0, 1.7, 1.1))
+	B.solid_block(host, Vector3(-11.8, 0.7, 7.0), Vector3(2.4, 1.4, 0.5))
+	ConceptModel3D.sized(host, "stone_steps", Vector3(10.5, -0.05, 3.5), Vector3(1.4, 0.45, 1.8), PI)
 	# The pier and ông Tư's thúng at its end.
 	B.box(host, Vector3(THUNG.x, 0.05, (SHORE_Z + THUNG.z) * 0.5 - 0.6), Vector3(1.8, 0.12, SHORE_Z - THUNG.z + 0.4), "6b5240", true).material_override = HorrorMaterials.tiled("floor_wood_planks", 1.2)
 	for z in range(int(SHORE_Z) - 1, int(THUNG.z) - 1, -2):

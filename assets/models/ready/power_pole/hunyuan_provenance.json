@@ -1,0 +1,60 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-03T01:08:45.001436+00:00",
+  "input": "assets/concepts/horror/power_pole.png",
+  "input_sha256": "4585b3d4b9a2d64366607e18a135ad072fc742593817bc1243b608e90425d488",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 45528,
+    "number_of_vertices": 22754,
+    "time": {
+      "remove background": 0.9502882957458496,
+      "shape generation": 9.73510193824768,
+      "export to trimesh": 0.010792016983032227,
+      "total": 10.699196577072144
+    }
+  },
+  "raw_sha256": "a69bb88407049a57873d9e3b4bc64a57a5b83030dbd34fa01dd990017ba5a729",
+  "status": "success",
+  "reduced_sha256": "051b9e19a10cd5850e1c19bf0cba59a34140e35ced017e13d68044fac74d0899",
+  "raw": "power_pole_raw.glb",
+  "reduced": "power_pole_reduced.glb",
+  "source_reduced_sha256": "25d17940ccf31e33d1226b117f021c6e6622e233d811dd0f8946af9e8bc5a47f",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "tool": "tools/art/prepare_horror_models.py",
+    "source_directory": "build/hunyuan_free/power_pole"
+  }
+}

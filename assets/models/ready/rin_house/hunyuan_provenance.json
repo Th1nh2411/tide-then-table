@@ -2,7 +2,7 @@
   "provider": "tencent/Hunyuan3D-2.1",
   "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
   "client_version": "gradio-client==1.3.0",
-  "started_utc": "2026-11-02T07:45:39.347505+00:00",
+  "started_utc": "2026-11-03T01:13:34.119038+00:00",
   "input": "assets/concepts/horror/rin_house.png",
   "input_sha256": "50cce4617ba7f7947defda39c1fbf1af684cb4467142ad90465b14feb8e11f03",
   "shape_parameters": {
@@ -17,12 +17,44 @@
   "texture_generated": false,
   "rig_generated": false,
   "reduction": {
-    "target_face_num": 2500,
+    "target_face_num": 5000,
     "file_type": "glb",
     "reduce_face": true,
     "export_texture": false
   },
-  "status": "failed",
-  "error_type": "AppError",
-  "error": "The upstream Gradio app has raised an exception: 'You have exceeded your ZeroGPU quota (90s requested vs. 86s left). Try again in 23:53:06. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'"
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 324826,
+    "number_of_vertices": 162285,
+    "time": {
+      "remove background": 0.8958139419555664,
+      "shape generation": 9.544750690460205,
+      "export to trimesh": 0.07288742065429688,
+      "total": 10.515723705291748
+    }
+  },
+  "raw_sha256": "debb23f35a1e40b54aed30c2d418d9f8e662406d71371761906bf07fa2c057e4",
+  "status": "success",
+  "reduced_sha256": "80aefda919c25f4fe7db4ea2aba1be3fb1de4d524fa5ac0c782f3c784756bfb3",
+  "raw": "rin_house_raw.glb",
+  "reduced": "rin_house_reduced.glb",
+  "source_reduced_sha256": "8c8f326814f71a0312d07a56d1dac67256d529d3f5761f96e30de0ec11c3cc94",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "tool": "tools/art/prepare_horror_models.py",
+    "source_directory": "build/hunyuan_free/rin_house"
+  }
 }

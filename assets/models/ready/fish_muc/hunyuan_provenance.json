@@ -1,0 +1,60 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-02T09:42:12.058730+00:00",
+  "input": "assets/concepts/horror/fish_muc.png",
+  "input_sha256": "a79152254a7fd3ea4babf56402f8817a235dfbe77e5f8ed2b6628129f45f09ba",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 2000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 77810,
+    "number_of_vertices": 38903,
+    "time": {
+      "remove background": 1.0135810375213623,
+      "shape generation": 9.657976627349854,
+      "export to trimesh": 0.03067636489868164,
+      "total": 10.705211162567139
+    }
+  },
+  "raw_sha256": "1e4408a761a71046a7d48c2b20fc41aac55011efe863b342d6eed95b0cbbad51",
+  "status": "success",
+  "reduced_sha256": "03dc0d52d4ae4451d8817f78f1b351b94cb53def4720f0d8aac9c57b1ac2654b",
+  "raw": "fish_muc_raw.glb",
+  "reduced": "fish_muc_reduced.glb",
+  "source_reduced_sha256": "2dc82132c3706cdaa5b2fe9a1b577f0ba81cb311d45440613c2929673aad0582",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "tool": "tools/art/prepare_horror_models.py",
+    "source_directory": "build/hunyuan_free/fish_muc"
+  }
+}

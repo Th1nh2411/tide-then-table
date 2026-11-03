@@ -387,3 +387,26 @@ Danh sách, ảnh review và kiểm tra texture lặp: `docs/HORROR_CODEX_DELIVE
 
 Palette và phong cách theo horror brief; không thay asset approved/active.
 Chưa tạo model Hunyuan hay sửa scene, script, material hoặc resource runtime.
+
+
+## Horror models — tích hợp 2026-11-03
+
+25 concept trong `docs/LOCAL_HUNYUAN_TONIGHT.md` đã có raw/reduced GLB,
+provenance và license trong `assets/models/ready/<id>/`. Game dùng
+`<id>_reduced.glb`, tổng **68.998 tam giác**; ngân sách nhỏ 2.000, vừa 3.000,
+nhà 5.000 (bậc đá thực tế 2.998). Không dựng ba NPC concept vì đã dùng PSX rig.
+
+| Nhóm | ID model runtime |
+|---|---|
+| Cá / đồ câu | `fish_ca_thu`, `fish_ca_mu`, `fish_muc`, `fish_cua`, `fish_tom`, `fish_oc_huong`, `fish_glowing`, `fish_basket`, `fishing_rod`, `fishing_bobber` |
+| Phòng / cửa nhà | `hat_hook`, `water_jar`, `low_table_tea`, `altar_ong_tu`, `wooden_bed`, `wooden_wardrobe` |
+| Hẻm / bến / cảnh kết | `bamboo_fence`, `banana_clump`, `power_pole`, `roadside_shrine`, `fishing_nets_drying`, `stone_steps`, `rin_house`, `neighbour_house_a`, `neighbour_house_b` |
+
+Bản reduced được thêm normals (không đổi vertices/index); source/derivative SHA-256
+ghi trong provenance. Tô màu runtime bằng concept projection có nhận ánh sáng; mặt bên/mái nhà và tủ
+dùng texture lặp. Chưa phải UV/PBR bake riêng. Metadata: `horror_models.json` +
+`horror_models.gd` (preload trong bản export). Props tĩnh không cần rig.
+
+Ảnh render 3 góc, ảnh gameplay, kiểm thử và giới hạn: `docs/HORROR_MODEL_INTEGRATION.md`.
+Backup trước thay: `.art_backups/horror_integration_20261103/manifest.json`.
+Ảnh concept/sprite/portrait approved không đổi; GLB inference gốc giữ nguyên.

@@ -1,0 +1,72 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-03T01:11:19.876060+00:00",
+  "input": "assets/concepts/horror/stone_steps.png",
+  "input_sha256": "059c6ec41e8096cc762b39a9a700de80e0f50da1899ea1e5ab7d04138830930d",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false,
+    "tool": "fast-simplification, local CPU",
+    "actual_faces": 2998,
+    "budget_met": true,
+    "source_faces": 4146,
+    "cloud_result_backup": "before_fast_simplification/stone_steps_reduced.glb",
+    "review_note": "Three geometry angles compared; main step silhouette retained. Runtime review pending."
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 290064,
+    "number_of_vertices": 144196,
+    "time": {
+      "remove background": 0.8759832382202148,
+      "shape generation": 9.576698780059814,
+      "export to trimesh": 0.06182575225830078,
+      "total": 10.517939805984497
+    }
+  },
+  "raw_sha256": "4bf00617c14d545d9887ac761a357fa1e833eb7c4f8c039f5f13b504d847df70",
+  "status": "success",
+  "reduced_sha256": "240ddd56d70a8ce879853fa717286306c536a1b322479cdb27b62d859d5c3ba3",
+  "raw": "stone_steps_raw.glb",
+  "reduced": "stone_steps_reduced.glb",
+  "previous_failures": [
+    {
+      "error_type": "WriteTimeout",
+      "error": "The write operation timed out"
+    }
+  ],
+  "source_reduced_sha256": "0b666182218c3052e0cadfe94d8d4c96511697a7247edf2fe6b817ae1fd3956d",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "tool": "tools/art/prepare_horror_models.py",
+    "source_directory": "build/hunyuan_free/stone_steps"
+  }
+}

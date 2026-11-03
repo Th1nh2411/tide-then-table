@@ -18,6 +18,8 @@ static func build(host: VillageScene3D) -> void:
 	var half := BedroomBuilder3D.HALF
 	var top := BedroomBuilder3D.HEIGHT
 	B.box(room, Vector3(0, top + 0.18, 0.1), Vector3(half.x * 2.0 + 0.9, 0.12, half.y * 2.0 + 1.1), "5b3a2e").material_override = HorrorMaterials.tiled("roof_tin_rusty", 1.4)
+	ConceptModel3D.spawn(room, "water_jar", Vector3(2.1, 0, -2.65), 0.72)
+	B.solid_block(room, Vector3(2.1, 0.35, -2.65), Vector3(0.5, 0.7, 0.5))
 	# A low concrete step outside the door.
 	B.box(room, BedroomBuilder3D.DOOR + Vector3(0, 0.03, -0.45), Vector3(1.3, 0.06, 0.6), "77736a")
 	# Front window (sea side): dark by day, warm at night.

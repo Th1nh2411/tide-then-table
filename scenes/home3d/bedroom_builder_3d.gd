@@ -47,10 +47,14 @@ static func build(host: Node3D) -> Label3D:
 	glow.emission = Color("6f8aa3")
 	glow.emission_energy_multiplier = 0.8
 	# Bed against the west wall, a low table.
-	B.box(host, BED + Vector3(0, 0.22, 0), Vector3(1.0, 0.44, 2.0), "6b5240", true)
-	B.box(host, BED + Vector3(0, 0.47, 0), Vector3(0.94, 0.08, 1.9), "d8cdb4")
-	B.box(host, BED + Vector3(0, 0.55, 0.75), Vector3(0.6, 0.1, 0.35), "e8e0cc")
-	B.box(host, Vector3(0.9, 0.25, 1.3), Vector3(0.8, 0.5, 0.5), "6b5240", true)
+	ConceptModel3D.sized(host, "wooden_bed", BED, Vector3(1.0, 1.6, 2.0))
+	B.solid_block(host, BED + Vector3(0, 0.22, 0), Vector3(1.0, 0.44, 2.0))
+	ConceptModel3D.fit(host, "low_table_tea", Vector3(0.9, 0, 1.3), Vector3(0.8, 0.8, 0.7))
+	B.solid_block(host, Vector3(0.9, 0.25, 1.3), Vector3(0.8, 0.5, 0.5))
+	ConceptModel3D.sized(host, "wooden_wardrobe", Vector3(1.95, 0, 0.65), Vector3(0.8, 1.85, 0.5), -PI * 0.5)
+	B.solid_block(host, Vector3(1.95, 0.9, 0.65), Vector3(0.5, 1.8, 0.8))
+	ConceptModel3D.fit(host, "altar_ong_tu", Vector3(-0.65, 1.4, 1.76), Vector3(1.0, 0.7, 0.45), PI)
+	ConceptModel3D.fit(host, "hat_hook", Vector3(2.35, 1.2, -0.8), Vector3(0.5, 0.65, 0.35), -PI * 0.5)
 	# The paper on the floor just inside the door.
 	B.box(host, PAPER, Vector3(0.34, 0.01, 0.24), "d9d2c0").rotation.y = 0.3
 	# Tear-off calendar: a red-topped block on the wall, the date in big ink.
