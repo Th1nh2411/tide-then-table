@@ -3,7 +3,8 @@ extends CanvasLayer
 ## Conversation as subtitles (horror build): plain text centred at the
 ## bottom of the screen, "Bảo: ..." with the speaker's name in their colour,
 ## no portrait, no paper box; narration is the same text in grey. Text
-## types out letter by letter.
+## types in word by word (SubtitleText); dead speakers (SpeakerTable) are
+## pale, trembling and named "...".
 ## E / Space / click: finish the line, then next line; Esc: skip the rest.
 ## The game is paused while it's open. A speaker's "(mood)" is dropped
 ## ("Rin (vui): ..." shows "Rin:"). Text may use
@@ -15,6 +16,7 @@ signal _chosen(index: int)
 ## Esc pressed: the rest of the conversation (or cutscene) is skipped.
 signal skipped
 
+## Unused (kept for older scenes): the pace is in SubtitleTuning.
 @export var chars_per_second: float = 45.0
 ## Colour band on the speaker's name tag; others use the default.
 @export var speaker_colors: Dictionary = {
@@ -29,7 +31,7 @@ signal skipped
 @export var enter_pixels: float = 14.0
 
 var _name_label: Label
-var _text_label: Label
+var _text_label: SubtitleText
 var _bubble: PanelContainer
 var _name_tag: PanelContainer
 var _back: Control
@@ -79,13 +81,16 @@ func show_line(speaker: String, text: String) -> void:
 	var paren := speaker.find("(")
 	if paren > 0 and speaker.ends_with(")"):
 		speaker = speaker.left(paren).strip_edges()
-	_has_speaker = speaker != ""
-	_name_label.text = speaker + ":"
+	var table := SpeechStrip.SPEAKERS
+	var dead := table.is_dead(speaker) or (speaker == "" and table.is_dead_whisper(text))
+	var tuning := _text_label.tuning
+	_has_speaker = speaker != "" or dead
+	_name_label.text = table.dead_label if dead else speaker + ":"
 	_name_tag.visible = _has_speaker
-	_name_label.add_theme_color_override("font_color", speaker_colors.get(speaker, default_color))
-	_text_label.add_theme_color_override("font_color", ink_color if _has_speaker else narration_color)
-	_text_label.text = text
-	_text_label.visible_characters = 0
+	var name_color: Color = speaker_colors.get(speaker, table.color_of(speaker) if table.colors.has(speaker) else default_color)
+	_name_label.add_theme_color_override("font_color", tuning.dead_name_color if dead else name_color)
+	var ink := tuning.dead_color if dead else (ink_color if _has_speaker else narration_color)
+	_text_label.set_line(text, ink, dead)
 	Sfx.play("blip")
 
 
@@ -96,7 +101,7 @@ func await_advance() -> void:
 ## Shows answers under the current line; returns the chosen index.
 func choose(options: PackedStringArray) -> int:
 	_open()
-	_text_label.visible_characters = -1
+	_text_label.finish()
 	for child in _choices.get_children():
 		child.queue_free()
 	for i in options.size():
@@ -148,7 +153,7 @@ func _close() -> void:
 
 
 func _typing() -> bool:
-	return _text_label.visible_characters < _text_label.text.length() and _text_label.visible_characters >= 0
+	return _text_label.typing()
 
 
 func _process(delta: float) -> void:
@@ -157,9 +162,7 @@ func _process(delta: float) -> void:
 	var real := delta / maxf(Engine.time_scale, 0.01)  # typing ignores cutscene slow-mo
 	_time += real
 	_enter = minf(_enter + real * 5.0, 1.0)
-	if _typing():
-		_text_label.visible_characters = mini(_text_label.text.length(),
-			_text_label.visible_characters + maxi(1, roundi(chars_per_second * real)))
+	_text_label.advance(real)
 	_layout()
 	_front.queue_redraw()
 
@@ -199,7 +202,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif pressed:
 		get_viewport().set_input_as_handled()
 		if _typing():
-			_text_label.visible_characters = _text_label.text.length()
+			_text_label.finish()
 		else:
 			_advanced.emit()
 
@@ -237,12 +240,7 @@ func _build() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 3)
 	pad.add_child(box)
-	_text_label = Label.new()
-	_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_text_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_text_label.add_theme_font_size_override("font_size", 12)
-	_text_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
-	_text_label.add_theme_constant_override("outline_size", 4)
+	_text_label = SubtitleText.new(12)
 	_text_label.custom_minimum_size.y = 34
 	box.add_child(_text_label)
 	_choices = VBoxContainer.new()

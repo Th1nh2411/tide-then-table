@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="SoundCaptions" format=3]
+
+[ext_resource type="Script" path="res://data/resources/sound_captions.gd" id="1_cap"]
+
+[resource]
+script = ExtResource("1_cap")
+captions = {
+"bell": "tiếng chuông ngân",
+"call": "tiếng ai gọi, vọng xa",
+"drag": "tiếng gì kéo lê, nặng",
+"gasp": "tiếng thở hắt",
+"knock3": "tiếng gõ cửa, ba tiếng",
+"slap": "tiếng nước vỗ",
+"splash": "tiếng nước động, xa xa",
+"static": "tiếng rè rè",
+"step_wood_1": "tiếng bước chân trên ván",
+"step_wood_2": "tiếng bước chân trên ván",
+"step_wood_3": "tiếng bước chân trên ván",
+"tock": "tiếng gỗ cộc",
+"whisper": "tiếng thì thầm"
+}
+sea_captions = {
+"knock3": "tiếng gõ mạn thúng, ba tiếng"
+}
+positional_only = PackedStringArray("splash", "slap", "tock", "step_wood_1", "step_wood_2", "step_wood_3")
+cooldowns = {
+"slap": 20.0,
+"splash": 20.0,
+"step_wood_1": 8.0,
+"step_wood_2": 8.0,
+"step_wood_3": 8.0,
+"tock": 20.0
+}

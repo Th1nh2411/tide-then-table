@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpeakerTable" format=3]
+
+[ext_resource type="Script" path="res://data/resources/speaker_table.gd" id="1_spk"]
+
+[resource]
+script = ExtResource("1_spk")
+colors = {
+"Bảo": Color(0.87058824, 0.61960787, 0.25490198, 1),
+"Cô Năm": Color(0.56078434, 0.6901961, 0.41568628, 1),
+"Mèo": Color(0.74509805, 0.46666667, 0.16862746, 1),
+"Rin": Color(0.30980393, 0.56078434, 0.7294118, 1),
+"Vy": Color(0.8352941, 0.5411765, 0.627451, 1)
+}
+dead = PackedStringArray("Ông Tư", "ong_tu", "drowned", "Người chết đuối", "Bóng người", "Người dưới nước", "...")

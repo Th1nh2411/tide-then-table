@@ -20,6 +20,7 @@ const DEFAULTS: Array[Array] = [
 	["video", "psx", true],
 	["video", "fullscreen", false],
 	["video", "flash", true],
+	["text", "sound_captions", true],
 ]
 
 ## Tests point this at a scratch file.
@@ -100,6 +101,15 @@ static func flash_effects() -> bool:
 
 static func set_flash_effects(on: bool) -> void:
 	set_value("video", "flash", on)
+
+
+## "Phụ đề âm thanh": captions for story sounds (CaptionLayer).
+static func sound_captions() -> bool:
+	return bool(get_value("text", "sound_captions"))
+
+
+static func set_sound_captions(on: bool) -> void:
+	set_value("text", "sound_captions", on)
 
 
 static func set_volume(value: float) -> void:
