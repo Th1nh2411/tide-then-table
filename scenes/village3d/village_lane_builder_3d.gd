@@ -22,11 +22,11 @@ static func build(host: Node3D) -> void:
 	var brick := HorrorMaterials.tiled("brick_wall_old", 1.6)
 	# North side: a lime-washed house, a brick wall, then the fence with the sea beyond.
 	_house(lane, Vector3(24.6, 0, -2.6), Vector3(9.0, 3.0, 6.6), 1.0)
-	B.box(lane, Vector3(32.0, 1.1, NORTH_Z), Vector3(5.8, 2.2, 0.25), "6b4a3a", true).material_override = brick
+	_brick_wall(lane, brick, 29.1, 34.9, NORTH_Z)
 	_fence(lane, 35.0, L.LANE_END_X, NORTH_Z)
 	_shrine(lane, Vector3(40.5, 0, NORTH_Z + 0.4))
 	# South side: brick wall hiding the road, a house, the banana clump, the fence.
-	B.box(lane, Vector3(25.0, 1.1, SOUTH_Z), Vector3(10.0, 2.2, 0.25), "6b4a3a", true).material_override = brick
+	_brick_wall(lane, brick, 20.0, 30.0, SOUTH_Z)
 	_house(lane, Vector3(34.0, 0, 9.1), Vector3(8.0, 2.8, 5.8), -1.0)
 	_banana(lane, Vector3(39.6, 0, SOUTH_Z - 0.55))
 	_fence(lane, 38.0, L.LANE_END_X, SOUTH_Z)
@@ -35,7 +35,17 @@ static func build(host: Node3D) -> void:
 	_wire(lane, Vector3(27.0, 6.6, SOUTH_Z - 0.35), Vector3(43.0, 6.6, SOUTH_Z - 0.35))
 	_wire(lane, Vector3(27.0, 6.6, SOUTH_Z - 0.35), Vector3(19.5, 5.0, -7.0))
 	_wire(lane, Vector3(43.0, 6.6, SOUTH_Z - 0.35), Vector3(56.0, 4.0, 4.0))
-	_street_ends(host)
+
+
+## A rendered brick wall from x0 to x1 along z: coping on top, a pillar at each end.
+static func _brick_wall(parent: Node3D, brick: Material, x0: float, x1: float, z: float) -> void:
+	var cap := HorrorMaterials.tiled("wall_plaster_old", 1.2, Color(0.7, 0.68, 0.62))
+	var mid := (x0 + x1) * 0.5
+	B.box(parent, Vector3(mid, 1.1, z), Vector3(x1 - x0, 2.2, 0.25), "6b4a3a", true).material_override = brick
+	B.box(parent, Vector3(mid, 2.25, z), Vector3(x1 - x0 + 0.1, 0.1, 0.38), "8a8478").material_override = cap
+	for x: float in [x0 + 0.2, x1 - 0.2]:
+		B.box(parent, Vector3(x, 1.2, z), Vector3(0.4, 2.4, 0.4), "6b4a3a").material_override = brick
+		B.box(parent, Vector3(x, 2.45, z), Vector3(0.5, 0.1, 0.5), "8a8478").material_override = cap
 
 
 ## A closed house block; `face` = +1 its door faces +Z (the lane), -1 faces -Z.
@@ -85,15 +95,3 @@ static func _wire(parent: Node3D, a: Vector3, b: Vector3) -> void:
 		var q: Vector3 = pair[1]
 		var piece := B.box(parent, (p + q) * 0.5, Vector3(0.025, 0.025, p.distance_to(q)), "151515")
 		piece.look_at_from_position((p + q) * 0.5, q, Vector3.UP if absf((q - p).normalized().y) < 0.99 else Vector3.RIGHT)
-
-
-## The street's far ends: road on past both ends (bikes ride in from there)
-## and a house front closing the west end.
-static func _street_ends(host: Node3D) -> void:
-	var road_z := RestaurantLayout3D.FRONT_Z + 0.2 + RestaurantLayout3D.ROAD_DEPTH * 0.5
-	for x: float in [-27.0, 27.0]:
-		B.box(host, Vector3(x, -0.2, road_z), Vector3(14.0, 0.2, RestaurantLayout3D.ROAD_DEPTH), "202e37").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var lime := HorrorMaterials.tiled("blue_lime_wall", 2.0, Color(0.75, 0.78, 0.78))
-	var west := RestaurantLayout3D.ROOM_X + 0.6
-	B.box(host, Vector3(-west, 2.5, 0.25), Vector3(1.0, 5.0, 16.1), "7b8c90").material_override = lime
-	B.box(host, Vector3(-west, -0.1, 0.25), Vector3(1.0, 0.2, 16.1), "4a4136")

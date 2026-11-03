@@ -68,7 +68,7 @@ func _attach(scene: Node) -> void:
 	if _walks(scene):
 		_game_camera = scene.get("demo_camera")
 		scene.set("demo_camera", _camera)
-		_camera.far = 80.0
+		_camera.far = 260.0  # the village bay and its islands
 		# Restaurant: facing the shop front (-Z); village: the scene's start_yaw.
 		var yaw: Variant = scene.get("start_yaw")
 		_yaw = float(yaw) if yaw != null else 0.0

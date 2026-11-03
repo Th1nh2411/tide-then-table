@@ -3,11 +3,10 @@ extends RefCounted
 ## Steering the 3D boat for one physics frame: rowed boats push only while a
 ## stroke pulls (RowStroke), motor boats accelerate; a worn hull slows it, collisions bounce it off and damage
 ## the hull (SeaBoatImpact3D: spin, rocking, shake, splash), the
-## boat's range (max_depth) pushes it back, the map edge clamps it.
+## edge band pushes it back without a word (SeaEdge3D: fog, dim lamp,
+## current, the bow turned home), the reach and the map edge clamp it.
 ## State stays on the sea scene (velocity, yaw_velocity, row...): other
 ## helpers read it.
-
-const BOAT_RANGE_LINE := "Sóng ngoài khơi đẩy thuyền trở lại."
 
 
 ## Moves the boat. Returns [forward, forward_speed] for the animation, or
@@ -61,14 +60,15 @@ static func drive(sea: SeaScene3D, delta: float) -> Array:
 	return [forward, forward_speed]
 
 
-## Boat range is inherited from the selected upgrade; the map edge clamps.
+## Boat range is inherited from the selected upgrade; the edge band works
+## first (SeaEdge3D), then the reach and the map edge clamp.
 static func _keep_in_bounds(sea: SeaScene3D) -> void:
 	var boat := sea.boat
+	SeaEdge3D.step(sea, sea.get_physics_process_delta_time())
 	var min_z := SeaLayout3D.reach_z(sea.boat_data.max_depth)
 	if boat.position.z < min_z:
 		boat.position.z = min_z
 		boat.velocity.z = maxf(boat.velocity.z, 0.0)
-		sea._say(BOAT_RANGE_LINE, 1.5)
 	var half := SeaLayout3D.size_world() * 0.5 - Vector2.ONE * 2.0
 	boat.position.x = clampf(boat.position.x, -half.x, half.x)
 	boat.position.z = clampf(boat.position.z, -half.y, SeaLayout3D.to_world(Vector2(0, SeaLayout3D.SHORE_PX)).z + 1.0)

@@ -10,8 +10,17 @@ extends Node
 
 enum Phase { MORNING, SHIFT, NIGHT }
 
+## Islands on the horizon per phase: [tint, silhouette 0..1 (1 = flat, no lit windows)].
+const ISLAND_LOOK := {
+	Phase.MORNING: [Color("7c8790"), 1.0],
+	Phase.SHIFT: [Color("4e4656"), 0.8],
+	Phase.NIGHT: [Color(0.85, 0.88, 0.95), 0.0],
+}
+
 @export var blink_in := 0.35
 @export var blink_out := 0.6
+## Fog density at the far end of the edge paths (WorldEdgeLoop3D).
+@export var haze_density := 0.4
 
 var phase := Phase.MORNING
 var inside := false
@@ -24,6 +33,8 @@ var _interiors: Dictionary = {}
 ## Node -> phases it shows in.
 var _shown_in: Dictionary = {}
 var _black := ColorRect.new()
+var _base_fog: Dictionary = {}  # Environment -> its own fog density
+var _islands: Array[ShaderMaterial] = []
 
 
 ## `host`: the restaurant root (its RestaurantEnvironment / StreetKeyLight / CoolStreetFill).
@@ -31,9 +42,9 @@ func setup(host: Node3D) -> void:
 	_world = host.get_node("RestaurantEnvironment") as WorldEnvironment
 	_sun = host.get_node("StreetKeyLight") as DirectionalLight3D
 	_fill = host.get_node("CoolStreetFill") as DirectionalLight3D
-	_envs[Phase.SHIFT] = _world.environment
-	_envs[Phase.MORNING] = _morning_env()
-	_envs[Phase.NIGHT] = _night_env()
+	_envs[Phase.SHIFT] = VillageSkies3D.dusk(_world.environment)
+	_envs[Phase.MORNING] = VillageSkies3D.morning()
+	_envs[Phase.NIGHT] = VillageSkies3D.night(_sun)
 	for key: Phase in _envs:
 		var room := (_envs[key] as Environment).duplicate() as Environment
 		room.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
@@ -51,10 +62,14 @@ func setup(host: Node3D) -> void:
 	layer.add_child(_black)
 
 
-## A street lamp bulb at `at` (parent space), lit from the shift on.
-func add_lamp(parent: Node3D, at: Vector3) -> void:
-	var off := RestaurantRoomBuilder3D.box(parent, at, Vector3(0.22, 0.22, 0.22), "6b6355")
-	var on := RestaurantRoomBuilder3D.box(parent, at, Vector3(0.23, 0.23, 0.23), "f2d98a")
+## A small lamp at `at` (parent space), lit from the shift on: a bulb under a
+## tin shade (`shade` false: the post brings its own).
+func add_lamp(parent: Node3D, at: Vector3, shade: bool = true) -> void:
+	if shade:
+		RestaurantRoomBuilder3D.box(parent, at + Vector3(0, 0.1, 0), Vector3(0.3, 0.05, 0.3), "3f423e")
+		RestaurantRoomBuilder3D.box(parent, at + Vector3(0, 0.15, 0), Vector3(0.12, 0.08, 0.12), "3f423e")
+	var off := RestaurantRoomBuilder3D.box(parent, at, Vector3(0.1, 0.12, 0.1), "6b6355")
+	var on := RestaurantRoomBuilder3D.box(parent, at, Vector3(0.11, 0.13, 0.11), "f2d98a")
 	var m := on.material_override as StandardMaterial3D
 	m.emission_enabled = true
 	m.emission = Color("ffd39b")
@@ -69,6 +84,23 @@ func add_lamp(parent: Node3D, at: Vector3) -> void:
 	show_in(off, [Phase.MORNING])
 	show_in(on, [Phase.SHIFT, Phase.NIGHT])
 	show_in(light, [Phase.SHIFT, Phase.NIGHT])
+
+
+## Island strips (SeaBackdrop3D) that follow the time of day.
+func add_islands(material: ShaderMaterial) -> void:
+	_islands.append(material)
+	_tint_islands()
+
+
+## Edge fog: 0 = the phase's own fog, 1 = a wall (haze_density).
+func set_haze(amount: float) -> void:
+	var env := _world.environment
+	for other: Environment in _base_fog:
+		if other != env:
+			other.fog_density = _base_fog[other]
+	if not _base_fog.has(env):
+		_base_fog[env] = env.fog_density
+	env.fog_density = lerpf(_base_fog[env], haze_density, clampf(amount, 0.0, 1.0))
 
 
 ## `node` is visible only in these phases.
@@ -117,44 +149,17 @@ func _apply() -> void:
 	for key: Variant in _shown_in:
 		if is_instance_valid(key):
 			(key as Node3D).visible = (_shown_in[key] as Array).has(phase)
+	_tint_islands()
+
+
+func _tint_islands() -> void:
+	var look: Array = ISLAND_LOOK[phase]
+	for material in _islands:
+		material.set_shader_parameter("tint", look[0])
+		material.set_shader_parameter("silhouette", look[1])
 
 
 static func _aim(light: DirectionalLight3D, degrees: Vector3, hex: String, energy: float) -> void:
 	light.rotation_degrees = degrees
 	light.light_color = Color(hex)
 	light.light_energy = energy
-
-
-## Grey dawn after the night: a pale overcast panorama, no sun.
-func _morning_env() -> Environment:
-	var env := Environment.new()
-	var sky_material := PanoramaSkyMaterial.new()
-	sky_material.panorama = load("res://assets/textures/sea3d/sky_dawn_overcast.png") as Texture2D
-	var sky := Sky.new()
-	sky.sky_material = sky_material
-	env.sky = sky
-	env.background_mode = Environment.BG_SKY
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("a9b2b8")
-	env.ambient_light_energy = 0.55
-	env.fog_enabled = true
-	env.fog_sky_affect = 0.3
-	env.fog_light_color = Color("98a2aa")
-	env.fog_density = 0.025
-	return env
-
-
-## Moonlit night: the sea's sky panorama turned to the moon light.
-func _night_env() -> Environment:
-	var env := Environment.new()
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("819796")
-	env.ambient_light_energy = 0.55
-	env.fog_enabled = true
-	env.fog_light_color = Color("172038")
-	env.fog_density = 0.02
-	var keep := _sun.rotation_degrees
-	_sun.rotation_degrees = Vector3(-48, 152, 0)
-	SeaBackdrop3D.apply_sky(env, _sun)
-	_sun.rotation_degrees = keep
-	return env

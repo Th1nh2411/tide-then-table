@@ -32,7 +32,7 @@ func _run() -> void:
 	room._open_shift()
 	await get_tree().process_frame
 	await get_tree().process_frame
-	_check(room.shift_running and room.hud.close_button.visible, "shift opens with the Đóng sớm button")
+	_check(room.shift_running and room.hud.visible and room.hud.ticket_row != null, "shift opens with only the order slips on screen")
 	room._spawn_order()
 	var table: int = -1
 	for i: int in range(room.orders.size()):

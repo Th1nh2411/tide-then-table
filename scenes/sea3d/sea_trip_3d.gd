@@ -24,7 +24,8 @@ static func spend_oil(sea: SeaScene3D, units: float) -> void:
 		sea.oil_low_sent = true
 		sea._say("Đèn leo lét rồi... về thôi.", 3.0)
 	if is_instance_valid(sea.boat_lamp):
-		sea.boat_lamp.light_energy = 2.5 * lerpf(0.3, 1.0, clampf(fraction * 2.0, 0.0, 1.0))
+		# The sea's edge dims it too (SeaEdge3D).
+		sea.boat_lamp.light_energy = 2.5 * lerpf(0.3, 1.0, clampf(fraction * 2.0, 0.0, 1.0)) * (1.0 - 0.6 * sea.edge_amount)
 
 
 static func end_trip(sea: SeaScene3D, towed: bool) -> void:

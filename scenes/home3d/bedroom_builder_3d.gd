@@ -21,6 +21,11 @@ const BED := Vector3(-1.7, 0, 0.7)
 ## Half the doorway's width in the north wall.
 const DOOR_HALF := 0.47
 const DOOR_HEIGHT := 2.05
+## South window (centre x, sill-to-head centre y), clear of ông Tư's altar.
+const WINDOW := Vector2(1.0, 1.5)
+const WINDOW_SIZE := Vector2(0.9, 0.8)
+## Writing area on the calendar sheet (under its red top), metres.
+const DATE_BOX := Vector2(0.3, 0.27)
 
 
 static func build(host: Node3D) -> Label3D:
@@ -40,12 +45,7 @@ static func build(host: Node3D) -> Label3D:
 	B.box(host, Vector3(-HALF.x + left * 0.5, HEIGHT * 0.5, -HALF.y), Vector3(left, HEIGHT, 0.1), "8a8070", true).material_override = wall
 	B.box(host, Vector3(HALF.x - right * 0.5, HEIGHT * 0.5, -HALF.y), Vector3(right, HEIGHT, 0.1), "8a8070", true).material_override = wall
 	B.box(host, Vector3(DOOR.x, (HEIGHT + DOOR_HEIGHT) * 0.5, -HALF.y), Vector3(DOOR_HALF * 2.0, HEIGHT - DOOR_HEIGHT, 0.1), "8a8070", true).material_override = wall
-	# Window in the south wall: a pale pane of dawn.
-	var pane := B.box(host, Vector3(0, 1.5, HALF.y - 0.06), Vector3(1.0, 0.8, 0.02), "9fb4c4")
-	var glow := pane.material_override as StandardMaterial3D
-	glow.emission_enabled = true
-	glow.emission = Color("6f8aa3")
-	glow.emission_energy_multiplier = 0.8
+	_window(host)
 	# Bed against the west wall, a low table.
 	ConceptModel3D.sized(host, "wooden_bed", BED, Vector3(1.0, 1.6, 2.0))
 	B.solid_block(host, BED + Vector3(0, 0.22, 0), Vector3(1.0, 0.44, 2.0))
@@ -70,6 +70,34 @@ static func build(host: Node3D) -> Label3D:
 	return date
 
 
+## Puts `words` on the calendar, shrunk to fit its sheet (PaperFit).
+static func set_date(date: Label3D, words: String) -> void:
+	date.text = words
+	PaperFit.fit_label3d(date, DATE_BOX, 34, 10)
+
+
+## South window: dim dawn glass behind iron bars in a wooden frame, the
+## shutters folded open outside.
+static func _window(host: Node3D) -> void:
+	var z := HALF.y
+	var at := Vector3(WINDOW.x, WINDOW.y, z)
+	var pane := B.box(host, at + Vector3(0, 0, -0.065), Vector3(WINDOW_SIZE.x, WINDOW_SIZE.y, 0.02), "6f8296")
+	var glow := pane.material_override as StandardMaterial3D
+	glow.emission_enabled = true
+	glow.emission = Color("4f6a83")
+	glow.emission_energy_multiplier = 0.35
+	B.box(host, at + Vector3(0, 0, 0.06), Vector3(WINDOW_SIZE.x, WINDOW_SIZE.y, 0.01), "1d1f22")  # seen from outside
+	var wood := HorrorMaterials.tiled("door_wood_old", 0.8, Color(0.6, 0.55, 0.5))
+	for side: float in [-1.0, 1.0]:
+		B.box(host, at + Vector3(side * (WINDOW_SIZE.x * 0.5 + 0.04), 0, -0.08), Vector3(0.08, WINDOW_SIZE.y + 0.16, 0.06), "4a3a2c").material_override = wood
+		B.box(host, at + Vector3(0, side * (WINDOW_SIZE.y * 0.5 + 0.04), -0.08), Vector3(WINDOW_SIZE.x + 0.16, 0.08, 0.08), "4a3a2c").material_override = wood
+		# Shutters folded back against the outside wall.
+		B.box(host, at + Vector3(side * (WINDOW_SIZE.x * 0.75 + 0.06), 0, 0.09), Vector3(WINDOW_SIZE.x * 0.5, WINDOW_SIZE.y, 0.03), "4a3a2c").material_override = wood
+	for i in 4:
+		var x := (float(i) + 0.5) / 4.0 * WINDOW_SIZE.x - WINDOW_SIZE.x * 0.5
+		B.box(host, at + Vector3(x, 0, -0.085), Vector3(0.025, WINDOW_SIZE.y, 0.025), "1c1c1c")
+
+
 ## The bulb, and pale dawn through the window ("DawnWindow": the village
 ## lighting turns it off after dark).
 static func _light(host: Node3D) -> void:
@@ -83,7 +111,7 @@ static func _light(host: Node3D) -> void:
 	var dawn := SpotLight3D.new()
 	dawn.name = "DawnWindow"
 	host.add_child(dawn)
-	dawn.position = Vector3(0, 1.6, HALF.y - 0.15)
+	dawn.position = Vector3(WINDOW.x, 1.6, HALF.y - 0.15)
 	dawn.rotation_degrees.x = -25.0
 	dawn.light_color = Color("9fb4d4")
 	dawn.light_energy = 1.2

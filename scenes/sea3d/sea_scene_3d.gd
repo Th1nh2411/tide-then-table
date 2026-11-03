@@ -64,6 +64,8 @@ var rod: Fishing3D
 ## Always false now (no place dialogs); DarkNight3D still reads it.
 var poi_busy := false
 var whirlpool_marks: Array[MeshInstance3D] = []
+## 0..1: how deep the boat is in the sea's edge band (SeaEdge3D).
+var edge_amount := 0.0
 
 func _ready() -> void:
 	rng.randomize()
@@ -80,6 +82,7 @@ func _ready() -> void:
 	SeaHud3D.build_shared_ui(self)
 	SeaSetup3D.build_tools(self)
 	SeaHud3D.build_navigation(self)
+	FallSafety3D.attach(self, boat)
 	DayClock.start_night()
 	var fog_tonight := Story.check_day()
 	# Saves happen in the morning only (horror build): a night is judged when Rin wakes.

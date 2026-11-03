@@ -75,12 +75,15 @@ static func build(host: Node3D) -> void:
 	_tables(host)
 	_kitchen(host)
 	box(host, Vector3(0, 1.4, L.FRONT_Z), Vector3(width, 3.0, 0.15), "35434d", true).visible = false
-	# Invisible end walls; the village map (host.street_exit = z range) opens the east one onto its lane.
-	var gap: Variant = host.get("street_exit")
+	# Invisible end walls; the village map opens them: host.street_exit (east,
+	# onto the lane) and host.street_west (west, the pavement on into the fog).
 	for x: float in [-L.ROOM_X, L.ROOM_X]:
+		var gap: Variant = host.get("street_exit" if x > 0.0 else "street_west")
 		var spans: Array[Vector2] = [Vector2(L.BACK_Z, L.FRONT_Z)]
-		if x > 0.0 and gap is Vector2:
-			spans = [Vector2(L.BACK_Z, (gap as Vector2).x), Vector2((gap as Vector2).y, L.FRONT_Z)]
+		if gap is Vector2:
+			spans = [Vector2(L.BACK_Z, (gap as Vector2).x)]
+			if (gap as Vector2).y < L.FRONT_Z:
+				spans.append(Vector2((gap as Vector2).y, L.FRONT_Z))
 		for span: Vector2 in spans:
 			box(host, Vector3(x, 1.4, (span.x + span.y) * 0.5), Vector3(0.15, 3.0, span.y - span.x), "35434d", true).visible = false
 	_player(host)
@@ -167,14 +170,15 @@ static func _lamp(host: Node3D, pos: Vector3, hex: String, energy: float, range_
 static func _shell(host: Node3D, depth: float, mid_z: float, width: float) -> void:
 	# Coplanar ground receives object shadows without self-shadow acne between tiles.
 	box(host, Vector3(0, -0.24, mid_z), Vector3(width, 0.4, depth), "394a50").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	for x in range(int(width)):
-		for z in range(int(depth)):
-			var tile := box(host, Vector3(x - L.ROOM_X + 0.5, -0.02, z + L.BACK_Z + 0.5), Vector3(0.96, 0.05, 0.96), "8e8c79" if (x + z) % 3 == 0 else "797e73")
-			tile.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	box(host, Vector3(0, L.WALL_H * 0.5, L.BACK_Z - 0.2), Vector3(width, L.WALL_H, 0.3), "b6a183", true)
-	box(host, Vector3(0, 0.4, L.BACK_Z - 0.02), Vector3(width, 0.8, 0.1), "577277")
-	box(host, Vector3(L.GRILL_POSITION.x, 3.7, L.BACK_Z), Vector3(9, 0.65, 0.14), "7a4841")
-	label(host, "HẢI SẢN XÓM ĐÈN", Vector3(L.GRILL_POSITION.x, 3.7, L.BACK_Z + 0.1), 52, "f2d98a")
+	# Cement tiles: one textured slab (was 640 boxes).
+	var tiles := box(host, Vector3(0, -0.02, mid_z), Vector3(width, 0.05, depth), "8e8c79")
+	tiles.material_override = HorrorMaterials.tiled("tiles_cement_floor", 1.0, Color(0.78, 0.78, 0.72))
+	tiles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# The shop row of tube houses (StreetFacades3D) behind the pavement; its wall collider here.
+	solid_block(host, Vector3(0, L.WALL_H * 0.5, L.BACK_Z - 0.2), Vector3(width, L.WALL_H, 0.3))
+	StreetFacades3D.shop_row(host)
+	box(host, Vector3(L.GRILL_POSITION.x, 3.7, L.BACK_Z + 0.02), Vector3(9, 0.65, 0.14), "7a4841")
+	label(host, "HẢI SẢN XÓM ĐÈN", Vector3(L.GRILL_POSITION.x, 3.7, L.BACK_Z + 0.11), 52, "f2d98a")
 	for n in range(int(width)):
 		var color := "456c65" if n % 2 else "c6b89a"
 		box(host, Vector3(n - L.ROOM_X + 0.5, 2.55, L.BACK_Z + 0.9), Vector3(0.98, 0.09, 1.1), color)
@@ -190,10 +194,10 @@ static func _shell(host: Node3D, depth: float, mid_z: float, width: float) -> vo
 	for x in range(-18, 19, 6):
 		box(host, Vector3(x, -0.08, L.FRONT_Z + 0.2 + L.ROAD_DEPTH * 0.5), Vector3(2.0, 0.02, 0.15), "8e8c79")
 
-## Street trees at both ends (no decor upgrades any more).
+## Street trees at both ends, in brick planters (no decor upgrades any more).
 static func _decor(host: Node3D) -> void:
 	for x: float in [-17.0, 17.0]:
-		RestaurantBatchVisuals.add(host, "sidewalk_tree", Vector3(x, 0, L.CURB_PROP_Z))
+		VillageProps3D.place(host, "planter_tree_street", Vector3(x, 0, L.CURB_PROP_Z), Vector3(2.6, 4.4, 2.6), x * 0.1)
 
 static func add_tables(host: Node3D, start_index: int) -> void:
 	_tables(host,start_index)

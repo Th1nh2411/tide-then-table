@@ -129,6 +129,7 @@ func _convert(source: Material) -> Material:
 		m.set_shader_parameter("albedo_tex", base.albedo_texture)
 	m.set_shader_parameter("use_vertex_color", base.vertex_color_use_as_albedo)
 	m.set_shader_parameter("uv_scale_offset", Vector4(base.uv1_scale.x, base.uv1_scale.y, base.uv1_offset.x, base.uv1_offset.y))
+	m.set_shader_parameter("triplanar", base.uv1_triplanar and base.uv1_world_triplanar)
 	m.set_shader_parameter("roughness", base.roughness)
 	if base.emission_enabled:
 		var e := base.emission * base.emission_energy_multiplier

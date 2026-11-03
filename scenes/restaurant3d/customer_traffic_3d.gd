@@ -8,6 +8,8 @@ const PARK_Z := 8.65
 const LANE_Z := 9.8
 const SLOT_XS: Array[float] = [-8.0, -4.0, 0.0, 4.0, 8.0, 12.0]
 const EDGE_X := 26.0
+## Bikes come and go this far west: deep in the village's west fog (WorldEdgeLoop3D).
+const WEST_EDGE_X := -40.0
 const BIKE_SPEED := 5.0
 ## Guests stroll at about their Walk clip pace (~1.0 m/s).
 const WALK_SPEED := 1.1
@@ -46,7 +48,7 @@ func _begin(table: int) -> void:
 	var from_left := randf() < 0.5
 	var x: float = SLOT_XS[slot]
 	var bike := _make_bike()
-	bike.position = Vector3(-EDGE_X if from_left else EDGE_X, 0, LANE_Z)
+	bike.position = Vector3(WEST_EDGE_X if from_left else EDGE_X, 0, LANE_Z)
 	var trip := {"table": table, "slot": slot, "bike": bike, "walker": null, "phase": "riding_in",
 		"route": [Vector3(x, 0, LANE_Z), Vector3(x, 0, PARK_Z)] as Array[Vector3]}
 	_used_slots[slot] = true
@@ -207,7 +209,7 @@ func _depart(trip: Dictionary) -> void:
 	var bike: Node3D = trip["bike"]
 	var x := bike.position.x
 	var right := randf() < 0.5
-	trip["route"] = [Vector3(x, 0, LANE_Z), Vector3(EDGE_X if right else -EDGE_X, 0, LANE_Z)] as Array[Vector3]
+	trip["route"] = [Vector3(x, 0, LANE_Z), Vector3(EDGE_X if right else WEST_EDGE_X, 0, LANE_Z)] as Array[Vector3]
 	trip["phase"] = "riding_out"
 
 
