@@ -1,0 +1,33 @@
+{
+  "2000": [
+    "dish_plate_fish",
+    "dish_bowl_soup",
+    "beer_glass_ice",
+    "tray_aluminium",
+    "buoy_pile"
+  ],
+  "3000": [
+    "beer_tower",
+    "table_stall_folding",
+    "stool_plastic_stack",
+    "charcoal_stove_clay",
+    "food_cart_glass",
+    "ice_box_styrofoam",
+    "altar_tray_offerings",
+    "lamp_post_village",
+    "coconut_palm",
+    "motorbike_cub",
+    "fish_drying_rack",
+    "clothesline",
+    "boat_pulled_up",
+    "thung_boat",
+    "shed_tin",
+    "boat_upturned",
+    "planter_tree_street"
+  ],
+  "5000": [
+    "tube_house_a",
+    "tube_house_b",
+    "tube_house_c"
+  ]
+}

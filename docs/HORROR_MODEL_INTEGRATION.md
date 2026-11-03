@@ -91,3 +91,12 @@ mới. Không bỏ khóa input của người chơi, không sửa luật câu c�
 Chạy test rồi bot tuần tự sau import: ALL OK / BOT OK; log xác nhận có đợi wake
 và tiếp tục sau reset tới kết thật. Đường dẫn log local:
 `build/horror_integration/brief4_tests0_final.log`, `brief4_bot0_final.log`.
+
+## Brief 5 — dừng ở quota (03/11/2026)
+
+Space anonymous từ chối job đầu tiên `dish_plate_fish`: 90 giây yêu cầu,
+86 giây quota còn lại. Đã dừng theo brief, **0/25 model mới**, chưa có số tam giác
+hay render 3 góc của đợt mới. 25 model cũ vẫn 68.998 tam giác.
+Không thêm ID chưa có mesh vào metadata/runtime. Danh sách pending đầy đủ,
+budget 2.000/3.000/5.000, batch Windows và điểm nối chờ mesh:
+[HORROR_CODEX_DELIVERY_5.md](HORROR_CODEX_DELIVERY_5.md).

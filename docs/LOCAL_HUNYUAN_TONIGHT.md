@@ -1,6 +1,36 @@
 # Dựng model local tối nay (Hunyuan3D-2mini-turbo, máy Windows)
 
-Còn **25 concept chưa có model** (3 concept nhân vật anh Út / ông Tư / chú Hai **không cần**, vì đã dùng gói PSX có rig).
+## Đợt hiện tại: brief 5, ngày 03/11/2026
+
+25 model của đợt đầu bên dưới đã xong. **25 concept brief 4 còn chờ dựng**:
+Space miễn phí từ chối ngay `dish_plate_fish` do quota anonymous (90 giây yêu cầu,
+86 giây còn lại). Đã dừng gọi Space theo brief, chưa có raw/reduced mới.
+ID và ngân sách chính thức: `tools/art/horror_brief5_models.json`;
+trạng thái và kế hoạch tích hợp: [HORROR_CODEX_DELIVERY_5.md](HORROR_CODEX_DELIVERY_5.md).
+
+Sau khi đồng bộ nhánh chứa các file này sang Windows và cài pipeline theo
+`ART_PIPELINE.md`, chạy từ repo:
+
+```powershell
+python tools/art/stage_horror_brief5.py
+# Chạy nguyên lệnh powershell mà tool vừa in (run_pending.ps1 dưới build/hunyuan_brief5/<stamp>/).
+```
+
+Tool chỉ copy concept, không gọi API hay cài weights. Script PowerShell sinh ra
+chạy tuần tự các nhóm bằng `hunyuan_local.ps1`, retry một lần riêng cho ID lỗi,
+liệt kê ID còn thiếu và trả exit 1 nếu chưa xong. Chạy lại tool stage trước mỗi
+lần tiếp tục: chỉ bỏ qua output có status success và hash raw/reduced/input đúng.
+Mỗi nhóm chỉ một ảnh được đưa vào thư mục output theo ID riêng, tránh khác biệt
+single/batch của CLI hiện tại. Không chạy inference song song trên CPU.
+
+Sau khi dựng: kiểm tra số tam giác theo budget, thêm normals nếu thiếu và merge
+metadata mới vào `horror_models.gd/.json` (giữ các ID cũ), render đủ 3 góc/model.
+Chưa gọi là tích hợp xong chỉ vì có GLB. Chưa thay furniture hay material của
+WORLD/STYLE; nối đồ ăn/đồ uống và normal offering sau khi review model.
+
+## Hướng dẫn đợt đầu — đã hoàn tất, giữ để tham khảo
+
+Đợt đầu có **25 concept** (3 concept nhân vật anh Út / ông Tư / chú Hai **không cần**, vì đã dùng gói PSX có rig).
 Mỗi model ~3,5 phút trên CPU → cả loạt **~1,5 giờ**. Chạy qua đêm được. Cài đặt máy: xem `docs/ART_PIPELINE.md` mục "Cài trên máy mới".
 
 ## Cách 1: tự chạy lệnh (PowerShell, ở thư mục repo)
