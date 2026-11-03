@@ -31,7 +31,12 @@ static func describe(host: Node3D) -> Dictionary:
 				words = "[E] Dọn bàn %d" % (i + 1)
 				cleaning = true
 				break
-		if not cleaning:
+		var vy := host.get("vy") as VyStaff3D
+		var plate_ready: bool = pos.distance_to(L.PASS_POSITION) < 1.35 and host.service.next_ready() >= 0
+		if not cleaning and not plate_ready and vy and vy.talk.can_talk(pos, host.demo_camera):
+			at = vy.rig.position + Vector3(0, 2.0, 0)
+			words = "[E] Nói chuyện · Vy"
+		elif not cleaning:
 			if pos.distance_to(L.PASS_POSITION) < 1.35:
 				at = L.PASS_POSITION + Vector3(0, 1.5, 0)
 				words = "[E] Nhận món Bảo đã nấu"

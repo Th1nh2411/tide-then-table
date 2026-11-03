@@ -82,21 +82,59 @@ func lose_order(table: int) -> void:
 func pickup_ready() -> bool:
 	if host.carrying_table >= 0:
 		return false
-	for i: int in range(host.orders.size()):
-		if host.orders[i].is_empty() or not bool(host.orders[i].get("cooked", false)) or str(host.orders[i].get("phase", "waiting")) != "waiting":
-			continue
+	var i := next_ready()
+	if i >= 0:
 		host.carrying_table = i
 		host._show_note("Đem %s tới bàn %d." % [host.orders[i]["dish"].display_name, i + 1])
 		return true
 	host._show_note("Bảo: Chưa có món trên bàn nhận.")
 	return false
 
-func clean_table(table: int) -> void:
+
+## First cooked plate on the bench Rin may take (not Vy's), else -1.
+func next_ready() -> int:
+	for i: int in range(host.orders.size()):
+		var order: Dictionary = host.orders[i]
+		if order.is_empty() or not bool(order.get("cooked", false)) or str(order.get("phase", "waiting")) != "waiting":
+			continue
+		if not bool(order.get("staff", false)) and host.carrying_table != i:
+			return i
+	return -1
+
+
+## The plate Vy should take: cooked, waiting, unclaimed, least patience left.
+func staff_pick() -> int:
+	var best := -1
+	for i: int in range(host.orders.size()):
+		var order: Dictionary = host.orders[i]
+		if order.is_empty() or not bool(order.get("cooked", false)) or str(order.get("phase", "waiting")) != "waiting":
+			continue
+		if host.carrying_table == i or bool(order.get("staff", false)):
+			continue
+		if best < 0 or float(order["patience"]) < float(host.orders[best]["patience"]):
+			best = i
+	return best
+
+## Vy set the plate she carried (order["staff"]) down; she says nothing.
+func staff_serve(table: int) -> void:
+	var order: Dictionary = host.orders[table]
+	if order.is_empty() or not bool(order.get("staff", false)) or str(order.get("phase", "waiting")) != "waiting":
+		return
+	order.erase("staff")
+	order["phase"] = "eating"
+	order["meal_left"] = host.MEAL_SECONDS
+	host.order_labels[table].text = "Bàn %d • đang ăn" % (table + 1)
+
+
+## `quiet`: Vy wiped it (no note).
+func clean_table(table: int, quiet := false) -> void:
 	if table < 0 or table >= host.dirty_tables.size() or not host.dirty_tables[table]:
 		return
 	host.dirty_tables[table] = false
 	host.table_plates[table].visible = false
 	host.order_labels[table].text = ""
+	if quiet:
+		return
 	Sfx.play("ok")
 	host._show_note("Đã dọn bàn %d." % (table + 1))
 
@@ -114,7 +152,7 @@ func end_shift() -> void:
 func sync_food_visuals() -> void:
 	for i: int in range(host.orders.size()):
 		var order: Dictionary = host.orders[i]
-		host.ready_plates[i].visible = not order.is_empty() and bool(order.get("cooked", false)) and str(order.get("phase", "waiting")) == "waiting" and host.carrying_table != i
+		host.ready_plates[i].visible = not order.is_empty() and bool(order.get("cooked", false)) and str(order.get("phase", "waiting")) == "waiting" and host.carrying_table != i and not bool(order.get("staff", false))
 		host.table_plates[i].visible = host.dirty_tables[i] or (not order.is_empty() and str(order.get("phase", "waiting")) == "eating")
 
 		var displayed_dish: DishData = order.get("dish")
