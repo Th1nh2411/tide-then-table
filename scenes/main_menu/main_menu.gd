@@ -4,7 +4,7 @@ extends Control
 ## with a save) / Chơi mới (press twice over a save) / Cài đặt / Thoát.
 
 ## Every day (new game, continue) starts in Rin's room.
-const BEDROOM_SCENE_PATH: String = "res://scenes/home3d/bedroom_scene_3d.tscn"
+const VILLAGE_SCENE_PATH: String = VillageLayout3D.SCENE
 ## Where the pier lamp sits in the key art (share of width / height).
 const LAMP_AT := Vector2(0.751, 0.462)
 ## Push-in: zoom reached after PUSH_SECONDS, then back (ping-pong).
@@ -111,7 +111,7 @@ func _on_continue_pressed() -> void:
 		_continue_button.hide()
 		_new_game_button.grab_focus()
 		return
-	SceneRouter.go_to(BEDROOM_SCENE_PATH)
+	SceneRouter.go_to(VILLAGE_SCENE_PATH)
 
 
 func _on_new_game_pressed() -> void:
@@ -123,7 +123,7 @@ func _on_new_game_pressed() -> void:
 		UiFx.shake(_new_game_button)
 		return
 	GameState.reset()
-	SceneRouter.go_to(BEDROOM_SCENE_PATH)  # mùng 9, Rin wakes in his room
+	SceneRouter.go_to(VILLAGE_SCENE_PATH)  # mùng 9, Rin wakes in his room
 
 
 func _saved_day() -> int:

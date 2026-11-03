@@ -4,7 +4,7 @@ extends CanvasLayer
 ## awake in bed — black screen and a pounding heart, a sharp gasp, his eyes
 ## open on the ceiling, he sits up shaking, then a line. With `knocks` (the
 ## drowned came to the door) three slow knocks sound in the black first.
-## Drives the bedroom's
+## Drives the village scene's
 ## `eye_offset` / `held_pitch` (FirstPersonView3D reads them) and `waking`.
 
 ## Eye lying on the bed, relative to standing at BedroomBuilder3D.START.
@@ -24,14 +24,14 @@ const AFTER_SIT := 0.6
 @export var knock_dark_seconds := 2.7
 @export var knock_at := 0.8
 
-var room: BedroomScene3D
+var room: VillageScene3D
 var line := ""
 var knocks := false
 var _black := ColorRect.new()
 var _shake := 0.0
 
 
-static func play(owner: BedroomScene3D, after: String, knock: bool = false) -> NightmareWake3D:
+static func play(owner: VillageScene3D, after: String, knock: bool = false) -> NightmareWake3D:
 	var wake := NightmareWake3D.new()
 	wake.room = owner
 	wake.line = after
@@ -54,7 +54,7 @@ func _ready() -> void:
 	if knocks:
 		Sfx.duck(knock_at + 0.9)
 		tween.tween_interval(knock_at)
-		tween.tween_callback(func() -> void: Sfx.play_at("knock3", BedroomBuilder3D.DOOR + Vector3(0, 1.1, 0), room, 1.0, 3.0))
+		tween.tween_callback(func() -> void: Sfx.play_at("knock3", VillageLayout3D.room_point(BedroomBuilder3D.DOOR) + Vector3(0, 1.1, 0), room, 1.0, 3.0))
 		tween.tween_interval(knock_dark_seconds - knock_at)
 	else:
 		tween.tween_interval(dark_seconds)

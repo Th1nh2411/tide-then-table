@@ -1,6 +1,6 @@
 class_name FirstPersonView3D
 extends Node
-## First-person view for the 3D bedroom, restaurant and sea (SceneRouter adds it at
+## First-person view for the 3D village map, restaurant and sea (SceneRouter adds it at
 ## start; F10 in debug builds toggles it): a camera at Rin's eyes, mouse look, his
 ## own body hidden from it. Restaurant: it becomes the host's `demo_camera`,
 ## so WASD already walks where he looks. Sea: the look turns with the boat and
@@ -69,8 +69,9 @@ func _attach(scene: Node) -> void:
 		_game_camera = scene.get("demo_camera")
 		scene.set("demo_camera", _camera)
 		_camera.far = 80.0
-		# Restaurant: facing the shop front (-Z); bedroom: towards the door.
-		_yaw = float(scene.get("start_yaw")) if (scene is BedroomScene3D or scene is WaterfrontScene3D) else 0.0
+		# Restaurant: facing the shop front (-Z); village: the scene's start_yaw.
+		var yaw: Variant = scene.get("start_yaw")
+		_yaw = float(yaw) if yaw != null else 0.0
 		var body := scene.get("body") as Node
 		if body:
 			for child in body.get_children():
@@ -133,16 +134,17 @@ func _update_mouse() -> void:
 		Input.mouse_mode = mode
 
 
-## Scenes where Rin walks with WASD relative to `demo_camera` (restaurant, bedroom, waterfront).
+## Scenes where Rin walks with WASD relative to `demo_camera` (the village
+## map, which is a RestaurantScene3D, and the restaurant alone).
 func _walks(scene: Node) -> bool:
-	return scene is RestaurantScene3D or scene is BedroomScene3D or scene is WaterfrontScene3D
+	return scene is RestaurantScene3D
 
 
 func _follow_walker(room: Node) -> void:
 	var player := room.get("player") as Node3D
 	if player == null:
 		return
-	# A scene may move the eye / hold the pitch for a moment (BedroomScene3D's nightmare wake).
+	# A scene may move the eye / hold the pitch for a moment (the village's nightmare wake).
 	var offset: Variant = room.get("eye_offset")
 	_camera.global_position = player.global_position + EYE_RESTAURANT + (offset as Vector3 if offset is Vector3 else Vector3.ZERO)
 	var held: Variant = room.get("held_pitch")

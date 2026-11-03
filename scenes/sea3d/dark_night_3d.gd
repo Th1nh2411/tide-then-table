@@ -6,7 +6,7 @@ extends Node3D
 ## HorrorBed mix, then haunts the edge of the lamp: knocks on the hull,
 ## whispers, static, a figure on the water, eyes gliding past. After a
 ## while away from the dock, far out, low on oil or after a catch, the sea
-## takes him (SeaTrip3D.taken_by_the_sea); the bedroom then resets the loop.
+## takes him (SeaTrip3D.taken_by_the_sea); the next morning resets the loop.
 
 const NODE_NAME := "DarkNight"
 const BED := "sea_dark"

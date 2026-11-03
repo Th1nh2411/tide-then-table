@@ -148,7 +148,7 @@ Vietnamese, keep code comments in short English.
 - **3-fish rule:** a calm night is only right if Rin docks with
   `LoopCalendar.MIN_FISH` (3) in the basket (`SeaTrip3D._go_home` ->
   `LoopCalendar.choose(true, fish)`, flag `night_catch`); staying home or
-  coming back short = reset + `LoopCalendar.last_calm_miss`: the bedroom's
+  coming back short = reset + `LoopCalendar.last_calm_miss`: the morning's
   `NightmareWake3D` knocks three times in the black and `WetFootprints3D` lays
   wet steps door -> bed (no text). A right night leaves `shop_fish` (the tray
   of fish beside Bảo's cart, `RestaurantFish3D`) and, after staying home on an
@@ -169,18 +169,22 @@ Vietnamese, keep code comments in short English.
   resume_at, trip_notes, play_seconds), `Sfx`, `DayClock` (display-only time of day: driven by
   `LampOil` at sea and by shift progress in the restaurant; `running` = night
   trip in progress), `SceneRouter` (`go_to(path, fade_color)`).
-- Flow: main menu → (New Game: `scenes/intro/intro_scene.tscn`, cutscene
-  `intro_call`: Rin, jobless in his rented room, calls Bảo to open the
-  restaurant) → sea night trip (`scenes/sea/sea_scene.tscn`, autosave at
-  start) → dock (E: unload the hold and keep fishing, or go home) / rescue (broken
-  hull or no oil) → rest card
-  (`scenes/rest/rest_scene.tscn`, autosave #2: Continue resumes at the
-  restaurant via `GameState.resume_at`; use `SaveSystem.autosave()`) → restaurant (menu planning → shift →
-  summary + rating → upgrade shop) → next day (freshness loss) → sea …
-  ending via fog whirlpool (omen on day 4 or the first glowing mackerel,
-  fog opens the next day; a full run is ~5 days / ~45 min, measured by a
-  whole-game bot). The ending shows a run card (`EndingStats`: days +
-  minutes, fish, guests, earnings) and a thank-you for playtesters.
+- Flow (horror build): main menu → the village map (`VillageScene3D`,
+  `scenes/village3d/village_scene_3d.tscn`, one first-person map, no scene
+  change inside it): Rin wakes in his room (morning: the night is judged
+  here, `VillageDay3D.judge_morning`; autosave; `NightmareWake3D` after a
+  reset) → E on the door (`VillageDoor3D`) → waterfront → lane → restaurant
+  street (the shift opens on first entry, `VillageLayout3D.SHIFT_X`) → after
+  the shift it is night everywhere → E on the bed = sleep (reload the
+  village = next morning; `choose(false)` if he did not go out) or E at
+  ông Tư's thúng on the pier = the night sea (`scenes/sea3d/sea_scene_3d.tscn`);
+  docking reloads the village at night on the pier (`VillageDay3D.NIGHT_FLAG`),
+  then the bed. Rằm endings go from the sea to `RamEpilogue3D`. Map:
+  `VillageScene3D` extends `RestaurantScene3D` (street at its own coordinates
+  x -20..20; its east wall opens at z 1..6 onto the lane x 20..47; waterfront
+  = `WaterfrontBuilder3D` pieces at (64, 0, -4.5); room = `BedroomBuilder3D`
+  at (61.5, 0, 6.9)); light by phase / zone `VillageLighting3D`, E outside
+  the restaurant `VillageSpots3D`, area sound + footsteps `VillageAudio3D`.
 - Sea view matches the restaurant: the boat camera zooms x2 (Rin is 16x32
   on screen, standing, no hat (art plans have no nón lá); `Boat._draw` is 3/4: the deck turns, the
   hull side always faces the bottom of the screen, Rin and the cat stay

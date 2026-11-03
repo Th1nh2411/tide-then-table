@@ -1,7 +1,10 @@
 extends Node
 ## Integration bot for the horror build's day loop (PLAN §10), mùng 9 to
-## rằm, then the ending: bedroom -> waterfront (morning) -> restaurant ->
-## waterfront (evening) -> house (sleep) or thúng (night at sea) -> bedroom.
+## rằm, then the ending, on the one village map (VillageScene3D): wakes in
+## the room -> opens the door -> the lane -> the street (the shift opens) ->
+## back -> the bed (sleep) or the thúng (night at sea -> the pier at night ->
+## the bed). Rin is placed along the way (teleport), E goes through the real
+## targets (VillageSpots3D). Each morning is a fresh load of the village.
 ## Perfect info: on omen nights (OmenPicker) it goes into the house to sleep,
 ## otherwise down into the thúng and brings back LoopCalendar.MIN_FISH fish
 ## through the real rod (Fishing3D: cast, bite, hook, reel, basket). Once (day 2 of the first loop) it picks the
@@ -11,9 +14,7 @@ extends Node
 ## scenes, service, story and transitions are real. No money / upgrades any more.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
-const BEDROOM := "res://scenes/home3d/bedroom_scene_3d.tscn"
-const QUAN := "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
-const WATERFRONT := "res://scenes/home3d/waterfront_scene_3d.tscn"
+const VILLAGE := "res://scenes/village3d/village_scene_3d.tscn"
 const END := "res://scenes/ending/ending_scene.tscn"
 var _ticks: int = 0
 var _failed := false
@@ -35,10 +36,10 @@ func _frames(count: int) -> void:
 func _until(path: String) -> Node:
 	return await _until_any([path])
 
-func _until_any(paths: Array[String]) -> Node:
+func _until_any(paths: Array[String], old: Node = null) -> Node:
 	for i: int in range(600):
 		var scene: Node = get_tree().current_scene
-		if scene and paths.has(scene.scene_file_path) and not SceneRouter._is_transitioning:
+		if scene and scene != old and paths.has(scene.scene_file_path) and not SceneRouter._is_transitioning:
 			return scene
 		await get_tree().process_frame
 	_fail("scene " + str(paths))
@@ -139,7 +140,6 @@ func _service(quan: Node) -> void:
 	if RamNight.is_ram() and not _refuse_tea(quan):
 		return
 	_roundtrip()
-	quan._walk_home()
 
 func _roundtrip() -> void:
 	var expected: Dictionary = SaveSystem.to_dict()
@@ -154,22 +154,26 @@ func _run() -> void:
 	SaveSystem.autosave_off = true
 	SceneRouter.fade_duration = 0.01
 	GameState.reset()
-	SceneRouter.go_to(BEDROOM)
+	SceneRouter.go_to(VILLAGE)
 	var reset_checked := false
 	var expect_reset := ""
+	var room: Node = await _until_any([VILLAGE, END])
 	for step: int in range(20):
-		var room: Node = await _until_any([BEDROOM, END])
 		if not room:
 			return
-		if room.scene_file_path == BEDROOM and room.leaving:
-			room = await _until(END)  # the last night ends straight from the bedroom
+		if room.scene_file_path == VILLAGE and room.leaving:
+			room = await _until(END)  # the last night ends straight from the morning
 			if not room:
 				return
 		if room.scene_file_path == END:
 			print("RUN ENDING | 3D | day %d | loops %d" % [GameState.day, LoopCalendar.loops()])
 			get_tree().quit(1 if _failed else 0)
 			return
-		var visited: bool = room.has_node(WetFootprints3D.NODE_NAME)
+		var village := room as VillageScene3D
+		if village.night:
+			_fail("woke up at night")
+			return
+		var visited: bool = village.has_node(WetFootprints3D.NODE_NAME)
 		if visited != (expect_reset == "home on a calm night"):
 			_fail("wet footprints %s after '%s'" % ["shown" if visited else "missing", expect_reset])
 			return
@@ -177,8 +181,8 @@ func _run() -> void:
 			if GameState.day != 1 or LoopCalendar.loops() != 1:
 				_fail(expect_reset + " did not reset to mùng 9")
 				return
-			var hint: String = room.NEWS.hint(LoopCalendar.missed())
-			if hint == "" or room.paper_hint() != hint:
+			var hint: String = VillageSpots3D.NEWS.hint(LoopCalendar.missed())
+			if hint == "" or village.paper_hint() != hint:
 				_fail("no hint on the mùng 9 paper after '%s'" % expect_reset)
 				return
 			print("LOOP RESET | %s -> %s | paper: %s" % [expect_reset, LoopCalendar.date_text(GameState.day), hint])
@@ -190,46 +194,85 @@ func _run() -> void:
 		var customs := OmenPicker.customs(OmenPicker.CATALOG, LoopCalendar.loops(), GameState.day)
 		print("HOME | %s | loops %d | omen %s | customs %s" % [LoopCalendar.date_text(GameState.day), LoopCalendar.loops(),
 			omen.id if omen else "-", ",".join(customs)])
-		room.leave()
-		var morning: Node = await _until(WATERFRONT)
-		if not morning:
+		if not await _walk_to_shift(village):
 			return
-		if morning.evening:
-			_fail("waterfront in the morning thinks it is evening")
-			return
-		morning.go_to_restaurant()
-		var quan: Node = await _until(QUAN)
-		if not quan:
-			return
-		if omen and not _omen_shown(quan, omen):
+		if omen and not _omen_shown(village, omen):
 			return
 		var go_home := omen != null
 		if not reset_checked and GameState.day == 2:
 			reset_checked = true
 			go_home = not go_home
 			expect_reset = "out on an omen night" if omen else "home on a calm night"
-		await _service(quan)
-		var evening: Node = await _until(WATERFRONT)
-		if not evening:
+		await _service(village)
+		if _failed:
 			return
-		if not evening.evening or not evening.has_node("DockOmens"):
-			_fail("evening waterfront without its dock omen props")
+		if village.dock_omens == null or village.lighting.phase != VillageLighting3D.Phase.NIGHT:
+			_fail("evening without night light or the dock omen props")
 			return
 		if go_home:
-			evening.go_to_sleep()
+			if not _press(village, "bed", VillageLayout3D.room_point(BedroomBuilder3D.BEDSIDE + Vector3(0.4, 0, 0)),
+					VillageLayout3D.room_point(BedroomBuilder3D.BED)):
+				return
+			room = await _until_any([VILLAGE, END], village)
 			continue
-		if RamNight.is_ram() and not evening.has_node("RamShore"):
+		if RamNight.is_ram() and not village.waterfront.has_node("RamShore"):
 			_fail("rằm evening without the hoa đăng")
 			return
-		evening.go_to_sea()
+		var thung := VillageSpots3D.thung_point()
+		if not _press(village, "thung", thung + Vector3(1.0, 0, 1.0), thung):
+			return
 		var sea: Node = await _until(SEA)
 		if not sea:
 			return
 		if RamNight.is_ram():
 			await _ram_night(sea)
+			if _failed:
+				return
+			room = await _until(END)
 			continue
 		await _night(sea)
+		if _failed:
+			return
+		room = await _until_any([VILLAGE], sea)
+		if room and (room as VillageScene3D).night:
+			room = await _home_from_pier(room as VillageScene3D)
 	_fail("no ending after 20 days")
+
+## Morning in the room: open the door, walk the lane into the street (teleports
+## along the way); the shift opens as Rin arrives.
+func _walk_to_shift(village: VillageScene3D) -> bool:
+	if not _press(village, "door", village.door.aim_point() + Vector3(0, -1.1, 0.9), village.door.aim_point()):
+		return false
+	for at: Vector3 in [VillageLayout3D.waterfront_point(WaterfrontBuilder3D.LANE) + Vector3(2, 0, 0),
+			Vector3(VillageLayout3D.EXIT_X + 8.0, 0, VillageLayout3D.LANE_Z), Vector3(2.0, 0, 2.0)]:
+		village.player.position = at
+		await _frames(2)
+	if not village.shift_running:
+		_fail("the shift did not open when Rin walked into the street")
+		return false
+	return true
+
+## Back on the pier at night: walk home and sleep (the morning judges the night).
+func _home_from_pier(village: VillageScene3D) -> Node:
+	if not VillageLayout3D.on_pier(village.player.position) or not village.shift_over:
+		_fail("back from the sea but not on the pier at night")
+		return null
+	if not _press(village, "bed", VillageLayout3D.room_point(BedroomBuilder3D.BEDSIDE + Vector3(0.4, 0, 0)),
+			VillageLayout3D.room_point(BedroomBuilder3D.BED)):
+		return null
+	return await _until_any([VILLAGE], village)
+
+## Stands Rin at `at` looking at `look`; E must aim at `what`, then E.
+func _press(village: VillageScene3D, what: String, at: Vector3, look: Vector3) -> bool:
+	village.player.position = at
+	village.demo_camera.global_position = at + Vector3(0, 1.55, 0)
+	village.demo_camera.look_at(look)
+	var aimed := village.spots.target()
+	if aimed != what:
+		_fail("E aims at '%s', expected '%s'" % [aimed, what])
+		return false
+	village._interact()
+	return true
 
 ## Rằm at the restaurant: anh Út came; the true path refuses his tea.
 func _refuse_tea(quan: Node) -> bool:
@@ -263,7 +306,7 @@ func _ram_night(sea: Node) -> void:
 		return
 	print("RAM ENDING | true | refused the tea, saw anh Út at the raft | clues %d" % NightErrand3D.clue_count())
 
-## The restaurant built tonight's omen props (the dock's are checked on the waterfront).
+## The street built tonight's omen props (the dock's are checked after the shift).
 func _omen_shown(quan: Node, omen: OmenData) -> bool:
 	var props := quan.get_node_or_null("Omens") as RestaurantOmens3D
 	var ok := props != null

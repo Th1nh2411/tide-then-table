@@ -5,7 +5,7 @@ extends RefCounted
 ## obvious ones only on early days (OmenCatalog.allowed: subtlety).
 ## Deterministic per (loop count, day): the same day of the same loop always
 ## gets the same omen, so reloads, tests and the bot agree. Stored as story
-## flags: LoopCalendar.OMEN_FLAG (judged in the bedroom) + ID_FLAG.
+## flags: LoopCalendar.OMEN_FLAG (judged when Rin wakes) + ID_FLAG.
 
 const ID_FLAG := "omen_id"
 const CATALOG: OmenCatalog = preload("res://data/omens/omen_catalog.tres")
@@ -41,7 +41,7 @@ static func _roll(catalog: OmenCatalog, loop: int, day: int, previous: String) -
 	return choices.back().id if not choices.is_empty() else ""
 
 
-## Called when a day starts (bedroom): sets or clears tonight's flags.
+## Called when a day starts (village morning): sets or clears tonight's flags.
 static func start_day(catalog: OmenCatalog = CATALOG) -> void:
 	var id := pick(catalog, LoopCalendar.loops(), GameState.day)
 	if id == "":

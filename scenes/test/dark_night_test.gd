@@ -1,11 +1,11 @@
 extends Node
 ## Standalone test for đêm âm (DarkNight3D, run with F6): a calm night's sea
 ## is untouched; with the omen flag the sea turns dark (fog, water, oil burn,
-## "sea_dark" bed) and haunts; being taken by the sea goes to the bedroom,
-## which judges the night as RESET (back to mùng 9).
+## "sea_dark" bed) and haunts; being taken by the sea wakes Rin in the village
+## morning, which judges the night as RESET (back to mùng 9).
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
-const BEDROOM := "res://scenes/home3d/bedroom_scene_3d.tscn"
+const VILLAGE := "res://scenes/village3d/village_scene_3d.tscn"
 
 var _failures := 0
 
@@ -69,10 +69,10 @@ func _run() -> void:
 	dark.away_seconds = dark.taken_after_seconds
 	_check(dark.should_take(), "time at sea triggers the ending")
 	dark.take()
-	var bedroom := await _scene(BEDROOM)
-	_check(bedroom != null, "taken by the sea -> bedroom")
+	var village := await _scene(VILLAGE) as VillageScene3D
+	_check(village != null and not village.night, "taken by the sea -> the village morning, in bed")
 	_check(GameState.day == 1 and LoopCalendar.loops() == 1 and not GameState.has_flag(LoopCalendar.OMEN_FLAG),
-		"bedroom judged it RESET: back to mùng 9")
+		"the morning judged it RESET: back to mùng 9")
 	_check(_reset_rule(), "omen + went out = RESET")
 	_finish()
 

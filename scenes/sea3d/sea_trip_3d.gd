@@ -1,10 +1,10 @@
 class_name SeaTrip3D
 extends RefCounted
 ## A night trip's start and end in the 3D sea: the night-start lines, lamp
-## oil (clock + light), ending the trip (back to the bedroom: the night counts
-## as "went out" with the basket's fish for LoopCalendar) and the whirlpool ending.
+## oil (clock + light), ending the trip (back to the village's pier at night:
+## the night counts as "went out" with the basket's fish for LoopCalendar,
+## judged when Rin wakes) and the whirlpool ending.
 
-const BEDROOM_SCENE := "res://scenes/home3d/bedroom_scene_3d.tscn"
 const ENDING_SCENE := "res://scenes/ending/ending_scene.tscn"
 
 
@@ -49,8 +49,9 @@ static func taken_by_the_sea(sea: SeaScene3D) -> void:
 	_go_home(sea, false, true)
 
 
-## A broken hull gets a free patch, then the bedroom judges the night.
-## `taken`: the sea took him, nothing comes home.
+## A broken hull gets a free patch; Rin is back on the pier at night and
+## walks home to bed (the morning judges the night). `taken`: the sea took
+## him, nothing comes home: he wakes straight into the (reset) morning.
 static func _go_home(sea: SeaScene3D, towed: bool, taken: bool = false) -> void:
 	if towed:
 		BoatCondition.tow_patch(20.0)
@@ -58,7 +59,10 @@ static func _go_home(sea: SeaScene3D, towed: bool, taken: bool = false) -> void:
 	DayClock.stop()
 	var fish := 0 if taken else sea.rod.basket.count()
 	LoopCalendar.choose(true, fish)
-	SceneRouter.go_to(BEDROOM_SCENE)
+	if taken:
+		SceneRouter.go_to(VillageLayout3D.SCENE)
+	else:
+		VillageDay3D.back_from_sea()
 
 
 static func enter_whirlpool(sea: SeaScene3D) -> void:

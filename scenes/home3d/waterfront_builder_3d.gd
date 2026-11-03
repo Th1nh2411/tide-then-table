@@ -1,17 +1,16 @@
 class_name WaterfrontBuilder3D
 extends RefCounted
-## Builds Xóm Đèn's waterfront for WaterfrontScene3D: the village ground, Rin's
-## house (ông Tư's) with its door, the pier running out to sea with ông Tư's
-## thúng tied at the end, lamp posts, dark neighbours, and the lane to the
-## restaurant, two lighthouses, and the dock omens (DockOmens3D). The sea lies
-## towards -Z, like the night sea's north.
+## Builds Xóm Đèn's waterfront: the village ground, Rin's house (ông Tư's)
+## with its door, the pier running out to sea with ông Tư's thúng tied at the
+## end, lamp posts, dark neighbours, the lane sign, two lighthouses, and the
+## dock omens (DockOmens3D). The sea lies towards -Z, like the night sea's
+## north. The village map (VillageBuilder3D) uses the pieces; the epilogue
+## (RamEpilogue3D) builds it whole.
 
 const B = preload("res://scenes/restaurant3d/restaurant_room_builder_3d.gd")
 const DOOR := Vector3(-1.0, 0, 9.4)
 const THUNG := Vector3(6.0, 0, -10.6)
 const LANE := Vector3(-14.0, 0, 8.0)
-const MORNING_START := Vector3(-1.0, 0, 8.4)
-const EVENING_START := Vector3(-12.5, 0, 7.6)
 const SHORE_Z := 2.0
 const PIER_POST := Vector3(7.0, 0.12, -9.4)
 const NEAR_LIGHTHOUSE := Vector3(-11.0, -0.2, -4.0)
@@ -19,17 +18,31 @@ const FAR_LIGHTHOUSE := Vector3(30.0, -0.2, -60.0)
 const WATER_Y := -0.35
 
 
+## The whole waterfront on its own (RamEpilogue3D): light, sea, house, lamps.
 static func build(host: Node3D, evening: bool) -> void:
 	_light(host, evening)
-	# Village ground, a sandy edge, the sea beyond.
+	SeaBackdrop3D.build_islands(host)
+	build_ground(host)
+	water(host)
+	_house(host, evening)
+	build_scenery(host)
+	for at: Vector3 in lamp_posts(host):
+		_lamp(host, at, evening)
+	if evening:  # the omens are read before the night's choice
+		build_omens(host)
+
+
+## Village ground and the sandy edge of the shore.
+static func build_ground(host: Node3D) -> void:
 	B.box(host, Vector3(0, -0.1, 8.0), Vector3(34, 0.2, 12), "4a4136", true).material_override = HorrorMaterials.tiled("ground_village", 2.0)
 	B.box(host, Vector3(0, -0.12, SHORE_Z + 0.6), Vector3(34, 0.2, 1.4), "8a7a5e", true)
-	_water(host)
-	# Rin's house: a low plastered front with a wooden door and one window.
+
+
+## Rin's house front as a closed block (the village map builds the real room instead).
+static func _house(host: Node3D, evening: bool) -> void:
 	var wall := HorrorMaterials.tiled("wall_plaster_old", 2.2)
-	var roof := HorrorMaterials.tiled("roof_tin_rusty", 1.4)
 	B.box(host, Vector3(-1.0, 1.6, 12.0), Vector3(7.0, 3.2, 5.0), "8f877a", true).material_override = wall
-	B.box(host, Vector3(-1.0, 3.35, 11.6), Vector3(7.6, 0.25, 5.8), "5b3a2e").material_override = roof
+	B.box(host, Vector3(-1.0, 3.35, 11.6), Vector3(7.6, 0.25, 5.8), "5b3a2e").material_override = HorrorMaterials.tiled("roof_tin_rusty", 1.4)
 	B.box(host, DOOR + Vector3(0, 1.0, 0.0), Vector3(0.95, 2.0, 0.08), "4a3a2e")
 	HorrorMaterials.picture(host, "door_wood_old", DOOR + Vector3(0, 1.0, -0.045), Vector2(0.95, 2.0), PI)
 	var window := B.box(host, Vector3(1.4, 1.6, 9.46), Vector3(1.0, 0.8, 0.04), "2b2a26")
@@ -39,9 +52,14 @@ static func build(host: Node3D, evening: bool) -> void:
 		glow.emission_enabled = true
 		glow.emission = Color("ffb35a")
 		glow.emission_energy_multiplier = 0.6
+
+
+## Neighbours, the pier with ông Tư's thúng, the lighthouses and the lane sign.
+static func build_scenery(host: Node3D) -> void:
+	var roof := HorrorMaterials.tiled("roof_tin_rusty", 1.4)
 	# Two dark neighbours down the lane.
 	for x: float in [-8.5, 7.5]:
-		B.box(host, Vector3(x, 1.4, 12.5), Vector3(4.5, 2.8, 4.0), "6f6a60", true).material_override = HorrorMaterials.tiled("wall_plaster_old", 2.2, Color(0.62, 0.66, 0.6))
+		B.box(host, Vector3(x, 1.4, 12.5), Vector3(4.5, 2.8, 4.0), "6f6a60", true).material_override = HorrorMaterials.tiled("blue_lime_wall", 2.2, Color(0.72, 0.76, 0.74))
 		B.box(host, Vector3(x, 2.95, 12.2), Vector3(5.0, 0.2, 4.8), "4b3428").material_override = roof
 	# The pier and ông Tư's thúng at its end.
 	B.box(host, Vector3(THUNG.x, 0.05, (SHORE_Z + THUNG.z) * 0.5 - 0.6), Vector3(1.8, 0.12, SHORE_Z - THUNG.z + 0.4), "6b5240", true).material_override = HorrorMaterials.tiled("floor_wood_planks", 1.2)
@@ -52,39 +70,48 @@ static func build(host: Node3D, evening: bool) -> void:
 	host.add_child(hull)
 	hull.position = THUNG + Vector3(-1.3, WATER_Y - 0.05, -0.4)
 	hull.scale = Vector3(1, 0.75, 1)
-	# Lamp posts along the shore; the lane sign towards the restaurant.
-	for x: float in [-6.0, 4.0]:
-		B.box(host, Vector3(x, 1.4, 3.6), Vector3(0.1, 2.8, 0.1), "394a50")
-		_lamp(host, Vector3(x, 2.7, 3.6), evening)
 	# A small lighthouse on the point, and the far one on Đá Canh Đêm: the dock omens use their beacons.
 	SeaWorldBuilder3D.batch_model(host, "lighthouse", NEAR_LIGHTHOUSE, Vector3(0.6, 0.95, 0.6))
 	SeaWorldBuilder3D.batch_model(host, "lighthouse", FAR_LIGHTHOUSE)
-	var beacons: Array[Vector3] = [NEAR_LIGHTHOUSE + Vector3(0, 3.35, 0), FAR_LIGHTHOUSE + Vector3(0, 3.6, 0)]
-	if evening:  # the omens are read before the night's choice
-		DockOmens3D.build(host, PIER_POST, beacons, Vector3(THUNG.x, WATER_Y + 0.25, THUNG.z - 2.0))
 	B.box(host, LANE + Vector3(0.6, 0.8, 0), Vector3(0.08, 1.6, 0.08), "4a3a2e")
-	var sign_ := B.box(host, LANE + Vector3(0.6, 1.5, 0), Vector3(0.05, 0.3, 1.0), "c9b896")
-	sign_.rotation.y = 0.0
+	B.box(host, LANE + Vector3(0.6, 1.5, 0), Vector3(0.05, 0.3, 1.0), "c9b896")
 	var words := B.label(host, "RA QUÁN", LANE + Vector3(0.64, 1.5, 0), 28, "2a2230")
 	words.rotation.y = PI * 0.5
 
 
-static func _water(host: Node3D) -> void:
+## Lamp posts along the shore; returns where their bulbs hang.
+static func lamp_posts(host: Node3D) -> Array[Vector3]:
+	var bulbs: Array[Vector3] = []
+	for x: float in [-6.0, 4.0]:
+		B.box(host, Vector3(x, 1.4, 3.6), Vector3(0.1, 2.8, 0.1), "394a50")
+		bulbs.append(Vector3(x, 2.7, 3.6))
+	return bulbs
+
+
+## The dock omen props (lanterns, beacons, pier head), seen before the night's choice.
+static func build_omens(host: Node3D) -> DockOmens3D:
+	var beacons: Array[Vector3] = [NEAR_LIGHTHOUSE + Vector3(0, 3.35, 0), FAR_LIGHTHOUSE + Vector3(0, 3.6, 0)]
+	return DockOmens3D.build(host, PIER_POST, beacons, Vector3(THUNG.x, WATER_Y + 0.25, THUNG.z - 2.0))
+
+
+## The sea off the shore: `size` metres, centred `centre_x` across. The
+## shader's zones are in world z, so `world_z` is the host's own z offset.
+static func water(host: Node3D, size: Vector2 = Vector2(160, 110), centre_x: float = 0.0, world_z: float = 0.0) -> void:
 	var water := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
-	plane.size = Vector2(160, 110)
+	plane.size = size
 	plane.subdivide_width = 120
 	plane.subdivide_depth = 80
 	water.mesh = plane
 	water.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var m := ShaderMaterial.new()
 	m.shader = SeaWater3D.SHADER
-	m.set_shader_parameter("reef_z", -40.0)
-	m.set_shader_parameter("near_z", -8.0)
+	m.set_shader_parameter("reef_z", -40.0 + world_z)
+	m.set_shader_parameter("near_z", -8.0 + world_z)
 	m.set_shader_parameter("boat_pos", Vector3(0, -100, 9999))  # no boat here: no hull hole / ring
 	water.material_override = m
 	host.add_child(water)
-	water.position = Vector3(0, WATER_Y, SHORE_Z - 55.0)
+	water.position = Vector3(centre_x, WATER_Y, SHORE_Z - size.y * 0.5)
 
 
 static func _light(host: Node3D, evening: bool) -> void:
@@ -122,7 +149,6 @@ static func _light(host: Node3D, evening: bool) -> void:
 		moon.light_energy = 0.6
 	world.environment = env
 	host.add_child(world)
-	SeaBackdrop3D.build_islands(host)
 
 
 static func _lamp(host: Node3D, at: Vector3, on: bool) -> void:

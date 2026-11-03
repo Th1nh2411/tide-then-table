@@ -3,9 +3,7 @@ extends Node
 ## Travel and minigame skill are scripted; no player's save is read or written.
 
 const SEA := "res://scenes/sea3d/sea_scene_3d.tscn"
-const BEDROOM := "res://scenes/home3d/bedroom_scene_3d.tscn"
-const WATERFRONT := "res://scenes/home3d/waterfront_scene_3d.tscn"
-const QUAN := "res://scenes/restaurant3d/restaurant_scene_3d.tscn"
+const VILLAGE := "res://scenes/village3d/village_scene_3d.tscn"
 const SAVE := "user://test_game3d_loop.json"
 var _failures: int = 0
 var _frames_elapsed: int = 0
@@ -18,7 +16,7 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	_frames_elapsed += 1
-	if _frames_elapsed > 1000:
+	if _frames_elapsed > 1500:
 		print("FAIL 3D loop timed out")
 		get_tree().quit(1)
 
@@ -41,6 +39,13 @@ func _scene(path: String) -> Node:
 	get_tree().quit(1)
 	return null
 
+## Stands Rin at `at` looking at `look` and returns what E would act on.
+static func aim(village: VillageScene3D, at: Vector3, look: Vector3) -> String:
+	village.player.position = at
+	village.demo_camera.global_position = at + Vector3(0, 1.55, 0)
+	village.demo_camera.look_at(look)
+	return village.spots.target()
+
 func _run() -> void:
 	SaveSystem.autosave_off = true
 	SceneRouter.fade_duration = 0.01
@@ -62,22 +67,38 @@ func _run() -> void:
 	sea.boat.position = sea.START
 	sea.boat.velocity = Vector3.ZERO
 	sea._end_trip(false)
-	var room: Node = await _scene(BEDROOM)
+	var pier := await _scene(VILLAGE) as VillageScene3D
+	if not pier:
+		return
+	_check(pier.night and pier.shift_over and GameState.day == 1 and VillageLayout3D.on_pier(pier.player.position),
+		"docking brings Rin back to the village pier at night, same day")
+	_check(pier.dock_omens != null and pier.lighting.phase == VillageLighting3D.Phase.NIGHT, "night on the waterfront: lamps, dock omens")
+	_check(not pier.spots.thung_ready(), "the thúng is done for tonight")
+	var bed := VillageLayout3D.room_point(BedroomBuilder3D.BED)
+	_check(aim(pier, VillageLayout3D.room_point(BedroomBuilder3D.BEDSIDE + Vector3(0.4, 0, 0)), bed) == "bed", "the bed is E in the room after dark")
+	pier._interact()
+	var room := await _scene(VILLAGE) as VillageScene3D
 	if not room:
 		return
-	_check(GameState.resume_at == "home" and GameState.day == 2 and GameState.caught_species.has(fish.id),
-		"docking with 3 fish wakes Rin in his room on the next day, catch remembered")
-	room.leave()
-	var morning: Node = await _scene(WATERFRONT)
-	if not morning:
-		return
-	_check(not morning.evening, "bedroom door opens onto the waterfront in the morning")
-	morning.go_to_restaurant()
-	var quan: Node = await _scene(QUAN)
-	if not quan:
-		return
-	_check(quan is Node3D, "the lane routes to the native 3D restaurant")
-	_check(quan.shift_running, "the shift opens by itself when Rin arrives (no menu planning)")
+	_check(GameState.resume_at == "home" and GameState.day == 2 and GameState.caught_species.has(fish.id) and not room.night,
+		"sleeping after 3 fish: the next morning in the room, catch remembered")
+	_check(not room.shift_running and room.lighting.phase == VillageLighting3D.Phase.MORNING, "morning: grey dawn, the shift not open yet")
+	var door_at := room.door.aim_point()
+	_check(aim(room, door_at + Vector3(0, -1.1, 0.9), door_at) == "door" and not room.door.is_open, "the closed door is E from inside")
+	room._interact()
+	_check(room.door.is_open, "E opens the door")
+	await _frames(2)
+	var through := Transform3D(Basis(), Vector3(VillageLayout3D.EXIT_X - 1.0, 0, VillageLayout3D.LANE_Z))
+	var walled := Transform3D(Basis(), Vector3(VillageLayout3D.EXIT_X - 1.0, 0, -4.0))
+	_check(not room.player.test_move(through, Vector3(3, 0, 0)) and room.player.test_move(walled, Vector3(3, 0, 0)),
+		"the street's east end opens onto the lane, the rest is walled")
+	room.player.position = Vector3(VillageLayout3D.LANE_END_X - 10.0, 0, VillageLayout3D.LANE_Z)
+	await _frames(2)
+	_check(room.sounds.area == "lane" and not room.shift_running, "the lane between home and the restaurant")
+	room.player.position = Vector3(2.0, 0, 2.0)
+	await _frames(2)
+	var quan: VillageScene3D = room
+	_check(quan.shift_running and quan.lighting.phase == VillageLighting3D.Phase.SHIFT, "the shift opens when Rin walks into the street")
 	var tray := quan.get_node_or_null(RestaurantFish3D.NODE_NAME) as RestaurantFish3D
 	_check(tray != null and tray.fish_count == LoopCalendar.MIN_FISH and tray.lines.has(RestaurantFish3D.ASK_LINE),
 		"last night's fish wait by Bảo's cart; Bảo asks for tonight's")
@@ -121,12 +142,10 @@ func _run() -> void:
 	quan._end_shift()
 	_check(quan.shift_over and GameState.day_history.size() == 1 and int(GameState.day_history[0]["earned"]) == quan.earned,
 		"closing records the shift for the ending card")
-	quan._walk_home()
-	var evening: Node = await _scene(WATERFRONT)
-	if not evening:
-		return
-	_check(evening.evening, "after the shift Rin walks back to the waterfront in the evening")
-	evening.go_to_sea()
+	_check(quan.dock_omens != null, "after the shift it is evening: the dock omens are out")
+	var thung := VillageSpots3D.thung_point()
+	_check(aim(quan, Vector3(thung.x + 1.0, 0, thung.z + 1.0), thung) == "thung", "the thúng is E on the pier after the shift")
+	quan._interact()
 	sea = await _scene(SEA)
 	if not sea:
 		return

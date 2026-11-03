@@ -6,7 +6,6 @@ extends Node3D
 ## Fishing3D, HUD/navigation -> SeaHud3D, steering -> SeaBoatMover3D,
 ## oil / trip end -> SeaTrip3D, debug keys -> SeaDebug3D.
 
-const REST_SCENE := SeaTrip3D.BEDROOM_SCENE
 const ENDING_SCENE := SeaTrip3D.ENDING_SCENE
 const CAMERA_OFFSET := Vector3(0,6.2,8.4)
 const CAMERA_LOOK_AHEAD := 1.8
@@ -83,7 +82,7 @@ func _ready() -> void:
 	SeaHud3D.build_navigation(self)
 	DayClock.start_night()
 	var fog_tonight := Story.check_day()
-	# Saves happen in the bedroom only (horror build): a night is judged on docking.
+	# Saves happen in the morning only (horror build): a night is judged when Rin wakes.
 	Sfx.ambience("sea")
 	Sfx.bed("sea")
 	_night_start_lines(fog_tonight)

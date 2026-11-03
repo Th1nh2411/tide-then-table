@@ -197,6 +197,15 @@ func bed(mix_name: String) -> void:
 	_bed.play()
 
 
+## Builds these bed mixes now (one hitch while a scene loads, none on the walk).
+func prebuild_beds(mix_names: Array[String]) -> void:
+	if silent:
+		return
+	for mix_name in mix_names:
+		if not _beds.has(mix_name):
+			_beds[mix_name] = HorrorBed.build(mix_name)
+
+
 func stop_all() -> void:
 	_ambience_name = ""
 	_bed_name = ""

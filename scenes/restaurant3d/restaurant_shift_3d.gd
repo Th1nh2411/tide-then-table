@@ -1,10 +1,9 @@
 class_name RestaurantShift3D
 extends RefCounted
 ## The 3D restaurant's shift clock: open the shift, tick it (clock, Bảo,
-## guests arriving, eating and running out of patience), close early (T),
-## and walk home to the waterfront, where the night's choice is made. Balance: ServiceTuning by day.
+## guests arriving, eating and running out of patience) and close early (T).
+## Balance: ServiceTuning by day.
 
-const WATERFRONT_SCENE := "res://scenes/home3d/waterfront_scene_3d.tscn"
 ## Short shifts: one day of the loop should take a few minutes.
 const SHIFT_SECONDS := 120.0
 const TUNINGS := [
@@ -78,13 +77,3 @@ func close_early() -> void:
 	host.seconds_left = 0.0
 	host._show_note("Rin: đóng cửa, phục vụ nốt khách đang ngồi.")
 
-
-## The way out of the street (StreetEnds3D): back to the waterfront for the
-## evening, where the night's choice is made (WaterfrontScene3D).
-func walk_home() -> void:
-	if host.sailing or host.shift_running:
-		return
-	host.sailing = true
-	GameState.resume_at = "home"
-	GameState.set_flag(WaterfrontScene3D.EVENING_FLAG)
-	SceneRouter.go_to(WATERFRONT_SCENE)
