@@ -48,6 +48,8 @@ func _until_any(paths: Array[String], old: Node = null) -> Node:
 			if not waited_for_wake:
 				print("HOME WAKE | waiting for control after reset")
 			waited_for_wake = true
+			if i % 150 == 0:
+				print("HOME WAKE | frame %d paused %s tweens %d" % [i, get_tree().paused, get_tree().get_processed_tweens().size()])
 		await get_tree().process_frame
 	_fail("scene " + str(paths))
 	return null

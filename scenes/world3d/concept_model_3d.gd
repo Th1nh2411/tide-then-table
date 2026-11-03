@@ -87,6 +87,7 @@ static func spawn(parent: Node3D, id: String, at: Vector3, height: float, yaw: f
 			wall = "floor_wood_planks"
 			roof = wall
 		material.set_shader_parameter("surface_textures", true)
+		material.set_shader_parameter("project_front_detail", id == "wooden_wardrobe")
 		material.set_shader_parameter("wall_texture", load("res://assets/textures/horror/%s.png" % wall))
 		material.set_shader_parameter("roof_texture", load("res://assets/textures/horror/%s.png" % roof))
 	for mesh in meshes:

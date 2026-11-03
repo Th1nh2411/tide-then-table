@@ -55,6 +55,8 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/power_pole"
+    "source_directory": "build/hunyuan_free/power_pole",
+    "material_concept_sha256": "ab52d1d90033d8e3a5c748f765eb6db1f13a9e0e8dd6657559b3bfc23d8f55aa",
+    "original_concept_backup": ".art_backups/brief4_projection_20261103/assets/concepts/horror/power_pole.png"
   }
 }

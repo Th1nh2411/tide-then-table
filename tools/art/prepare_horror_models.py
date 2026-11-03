@@ -115,6 +115,7 @@ def main():
             provenance['reduced_sha256'] = hashlib.sha256(finished).hexdigest()
             provenance['integration'] = dict(normals_added_primitives=added, geometry_unchanged=True,
                                              tool='tools/art/prepare_horror_models.py',
+                                             material_concept_sha256=hashlib.sha256((ROOT/f'assets/concepts/horror/{name}.png').read_bytes()).hexdigest(),
                                              source_directory=source.relative_to(ROOT).as_posix() if source.is_relative_to(ROOT) else str(source))
             write(ROOT/'assets/models/ready'/name/'hunyuan_provenance.json', (json.dumps(provenance, indent=2)+'\n').encode())
             vertices = mesh.vertices

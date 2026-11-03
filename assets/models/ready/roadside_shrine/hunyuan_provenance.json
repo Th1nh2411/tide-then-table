@@ -55,6 +55,8 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/roadside_shrine"
+    "source_directory": "build/hunyuan_free/roadside_shrine",
+    "material_concept_sha256": "676400e6495b6038865f37583d81099abbc51cd50183e2816504f5b97ee6736d",
+    "original_concept_backup": ".art_backups/brief4_projection_20261103/assets/concepts/horror/roadside_shrine.png"
   }
 }

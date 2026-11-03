@@ -55,6 +55,8 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/fishing_nets_drying"
+    "source_directory": "build/hunyuan_free/fishing_nets_drying",
+    "material_concept_sha256": "f272a95e478fc5b883625ab90cd6c85ac70186546cf4436481b2a20565518feb",
+    "original_concept_backup": ".art_backups/brief4_projection_20261103/assets/concepts/horror/fishing_nets_drying.png"
   }
 }

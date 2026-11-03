@@ -31,3 +31,8 @@ Original generator source retained. No programmatic repainting or palette quanti
 
 Isolated whole-object concept for image-to-3D; draft for art review.
 No game integration, no runtime references changed, not approved.
+
+## Brief 4 — background removal, 2026-11-03
+
+Tool: local Python (Pillow/NumPy), explicitly requested background cut. Source RGB and original sidecar preserved at `.art_backups/brief4_projection_20261103/assets/concepts/horror/power_pole.png`. Removed neutral pixels within 35 RGB levels of median border colour, with channel spread <16; geometry and object colours retained. Output RGBA with true alpha, dimensions unchanged. Projection uses alpha to replace background samples with object-colour fallback; it does not cut holes in the 3D mesh.
+Material PNG SHA-256: `ab52d1d90033d8e3a5c748f765eb6db1f13a9e0e8dd6657559b3bfc23d8f55aa`.

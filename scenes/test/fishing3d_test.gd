@@ -94,11 +94,15 @@ func _run() -> void:
 
 
 func _check_aim() -> void:
+	# Shoals are random and may border the boat's depth limit. Aim along
+	# the shore from a fixed water point so range clamping cannot shorten
+	# the maximum-distance assertion.
+	_sea.boat.global_position = FishingSpot3D.clamp_to_water(_sea, Vector3(0, 0, _sea.START.z))
 	var camera := get_viewport().get_camera_3d()
 	var eye := _sea.boat.global_position + Vector3(0, 1.4, 0)
-	camera.global_transform = Transform3D(Basis.IDENTITY, eye).looking_at(eye + Vector3(0, -1.0, -0.3))
+	camera.global_transform = Transform3D(Basis.IDENTITY, eye).looking_at(eye + Vector3(0.3, -1.0, 0))
 	var near := FishingSpot3D.flat_distance(_sea, _rod.aim())
-	camera.global_transform = Transform3D(Basis.IDENTITY, eye).looking_at(eye + Vector3(0, 0.2, -1.0))
+	camera.global_transform = Transform3D(Basis.IDENTITY, eye).looking_at(eye + Vector3(1.0, 0.2, 0))
 	var far := FishingSpot3D.flat_distance(_sea, _rod.aim())
 	_check("aim: looking down lands at the shortest cast, up at the longest",
 		is_equal_approx(near, _rod.tuning.cast_min) and is_equal_approx(far, _rod.tuning.cast_max))

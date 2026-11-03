@@ -31,3 +31,8 @@ Original generator source retained. No programmatic repainting or palette quanti
 
 Isolated whole-object concept for image-to-3D; draft for art review.
 No game integration, no runtime references changed, not approved.
+
+## Brief 4 — background removal, 2026-11-03
+
+Tool: local Python (Pillow/NumPy), explicitly requested background cut. Source RGB and original sidecar preserved at `.art_backups/brief4_projection_20261103/assets/concepts/horror/bamboo_fence.png`. Removed neutral pixels within 35 RGB levels of median border colour, with channel spread <16; geometry and object colours retained. Output RGBA with true alpha, dimensions unchanged. Projection uses alpha to replace background samples with object-colour fallback; it does not cut holes in the 3D mesh.
+Material PNG SHA-256: `6b288d8e3afc85ea0045b12fc4db874aa0d23ff2d9702af495a5fe06604b47e1`.

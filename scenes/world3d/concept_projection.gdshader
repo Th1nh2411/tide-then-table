@@ -21,6 +21,9 @@ uniform float glow = 0.0;
 uniform vec3 projection_u = vec3(1.0, 0.0, 0.0);
 uniform vec3 projection_v = vec3(0.0, 1.0, 0.0);
 uniform bool surface_textures = false;
+// Buildings need surface materials on every facade: the concept includes
+// freestanding furniture that must never become paint on a wall.
+uniform bool project_front_detail = true;
 uniform sampler2D wall_texture : source_color, filter_nearest_mipmap, repeat_enable;
 uniform sampler2D roof_texture : source_color, filter_nearest_mipmap, repeat_enable;
 
@@ -45,10 +48,12 @@ void fragment() {
 	vec3 normalized = (local - bounds_min) / max(bounds_size, vec3(0.0001));
 	vec2 k = vec2(dot(normalized, projection_u), dot(normalized, projection_v));
 	vec2 uv = crop.xy + vec2(k.x, 1.0 - k.y) * crop.zw;
-	vec3 c = texture(concept, uv).rgb;
-	if (is_background(c)) {
-		c = texture(concept, mix(uv, crop.xy + crop.zw * 0.5, 0.3)).rgb;  // a little further in
-		if (is_background(c)) {
+	vec4 source = texture(concept, uv);
+	vec3 c = source.rgb;
+	if (source.a < 0.5 || is_background(c)) {
+		vec4 inner = texture(concept, mix(uv, crop.xy + crop.zw * 0.5, 0.3));
+		c = inner.rgb;  // a little further in, without sampling the removed background
+		if (inner.a < 0.5 || is_background(c)) {
 			c = fallback_color;
 		}
 	}
@@ -59,7 +64,7 @@ void fragment() {
 		vec3 front = normalize(cross(projection_u, projection_v));
 		if (n.y > 0.55 && normalized.y > 0.55) {
 			c = texture(roof_texture, world_position.xz / 1.4).rgb;
-		} else if (abs(dot(n, front)) < 0.6) {
+		} else if (!project_front_detail || abs(dot(n, front)) < 0.6) {
 			vec2 wall_uv = abs(n.x) > abs(n.z) ? world_position.zy : world_position.xy;
 			c = texture(wall_texture, wall_uv / 1.6).rgb;
 		}

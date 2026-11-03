@@ -55,6 +55,8 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/bamboo_fence"
+    "source_directory": "build/hunyuan_free/bamboo_fence",
+    "material_concept_sha256": "6b288d8e3afc85ea0045b12fc4db874aa0d23ff2d9702af495a5fe06604b47e1",
+    "original_concept_backup": ".art_backups/brief4_projection_20261103/assets/concepts/horror/bamboo_fence.png"
   }
 }
