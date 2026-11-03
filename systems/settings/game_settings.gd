@@ -19,6 +19,7 @@ const DEFAULTS: Array[Array] = [
 	["audio", "muted", false],
 	["video", "psx", true],
 	["video", "fullscreen", false],
+	["text", "sound_captions", true],
 ]
 
 ## Tests point this at a scratch file.
@@ -89,6 +90,15 @@ static func psx() -> bool:
 
 static func fullscreen() -> bool:
 	return bool(get_value("video", "fullscreen"))
+
+
+## "Phụ đề âm thanh": captions for story sounds (CaptionLayer).
+static func sound_captions() -> bool:
+	return bool(get_value("text", "sound_captions"))
+
+
+static func set_sound_captions(on: bool) -> void:
+	set_value("text", "sound_captions", on)
 
 
 static func set_volume(value: float) -> void:
