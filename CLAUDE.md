@@ -120,7 +120,8 @@ Vietnamese, keep code comments in short English.
   phone shop, Sửa quán), daily challenges + achievements, Xóm Đèn Review /
   rivals, fish orders + regulars, today's dish (`DailyTrend`), storage +
   spoiling, the phone app (Rin's Catch, J, M map, map pins), NEO, `QuestTracker`,
-  Nhịp Sóng (`WaveMark` / `WavePower`, C), staff / Vy hiring, the cat, weather,
+  Nhịp Sóng (`WaveMark` / `WavePower`, C), staff hiring (Vy is back as fixed staff,
+  see below), the cat, weather,
   night events, nets (Q), sea places with dialogs (shrine, hut, lighthouse;
   the raft stays as scenery), the 2D restaurant / sea / cutscene classes, the
   cooking overlay + shift receipt; (PLAN §10 H8) the 2D rod fight
@@ -154,6 +155,16 @@ Vietnamese, keep code comments in short English.
   of fish beside Bảo's cart, `RestaurantFish3D`) and, after staying home on an
   omen night, `bao_no_fish` (Bảo grumbles). Bảo asks for 3 fish once per shift
   (not on rằm). Omen nights / rằm keep their rules.
+- **Vy (horror build):** Bảo's old friend, fixed staff every shift from
+  mùng 9 (no hiring, no flags; survives the loop). `VyStaff3D` (scenes/
+  restaurant3d, node "VyStaff" of the restaurant / village): walks in from
+  the street's west end when the shift opens, one job at a time (ready plate
+  -> its table, else wipe a dirty table), rests between, slower than Rin,
+  waits for Rin in her way, walks off when the shift is over; a plate she
+  took is `order["staff"]` (`RestaurantService3D.next_ready` / `staff_pick`
+  keep Rin and her apart). E while looking at her: one line by day
+  (`VyTalk3D`, `data/story/vy.tres`, uneasy `vy_late.tres` from day 5).
+  Test `vy_staff_test`.
 - **People (3D):** every actor is a `PersonRig3D.build(parent, id)` (walk /
   carry / sit / drive_ground_motion API). Rin keeps his own rig
   (`RinPilotVisual`, rin_pilot.glb); every NPC is `PsxCharacterVisual`
@@ -378,7 +389,7 @@ Vietnamese, keep code comments in short English.
   restaurant, LAST in the tree; text from `PhoneReports` (pure). Lore: Rin is
   an IT graduate (male) whose failed startup (with friend Bảo, now the
   restaurant's chef — he cooked the best instant noodles in their dorm) left
-  this app; story (PLAN.md §1, keep lines in line with its timeline + fog rules: Rin's grandpa ông Tư vanished in the fog two years ago, Vy is ông Tám's granddaughter): the fog hides a portal to a
+  this app; story (PLAN.md §1, keep lines in line with its timeline + fog rules: Rin's grandpa ông Tư vanished in the fog two years ago; horror build: Vy is Bảo's old friend who works the cart, not ông Tám's granddaughter): the fog hides a portal to a
   parallel sea, cá Ông are its guardians, the Thâm Lam corporation exploits
   it. Clues appear as `[WARN]`/`[ERR]`
   log lines and glitched aberrant-fish names.

@@ -102,9 +102,12 @@ func _service(quan: Node) -> void:
 	for turn: int in range(200):
 		if quan.shift_over:
 			break
-		quan._spawn_order()
+		if turn < 40:
+			quan._spawn_order()  # then let Vy's plate and the last tables drain
 		quan._tick_bao(20.0)
 		quan._tick_bao(20.0)
+		for step: int in range(6):
+			quan.vy.tick(0.5)  # Vy works alongside at her own pace
 		for table: int in range(quan.orders.size()):
 			if quan.orders[table].is_empty():
 				if quan.dirty_tables[table]:
@@ -135,8 +138,8 @@ func _service(quan: Node) -> void:
 		_fail("restaurant failed to drain orders")
 		return
 	var tray := quan.get_node(RestaurantFish3D.NODE_NAME) as RestaurantFish3D
-	print("DAY %d | served %d | lost %d | rating %d | fish on the tray %d | %s" % [GameState.day, quan.served, quan.lost,
-		GameState.last_rating, tray.fish_count, " / ".join(tray.lines)])
+	print("DAY %d | served %d (Vy %d plates, %d tables) | lost %d | rating %d | fish on the tray %d | %s" % [GameState.day, quan.served,
+		quan.vy.served, quan.vy.wiped, quan.lost, GameState.last_rating, tray.fish_count, " / ".join(tray.lines)])
 	if RamNight.is_ram() and not _refuse_tea(quan):
 		return
 	_roundtrip()

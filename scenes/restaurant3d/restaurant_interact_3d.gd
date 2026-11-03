@@ -1,7 +1,7 @@
 class_name RestaurantInteract3D
 extends RefCounted
 ## What E does in the 3D restaurant, by where Rin stands: Cô Năm
-## (she talks, CO_NAM lines), tables (serve the carried plate / clean), the
+## (she talks, CO_NAM lines), Vy (looked at, hands free: VyTalk3D), tables (serve the carried plate / clean), the
 ## plate table and the beer keg (a tower straight into Rin's hands).
 
 const L = preload("res://scenes/restaurant3d/restaurant_layout_3d.gd")
@@ -46,7 +46,15 @@ func interact() -> void:
 		if host.dirty_tables[i] and at.distance_to(L.TABLES[i]) < 2.0:
 			host._clean_table(i)
 			return
-	if at.distance_to(L.PASS_POSITION) < 1.35:
+	var at_bench: bool = at.distance_to(L.PASS_POSITION) < 1.35
+	if at_bench and host.service.next_ready() >= 0:
+		host._pickup_ready()
+		return
+	var vy: VyStaff3D = host.vy
+	if vy and vy.talk.can_talk(at, host.demo_camera):
+		host._show_note(vy.talk.say())
+		return
+	if at_bench:
 		host._pickup_ready()
 		return
 	_cook_here(at)

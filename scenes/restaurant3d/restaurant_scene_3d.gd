@@ -5,7 +5,8 @@ extends Node3D
 ## Bảo -> RestaurantCrew3D, shift
 ## clock -> RestaurantShift3D, orders -> RestaurantService3D, E -> RestaurantInteract3D,
 ## Rin's walking -> RinMover3D, omen props -> RestaurantOmens3D,
-## the fish tray + Bảo asking for fish -> RestaurantFish3D. In the game it is
+## the fish tray + Bảo asking for fish -> RestaurantFish3D, Vy (serves and
+## wipes tables during the shift, E talks) -> VyStaff3D. In the game it is
 ## the street of the village map (VillageScene3D extends it); this scene on
 ## its own is the restaurant for tests.
 ## The underscore wrappers stay: tests and the bot call them.
@@ -74,6 +75,7 @@ var table_plates: Array[Node3D] = []
 var ready_plates: Array[Node3D] = []
 var bao_model: PersonRig3D
 var bao_label: Label3D
+var vy: VyStaff3D
 var goal_pulse: TargetPulse3D
 
 func _next_spawn_interval() -> float:
@@ -94,6 +96,10 @@ func _ready() -> void:
 	var traffic := CustomerTraffic3D.new()
 	traffic.host = self
 	add_child(traffic)
+	vy = VyStaff3D.new()
+	vy.name = "VyStaff"
+	add_child(vy)
+	vy.setup(self)
 	RestaurantSetup3D.build_ui(self)
 	RestaurantSetup3D.open_day(self)
 	RestaurantOmens3D.build(self)
