@@ -410,3 +410,17 @@ dùng texture lặp. Chưa phải UV/PBR bake riêng. Metadata: `horror_models.j
 Ảnh render 3 góc, ảnh gameplay, kiểm thử và giới hạn: `docs/HORROR_MODEL_INTEGRATION.md`.
 Backup trước thay: `.art_backups/horror_integration_20261103/manifest.json`.
 Ảnh concept/sprite/portrait approved không đổi; GLB inference gốc giữ nguyên.
+
+## Horror brief 4 — concept và texture, 2026-11-03
+
+25 concept mới 1024×1024 RGB trong `assets/concepts/horror/`, 5 texture mới
+trong `assets/textures/horror/`; mỗi PNG có sidecar prompt/tool/date/SHA-256.
+Danh sách ID, kích thước chính thức, review và giới hạn:
+`docs/HORROR_CODEX_DELIVERY_4.md` mục 2–3. Chỉ bản nháp, chưa nối scene/model.
+`village_far_strip` là 2048×512 RGBA; `sky_dusk_pano` 2048×1024 RGB;
+`sand_packed`, `plaster_shopfront`, `street_tiles_worn` đều 512×512 RGB.
+
+Bốn concept cũ `bamboo_fence`, `power_pole`, `roadside_shrine`,
+`fishing_nets_drying` nay 1024×1024 RGBA để loại nền khỏi projection;
+backup PNG/sidecar gốc trong `.art_backups/brief4_projection_20261103/`.
+Inference GLB và tên file giữ nguyên. Review đủ 3 góc/model trong delivery 4.
