@@ -98,6 +98,9 @@ func _night(sea: Node) -> void:
 
 func _service(quan: Node) -> void:
 	await _frames(3)
+	# A nightmare wake (with the wrong-night face) blocks E until it ends.
+	while bool(quan.get("waking")):
+		await _frames(1)
 	quan._open_shift()  # normally opens on arrival; a no-op then
 	for turn: int in range(200):
 		if quan.shift_over:

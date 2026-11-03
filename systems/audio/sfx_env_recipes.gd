@@ -67,6 +67,22 @@ const SOUNDS := {
 	"bamboo_creak": [{"w": "square", "f": [58, 40], "d": 0.75, "v": 0.14, "lp": 0.18, "a": 0.18, "am": [6.0, 0.6]},
 		{"at": 0.05, "w": "tri", "f": [220, 190], "d": 0.6, "v": 0.035, "lp": 0.25, "a": 0.15},
 		{"at": 0.78, "w": "tri", "f": [610, 520], "d": 0.05, "v": 0.09}, {"at": 0.9, "w": "tri", "f": [560, 500], "d": 0.04, "v": 0.05}],
+	# Jump scares (UncannyDirector): no screams, only the body of the sound.
+	# Something heavy and wet hits the thúng (the fake scare's fish).
+	"hull_thump": [{"w": "sine", "f": [95, 38], "d": 0.32, "v": 0.6}, {"at": 0.0, "w": "noise", "lp": 0.12, "d": 0.16, "v": 0.3},
+		{"at": 0.02, "w": "noise", "lp": 0.4, "d": 0.3, "v": 0.12, "a": 0.02}],
+	# A fish thrashing on wet bamboo: quick slaps, slowing down.
+	"fish_thrash": [{"w": "noise", "lp": 0.55, "d": 0.05, "v": 0.26}, {"at": 0.13, "w": "noise", "lp": 0.5, "d": 0.05, "v": 0.22},
+		{"at": 0.24, "w": "noise", "lp": 0.55, "d": 0.04, "v": 0.2}, {"at": 0.4, "w": "noise", "lp": 0.45, "d": 0.05, "v": 0.15},
+		{"at": 0.62, "w": "noise", "lp": 0.4, "d": 0.05, "v": 0.1}, {"at": 0.95, "w": "noise", "lp": 0.35, "d": 0.05, "v": 0.06}],
+	# A slow breath out right by the ear (ông Tư behind Rin).
+	"breath_close": [{"w": "noise", "lp": 0.22, "hp": 0.02, "d": 1.3, "v": 0.2, "a": 0.4, "swell": 0.5},
+		{"at": 0.1, "w": "noise", "lp": 0.6, "hp": 0.3, "d": 0.9, "v": 0.04, "a": 0.3}],
+	# Water dripping off someone standing still.
+	"drip": [{"w": "sine", "f": [1300, 2100], "d": 0.04, "v": 0.12}, {"at": 0.35, "w": "sine", "f": [1150, 1900], "d": 0.04, "v": 0.09},
+		{"at": 0.9, "w": "sine", "f": [1400, 2300], "d": 0.04, "v": 0.08}],
+	# The wrong night's last frame: a dull, close, muffled thud.
+	"dead_thud": [{"w": "sine", "f": [70, 30], "d": 0.45, "v": 0.7}, {"at": 0.0, "w": "noise", "lp": 0.06, "d": 0.3, "v": 0.25}],
 }
 
 const LOOPS := {

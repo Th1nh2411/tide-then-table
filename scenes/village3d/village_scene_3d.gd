@@ -67,6 +67,7 @@ func _ready() -> void:
 	else:
 		_start_morning(result, was_ram)
 	sounds.update(player.global_position, 0.0)
+	UncannyVillage3D.attach(self)  # wrong-looking things, dosed by day
 
 
 func _start_morning(result: LoopCalendar.Result, was_ram: bool) -> void:
@@ -79,7 +80,7 @@ func _start_morning(result: LoopCalendar.Result, was_ram: bool) -> void:
 		var visited := LoopCalendar.last_calm_miss
 		if visited:
 			WetFootprints3D.build(self, VillageLayout3D.room_point(BedroomBuilder3D.DOOR), VillageLayout3D.room_point(BedroomBuilder3D.BEDSIDE))
-		NightmareWake3D.play(self, "Hộc... hộc...", visited)
+		NightmareWake3D.play(self, "Hộc... hộc...", visited, WrongNightScare3D.due_at_wake(result))
 		if was_ram:
 			VillageDay3D.gate_closed(self)  # rằm went by with nothing found
 	GameState.resume_at = "home"

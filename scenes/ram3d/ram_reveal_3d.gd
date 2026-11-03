@@ -5,10 +5,11 @@ extends RefCounted
 ## to the far edge and drops it into the fog; Rin's lamp flickers on him, he
 ## turns and sees Rin. Rin rows back into the dark. -> RamEpilogue3D (true).
 ## Sound: near silence as the raft comes into view; when he looks up, the one
-## moment of full silence in the game (bed and ambience off, SILENCE s).
+## moment of full silence in the game (bed and ambience off, SILENCE s), then
+## the lamp catches him turning: head round past the shoulder, body after.
 
 const RAFT_TOP := 0.62
-const SILENCE := 1.5
+const SILENCE := 1.0
 
 
 static func play(ram: RamSea3D) -> void:
@@ -51,12 +52,20 @@ static func play(ram: RamSea3D) -> void:
 	await drop.finished
 	Sfx.play("splash")
 	body.visible = false
-	await RamFx3D.wait(ram, 0.4)
-	# He looks up, straight at Rin's lamp: nothing at all to hear.
+	# He turns his back to Rin to watch it sink...
+	var watch := sea.create_tween()
+	watch.tween_property(ut, "rotation:y", atan2(dir.x, dir.z), RamNight.secs(0.5))
+	await watch.finished
+	# ...then nothing at all to hear, and Rin's lamp catches him turning:
+	# the head first, round past his shoulder, then the body follows.
 	Sfx.duck(SILENCE + 0.3, 0.0)
 	await RamFx3D.wait(ram, SILENCE)
 	Sfx.hold("heartbeat", true)
-	await _flash(ram, flash, 0.2)
+	UncannyActor3D.attach(ut).stare_at(ram.get_viewport().get_camera_3d(), 170.0, RamNight.secs(0.35))
+	await _flash(ram, flash, 0.0)
+	var face := sea.create_tween()
+	face.tween_property(ut, "rotation:y", atan2(-dir.x, -dir.z), RamNight.secs(0.7)).set_trans(Tween.TRANS_SINE)
+	await face.finished
 	await RamFx3D.say_lines(ram.text, RamFx3D.LINES.ut_seen, 2.4)
 	lamp.visible = false
 	lamp_light.visible = false
