@@ -11,6 +11,8 @@ extends RefCounted
 
 const RATE := 22050
 const SECONDS := 9.0
+## Keep tape/radio texture behind environmental detail rather than in front.
+const NOISE_GAIN := 0.8
 ## Layer volumes per place: hiss, crackle, radio, glitch, drone.
 const MIXES := {
 	"room": {"hiss": 0.05, "crackle": 0.16, "radio": 0.0, "glitch": 0.3, "drone": 0.05},
@@ -42,9 +44,9 @@ static func render(mix_name: String) -> PackedFloat32Array:
 	out.resize(n)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(mix_name)
-	_hiss(out, float(mix["hiss"]), rng)
-	_crackle(out, float(mix["crackle"]), rng)
-	_radio(out, float(mix["radio"]), rng)
+	_hiss(out, float(mix["hiss"]) * NOISE_GAIN, rng)
+	_crackle(out, float(mix["crackle"]) * NOISE_GAIN, rng)
+	_radio(out, float(mix["radio"]) * NOISE_GAIN, rng)
 	_drone(out, float(mix["drone"]), float(mix.get("drone_hz", 55.0)))
 	var env: Array = mix.get("env", [])
 	for layer: Array in env:

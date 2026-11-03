@@ -16,8 +16,8 @@ const SETTINGS_PATH := "user://settings.cfg"
 const SOUNDS := SfxRecipes.SOUNDS
 const LOOPS := SfxRecipes.LOOPS
 const POOL_SIZE := 8
-const AMBIENCE_DB := -6.0
-const BED_DB := -4.0
+const AMBIENCE_DB := -9.0
+const BED_DB := -9.0
 
 var muted: bool = false
 ## Headless runs (tests, bots) build the sounds but never play them: the
