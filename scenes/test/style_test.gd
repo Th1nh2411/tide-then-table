@@ -118,7 +118,8 @@ func _village() -> void:
 	check(left.is_empty(), "every opaque lit StandardMaterial3D in the village is graded (left: %s)" % [left.slice(0, 5)])
 	check(graded > 50 and concepts > 5, "village has graded materials (%d, %d concept models)" % [graded, concepts])
 	var looks := StyleMaterials.all().size()
-	check(looks * 4 < graded, "graded materials shared by look (%d shaders for %d surfaces)" % [looks, graded])
+	# BoxBatch3D merges many boxes into one surface per colour, so surfaces per look dropped; 2x still proves sharing.
+	check(looks * 2 < graded,"graded materials shared by look (%d shaders for %d surfaces)" % [looks, graded])
 	check(out.is_empty(), "every graded material inside the guide's saturation / value range (out: %s)" % [out.slice(0, 5)])
 	village.queue_free()
 	await get_tree().process_frame
