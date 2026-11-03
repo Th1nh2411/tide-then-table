@@ -1,6 +1,6 @@
 extends CanvasLayer
 ## Scene switching with a simple fade-to-black. Autoloaded as `SceneRouter`.
-## Usage: SceneRouter.go_to("res://scenes/home3d/bedroom_scene_3d.tscn")
+## Usage: SceneRouter.go_to("res://scenes/village3d/village_scene_3d.tscn")
 ## Pass a color to fade through something other than black (e.g. white).
 
 signal scene_changed(scene_path: String)

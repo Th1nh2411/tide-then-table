@@ -51,6 +51,5 @@ func _run() -> void:
 	_check(not room.dirty_tables[table], "served, paid and cleaned")
 	room._end_shift()
 	await get_tree().process_frame
-	var ends := room.get_node("StreetEnds") as StreetEnds3D
-	_check(room.shift_over and ends.can_leave(), "after the shift the street ends are the way out")
+	_check(room.shift_over and not room.shift_running, "after the shift the street is free to leave")
 	get_tree().quit()

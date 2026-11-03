@@ -75,8 +75,14 @@ static func build(host: Node3D) -> void:
 	_tables(host)
 	_kitchen(host)
 	box(host, Vector3(0, 1.4, L.FRONT_Z), Vector3(width, 3.0, 0.15), "35434d", true).visible = false
+	# Invisible end walls; the village map (host.street_exit = z range) opens the east one onto its lane.
+	var gap: Variant = host.get("street_exit")
 	for x: float in [-L.ROOM_X, L.ROOM_X]:
-		box(host, Vector3(x, 1.4, mid_z), Vector3(0.15, 3.0, depth), "35434d", true).visible = false
+		var spans: Array[Vector2] = [Vector2(L.BACK_Z, L.FRONT_Z)]
+		if x > 0.0 and gap is Vector2:
+			spans = [Vector2(L.BACK_Z, (gap as Vector2).x), Vector2((gap as Vector2).y, L.FRONT_Z)]
+		for span: Vector2 in spans:
+			box(host, Vector3(x, 1.4, (span.x + span.y) * 0.5), Vector3(0.15, 3.0, span.y - span.x), "35434d", true).visible = false
 	_player(host)
 
 static func _lighting(host: Node3D) -> void:

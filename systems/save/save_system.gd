@@ -1,6 +1,6 @@
 class_name SaveSystem
 extends RefCounted
-## Saves/loads GameState as JSON. Saved in the bedroom only (horror build).
+## Saves/loads GameState as JSON. Saved each morning only (horror build).
 ## Loading is defensive: a missing or wrongly typed field falls back to the
 ## fresh-game value instead of crashing. Fields of older saves (money,
 ## upgrades, storage, orders, pantry, staff, stats, social, weather, map pins)

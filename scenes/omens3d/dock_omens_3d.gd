@@ -1,7 +1,7 @@
 class_name DockOmens3D
 extends Node3D
-## The dock's omen props on the waterfront (WaterfrontScene3D), seen before
-## the night's choice, each in its normal or wrong state (OmenPicker.state):
+## The dock's omen props on the waterfront (village map, after the shift),
+## seen before the night's choice, each in its normal or wrong state (OmenPicker.state):
 ## - "hoa_dang" (a custom, some nights): paper lanterns float out to sea;
 ##   on its night they drift back in and bunch up against the pier.
 ## - "hai_dang": the lighthouse beacons (by the pier and far out on Đá Canh
@@ -25,6 +25,7 @@ var _drift := Vector3(0, 0, -LANTERN_SPEED)
 ## Lanterns drifting in stop here (just off the pier head).
 var _shore_z := 0.0
 var _beacons: Array[MeshInstance3D] = []
+var _beacon_hex := BEACON_CALM
 var _time := 0.0
 
 
@@ -58,6 +59,7 @@ func _ready() -> void:
 		lantern.set_meta("phase", rng.randf() * TAU)
 		_lanterns.append(lantern)
 	var beacon_hex := BEACON_OMEN if OmenPicker.is_tonight("hai_dang") else BEACON_CALM
+	_beacon_hex = beacon_hex
 	for at: Vector3 in beacon_tops:
 		_beacons.append(OmenProps3D.sphere(self, at, 0.45, beacon_hex, 6.0))
 		OmenProps3D.light(self, at, beacon_hex, 2.0, 9.0)
@@ -95,4 +97,12 @@ func _process(delta: float) -> void:
 		lantern.rotation.y += delta * 0.2
 	var pulse := 4.0 + 3.0 * absf(sin(_time * 1.2))
 	for beacon in _beacons:
-		(beacon.material_override as StandardMaterial3D).emission_energy_multiplier = pulse
+		var standard := beacon.material_override as StandardMaterial3D
+		if standard:
+			standard.emission_energy_multiplier = pulse
+			continue
+		# The PS1 look swapped the material for its shader (built after the scene started).
+		var psx := beacon.material_override as ShaderMaterial
+		var hue := Color(_beacon_hex)
+		if psx:
+			psx.set_shader_parameter("emission", Vector3(hue.r, hue.g, hue.b) * pulse)

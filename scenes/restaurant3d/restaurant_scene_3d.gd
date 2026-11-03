@@ -4,8 +4,10 @@ extends Node3D
 ## Orchestrator: room -> RestaurantRoomBuilder3D, overlay -> RestaurantPanels3D,
 ## Bảo -> RestaurantCrew3D, shift
 ## clock -> RestaurantShift3D, orders -> RestaurantService3D, E -> RestaurantInteract3D,
-## Rin's walking -> RinMover3D, the street ends -> StreetEnds3D, omen props -> RestaurantOmens3D,
-## the fish tray + Bảo asking for fish -> RestaurantFish3D.
+## Rin's walking -> RinMover3D, omen props -> RestaurantOmens3D,
+## the fish tray + Bảo asking for fish -> RestaurantFish3D. In the game it is
+## the street of the village map (VillageScene3D extends it); this scene on
+## its own is the restaurant for tests.
 ## The underscore wrappers stay: tests and the bot call them.
 
 const SHIFT_SECONDS := RestaurantShift3D.SHIFT_SECONDS
@@ -64,7 +66,6 @@ var lost := 0
 ## for the ending's run card (GameState.day_history).
 var earned := 0
 var step_clock := 0.0
-var sailing := false
 var rng := RandomNumberGenerator.new()
 var tuning: ServiceTuning
 var demo_camera: Camera3D
@@ -95,7 +96,6 @@ func _ready() -> void:
 	add_child(traffic)
 	RestaurantSetup3D.build_ui(self)
 	RestaurantSetup3D.open_day(self)
-	StreetEnds3D.build(self)
 	RestaurantOmens3D.build(self)
 	RamGuest3D.attach(self)  # rằm only: anh Út and his ginger tea
 	RestaurantFish3D.build(self)  # last night's fish + Bảo asking for tonight's
@@ -178,9 +178,6 @@ func _end_shift() -> void:
 
 func _sync_food_visuals() -> void:
 	service.sync_food_visuals()
-
-func _walk_home() -> void:
-	shift.walk_home()
 
 func _show_note(words: String) -> void:
 	panels.say(words)

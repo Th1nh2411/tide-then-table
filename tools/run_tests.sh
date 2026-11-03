@@ -46,7 +46,7 @@ for scene in scenes/test/*_test.tscn scenes/test/*3d*smoke.tscn; do
 done
 
 echo "== Smoke runs"
-for scene in scenes/main_menu/main_menu.tscn scenes/home3d/bedroom_scene_3d.tscn scenes/ending/ending_scene.tscn \
+for scene in scenes/main_menu/main_menu.tscn scenes/village3d/village_scene_3d.tscn scenes/ending/ending_scene.tscn \
 		scenes/sea3d/*smoke.tscn scenes/restaurant3d/*smoke.tscn scenes/restaurant3d/*check.tscn; do
 	[ -e "$scene" ] || continue  # a glob with no match stays literal
 	run_scene "$scene"

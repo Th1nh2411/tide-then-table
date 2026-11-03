@@ -1,7 +1,7 @@
 class_name OmenEcho3D
 extends Node3D
 ## A subtle omen's second tell on the evening waterfront (research 1.2): a
-## few seconds after Rin gets back from the shift, a sound from the pier head
+## few seconds after Rin walks down to the waterfront after the shift, a sound from the pier head
 ## (OmenData.echo_sound, placed in the world) and a neighbour's line
 ## (echo_line). Only on the night of an omen that has one; dock omens get
 ## their second tell from Cô Năm at the restaurant instead.
@@ -11,7 +11,7 @@ const NODE_NAME := "OmenEcho"
 @export var delay := 3.5
 @export var line_seconds := 4.5
 
-var host: WaterfrontScene3D
+var host: VillageScene3D
 var sound_at := Vector3.ZERO
 var omen: OmenData
 var played := false
@@ -19,7 +19,7 @@ var _left := 0.0
 
 
 ## Added only on an evening whose omen has an echo; null otherwise.
-static func attach(owner: WaterfrontScene3D, at: Vector3) -> OmenEcho3D:
+static func attach(owner: VillageScene3D, at: Vector3) -> OmenEcho3D:
 	var tonight := OmenPicker.tonight()
 	if tonight == null or tonight.echo_line == "":
 		return null

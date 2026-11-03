@@ -3,7 +3,8 @@ extends Node3D
 ## Hoa đăng on rằm (PLAN §10 H7): villagers stand at the water's edge below
 ## the waterfront and set paper lanterns afloat, one every few seconds; they
 ## drift out to sea. Their talk shows when Rin comes close (RamLinesData
-## .shore). Added to the rằm evening waterfront and to the true ending's dawn.
+## .shore). Added to the rằm evening waterfront (village map) and to the true
+## ending's dawn.
 
 const VILLAGERS: Array[Vector3] = [Vector3(-3.6, 0, 2.5), Vector3(-1.2, 0, 2.4), Vector3(1.9, 0, 2.6)]
 const DRIFT := Vector3(0.05, 0, -0.32)
@@ -56,8 +57,9 @@ func _process(delta: float) -> void:
 		lantern.position.y = WaterfrontBuilder3D.WATER_Y + 0.08 + sin(Time.get_ticks_msec() / 700.0 + lantern.position.x) * 0.03
 		lantern.rotation.y += delta * 0.15
 	if talk and not _talked:
-		var player := get_parent().get("player") as Node3D
-		if player and Walker3D.near(player, VILLAGERS[1], TALK_REACH):
+		var village := get_tree().current_scene as VillageScene3D
+		var player: Node3D = village.player if village else null
+		if player and Walker3D.near(player, to_global(VILLAGERS[1]), TALK_REACH):
 			_talked = true
 			RamFx3D.say_lines(_text, RamFx3D.LINES.shore, 3.6)
 

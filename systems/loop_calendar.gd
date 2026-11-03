@@ -9,7 +9,7 @@ extends RefCounted
 
 const FIRST_LUNAR := 9
 const NIGHTS := 7
-## Set by the street end / the dock: "out" or "home". Read once in the bedroom.
+## Set by the bed / docking: "out" or "home". Read once when Rin wakes.
 const CHOICE_FLAG := "night_choice"
 ## Set by the omen system (H5) for tonight.
 const OMEN_FLAG := "omen_tonight"
@@ -31,11 +31,11 @@ const MISSED_CALM := "calm"
 
 enum Result { NONE, NEXT, RESET, END }
 
-## The last choice take_result() judged ("out" / "home" / ""), so the bedroom
+## The last choice take_result() judged ("out" / "home" / ""), so the morning
 ## can tell how the night went wrong.
 static var last_choice := ""
 ## True when the last judged night was calm and went wrong (stayed home or
-## came back short): the bedroom shows the ghosts' visit.
+## came back short): the morning shows the ghosts' visit.
 static var last_calm_miss := false
 
 

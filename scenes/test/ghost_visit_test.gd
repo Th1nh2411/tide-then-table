@@ -4,7 +4,7 @@ extends Node
 ## on mùng 9 with three knocks in the dark and wet footprints from the door to
 ## the bed; a right night or an omen night gone wrong has none. No words.
 
-const BEDROOM := "res://scenes/home3d/bedroom_scene_3d.tscn"
+const VILLAGE := "res://scenes/village3d/village_scene_3d.tscn"
 
 var _failures := 0
 
@@ -28,12 +28,12 @@ func _run() -> void:
 		var first := prints.get_child(0) as Node3D
 		var last := prints.get_child(prints.get_child_count() - 1) as Node3D
 		_check("the steps go from the door to the bed",
-			first.position.distance_to(BedroomBuilder3D.DOOR) < last.position.distance_to(BedroomBuilder3D.DOOR)
-			and last.position.distance_to(BedroomBuilder3D.BEDSIDE) < 0.5)
+			first.position.distance_to(_room(BedroomBuilder3D.DOOR)) < last.position.distance_to(_room(BedroomBuilder3D.DOOR))
+			and last.position.distance_to(_room(BedroomBuilder3D.BEDSIDE)) < 0.5)
 	_check("no words explain it", room.text.saying() == "")
 	_check("the wake gives control back within 5 s", wake != null and wake.total_seconds() < 5.0)
 	_check("a calm miss is remembered (note_ flag)", LoopCalendar.missed() == LoopCalendar.MISSED_CALM)
-	_check("the mùng 9 paper carries the calm hint", room.paper_hint() == room.NEWS.calm_missed_hint)
+	_check("the mùng 9 paper carries the calm hint", room.paper_hint() == VillageSpots3D.NEWS.calm_missed_hint)
 	_check_note(room)
 	room.queue_free()
 	await get_tree().process_frame
@@ -65,19 +65,25 @@ func _run() -> void:
 
 
 ## "Những điều kiêng" on the wall by the door: E on it while looking at it.
-func _check_note(room: BedroomScene3D) -> void:
+func _check_note(room: VillageScene3D) -> void:
 	room.waking = false
-	room.player.position = Vector3(BedroomBuilder3D.NOTE.x, 0, BedroomBuilder3D.NOTE.z + 0.9)
+	var note := _room(BedroomBuilder3D.NOTE)
+	room.player.position = Vector3(note.x, 0, note.z + 0.9)
 	room.demo_camera.global_position = room.player.position + Vector3(0, 1.55, 0)
-	room.demo_camera.look_at(BedroomBuilder3D.NOTE)
-	_check("looking at the note by the door targets it", room.target() == "note")
-	var body := room.KIENG.body()
-	_check("the note has 4-6 rules and no game words", room.KIENG.lines.size() >= 4 and room.KIENG.lines.size() <= 6
+	room.demo_camera.look_at(note)
+	_check("looking at the note by the door targets it", room.spots.target() == "note")
+	var kieng := VillageSpots3D.KIENG
+	var body := kieng.body()
+	_check("the note has 4-6 rules and no game words", kieng.lines.size() >= 4 and kieng.lines.size() <= 6
 		and not body.to_lower().contains("điềm") and not body.to_lower().contains("anomaly"))
 
 
-func _open() -> BedroomScene3D:
-	var room := (load(BEDROOM) as PackedScene).instantiate() as BedroomScene3D
+func _room(local: Vector3) -> Vector3:
+	return VillageLayout3D.room_point(local)
+
+
+func _open() -> VillageScene3D:
+	var room := (load(VILLAGE) as PackedScene).instantiate() as VillageScene3D
 	add_child(room)
 	await get_tree().process_frame
 	return room
