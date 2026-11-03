@@ -1,6 +1,6 @@
 class_name RestaurantPanels3D
 extends RefCounted
-## The restaurant's 2D overlay: note line and action hint. Looks come from the project
+## The restaurant's 2D overlay: spoken lines as subtitles and the action hint. Looks come from the project
 ## theme (assets/ui/game_theme.tres).
 
 var host: Node3D
@@ -49,15 +49,10 @@ func build() -> void:
 	_prompt.hide()
 
 
-## Bottom speech strip: "Bảo: ..." puts the speaker's name in red ink.
+## Subtitle line at the bottom: "Bảo: ..." shows "Bảo:" above it in his colour.
 func _build_note(layer: CanvasLayer) -> void:
 	_note = SpeechStrip.new()
-	_note.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	_note.offset_left = 12
-	_note.offset_right = -12
-	_note.offset_top = -30
-	_note.offset_bottom = -8
-	_note.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_note.set_anchors_preset(Control.PRESET_FULL_RECT)
 	layer.add_child(_note)
 
 
@@ -65,7 +60,7 @@ func say(words: String) -> void:
 	_note.say(words, 4.0)
 
 
-## Kept for the scene's frame loop; the strip times itself out.
+## Kept for the scene's frame loop; the subtitle times itself out.
 func tick(_delta: float) -> void:
 	pass
 

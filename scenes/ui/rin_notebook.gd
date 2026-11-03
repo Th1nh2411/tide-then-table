@@ -9,27 +9,16 @@ extends CanvasLayer
 signal closed
 
 const COVER := "notebook_cover"
-const PAGE := "notebook_page"
 const HAND: FontFile = preload("res://assets/fonts/PatrickHand-Regular.ttf")
 const CLUES: LinesData = preload("res://data/story/clues.tres")
 const NEWS: NewsData = preload("res://data/story/news.tres")
-const FONT_SIZE := 11
-## On the page art (fractions of its size): the label box on the cover, the
-## writing area of each page, the first ruled line and the ruling.
+## The label box on the cover art (fractions of its size).
 const LABEL := Rect2(0.25, 0.246, 0.536, 0.197)
-const LEFT_X := Vector2(0.095, 0.455)
-const RIGHT_X := Vector2(0.55, 0.925)
-const FIRST_RULE := 0.079
-const RULE := 0.0297
-const ROWS := 28
-const PENCIL := Color("33394a")
-const RED_PENCIL := Color("7a2a22")
 
 var _was_paused := false
 var _opened_frame := 0
-var _book: TextureRect
-var _ink: Control
-var _cover_text: Control
+var _cover: TextureRect
+var _ink: NotebookSpread
 var _pages: Array[Array] = []
 var _spread := -1  # -1 = closed cover
 
@@ -53,36 +42,47 @@ func _ready() -> void:
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
 	var view := get_viewport().get_visible_rect().size
-	_book = TextureRect.new()
-	_book.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_book.stretch_mode = TextureRect.STRETCH_SCALE
-	_book.size = Vector2(view.y * 0.955 * 1024.0 / 1400.0, view.y * 0.955)
-	_book.position = (view - _book.size) * 0.5
-	add_child(_book)
-	_cover_text = _make_cover_label()
-	_book.add_child(_cover_text)
-	_ink = Control.new()
-	_ink.size = _book.size
-	_ink.draw.connect(_draw_ink)
-	_book.add_child(_ink)
-	var width := (LEFT_X.y - LEFT_X.x) * _book.size.x
-	var list := NotebookPages.entries(GameState.story_flags, CLUES.lines, NEWS.hint)
-	_pages = NotebookPages.layout(list, width, ROWS, _measure)
+	# Closed: the portrait cover. Open: a landscape spread over most of the screen.
+	_cover = TextureRect.new()
+	_cover.texture = load(HorrorMaterials.DIR + COVER + ".png") as Texture2D
+	_cover.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_cover.stretch_mode = TextureRect.STRETCH_SCALE
+	_cover.size = Vector2(view.y * 0.955 * 1024.0 / 1400.0, view.y * 0.955).round()
+	_cover.position = ((view - _cover.size) * 0.5).round()
+	add_child(_cover)
+	_cover.add_child(_make_cover_label())
+	_ink = NotebookSpread.new()
+	_ink.size = spread_size(view)
+	_ink.position = ((view - _ink.size) * 0.5).round()
+	add_child(_ink)
+	_pages = pages_for(_ink, GameState.story_flags)
+	_ink.pages = _pages
 	_show(-1)
 	_was_paused = get_tree().paused
 	get_tree().paused = true
 	Sfx.play("flip")
 
 
-func _measure(text: String) -> float:
-	return HAND.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x
+## The open spread: landscape, most of the screen.
+static func spread_size(view: Vector2) -> Vector2:
+	return Vector2(minf(view.x * 0.93, view.y * 0.92 * 1.9), view.y * 0.92).round()
+
+
+## Entries for `flags` wrapped to the spread's writing column, page by page.
+static func pages_for(spread: NotebookSpread, flags: Dictionary) -> Array[Array]:
+	var width := minf(spread.writing_span(0).y, spread.writing_span(1).y)
+	var font_px := spread.font_size()
+	var measure := func(text: String) -> float:
+		return HAND.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_px).x
+	var list := NotebookPages.entries(flags, CLUES.lines, NEWS.hint)
+	return NotebookPages.layout(list, width, NotebookSpread.rows(), measure)
 
 
 ## "SỔ TAY" written by hand in the cover's blank label.
 func _make_cover_label() -> Control:
 	var box := VBoxContainer.new()
-	box.position = LABEL.position * _book.size
-	box.size = LABEL.size * _book.size
+	box.position = LABEL.position * _cover.size
+	box.size = LABEL.size * _cover.size
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_theme_constant_override("separation", -4)
 	box.pivot_offset = box.size * 0.5
@@ -101,47 +101,10 @@ func _make_cover_label() -> Control:
 ## -1 = the cover, else spread i (pages 2i, 2i + 1).
 func _show(spread: int) -> void:
 	_spread = clampi(spread, -1, NotebookPages.spread_count(_pages) - 1)
-	var cover := _spread < 0
-	_book.texture = load(HorrorMaterials.DIR + (COVER if cover else PAGE) + ".png") as Texture2D
-	_cover_text.visible = cover
-	_ink.visible = not cover
+	_cover.visible = _spread < 0
+	_ink.visible = _spread >= 0
+	_ink.spread = maxi(0, _spread)
 	_ink.queue_redraw()
-
-
-func _draw_ink() -> void:
-	if _spread < 0:
-		return
-	var many := _pages.size() > 2
-	for side in 2:
-		var index := _spread * 2 + side
-		var span := LEFT_X if side == 0 else RIGHT_X
-		var x := span.x * _ink.size.x
-		if index < _pages.size():
-			var rows: Array = _pages[index]
-			for i in rows.size():
-				var row: Dictionary = rows[i]
-				_write_row(row, x, _rule_y(i), (span.y - span.x) * _ink.size.x)
-		if many and index < _pages.size():
-			var corner := x if side == 0 else span.y * _ink.size.x - 6.0
-			_ink.draw_string(HAND, Vector2(corner, _rule_y(ROWS) + 2.0), str(index + 1),
-				HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE - 2, PENCIL)
-
-
-func _rule_y(row: int) -> float:
-	# Writing sits a hair above the ruled line.
-	return (FIRST_RULE + RULE * float(row + 1)) * _ink.size.y - 1.5
-
-
-func _write_row(row: Dictionary, x: float, y: float, width: float) -> void:
-	var text := str(row.get("text", ""))
-	if text == "":
-		return
-	if row.get("kind", "") == "date":
-		_ink.draw_string(HAND, Vector2(x, y), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, RED_PENCIL)
-		var under := minf(_measure(text), width)
-		_ink.draw_line(Vector2(x, y + 1.5), Vector2(x + under, y + 1.0), Color(RED_PENCIL, 0.7), 0.6)
-	else:
-		_ink.draw_string(HAND, Vector2(x, y), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, PENCIL)
 
 
 func _input(event: InputEvent) -> void:
@@ -154,7 +117,7 @@ func _input(event: InputEvent) -> void:
 	elif _spread < 0:
 		if (key and key.physical_keycode in [KEY_E, KEY_SPACE, KEY_D, KEY_RIGHT]) or (click and click.button_index == MOUSE_BUTTON_LEFT):
 			_turn(0)
-	elif event.is_action("turn_right") or (click and click.position.x > _book.get_global_rect().get_center().x):
+	elif event.is_action("turn_right") or (click and click.position.x > _ink.get_global_rect().get_center().x):
 		_turn(_spread + 1)
 	elif event.is_action("turn_left") or click:
 		_turn(_spread - 1)

@@ -1,6 +1,7 @@
 extends Node
 ## Standalone test for SpeechStrip (run with F6): speaker names, the default
-## speaker, kept lines, fading out; plus the speaker slugs / moods parsed by
+## speaker, one line at a time (a fresh line makes the next wait), kept
+## lines, fading out; plus the speaker slugs / moods parsed by
 ## the dialogue code.
 
 var _failures: int = 0
@@ -14,9 +15,14 @@ func _ready() -> void:
 	layer.add_child(strip)
 	await get_tree().process_frame
 	strip.say("Bảo: Hết ca rồi.", 1.0)
-	_check("named line shows its speaker", strip._speaker.text == "Bảo" and strip._text.text == "Hết ca rồi.")
+	_check("named line shows its speaker", strip._speaker.text == "Bảo:" and strip._text.text == "Hết ca rồi.")
+	_check("subtitle: no box, outlined, low and centred", strip._text.get_theme_constant("outline_size") > 0
+		and strip._text.position.y > strip.size.y * 0.6)
 	strip.say("Đèn leo lét rồi... về thôi.", 0.0)
-	_check("plain line uses the default speaker", strip._speaker.text == "Rin" and strip.current == "Đèn leo lét rồi... về thôi.")
+	strip.say("Đèn leo lét rồi... về thôi.", 0.0)
+	_check("a line said over a fresh one waits, once", strip.current == "Bảo: Hết ca rồi." and strip._queue.size() == 1)
+	strip._process(SpeechStrip.MIN_SECONDS + 0.1)
+	_check("then shows, with the default speaker", strip._speaker.text == "Rin:" and strip.current == "Đèn leo lét rồi... về thôi.")
 	strip._process(5.0)
 	_check("a kept line stays", strip.current != "")
 	strip.say("Buông ra!", 0.2)
