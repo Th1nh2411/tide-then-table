@@ -50,11 +50,9 @@ static func build(host: Node3D) -> Dictionary:
 		OmenProps3D.light(stage, at - Vector3(0, 0.15, 0), "e8c890", 0.7, 5.5)
 	B.box(stage, Vector3(4.0, -0.45, 20.0), Vector3(40, 0.1, 20), "0e171a")
 	# Out past the road, the empty thúng drifting with the green cord.
-	var drift := (load("res://scenes/art_pilots/boat_pilot.tscn") as PackedScene).instantiate() as Node3D
-	stage.add_child(drift)
-	drift.position = Vector3(6.0, -0.3, 13.0)
-	drift.scale = Vector3(1, 0.75, 1)
-	var rim := Vector3(-1.16, 0.42, -0.2)
+	var drift := ThungHull3D.place(stage, -0.24, "DriftThung")
+	drift.position += Vector3(6.0, 0, 13.0)
+	var rim := ThungHull3D.rim_point(drift, Vector2(-1.16, -0.2)) - drift.position
 	ThungCharm3D.tie(stage, drift.position + rim, atan2(-rim.z, rim.x), false).scale = Vector3.ONE * 2.0
 	OmenProps3D.light(stage, drift.position + Vector3(0, 1.4, 0), "7fa8a0", 0.6, 4.0)
 	var ut := PersonRig3D.build(stage, "guest_rich")
@@ -73,10 +71,7 @@ static func build(host: Node3D) -> Dictionary:
 
 
 static func _table(stage: Node3D, at: Vector3, seat: Vector3) -> void:
-	var table: Node3D = B.TABLE_PILOT.instantiate()
-	stage.add_child(table)
-	table.position = at
-	table.rotation.y = RestaurantLayout3D.TABLE_YAW
+	RestaurantFurniture3D.table(stage, at, RestaurantLayout3D.TABLE_YAW)
 	var stool: Node3D = B.STOOL_PILOT.instantiate()
 	stage.add_child(stool)
 	stool.position = seat

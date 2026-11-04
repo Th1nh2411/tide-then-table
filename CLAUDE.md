@@ -295,7 +295,12 @@ Vietnamese, keep code comments in short English.
   real edges (`VillageEdges3D`, no invisible-wall-only edge where it shows).
   Static boxes go through `BoxBatch3D` (one mesh per material). Props by id via
   `VillageProps3D.place`: the model in `assets/models/ready/<id>/` when it
-  exists, else a stand-in (`VillageStandins3D` / `VillageNature3D`). Fog loop:
+  exists, else a stand-in (`VillageStandins3D` / `VillageNature3D`). Street
+  furniture meshes (guest tables, Bảo's stove + glass cart + ice box, spare
+  stool stack) come from `RestaurantFurniture3D`, ông Tư's thúng (sea, pier,
+  epilogue) from `ThungHull3D.place(parent, floor_y)`: real model fitted to
+  the old footprint, old mesh if the glb is missing; colliders stay with the
+  caller. Fog loop:
   `WorldEdgeLoop3D` (west pavement x < -20 <-> east shore path x > 81, 25 m
   into the fog = moved to the other one, same heading; tries per day,
   `VillageFogSigns3D`); third loop: the dead-end alley off the lane's south

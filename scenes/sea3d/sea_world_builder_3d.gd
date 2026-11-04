@@ -189,19 +189,17 @@ static func _solid_footprint(sea: SeaScene3D, visual: Node3D) -> void:
 	body.add_child(collider)
 	sea.add_child(body)
 
+## The thúng's inner floor in boat_visual space: Rin's feet, FishBasket3D.IN_BOAT.
+const THUNG_FLOOR_Y := 0.2
+
 static func build_boat(sea: SeaScene3D) -> void:
 	var boat_id := sea.boat_data.id
 	if boat_id == "thuyen_thung":
-		# Generated hollow hull; controller/collider, actor and lamp remain separate.
-		var hull := preload("res://scenes/art_pilots/boat_pilot.tscn").instantiate()
-		hull.name = "HunyuanThungHull"
-		# Keep the inferred interior above the sea's flat water planes during bob.
-		# Rim remains y=.56; no replacement floor or added hull geometry.
-		hull.scale.y = 0.75
-		hull.position.y = 0.14
-		sea.boat_visual.add_child(hull)
+		# The thúng model; controller/collider, actor and lamp remain separate.
+		# Its woven floor (Rin's feet, the basket) stays above the sea's water plane during bob.
+		var hull := ThungHull3D.place(sea.boat_visual, THUNG_FLOOR_Y, "HunyuanThungHull")
 		# Anh Út's green cord on the front-left rim, in Rin's view (from mùng 10).
-		var rim := Vector3(-0.5, 0.56, -1.06)
+		var rim := ThungHull3D.rim_point(hull, Vector2(-0.5, -1.06))
 		ThungCharm3D.tie(sea.boat_visual, rim, atan2(-rim.z, rim.x)).scale = Vector3.ONE * 1.5
 	else:
 		batch_model(sea.boat_visual, "ghe_may" if boat_id == "ghe_may" else "ghe_cheo", Vector3(0, 0.12, 0))

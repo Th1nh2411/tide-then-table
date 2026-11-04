@@ -6,7 +6,8 @@ extends RefCounted
 
 const L = preload("res://scenes/restaurant3d/restaurant_layout_3d.gd")
 const STOOL_PILOT = preload("res://assets/models/ready/stool/stool.glb")
-const TABLE_PILOT = preload("res://assets/models/ready/table/table.glb")
+## Spare stools stacked against the shop wall west of the plate table (its FloorGrid3D rect).
+const STOOL_STACK_SPOT := Vector3(-2.75, 0, -7.0)
 ## Cô Năm behind her counter (RestaurantRoles3D turns Rin's view to her).
 const CO_NAM_SPOT := L.COUNTER_POSITION + Vector3(-2.1, 0, -0.85)
 
@@ -210,12 +211,8 @@ static func _tables(host: Node3D, start_index := 0) -> void:
 	var table_count := L.table_count()
 	for i in range(start_index,table_count):
 		var p: Vector3 = L.TABLES[i]
-		var table: Node3D = TABLE_PILOT.instantiate()
+		var table := RestaurantFurniture3D.table(host, p, L.TABLE_YAW)
 		table.name = "DiningTable_%d" % i
-		host.add_child(table)
-		table.position = p
-		table.rotation.y = L.TABLE_YAW
-		WorldPresentation3D.cast_shadows(table)
 		ContactShadow3D.attach(table, 0.9, 0.8, 0.4)
 		solid_block(host, p + Vector3(0, 0.8, 0), L.TABLE_COLLISION_SIZE)
 		for side in [-1.0, 1.0]:
@@ -266,7 +263,7 @@ static func _tables(host: Node3D, start_index := 0) -> void:
 
 ## Food cart, kitchen sign, Cô Năm's counter, Bảo, plate pass and beer keg (no grill).
 static func _kitchen(host: Node3D) -> void:
-	RestaurantBatchVisuals.add(host, "food_cart_0", L.GRILL_POSITION)
+	RestaurantFurniture3D.cart(host, L.GRILL_POSITION)
 	solid_block(host, L.GRILL_POSITION + Vector3(0, 0.7, 0), Vector3(2.8, 1.3, 1.25))
 	box(host, L.KITCHEN_BOARD_POSITION + Vector3(0, 0.7, 0), Vector3(1.2, 1.3, 0.1), "5a3d2e", true)
 	# Cô Năm keeps her grocery counter separate from the kitchen.
@@ -288,6 +285,8 @@ static func _kitchen(host: Node3D) -> void:
 	RestaurantBatchVisuals.add(host, "bin", L.PASS_POSITION + Vector3(-0.95, 0, 0))
 	RestaurantBatchVisuals.add(host, "beer_keg", L.BEER_POSITION)
 	solid_block(host, L.BEER_POSITION + Vector3(0, 0.85, 0), Vector3(0.5, 1.2, 0.5))
+	if RestaurantFurniture3D.stool_stack(host, STOOL_STACK_SPOT, 0.3):
+		solid_block(host, STOOL_STACK_SPOT + Vector3(0, 0.5, 0), Vector3(0.5, 1.0, 0.5))
 
 static func _player(host: Node3D) -> void:
 	var player := CharacterBody3D.new()

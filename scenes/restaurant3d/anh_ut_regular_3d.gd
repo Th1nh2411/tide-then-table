@@ -43,10 +43,7 @@ static func attach(owner: RestaurantScene3D) -> AnhUtRegular3D:
 
 func _ready() -> void:
 	absent = GameState.has_flag(LoopCalendar.OMEN_FLAG)
-	var table: Node3D = RestaurantRoomBuilder3D.TABLE_PILOT.instantiate()
-	add_child(table)
-	table.position = TABLE
-	table.rotation.y = RestaurantLayout3D.TABLE_YAW
+	RestaurantFurniture3D.table(self, TABLE, RestaurantLayout3D.TABLE_YAW)
 	RestaurantRoomBuilder3D.solid_block(self, TABLE + Vector3(0, 0.8, 0), RestaurantLayout3D.TABLE_COLLISION_SIZE)
 	var stool: Node3D = RestaurantRoomBuilder3D.STOOL_PILOT.instantiate()
 	add_child(stool)

@@ -20,8 +20,8 @@ const PIER_POST := Vector3(7.0, 0.12, -9.4)
 const NEAR_LIGHTHOUSE := Vector3(-11.0, -0.2, -4.0)
 const FAR_LIGHTHOUSE := Vector3(30.0, -0.2, -60.0)
 const WATER_Y := -0.35
-## The charm on the pier thúng, from the hull origin: rim top facing the shore, clear of the planks.
-const PIER_CHARM := Vector3(-0.35, 0.42, 1.13)
+## The charm on the pier thúng: rim top towards (x, z) from its centre, facing the shore, clear of the planks.
+const PIER_CHARM := Vector3(-0.35, 0, 1.13)
 
 
 ## The whole waterfront on its own (RamEpilogue3D): light, sea, house, lamps.
@@ -70,16 +70,17 @@ static func build_scenery(host: Node3D) -> void:
 	B.solid_block(host, Vector3(-11.8, 0.7, 7.0), Vector3(2.4, 1.4, 0.5))
 	ConceptModel3D.sized(host, "stone_steps", Vector3(10.5, -0.05, 3.5), Vector3(1.4, 0.45, 1.8), PI)
 	_pier(host)
-	var hull := (load("res://scenes/art_pilots/boat_pilot.tscn") as PackedScene).instantiate() as Node3D
-	host.add_child(hull)
-	hull.position = THUNG + Vector3(-1.3, WATER_Y - 0.05, -0.4)
-	hull.scale = Vector3(1, 0.75, 1)
-	# Woven bamboo, tarred dark (the bare model reads as a pale disc in a plain hull).
-	var weave := HorrorMaterials.tiled("floor_wood_planks", 0.3, Color(0.42, 0.34, 0.26))
-	for mesh in hull.find_children("*", "MeshInstance3D", true, false):
-		(mesh as MeshInstance3D).material_override = weave
+	var hull := ThungHull3D.place(host, WATER_Y + 0.04, "PierThung")
+	# Moored beside the pier, its rim just touching the planks (not through them).
+	hull.position += THUNG + Vector3(-PIER_HALF - ThungHull3D.DIAMETER * 0.5 - 0.05, 0, -0.4)
+	if not ThungHull3D.real():
+		# Woven bamboo, tarred dark (the bare bowl reads as a pale disc in a plain hull).
+		var weave := HorrorMaterials.tiled("floor_wood_planks", 0.3, Color(0.42, 0.34, 0.26))
+		for mesh in hull.find_children("*", "MeshInstance3D", true, false):
+			(mesh as MeshInstance3D).material_override = weave
 	# Anh Út's green cord on the rim facing the pier (shown once he gave it).
-	ThungCharm3D.tie(host, hull.position + PIER_CHARM, -atan2(PIER_CHARM.z, PIER_CHARM.x))
+	var charm := ThungHull3D.rim_point(hull, Vector2(PIER_CHARM.x, PIER_CHARM.z))
+	ThungCharm3D.tie(host, charm, -atan2(PIER_CHARM.z, PIER_CHARM.x))
 	# A small lighthouse on the point, and the far one on Đá Canh Đêm: the dock omens use their beacons.
 	SeaWorldBuilder3D.batch_model(host, "lighthouse", NEAR_LIGHTHOUSE, Vector3(0.6, 0.95, 0.6))
 	SeaWorldBuilder3D.batch_model(host, "lighthouse", FAR_LIGHTHOUSE)

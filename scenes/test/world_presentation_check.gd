@@ -59,7 +59,7 @@ func _run() -> void:
 	await get_tree().process_frame
 	var rider := sea.boat_visual.get_node("RinOnBoat") as Node3D
 	var hull := sea.boat_visual.get_node("HunyuanThungHull") as Node3D
-	check(rider.scale.is_equal_approx(Vector3.ONE*.85) and hull.scale.is_equal_approx(Vector3(1,.75,1)), "Sea rider and hull scale remain unchanged")
+	check(rider.scale.is_equal_approx(Vector3.ONE*.85) and hull.scale.is_equal_approx(Vector3.ONE if ThungHull3D.real() else Vector3(1,.75,1)), "Sea rider and hull scale remain unchanged")
 	check(shadows(rider) and shadows(hull) and sea.boat_lamp.shadow_enabled, "Boat, Rin and boat lamp support real shadows")
 	sea.cinematic._target = sea.boat.position + Vector3.FORWARD*3
 	sea.cinematic._build_props()

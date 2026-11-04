@@ -16,6 +16,7 @@ const FIXED: Array[Rect2] = [
 	Rect2(RestaurantLayout3D.BOARD_POSITION.x-.75, RestaurantLayout3D.BOARD_POSITION.z-.06, 1.5, .12), # menu board
 	Rect2(8.2, -4.7, 3.6, 0.8),     # grocery counter
 	Rect2(-1.95, -7.6, 0.9, 0.8),    # fridge
+	Rect2(-3.0, -7.25, 0.5, 0.5),    # spare stool stack (RestaurantRoomBuilder3D.STOOL_STACK_SPOT)
 	Rect2(2.6, RestaurantLayout3D.CURB_PROP_Z-.2, .4, .4), # string-light pole
 	Rect2(7.85, 1.45, 2.05, 1.5),   # anh Út's table + stool (RamGuest3D.TABLE)
 	Rect2(-5.5, -0.15, 2.05, 1.5),  # chú Bảy's corner table + stool (ChuBay3D.TABLE)
