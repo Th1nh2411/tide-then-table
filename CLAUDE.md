@@ -226,6 +226,14 @@ Vietnamese, keep code comments in short English.
   profile names ("LeftFoot"); look bones up with `RinPilotVisual.bone("Foot.L")`.
   New model: copy FBX + PNG, `--import`, `tools/psx_chars/set_retarget_import.py`,
   `--import`, add to `CAST`. Test `psx_characters_test`.
+- **Restaurant guests (3D):** `CustomerTraffic3D` (orchestrator, reads host
+  `orders` / `guests` / `TABLES`): `GuestBikes3D` (slots, riding) +
+  `BikeRider3D` (guest drives, partner pillion, women side-saddle; sit clip
+  lifted onto the seat, driver plays `RideIdle`; get off at the curb / on
+  again), `WalkInGuests3D` (40% walk from the west fog / east bend / lane,
+  couples side by side, out the same way), `GuestSeating3D` (stool sit /
+  stand). Party size from `PartyOrders3D.guests`. The omen bike stays empty.
+  Test `traffic_check`.
   Roles (PLAN §10 "Vai trò nhân vật"): each villager's E line is data,
   `data/story/<who>.tres` (`NpcLinesData`: one entry per day, "|" splits
   lines, omen / night / after-reset variants) shown by `NpcTalk3D` (close +
