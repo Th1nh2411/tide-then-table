@@ -12,6 +12,10 @@ const DOOR := Vector3(-1.0, 0, 9.4)
 const THUNG := Vector3(6.0, 0, -10.6)
 const LANE := Vector3(-14.0, 0, 8.0)
 const SHORE_Z := 2.0
+## The pier's shore end, on the dry sand (local z), and the end by the thúng.
+const PIER_START_Z := 3.2
+const PIER_END_Z := -11.4
+const PIER_HALF := 0.9
 const PIER_POST := Vector3(7.0, 0.12, -9.4)
 const NEAR_LIGHTHOUSE := Vector3(-11.0, -0.2, -4.0)
 const FAR_LIGHTHOUSE := Vector3(30.0, -0.2, -60.0)
@@ -34,11 +38,19 @@ static func build(host: Node3D, evening: bool) -> void:
 		build_omens(host)
 
 
-## Village ground and the sandy edge of the shore.
-static func build_ground(host: Node3D) -> void:
-	# Packed sandy earth, wet sand at the waterline.
-	B.box(host, Vector3(0, -0.1, 8.0), Vector3(34, 0.2, 12), "4a4136", true).material_override = HorrorMaterials.tiled("lane_dirt", 3.0, Color(0.95, 0.88, 0.74))
-	B.box(host, Vector3(0, -0.12, SHORE_Z + 0.6), Vector3(34, 0.2, 1.4), "8a7a5e", true).material_override = HorrorMaterials.tiled("lane_dirt", 2.0, Color(0.8, 0.74, 0.62))
+## Village ground and the beach sloping into the sea (ShoreBeach3D, local
+## x `beach_x`; east of `low_from` it meets lower land; `headland`: a block of
+## land west of it, x / z rect, whose sea sides slope too).
+static func build_ground(host: Node3D, beach_x: Vector2 = Vector2(-17.0, 17.0), low_from: float = INF, headland: Rect2 = Rect2()) -> void:
+	# Packed sandy earth inland of the beach's dry sand; the collider runs on to the shore line.
+	var inland := Vector2(ShoreBeach3D.DRY_Z, 14.0)
+	B.box(host, Vector3(0, -0.1, (inland.x + inland.y) * 0.5), Vector3(34, 0.2, inland.y - inland.x), "4a4136").material_override = HorrorMaterials.tiled("lane_dirt", 3.0, Color(0.95, 0.88, 0.74))
+	B.solid_block(host, Vector3(0, -0.1, (SHORE_Z + inland.y) * 0.5), Vector3(34, 0.2, inland.y - SHORE_Z))
+	var beach := ShoreBeach3D.new()
+	beach.waterfront(beach_x.x, beach_x.y, low_from)
+	if headland.has_area():
+		beach.headland(headland, ShoreBeach3D.LOW_TOP)
+	beach.commit(host)
 
 
 ## Rin's house front as a closed block (the village map builds the real room instead).
@@ -57,11 +69,7 @@ static func build_scenery(host: Node3D) -> void:
 	ConceptModel3D.fit(host, "fishing_nets_drying", Vector3(-11.8, 0, 7.0), Vector3(3.0, 1.7, 1.1))
 	B.solid_block(host, Vector3(-11.8, 0.7, 7.0), Vector3(2.4, 1.4, 0.5))
 	ConceptModel3D.sized(host, "stone_steps", Vector3(10.5, -0.05, 3.5), Vector3(1.4, 0.45, 1.8), PI)
-	# The pier and ông Tư's thúng at its end.
-	B.box(host, Vector3(THUNG.x, 0.05, (SHORE_Z + THUNG.z) * 0.5 - 0.6), Vector3(1.8, 0.12, SHORE_Z - THUNG.z + 0.4), "6b5240", true).material_override = HorrorMaterials.tiled("floor_wood_planks", 1.2)
-	for z in range(int(SHORE_Z) - 1, int(THUNG.z) - 1, -2):
-		for side: float in [-0.8, 0.8]:
-			B.box(host, Vector3(THUNG.x + side, -0.6, float(z)), Vector3(0.14, 1.3, 0.14), "3e3024")
+	_pier(host)
 	var hull := (load("res://scenes/art_pilots/boat_pilot.tscn") as PackedScene).instantiate() as Node3D
 	host.add_child(hull)
 	hull.position = THUNG + Vector3(-1.3, WATER_Y - 0.05, -0.4)
@@ -82,6 +90,27 @@ static func build_scenery(host: Node3D) -> void:
 	B.box(host, LANE + Vector3(0.6, 1.45, -0.62), Vector3(0.05, 0.2, 0.2), "c9b896").rotation.x = PI * 0.25
 	var words := B.label(host, "RA QUÁN", LANE + Vector3(0.64, 1.45, 0), 28, "e9dcc0")
 	words.rotation.y = PI * 0.5
+
+
+## The pier from the dry sand out over the slope to ông Tư's thúng: planks,
+## two stringers, posts in pairs every 2 m down into the sand / sea bed with a
+## cross beam each. Its collider's top is the sand's (no step for walkers).
+static func _pier(host: Node3D) -> void:
+	var planks := HorrorMaterials.tiled("floor_wood_planks", 1.2)
+	var wood := HorrorMaterials.tiled("floor_wood_planks", 0.5, Color(0.55, 0.45, 0.36))
+	var length := PIER_START_Z - PIER_END_Z
+	var mid := (PIER_START_Z + PIER_END_Z) * 0.5
+	B.box(host, Vector3(THUNG.x, 0.05, mid), Vector3(PIER_HALF * 2.0, 0.12, length), "6b5240").material_override = planks
+	B.solid_block(host, Vector3(THUNG.x, -0.2, mid), Vector3(PIER_HALF * 2.0, 0.4, length))
+	for side: float in [-0.7, 0.7]:
+		B.box(host, Vector3(THUNG.x + side, -0.08, mid - 0.2), Vector3(0.12, 0.1, length - 0.6), "3e3024").material_override = wood
+	var z := SHORE_Z - 1.0
+	while z > PIER_END_Z:
+		var bed := ShoreBeach3D.height_at(THUNG.x, z) - 0.3
+		for side: float in [-0.8, 0.8]:
+			B.box(host, Vector3(THUNG.x + side, (0.04 + bed) * 0.5, z), Vector3(0.14, 0.04 - bed, 0.14), "3e3024").material_override = wood
+		B.box(host, Vector3(THUNG.x, -0.15, z), Vector3(PIER_HALF * 2.0 + 0.1, 0.1, 0.12), "3e3024").material_override = wood
+		z -= 2.0
 
 
 ## Lamp posts along the shore; returns where their bulbs hang.
