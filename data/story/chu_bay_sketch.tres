@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="NoteData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/note_data.gd" id="1_note"]
+
+[resource]
+script = ExtResource("1_note")
+title = "Đường ra bè"
+lines = Array[String](["Từ đầu cầu tàu chèo ra, mũi thúng ngó về đèn Đá Canh Đêm.", "Qua ba cái cọc thì quẹo phải.", "Thấy ngọn đèn xanh là tới bè. Đừng để nó thấy con."])
+signature = ""

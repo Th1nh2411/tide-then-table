@@ -9,6 +9,8 @@ const LINES: LinesData = preload("res://data/story/vy.tres")
 const LATE: LinesData = preload("res://data/story/vy_late.tres")
 const HEARD: NpcLinesData = preload("res://data/story/vy_heard.tres")
 const LATE_DAY := 5
+## 6 = mùng 14.
+const REVEAL_DAY := 6
 const REACH := 1.8
 
 var vy: VyStaff3D
@@ -37,7 +39,15 @@ static func day_list(day: int) -> Array[String]:
 
 
 func today() -> Array[String]:
-	return day_list(GameState.day)
+	var out := day_list(GameState.day)
+	if reveal_due():
+		out.push_front(HEARD.format(str(HEARD.named["bay_table"])))
+	return out
+
+
+## Mùng 14, and Rin has talked to chú Bảy (in any loop): the corner table is empty.
+static func reveal_due() -> bool:
+	return GameState.day == REVEAL_DAY and GameState.has_flag(ChuBayTalk3D.MET_FLAG)
 
 
 func can_talk(rin: Vector3, camera: Camera3D) -> bool:

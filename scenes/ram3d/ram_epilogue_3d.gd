@@ -4,14 +4,17 @@ extends Node3D
 ## words on screen only, then the ending card (RamNight.ending_id()):
 ## - "true": grey dawn. The village found the bodies under the raft; hoa đăng
 ##   are released; the dead stand along the pier and fade one by one, ông Tư
-##   last (with enough notebook clues he speaks to Rin first).
-## - "drowned": a year later, through Rin's ghost standing in the water by the
-##   pier: a young fisherman walks up the lane, anh Út waiting at its sign.
+##   last, chú Bảy just before him nods to Rin (with enough notebook clues
+##   ông Tư speaks to Rin first).
+## - "drowned": a year later, Rin's ghost on chú Bảy's corner stool at the
+##   restaurant (RamEpilogueShop3D): a young fisherman sits down with anh Út.
 
 const SCENE := "res://scenes/ram3d/ram_epilogue_3d.tscn"
 const ENDING := "res://scenes/ending/ending_scene.tscn"
 const PIER_X := 6.0
 const GHOSTS := 7
+## Chú Bảy stands just before ông Tư (the last one).
+const BAY := GHOSTS - 2
 
 var text: OnScreenText
 var black: ColorRect
@@ -48,7 +51,7 @@ func _play_true() -> void:
 	for i in GHOSTS:
 		var z := 0.6 - float(i) * 1.55
 		var side := -0.45 if i % 2 == 0 else 0.45
-		var ghost := RamFx3D.ghost(self, Vector3(PIER_X + side, 0.12, z), "ong_tu" if i == GHOSTS - 1 else "drowned")
+		var ghost := RamFx3D.ghost(self, Vector3(PIER_X + side, 0.12, z), _ghost_variant(i))
 		RamFx3D.ghost_holder(ghost).rotation.y = atan2(camera.position.x - PIER_X, camera.position.z - z)
 		RamFx3D.set_ghost_alpha(ghost, 0.0)
 		ghosts.append(ghost)
@@ -61,11 +64,18 @@ func _play_true() -> void:
 	for ghost in ghosts:
 		_fade_ghost(ghost, 0.45, 1.6)
 	await RamFx3D.wait(self, 3.0)
-	# They go one by one from the shore end; ông Tư stays last.
-	for i in GHOSTS - 1:
+	# They go one by one from the shore end; chú Bảy nods to Rin, then ông Tư stays last.
+	for i in BAY:
 		_fade_ghost(ghosts[i], 0.0, 1.4)
 		await RamFx3D.wait(self, 0.8)
-	await RamFx3D.wait(self, 1.6)
+	await RamFx3D.wait(self, 0.8)
+	var bay := RamFx3D.ghost_holder(ghosts[BAY])
+	var nod := create_tween()
+	nod.tween_property(bay, "rotation:x", 0.16, RamNight.secs(0.5))
+	nod.tween_property(bay, "rotation:x", 0.0, RamNight.secs(0.6))
+	await nod.finished
+	_fade_ghost(ghosts[BAY], 0.0, 1.6)
+	await RamFx3D.wait(self, 2.0)
 	if RamNight.grandpa_speaks(NightErrand3D.clue_count()):
 		await RamFx3D.say_lines(text, [RamFx3D.LINES.grandpa], 3.6)
 	Sfx.play("bell", 0.0)
@@ -75,21 +85,15 @@ func _play_true() -> void:
 
 
 func _play_drowned() -> void:
-	# Rin's ghost, waist-deep beside the pier, looking back at the village.
-	camera.position = Vector3(0.0, 0.9, 1.2)
-	camera.look_at(Vector3(-10.0, 1.0, 8.0))
+	# Rin's ghost on chú Bảy's corner stool, a year later (RamEpilogueShop3D).
+	var shop := RamEpilogueShop3D.build(self)
+	camera.position = shop["eye"]
+	camera.look_at(shop["look"])
 	RamFx3D.veil(self, "1d4a44", 0.22, 18)
-	# The other dead, waist-deep beside him.
-	for at: Vector3 in [Vector3(-3.6, -0.5, 1.2), Vector3(-1.8, -0.5, -0.6)]:
-		var ghost := RamFx3D.ghost(self, at)
-		RamFx3D.ghost_holder(ghost).rotation.y = PI * 0.75
-	var ut := PersonRig3D.build(self, "guest_rich")
-	ut.position = WaterfrontBuilder3D.LANE + Vector3(1.4, 0, -0.8)
-	ut.rotation.y = PI * 0.5
-	var young := PersonRig3D.build(self, "guest_3")
-	var from := Vector3(3.5, 0, 3.2)
-	var to := WaterfrontBuilder3D.LANE + Vector3(2.6, 0, -0.4)
-	young.position = from
+	var ut: PersonRig3D = shop["ut"]
+	var young: PersonRig3D = shop["young"]
+	var from: Vector3 = shop["from"]
+	var to: Vector3 = shop["to"]
 	young.rotation.y = atan2(to.x - from.x, to.z - from.z)
 	var lines := RamFx3D.LINES.drowned.duplicate()
 	if not lines.is_empty():
@@ -100,14 +104,24 @@ func _play_drowned() -> void:
 	walk.tween_property(young, "position", to, RamNight.secs(6.0))
 	await walk.finished
 	young.set_walking(0.0, 0.0)
+	young.position = shop["seat"]
+	young.rotation.y = PI * 0.5
+	young.set_seated(true)
 	await RamFx3D.say_lines(text, lines, 3.2)
-	# Anh Út looks past the boy, down to the water, at Rin.
-	var look := camera.global_position - ut.position
+	# Anh Út looks past the boy, at the corner stool, at Rin.
+	var look := camera.global_position - ut.global_position
 	var turn := create_tween()
 	turn.tween_property(ut, "rotation:y", atan2(look.x, look.z), RamNight.secs(1.4))
 	Sfx.play("knock3", 0.0)
 	await RamFx3D.wait(self, 2.2)
 	await _to_card()
+
+
+## Who stands where on the pier: the drowned, chú Bảy, ông Tư last.
+static func _ghost_variant(i: int) -> String:
+	if i == GHOSTS - 1:
+		return "ong_tu"
+	return "chu_bay" if i == BAY else "drowned"
 
 
 func _to_card() -> void:

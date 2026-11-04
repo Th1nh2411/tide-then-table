@@ -5,4 +5,7 @@
 [resource]
 script = ExtResource("1_npc")
 speaker = "Vy"
-days = Array[String](["", "Bàn ngoài kia nói mấy vụ mất tích toàn rơi vô đêm tối trời. Tui nghe mà nổi da gà.", "Hai ông khách cãi nhau. Ông này nói dây neo bị cắt, ông kia nói sóng giật đứt.", "Bàn ba nói hồi khuya thấy đèn xanh ngoài bè tôm. Tui tưởng đèn câu mực.", "Có bà khách nói năm ngoái cậu gác đèn cũng mất đúng mùa này.", "Mấy ông đánh cá nói ai bán cá cho bè ngoài kia rồi cũng... thôi, tui không kể nữa.", "Khách nói tối nay cả xóm thả hoa đăng. Anh Rin có ra không?"])
+named = {
+"bay_table": "Bàn góc đó trống mà anh. Hồi trước... là chỗ của chú gác đèn."
+}
+days = Array[String](["", "Bàn ngoài kia nói ma da toàn bắt người vô đêm tối trời. Tui nghe mà nổi da gà.", "Hai ông khách cãi nhau. Ông này nói dây neo bị cắt, ông kia nói sóng giật đứt.", "Bàn ba nói hồi khuya thấy đèn xanh ngoài bè tôm. Tui tưởng đèn câu mực.", "Có bà khách nói năm ngoái ông gác đèn cũng mất đúng mùa này.", "Mấy ông đánh cá nói ai bán cá cho bè ngoài kia rồi cũng... thôi, tui không kể nữa.", "Khách nói tối nay cả xóm thả hoa đăng. Anh Rin có ra không?"])

@@ -14,8 +14,8 @@ extends Node3D
 @export var seen_seconds := 1.1
 @export var give_up_seconds := 9.0
 @export var retry_seconds := 25.0
-## Out to sea, towards the raft (village -Z is the sea).
-@export var raft_direction := Vector3(0.45, 0.12, -1.0)
+## Towards the lobster raft (SeaLayout3D.raft_bearing, a little raised).
+@export var raft_direction := SeaLayout3D.raft_bearing() + Vector3(0, 0.12, 0)
 ## The turn towards the breath (s): slower than a talk, a startled look round.
 @export var turn_seconds := 0.55
 

@@ -216,6 +216,9 @@ static func build_boat(sea: SeaScene3D) -> void:
 		hull.scale.y = 0.75
 		hull.position.y = 0.14
 		sea.boat_visual.add_child(hull)
+		# Anh Út's green cord on the front-left rim, in Rin's view (from mùng 10).
+		var rim := Vector3(-0.5, 0.56, -1.06)
+		ThungCharm3D.tie(sea.boat_visual, rim, atan2(-rim.z, rim.x)).scale = Vector3.ONE * 1.5
 	else:
 		batch_model(sea.boat_visual, "ghe_may" if boat_id == "ghe_may" else "ghe_cheo", Vector3(0, 0.12, 0))
 	# Bare visual instance (not a PersonRig3D); in person_rin so a cutscene Rin hides it.

@@ -6,7 +6,7 @@ extends Node3D
 ## Supported story/gameplay actor IDs ("guest" / "drowned" pick one of a pool).
 const LOOKS := {
 	"rin": {}, "bao": {}, "co_nam": {}, "guest_rich": {}, "chu_hai": {},
-	"ong_tam": {}, "ong_tu": {}, "vy": {}, "vy_sau": {}, "staff": {},
+	"ong_tam": {}, "ong_tu": {}, "chu_bay": {}, "vy": {}, "vy_sau": {}, "staff": {},
 	"guest_1": {}, "guest_2": {}, "guest_3": {}, "guest_4": {}, "guest_5": {},
 	"guest_6": {}, "guest_7": {}, "guest_8": {}, "guest_9": {},
 	"guest_regular": {}, "drowned_m": {}, "drowned_f": {},

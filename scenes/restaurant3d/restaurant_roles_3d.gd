@@ -6,7 +6,9 @@ extends Node
 ##   mùng 12-14 (data/story/bao.tres); tonight's omen first when he has one.
 ## - Cô Năm at her counter: the rằm line, tonight's omen tell
 ##   (OmenData.co_nam_line), then the day's gossip (data/story/co_nam.tres).
-## - anh Út at his table (AnhUtRegular3D), or the guest without a shadow.
+## - anh Út at his table (AnhUtRegular3D), or the guest without a shadow;
+##   from mùng 10 his first line hands Rin the green cord (ThungCharm3D).
+## - chú Bảy at the corner table (ChuBay3D, every day).
 ## One line in RestaurantScene3D._ready; RestaurantInteract3D asks it.
 
 const BAO: NpcLinesData = preload("res://data/story/bao.tres")
@@ -18,6 +20,7 @@ var host: RestaurantScene3D
 var bao: NpcTalk3D
 var co_nam: NpcTalk3D
 var ut: AnhUtRegular3D
+var bay: ChuBay3D
 
 
 static func attach(owner: RestaurantScene3D) -> RestaurantRoles3D:
@@ -44,6 +47,7 @@ func _ready() -> void:
 	if omen and omen.co_nam_line != "":
 		co_nam.first.append(CO_NAM.format(omen.co_nam_line))
 	ut = AnhUtRegular3D.attach(host)
+	bay = ChuBay3D.attach(host)
 
 
 ## Cô Năm's next line (Rin is at her counter).
@@ -55,7 +59,10 @@ func co_nam_say() -> void:
 func talk(at: Vector3) -> bool:
 	var camera := host.demo_camera
 	if ut and ut.seated() and ut.talk.can_talk(at, camera):
-		host._show_note(ut.talk.say())
+		host._show_note(ut.say())
+		return true
+	if bay and bay.present() and bay.talk.can_talk(at, camera):
+		host._show_note(bay.say())
 		return true
 	if ut and ut.ghost_near(at):
 		LookAtSpeaker3D.person(ut.ghost, 1.2)
@@ -72,6 +79,8 @@ func hint(at: Vector3) -> Dictionary:
 	var camera := host.demo_camera
 	if ut and ut.seated() and ut.talk.can_talk(at, camera):
 		return {"at": AnhUtRegular3D.SEAT + Vector3(0, 1.7, 0), "words": "[E] Nói chuyện · Anh Út"}
+	if bay and bay.present() and bay.talk.can_talk(at, camera):
+		return bay.hint()
 	if bao.can_talk(at, camera):
 		return {"at": host.bao_model.global_position + Vector3(0, 2.0, 0), "words": "[E] Nói chuyện · Bảo"}
 	return {}

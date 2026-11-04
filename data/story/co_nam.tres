@@ -5,4 +5,4 @@
 [resource]
 script = ExtResource("1_npc")
 speaker = "Cô Năm"
-days = Array[String](["Ba người mất ngoài sương rồi đó con. Ai cũng đổ tại cái sương.", "Bữa ông Tư đi, cô nhớ trời tối om, không thấy trăng đâu hết.", "Thằng con bà Sáu vớt được sợi dây neo. Nó nói đầu dây ngọt như dao cắt.", "Bà Sáu nói mấy người mất đều bán cá cho cái bè ngoài kia.", "Cậu gác đèn năm ngoái hay ghé mua dầu. Bữa cuối cậu xin thêm giấy, nói phải ghi lại chuyện gì.", "Thằng Út dạo này dư tiền dữ. Mới đóng thêm sàn bè, giờ có ghe mới.", "Cô xếp sẵn bảy cái hoa đăng rồi. Tối thả cho mấy người chưa về."])
+days = Array[String](["Ba người rồi đó con. Tháng Bảy ma da đói, nó bắt người thế mạng.", "Bữa ông Tư đi trời tối om, không thấy trăng. Cô có cúng cho ổng một mâm rồi.", "Cô cúng ngoài bến ba bữa rồi. Mà sao người ta vẫn mất hoài vậy con?", "Bà Sáu nói mấy người mất đều bán cá cho cái bè ngoài kia.", "Ông gác đèn năm ngoái hay ghé mua dầu. Bữa cuối ổng xin thêm giấy, nói phải ghi lại chuyện gì.", "Thằng Út dạo này dư tiền dữ. Mới đóng thêm sàn bè, giờ có ghe mới.", "Cô xếp sẵn bảy cái hoa đăng rồi. Tối thả cho mấy người chưa về."])

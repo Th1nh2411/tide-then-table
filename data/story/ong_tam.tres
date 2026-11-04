@@ -5,13 +5,13 @@
 [resource]
 script = ExtResource("1_npc")
 speaker = "Ông Tám"
-days = Array[String](["Thúng ông Tư hồi đó cũng tay ông vá. Tháng Bảy ông vá kỹ lắm.", "Hồi nhỏ tháng này bà ông cấm kêu tên nhau ngoài bến. Sợ dưới nước nghe.", "Cúng cô hồn thì rải gạo muối ra đường, cho mấy người không ai nhớ tới.", "Mâm cúng để nguội rồi mới dọn. Giành với họ là mang tội.", "Cậu gác đèn năm ngoái hay ngồi đây với ông. Cậu nói khuya nào cũng thấy ngọn đèn lạ ngoài bè.", "Thằng Hai đi biển khuya qua, tới giờ chưa về. Xe nó còn dựng trước cửa.", "Rằm rồi. Tối nay thả đèn, ai chưa có mồ thì theo ánh đèn mà về."])
+days = Array[String](["Thúng ông Tư hồi đó cũng tay ông vá. Tháng Bảy ma da hay níu mạn, ông vá kỹ lắm.", "Hồi nhỏ tháng này bà ông cấm kêu tên nhau ngoài bến. Ma da nghe được là nó kêu theo.", "Cúng cô hồn thì rải gạo muối ra đường, cho mấy người không ai nhớ tới.", "Mâm cúng để nguội rồi mới dọn. Giành với họ là mang tội.", "Người gác đèn năm ngoái hay ngồi đây với ông. Ổng nói khuya nào cũng thấy ngọn đèn lạ ngoài bè.", "Thằng Hai đi biển khuya qua, tới giờ chưa về. Xe nó còn dựng trước cửa.", "Rằm rồi. Tối nay thả đèn, ai chưa có mồ thì theo ánh đèn mà về."])
 after_reset = {
 "bong_cau_tau": "Cái bóng đầu cầu tàu đó... nó đứng chờ, chưa kéo ai xuống bao giờ.",
 "caught": "Khuya qua bây lại gần cái bóng đó phải hông? Thấy lạ thì đứng xa xa, lại gần là nó theo về tới nhà.",
 "calm": "Khuya qua ông thấy có người đứng trước cửa nhà bây. Ướt từ đầu tới chân.",
 "goi_ten": "Tiếng kêu từ dưới nước nghe giống người quen lắm. Hồi đó ông cũng suýt dạ.",
-"hai_dang": "Đèn ngoài mũi đá mà đổi màu... hồi cậu gác đèn mất nó cũng vậy.",
+"hai_dang": "Đèn ngoài mũi đá mà đổi màu... hồi người gác đèn mất nó cũng vậy.",
 "hoa_dang": "Đèn thả ra cứ trôi về chân mình... là dưới đó chưa chịu nhận.",
 "led_chao": "Bảng quán ghi món không ai nấu... ông thấy một lần rồi, hồi còn trai.",
 "mam_cung": "Mâm cơm xô lệch vậy... hồi đó bà ông ngồi canh tới tàn nhang.",

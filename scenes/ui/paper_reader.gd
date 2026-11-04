@@ -13,12 +13,23 @@ signal closed
 var _was_paused := false
 var _layout: Dictionary = {}
 var _ink: Control
+## Pen strokes drawn under the words: point pairs in paper fractions (a sketch map).
+var strokes := PackedVector2Array()
 
 
 static func read(owner: Node, kind: String, title: String, body: String, aside: String = "") -> void:
 	var reader := PaperReader.new()
 	owner.add_child(reader)
 	reader._open(kind, title, body, aside)
+	await reader.closed
+
+
+## The same, with a hand-drawn sketch (`strokes`: line segments as point pairs, paper fractions).
+static func read_sketch(owner: Node, kind: String, title: String, body: String, strokes_: PackedVector2Array) -> void:
+	var reader := PaperReader.new()
+	reader.strokes = strokes_
+	owner.add_child(reader)
+	reader._open(kind, title, body)
 	await reader.closed
 
 
@@ -49,6 +60,8 @@ func _open(kind: String, title: String, body: String, aside: String = "") -> voi
 
 
 func _draw_ink() -> void:
+	for i in range(0, strokes.size() - 1, 2):
+		_ink.draw_line(strokes[i] * _ink.size, strokes[i + 1] * _ink.size, PaperLayout.HAND_INK, maxf(1.0, _ink.size.x * 0.004))
 	for paste: Dictionary in _layout.get("boxes", []):
 		var rect: Rect2 = paste["rect"]
 		_ink.draw_rect(rect, paste["color"])

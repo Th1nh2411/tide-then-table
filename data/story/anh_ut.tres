@@ -5,7 +5,8 @@
 [resource]
 script = ExtResource("1_npc")
 speaker = "Anh Út"
-days = Array[String](["Cá bữa nay ngọt nghe Rin. Ông Tư dạy em lựa cá hả?", "Anh ngồi chỗ này riết, thằng Bảo sắp tính tiền ghế anh rồi.", "Tay anh còn ướt, em cầm tiền giùm anh nghen.", "Cá em câu tươi quá. Bữa nào chèo ra bè anh, anh mua giá cao.", "Đèn hải đăng hồi này chập chờn ghê. Cậu gác đèn mà còn chắc sửa rồi.", "Mai rằm, anh pha bình trà gừng mời em. Lâu rồi chưa ngồi với nhau.", ""])
+days = Array[String](["Ông Tư bị ma da bắt đó em. Tháng Bảy nó đói.|Cá bữa nay ngọt nghe Rin. Ông Tư dạy em lựa cá hả?", "Anh ngồi chỗ này riết, thằng Bảo sắp tính tiền ghế anh rồi.", "Tay anh còn ướt, em cầm tiền giùm anh nghen.", "Cá em câu tươi quá. Bữa nào chèo ra bè anh, anh mua giá cao.", "Đèn hải đăng hồi này chập chờn ghê. Ông gác đèn mà còn thì chắc sửa rồi.", "Mai rằm, anh pha bình trà gừng mời em. Lâu rồi chưa ngồi với nhau.", ""])
 named = {
+"charm": "Nè, bùa trừ ma da. Buộc vô thúng, ma hổng dám lại gần.",
 "ghost": "...chỗ này... có người ngồi rồi..."
 }

@@ -16,6 +16,8 @@ const PIER_POST := Vector3(7.0, 0.12, -9.4)
 const NEAR_LIGHTHOUSE := Vector3(-11.0, -0.2, -4.0)
 const FAR_LIGHTHOUSE := Vector3(30.0, -0.2, -60.0)
 const WATER_Y := -0.35
+## The charm on the pier thúng, from the hull origin: rim top facing the shore, clear of the planks.
+const PIER_CHARM := Vector3(-0.35, 0.42, 1.13)
 
 
 ## The whole waterfront on its own (RamEpilogue3D): light, sea, house, lamps.
@@ -68,6 +70,8 @@ static func build_scenery(host: Node3D) -> void:
 	var weave := HorrorMaterials.tiled("floor_wood_planks", 0.3, Color(0.42, 0.34, 0.26))
 	for mesh in hull.find_children("*", "MeshInstance3D", true, false):
 		(mesh as MeshInstance3D).material_override = weave
+	# Anh Út's green cord on the rim facing the pier (shown once he gave it).
+	ThungCharm3D.tie(host, hull.position + PIER_CHARM, -atan2(PIER_CHARM.z, PIER_CHARM.x))
 	# A small lighthouse on the point, and the far one on Đá Canh Đêm: the dock omens use their beacons.
 	SeaWorldBuilder3D.batch_model(host, "lighthouse", NEAR_LIGHTHOUSE, Vector3(0.6, 0.95, 0.6))
 	SeaWorldBuilder3D.batch_model(host, "lighthouse", FAR_LIGHTHOUSE)

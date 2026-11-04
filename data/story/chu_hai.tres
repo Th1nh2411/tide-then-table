@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_npc")
 speaker = "Chú Hai"
-days = Array[String](["Chú dắt xe ra chợ đây. Xe này đề hoài không nổ.", "Bữa nay cá ngoài bè ăn giá hơn chợ. Chú bán ngoài đó luôn cho khỏe.", "Có dư thùng xốp thì để đó nghe con, chiều chú qua lấy.", "Chủ bè ngoài kia trả giá cao lắm. Bữa nào chú dẫn con ra.", "Khuya nay chú ra khơi một chuyến. Bè ngoài kia hẹn mua hết mẻ.", "", ""])
-nights = Array[String](["Tối rồi hả con. Đèn trên cọc còn sáng, nhìn nó mà về.", "Thằng Tèo nhà bên lại trốn cơm. Má nó kêu khản cổ.", "Tháng này khuya nào chú cũng nghe ai đi ngoài hẻm. Ra coi thì không có ai.", "Bè ngoài kia đèn sáng tới khuya. Chủ bè làm ăn khá thiệt.", "Chú hút hết điếu này rồi đi. Ai hỏi thì nói chú ra bè nghe con.", "", ""])
+days = Array[String](["Chú dắt xe ra chợ đây. Xe này đề hoài không nổ.", "Bữa nay cá ngoài bè ăn giá hơn chợ. Chú bán ngoài đó luôn cho khỏe.", "Dây neo thúng thằng Lành vớt lên, đầu dây cắt ngọt như dao.|Chắc ma da nó cắn. Thôi, nói chi cho xui.", "Chủ bè ngoài kia trả giá cao lắm. Bữa nào chú dẫn con ra.", "Khuya nay chú ra khơi, đem cá ra bè anh Út bán. Ổng hẹn mua hết mẻ.", "", ""])
+nights = Array[String](["Tối rồi hả con. Đèn trên cọc còn sáng, nhìn nó mà về.", "Thằng Tèo nhà bên lại trốn cơm. Má nó kêu khản cổ.", "Tháng này khuya nào chú cũng nghe ai đi ngoài hẻm. Ra coi thì không có ai.", "Bè ngoài kia đèn sáng tới khuya. Chủ bè làm ăn khá thiệt.", "Chú hút hết điếu này rồi đi. Ai hỏi thì nói chú ra bè anh Út nghe con.", "", ""])
 night_omen_lines = {
 "goi_ten": "Hồi nãy ai ngoài bến kêu tên con đó. Giọng nghe lạ hoắc."
 }

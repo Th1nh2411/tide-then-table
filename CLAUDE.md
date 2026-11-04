@@ -206,6 +206,16 @@ Vietnamese, keep code comments in short English.
   shadowless guest, ông Tư's breath behind Rin) turns the view to the speaker:
   `LookAtSpeaker3D.at / person` -> `FirstPersonView3D.look_toward(point, s)`
   (~0.3 s eased, mouse takes over, none while paused / line out fishing).
+- **Story misdirection (horror):** the village blames "ma da bắt người thế
+  mạng" (acts: mùng 9–10 ghosts, 11–12 doubt, 13–14 a man, rằm reveal; PLAN
+  §10 clue table). Anh Út gives Rin a green cord "bùa trừ ma da" on mùng 10
+  (`ThungCharm3D`, loop flag `ut_charm`, shown on the pier / sea thúng); the
+  bodies under his raft all wear it. Chú Bảy (`ChuBay3D` + `ChuBayTalk3D`,
+  data `chu_bay.tres`) is the dead lighthouse keeper as a solid old regular
+  at the corner table: never served, cup always full, damp, remembers loops,
+  sketch to the raft on mùng 11 (diary paper), warns on omen days, meta
+  `uncanny_skip`; Vy's mùng 14 line reveals the table is empty (`note_bay_met`).
+  Never name him the keeper before the reveal; villagers say "ông gác đèn".
 - **People (3D):** every actor is a `PersonRig3D.build(parent, id)` (walk /
   carry / sit / drive_ground_motion API). Rin keeps his own rig
   (`RinPilotVisual`, rin_pilot.glb); every NPC is `PsxCharacterVisual`

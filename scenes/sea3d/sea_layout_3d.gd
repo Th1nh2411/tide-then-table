@@ -31,6 +31,11 @@ const SUBMERGED_PX := [[400, 820, 12], [620, 700, 10], [880, 850, 9], [980, 610,
 	[1100, 300, 12], [300, 160, 11], [1700, 520, 13]]
 
 
+## Flat direction from the dock to the lobster raft (the village's sea shares these axes).
+static func raft_bearing() -> Vector3:
+	return (to_world(RAFT_PX) - to_world(DOCK_PX)).normalized()
+
+
 static func to_world(px: Vector2) -> Vector3:
 	return Vector3((px.x - MAP_PX.x * 0.5) / PX_PER_UNIT, 0.0, (px.y - MAP_PX.y * 0.5) / PX_PER_UNIT)
 

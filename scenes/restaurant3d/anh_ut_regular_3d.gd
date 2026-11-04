@@ -18,6 +18,8 @@ const GHOST_REACH := 2.4
 ## From this day (4 = 12 tháng Bảy) an omen night puts the shadowless guest on his stool.
 @export var ghost_from_day := 4
 @export var ghost_variant := "guest_7"
+## 2 = mùng 10: he hands Rin the charm.
+const CHARM_DAY := 2
 
 var host: RestaurantScene3D
 var ut: PersonRig3D
@@ -88,6 +90,17 @@ func _process(_delta: float) -> void:
 		if on and not _staring and host.demo_camera:
 			_staring = true
 			UncannyActor3D.attach(ghost).stare_at(host.demo_camera, 120.0, 0.8)
+
+
+## E on him: from CHARM_DAY the first line gives Rin the green cord
+## "bùa trừ ma da" (ThungCharm3D.FLAG, a loop flag: given again after a reset).
+func say() -> String:
+	if GameState.day >= CHARM_DAY and not GameState.has_flag(ThungCharm3D.FLAG):
+		GameState.set_flag(ThungCharm3D.FLAG)
+		LookAtSpeaker3D.person(ut, talk.head_height + 0.1)
+		Sfx.play("flip")
+		return LINES.named_line("charm")
+	return talk.say()
 
 
 ## He is on his stool now.

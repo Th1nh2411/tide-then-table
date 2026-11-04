@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="NpcLinesData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/npc_lines_data.gd" id="1_npc"]
+
+[resource]
+script = ExtResource("1_npc")
+speaker = "Chú Bảy"
+days = Array[String](["Chiều nào chú cũng ngồi góc này ngó ra biển. Quen rồi con.|Hồi ông Tư còn trai, ổng chèo thúng lẹ nhứt xóm. Con giống ổng cái lưng.", "Đèn của chú tối nay hơi yếu. Khuya chú phải về châm thêm dầu.|Ông Tư hay đem cá lên đèn cho chú. Hai ông cháu tốt bụng y nhau.", "Ma da hổng có cắt dây đâu con.", "Người ta đổ cho ma da. Ma da đâu có biết lựa người bán cá, con.|Đứng trên đèn ngó xuống, cái gì ngoài biển chú cũng thấy hết.", "Mấy bữa nay chú lên đèn hổng được. Cửa dưới chân đèn ai khoá rồi.|Biển tháng Bảy lạnh lắm con. Lạnh tới trong xương.", "Mai rằm rồi. Chú ngồi đây lâu quá, cũng muốn về.|Cái bè có ngọn đèn xanh đó, con đừng ngó lâu.", "Tối nay chú ra bến đứng. Con đi thì chú đưa đường."])
+named = {
+"again_calm": "Lại gặp con rồi. Bữa trước biển êm mà con hổng ra... có ai tới gõ cửa phải hông?",
+"again_omen": "Lại gặp con rồi. Bữa trước con đi đêm hổng nên đi.",
+"warn": "Tối nay ở nhà đi con."
+}

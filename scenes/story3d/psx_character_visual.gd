@@ -19,9 +19,11 @@ const CAST := {
 	"guest_3": "Character_12", "guest_4": "Character_30_Female",
 	"guest_5": "Character_13", "guest_6": "Character_32_Female",
 	"guest_7": "Character_Male_50", "guest_8": "Character_54_Female",
-	"guest_9": "Character_Male_53", "guest_regular": "Character_Male_50",
+	"guest_9": "Character_Male_34", "guest_regular": "Character_Male_50",
 	"staff": "Character_13", "vy": "Character_30_Female",
 	"vy_sau": "Character_54_Female",
+	# Chú Bảy, the dead regular: his model is kept out of the guest pool.
+	"chu_bay": "Character_Male_53",
 	"drowned_m": "Character_Male_57", "drowned_f": "Character_31_Female",
 }
 
