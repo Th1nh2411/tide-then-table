@@ -16,21 +16,17 @@ func _ready() -> void:
 	add_child(sea)
 	sea.set_physics_process(false)
 	await get_tree().process_frame
-	check(is_equal_approx(float(sea.get("oil_capacity")), 100.0), "sea3d lamp has a fixed tank (no upgrades)")
-	sea.call("_physics_process", 1.0)
-	check(is_equal_approx(float(sea.get("oil")), 100.0), "sea3d dock does not burn oil")
+	check(sea.get("oil") == null and sea.get("oil_capacity") == null, "sea3d has no lamp oil")
 	var boat := sea.get("boat") as CharacterBody3D
 	boat.position = SeaLayout3D.to_world(Vector2(900, 1000))
 	sea.call("_physics_process", 1.0)
-	check(is_equal_approx(float(sea.get("oil")), 100.0 - 100.0 / 240.0), "sea3d sailing uses original oil burn rate")
-	var before := float(sea.get("oil"))
 	var at := boat.position
 	sea.set("fishing", true)
 	sea.call("_physics_process", 1.0)
 	sea.set("fishing", false)
-	check(float(sea.get("oil")) < before and boat.position == at, "sea3d lamp burns while the line is out, the boat holds still")
-	sea.call("_spend_oil", float(sea.get("oil")) - 50.0)
-	check(DayClock.current_minutes > 0.0, "sea3d clock follows the tank fraction")
+	check(boat.position == at and not bool(sea.get("ending")), "sea3d boat holds still while the line is out, the night goes on")
+	var lamp := sea.get("boat_lamp") as SpotLight3D
+	check(lamp != null and lamp.visible and lamp.light_energy > 2.0, "sea3d lamp stays lit at full strength")
 	var school: int = sea.call("_nearest_school_index")
 	check(school >= 0, "sea3d starter boat can reach a fishing school")
 	_check_shoals(sea)

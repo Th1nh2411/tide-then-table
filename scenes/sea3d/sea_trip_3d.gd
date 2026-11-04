@@ -1,7 +1,7 @@
 class_name SeaTrip3D
 extends RefCounted
-## A night trip's start and end in the 3D sea: the night-start lines, lamp
-## oil (clock + light), ending the trip (back to the village's pier at night:
+## A night trip's start and end in the 3D sea: the night-start lines, ending
+## the trip on docking (back to the village's pier at night:
 ## the night counts as "went out" with the basket's fish for LoopCalendar,
 ## judged when Rin wakes) and the whirlpool ending.
 
@@ -16,23 +16,11 @@ static func night_start_lines(sea: SeaScene3D, fog_tonight: bool) -> void:
 		sea._say("Sương phủ kín góc đông bắc... trong đó có ánh sáng gì vậy?", 3.0)
 
 
-static func spend_oil(sea: SeaScene3D, units: float) -> void:
-	sea.oil = maxf(sea.oil - units, 0.0)
-	var fraction := sea.oil / maxf(sea.oil_capacity, 1.0)
-	DayClock.set_progress(1.0 - fraction, DayClock.night_start_hour, DayClock.dawn_hour)
-	if not sea.oil_low_sent and fraction <= 0.25 and sea.oil > 0.0:
-		sea.oil_low_sent = true
-		sea._say("Đèn leo lét rồi... về thôi.", 3.0)
-	if is_instance_valid(sea.boat_lamp):
-		# The sea's edge dims it too (SeaEdge3D).
-		sea.boat_lamp.light_energy = 2.5 * lerpf(0.3, 1.0, clampf(fraction * 2.0, 0.0, 1.0)) * (1.0 - 0.6 * sea.edge_amount)
-
-
-static func end_trip(sea: SeaScene3D, towed: bool) -> void:
+static func end_trip(sea: SeaScene3D) -> void:
 	if sea.ending:
 		return
 	sea.ending = true
-	_go_home(sea, towed)
+	_go_home(sea)
 
 
 ## Đêm âm (DarkNight3D): the light dies, hands take the boat; he never
@@ -47,16 +35,13 @@ static func taken_by_the_sea(sea: SeaScene3D) -> void:
 	if not is_instance_valid(sea) or not sea.is_inside_tree():
 		return
 	GameState.trip_notes.append("Rin không về tới bến.")
-	_go_home(sea, false, true)
+	_go_home(sea, true)
 
 
-## A broken hull gets a free patch; Rin is back on the pier at night and
-## walks home to bed (the morning judges the night). `taken`: the sea took
-## him, nothing comes home: he wakes straight into the (reset) morning.
-static func _go_home(sea: SeaScene3D, towed: bool, taken: bool = false) -> void:
-	if towed:
-		BoatCondition.tow_patch(20.0)
-		GameState.trip_notes.append("Rin được kéo thuyền về bến trong đêm.")
+## Rin is back on the pier at night and walks home to bed (the morning
+## judges the night). `taken`: the sea took him, nothing comes home: he
+## wakes straight into the (reset) morning.
+static func _go_home(sea: SeaScene3D, taken: bool = false) -> void:
 	DayClock.stop()
 	var fish := 0 if taken else sea.rod.basket.count()
 	LoopCalendar.choose(true, fish)

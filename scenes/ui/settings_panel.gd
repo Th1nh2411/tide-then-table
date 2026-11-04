@@ -10,7 +10,7 @@ signal closed
 const KEYS: Array[Array] = [
 	["W A S D", "đi / chèo thúng"], ["Chuột", "nhìn quanh"],
 	["Chuột trái", "quăng câu, giữ để kéo"], ["E", "lấy, mở, hỏi"],
-	["R", "lên bờ (ở bến)"], ["F", "vá thúng (ở bến)"], ["N", "sổ tay"],
+	["R", "lên bờ (ở bến)"], ["N", "sổ tay"],
 	["Alt", "hiện con trỏ"], ["Esc", "tạm dừng"], ["F11", "toàn màn hình"],
 ]
 

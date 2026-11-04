@@ -110,7 +110,7 @@ func _night(sea: Node) -> void:
 	print("SEA | %s | basket %d" % [LoopCalendar.date_text(GameState.day), sea.rod.basket.count()])
 	sea.boat.position = sea.START
 	sea.boat.velocity = Vector3.ZERO
-	sea._end_trip(false)
+	sea._end_trip()
 
 func _service(quan: Node) -> void:
 	await _frames(3)

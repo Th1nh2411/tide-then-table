@@ -66,7 +66,7 @@ func _run() -> void:
 	_check(GameState.caught_species.has(fish.id), "catch reaches persistent Dex")
 	sea.boat.position = sea.START
 	sea.boat.velocity = Vector3.ZERO
-	sea._end_trip(false)
+	sea._end_trip()
 	var pier := await _scene(VILLAGE) as VillageScene3D
 	if not pier:
 		return

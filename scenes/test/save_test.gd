@@ -32,14 +32,12 @@ func _test_round_trip() -> void:
 	GameState.record_catch(_fish("cua"), 3, 1.4)
 	GameState.resume_at = "home"
 	GameState.play_seconds = 1800.5
-	GameState.boat_hp = 55.0
 	GameState.add_day_record({"day": 5, "earned": 300, "rating": 4, "served": 9})
 	_check("save writes file", SaveSystem.save_game(TEST_PATH) and SaveSystem.has_save(TEST_PATH))
 	GameState.reset()
 	_check("load ok", SaveSystem.load_game(TEST_PATH))
 	_check("day", GameState.day == 6)
 	_check("rating", GameState.last_rating == 4)
-	_check("hull", is_equal_approx(GameState.boat_hp, 55.0))
 	_check("story flag", GameState.has_flag("saw_glowing_fish"))
 	_check("dex counts", int(GameState.caught_species.get("cua", 0)) == 3)
 	_check("resume point", GameState.resume_at == "home")
@@ -53,7 +51,8 @@ func _test_round_trip() -> void:
 		and GameState.story_flags.get("fog_omen_day") is int)
 	var data := SaveSystem.to_dict()
 	_check("no money / upgrades / storage in the save", not data.has("money") and not data.has("upgrade_levels")
-		and not data.has("storage") and not data.has("orders") and not data.has("staff") and not data.has("social"))
+		and not data.has("storage") and not data.has("orders") and not data.has("staff") and not data.has("social")
+		and not data.has("boat_hp"))
 
 
 func _test_missing_fields() -> void:
@@ -69,7 +68,7 @@ func _test_wrong_types() -> void:
 	_check("negative day -> 1", GameState.day == 1)
 	_check("bad resume -> home", GameState.resume_at == "home")
 	_check("rating clamped", GameState.last_rating == 5)
-	_check("hull clamped", GameState.boat_hp == BoatCondition.MAX_HP)
+	_check("old hull field ignored", not "boat_hp" in GameState)
 	_check("bad containers ignored", GameState.caught_species.is_empty() and GameState.story_flags.is_empty())
 
 

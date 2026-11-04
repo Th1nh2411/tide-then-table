@@ -19,8 +19,6 @@ var story_flags: Dictionary = {}
 
 ## Stars (1-5) from the last shift; drives customer frequency the next day.
 var last_rating: int = STARTING_RATING
-## Hull condition 0..100 (see BoatCondition). Carries over between days.
-var boat_hp: float = 100.0
 ## fish_id -> how many caught in total (fish names, NEW card, ending card).
 var caught_species: Dictionary = {}
 ## Species id -> biggest size caught (CatchRoll size, 1.0 = average).
@@ -44,7 +42,6 @@ func reset() -> void:
 	day = STARTING_DAY
 	story_flags.clear()
 	last_rating = STARTING_RATING
-	boat_hp = 100.0
 	caught_species.clear()
 	best_sizes.clear()
 	day_history.clear()

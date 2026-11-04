@@ -60,13 +60,12 @@ func _ready() -> void:
 	LoopCalendar.choose(true)
 	failures += _check("rằm, refused + recorded -> end", LoopCalendar.take_result() == LoopCalendar.Result.END)
 	failures += _check("rằm ignores the fish count", LoopCalendar.shop_fish() == 3)
-	GameState.boat_hp = 10.0
 	GameState.play_seconds = 120.0
 	GameState.set_flag("note_paper_1")
 	GameState.set_flag("tip_menu3d")
 	GameState.set_flag("omen_seen")
 	LoopCalendar.reset_loop()
-	failures += _check("reset: back to mùng 9, hull reset", GameState.day == 1 and GameState.boat_hp == 100.0)
+	failures += _check("reset: back to mùng 9", GameState.day == 1)
 	failures += _check("reset keeps notes and play time, drops old tip flags", GameState.has_flag("note_paper_1")
 		and not GameState.has_flag("tip_menu3d") and is_equal_approx(GameState.play_seconds, 120.0))
 	failures += _check("reset forgets the rest, counts loops", not GameState.has_flag("omen_seen") and LoopCalendar.loops() == 1

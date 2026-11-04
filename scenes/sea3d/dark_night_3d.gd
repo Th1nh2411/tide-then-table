@@ -2,10 +2,10 @@ class_name DarkNight3D
 extends Node3D
 ## "Đêm âm" (PLAN §10): Rin went out on a night with an omen. Added by
 ## SeaSetup3D only when LoopCalendar.OMEN_FLAG is set, so calm nights are
-## untouched. Turns the sea wrong (DarkNightLook), burns oil faster, darker
+## untouched. Turns the sea wrong (DarkNightLook), a darker
 ## HorrorBed mix, then haunts the edge of the lamp: knocks on the hull,
 ## whispers, static, a figure on the water, eyes gliding past. After a
-## while away from the dock, far out, low on oil or after a catch, the sea
+## while away from the dock, far out or after a catch, the sea
 ## takes him (SeaTrip3D.taken_by_the_sea); the next morning resets the loop.
 
 const NODE_NAME := "DarkNight"
@@ -13,7 +13,6 @@ const BED := "sea_dark"
 const WHISPERS: Array[String] = ["...về đi...", "...đừng ra xa...", "...hắn đang ở ngoài này..."]
 
 @export var look: DarkNightLook = DarkNightLook.new()
-@export var oil_burn_scale := 2.2
 @export_group("Haunting")
 @export var first_event_seconds := 7.0
 @export var event_gap_min := 6.0
@@ -38,7 +37,6 @@ const WHISPERS: Array[String] = ["...về đi...", "...đừng ra xa...", "...h�
 ## Seconds away from the dock (not fishing / visiting) before the sea takes him.
 @export var taken_after_seconds := 60.0
 @export var taken_distance := 55.0
-@export var taken_oil_fraction := 0.2
 @export var taken_after_catch_seconds := 3.0
 ## >1 plays the ending faster (tests).
 @export var taken_speed := 1.0
@@ -77,7 +75,6 @@ func _ready() -> void:
 	_next_event = first_event_seconds
 	look.apply(sea)
 	_moon = look.build_moon(self)
-	sea.oil_burn_scale *= oil_burn_scale
 	_start_sound.call_deferred()
 
 
@@ -114,10 +111,8 @@ func _process(delta: float) -> void:
 
 ## 0..1 towards the end of the night (the strongest of the triggers).
 func progress() -> float:
-	var oil_fraction := sea.oil / maxf(sea.oil_capacity, 1.0)
-	return clampf(maxf(maxf(away_seconds / taken_after_seconds,
-		sea.boat.position.distance_to(sea.START) / taken_distance),
-		inverse_lerp(1.0, taken_oil_fraction, oil_fraction)), 0.0, 1.0)
+	return clampf(maxf(away_seconds / taken_after_seconds,
+		sea.boat.position.distance_to(sea.START) / taken_distance), 0.0, 1.0)
 
 
 func should_take() -> bool:
@@ -208,7 +203,7 @@ func _on_figure_vanished(seen: bool, kind: DarkNightFigure3D.Kind) -> void:
 		_say_once("swim", "Cái gì vừa lặn xuống vậy?", 2.5)
 
 
-## Lamp goes out for a blink (visibility only: the oil code sets its energy).
+## Lamp goes out for a blink (visibility only: SeaEdge3D sets its energy).
 func _blink() -> void:
 	var lamp := sea.boat_lamp
 	if not is_instance_valid(lamp):

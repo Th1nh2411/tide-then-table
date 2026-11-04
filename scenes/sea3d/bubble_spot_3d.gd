@@ -2,7 +2,7 @@ class_name BubbleSpot3D
 extends Node3D
 ## The only sign of a fish shoal at sea: bubbles rising and popping on the
 ## water. More fish left = more bubbles. Only drawn near the boat, inside the
-## lamp's reach (`view_range`, set by the sea scene from the lamp and oil).
+## lamp's reach (`view_range`, set by the sea scene from the lamp).
 
 const MIN_BUBBLES: int = 3
 const BUBBLES_PER_FISH: int = 2

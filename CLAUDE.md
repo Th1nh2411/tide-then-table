@@ -167,7 +167,13 @@ Vietnamese, keep code comments in short English.
   is held until Rin looks at the basket (`FishBasket3D` in the boat) and
   presses E (prompt "[E] bỏ vào giỏ"); no casting while holding.
   Species / size from `SeaShoals3D` + `CatchRoll`; `GameState.record_catch`
-  still feeds the ending card. The lamp burns while the line is out.
+  still feeds the ending card. The basket shows its fish (no number).
+- **No lamp oil, hull or sea HUD (horror build):** the boat lamp stays lit
+  (only `SeaEdge3D` dims it at the edge), collisions only bounce / rock /
+  splash (`SeaBoatImpact3D`, no damage, no F repair, `BoatCondition` and
+  `GameState.boat_hp` are gone; old saves' "boat_hp" is ignored); the night
+  ends when Rin docks (R) or the sea takes him (omen). `SeaHudView3D` keeps
+  only the "[R] lên bờ" prompt + subtitles; the paddle is `ThungPaddle3D`.
 - **3-fish rule:** a calm night is only right if Rin docks with
   `LoopCalendar.MIN_FISH` (3) in the basket (`SeaTrip3D._go_home` ->
   `LoopCalendar.choose(true, fish)`, flag `night_catch`); staying home or
@@ -261,10 +267,10 @@ Vietnamese, keep code comments in short English.
   couples side by side, out the same way), `GuestSeating3D` (stool sit /
   stand). Party size from `PartyOrders3D.guests`. The omen bike stays empty.
   Test `traffic_check`.
-- Autoloads: `GameState` (day, story_flags, last_rating, boat_hp,
+- Autoloads: `GameState` (day, story_flags, last_rating,
   caught_species, best_sizes, day_history (`earned` only for the ending card),
-  resume_at, trip_notes, play_seconds), `Sfx`, `DayClock` (display-only time of day: driven by
-  `LampOil` at sea and by shift progress in the restaurant; `running` = night
+  resume_at, trip_notes, play_seconds), `Sfx`, `DayClock` (display-only time of day: idle at
+  sea (old 2D: lamp oil), shift progress in the restaurant; `running` = night
   trip in progress), `SceneRouter` (`go_to(path, fade_color)`).
 - Flow (horror build): main menu → the village map (`VillageScene3D`,
   `scenes/village3d/village_scene_3d.tscn`, one first-person map, no scene

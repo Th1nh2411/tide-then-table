@@ -1,16 +1,15 @@
 class_name SeaBoatMover3D
 extends RefCounted
 ## Steering the 3D boat for one physics frame: rowed boats push only while a
-## stroke pulls (RowStroke), motor boats accelerate; a worn hull slows it, collisions bounce it off and damage
-## the hull (SeaBoatImpact3D: spin, rocking, shake, splash), the
+## stroke pulls (RowStroke), motor boats accelerate; collisions bounce it off
+## without damage (SeaBoatImpact3D: spin, rocking, shake, splash), the
 ## edge band pushes it back without a word (SeaEdge3D: fog, dim lamp,
 ## current, the bow turned home), the reach and the map edge clamp it.
 ## State stays on the sea scene (velocity, yaw_velocity, row...): other
 ## helpers read it.
 
 
-## Moves the boat. Returns [forward, forward_speed] for the animation, or
-## an empty array when the hull broke (the trip has ended).
+## Moves the boat. Returns [forward, forward_speed] for the animation.
 static func drive(sea: SeaScene3D, delta: float) -> Array:
 	var boat := sea.boat
 	var data := sea.boat_data
@@ -23,18 +22,17 @@ static func drive(sea: SeaScene3D, delta: float) -> Array:
 			sea._wait_controls_release = false
 		throttle = 0.0
 		steer = 0.0
-	var condition := lerpf(0.6, 1.0, clampf(GameState.boat_hp / 50.0, 0.0, 1.0))
 	if data.rowed:
 		# Paddled: pushed only while a stroke pulls, then it glides and spins down.
 		var push := sea.row.step(delta, throttle, steer, data)
-		boat.velocity += forward * push.x * condition
+		boat.velocity += forward * push.x
 		sea.yaw_velocity += push.y
 		boat.velocity *= exp(-data.glide_drag * delta)
 		sea.yaw_velocity *= exp(-data.spin_drag * delta)
 	else:
 		boat.velocity += forward * throttle * data.acceleration / 10.0 * delta
 		boat.velocity *= exp(-1.15 * delta)
-	boat.velocity = boat.velocity.limit_length(data.max_speed / 10.0 * condition)
+	boat.velocity = boat.velocity.limit_length(data.max_speed / 10.0)
 	var forward_speed := boat.velocity.dot(forward)
 	if not data.rowed:
 		var turn_target := steer * deg_to_rad(data.turn_speed) * (0.35 + minf(absf(forward_speed) / 8.0, 0.65))
@@ -48,14 +46,9 @@ static func drive(sea: SeaScene3D, delta: float) -> Array:
 	boat.position.y = 0.0
 	if boat.get_slide_collision_count() > 0:
 		if before.distance_to(boat.position) < 0.3 and impact_speed > 2.0 and sea.impact_cooldown <= 0.0:
-			BoatCondition.damage(minf(14.0, impact_speed * 1.6))
 			sea.impact_cooldown = 0.85
 			sea._say("Ối... đụng trúng gì rồi.", 1.8)
 		sea.impact.hit(sea, boat.get_slide_collision(0), before_velocity, forward)
-		if GameState.boat_hp <= 0.0:
-			sea._say("Thúng nát rồi... may có người kéo về.", 3.0)
-			sea._end_trip(true)
-			return []
 	_keep_in_bounds(sea)
 	return [forward, forward_speed]
 

@@ -1,6 +1,7 @@
 class_name SeaHud3D
 extends RefCounted
-## HUD (SeaHudView3D: icon chips, the dock prompt, the shared subtitles) and
+## Screen layer (SeaHudView3D: the dock prompt, the shared subtitles; no
+## plank, clock or meters) and
 ## the pause menu of the 3D sea. No markers or place names: the way home is
 ## in the world (SeaLandmarks3D). No how-to pointers: ông Tám tells Rin about
 ## the bubbles at dawn (data/story/ong_tam.tres).

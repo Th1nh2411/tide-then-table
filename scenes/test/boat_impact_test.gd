@@ -22,7 +22,6 @@ func _ready() -> void:
 	var rock: SubmergedRock3D = sea.submerged[0]
 	sea.boat.position = rock.position + Vector3(3.0, 0, 0)
 	sea.boat.rotation.y = PI * 0.5
-	var hp: float = GameState.boat_hp
 	var bounced := false
 	var rocked := 0.0
 	for i in 30:
@@ -33,7 +32,7 @@ func _ready() -> void:
 		bounced = bounced or sea.boat.velocity.x > 0.3
 	check(bounced, "boat bounces back off the rock")
 	check(rocked > 0.03, "hull rocks on impact")
-	check(GameState.boat_hp < hp, "impact still damages the hull")
+	check(not "boat_hp" in GameState, "impacts do no damage (no hull)")
 	for i in 70:
 		await get_tree().physics_frame
 	check(sea.impact.rock.length() < 0.02, "rocking settles")

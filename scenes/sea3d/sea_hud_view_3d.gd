@@ -1,76 +1,28 @@
 class_name SeaHudView3D
 extends Control
-## The 3D sea's HUD, icon first (words in tooltips): a weathered plank top-left
-## with the boat and clock, then meters for lamp oil, hull and the
-## basket (fish count); at the dock the R prompt (InteractPrompt "[R] lên bờ",
-## under the crosshair like every other prompt); Rin's lines on the
-## screen's shared SpeechStrip (unnamed ones are Rin's). No key card: the horror build shows no
-## control hints (the pause menu's settings list the keys).
+## The 3D sea's screen layer: no plank, clock or meters (the lamp stays lit,
+## the basket shows its fish). Only the dock prompt (InteractPrompt "[R] lên
+## bờ", under the crosshair like every other prompt) and Rin's lines on the
+## screen's shared SpeechStrip (unnamed ones are Rin's). No key card: the
+## horror build shows no control hints (the pause menu's settings list the keys).
 ## SeaHud3D.update calls `refresh` every frame.
 
 const SCREEN := Vector2(640, 360)
-## Fish that fill the basket meter (it only shows how full the giỏ looks).
-const BASKET_FULL := 8.0
 
 var speech: SpeechStrip
 var _said: String = ""  # the sea message this HUD last put on the strip
-var _time: Label
-var _boat: Control
-var _oil: MeterBar
-var _hull: MeterBar
-var _hold: MeterBar
-var _fish: Label
 var _prompt: InteractPrompt
 
 
 func _ready() -> void:
 	size = SCREEN
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_build_plank()
 	_prompt = InteractPrompt.new()
 	add_child(_prompt)
 	speech = SpeechStrip.shared(self)
 
 
-func _build_plank() -> void:
-	var parts := HudChips.plank(&"WoodPanel", 6)
-	var panel: PanelContainer = parts[0]
-	panel.position = Vector2(6, 4)
-	add_child(panel)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 3)
-	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	(parts[1] as HBoxContainer).add_child(column)
-	var top := HBoxContainer.new()
-	top.add_theme_constant_override("separation", 7)
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	column.add_child(top)
-	_boat = UiIcons.make("boat", 14, UiIcons.CREAM, Color("3c5e8b"))
-	_boat.mouse_filter = Control.MOUSE_FILTER_PASS
-	top.add_child(_boat)
-	_time = HudChips.stat(top, "clock", Color("a4dddb"), "Giờ", 12)
-	var gauges := HBoxContainer.new()
-	gauges.add_theme_constant_override("separation", 6)
-	gauges.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	column.add_child(gauges)
-	_oil = HudChips.meter(gauges, "lamp", UiIcons.GOLD, "Dầu đèn", Color("de9e41"), 26)
-	_hull = HudChips.meter(gauges, "wrench", Color("c7cfcc"), "Thân thuyền", Color("a8ca58"), 22)
-	_hull.low = 0.3
-	_hull.segments = 4
-	_hold = HudChips.meter(gauges, "fish", Color("73bed3"), "Giỏ cá", Color("73bed3"), 22)
-	_hold.low = 0.0
-	_fish = HudChips.number(10)
-	(_hold.get_parent() as HBoxContainer).add_child(_fish)
-
-
 func refresh(sea: SeaScene3D) -> void:
-	_boat.tooltip_text = sea.boat_data.display_name
-	_time.text = DayClock.get_time_text()
-	_oil.set_value(sea.oil / maxf(sea.oil_capacity, 1.0))
-	_hull.set_value(GameState.boat_hp / 100.0)
-	var fish: int = sea.rod.basket.count() if sea.rod else 0
-	_hold.set_value(clampf(fish / BASKET_FULL, 0.0, 1.0))
-	HudChips.show_number(_fish, fish)
 	_prompt.set_text(dock_prompt(sea), "R")
 	if sea.message.text != _said:
 		speech.retract(_said)  # only this HUD's own line, never another source's

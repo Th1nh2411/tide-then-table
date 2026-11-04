@@ -1,8 +1,8 @@
 class_name FishBasket3D
 extends Node3D
 ## The giỏ cá in the thúng: Rin drops each landed fish in with E while
-## looking at it (Fishing3D). Shows the fish stacked inside and a small
-## count. What it holds on docking is the night's catch (LoopCalendar).
+## looking at it (Fishing3D). Shows the fish stacked inside (no number:
+## looking in is how Rin counts). What it holds on docking is the night's catch (LoopCalendar).
 
 ## Where it sits in the boat (BoatVisual space): low, left of Rin.
 const IN_BOAT := Vector3(-0.15, 0.2, -0.2)
@@ -12,20 +12,13 @@ const HEIGHT := 0.3
 var fish: Array[FishData] = []
 var sizes: Array[float] = []
 var _stack := Node3D.new()
-var _count := Label3D.new()
 
 
 func _ready() -> void:
 	ConceptModel3D.fit(self, "fish_basket", Vector3.ZERO, Vector3(RADIUS * 2.0, HEIGHT * 1.4, RADIUS * 2.0))
 	add_child(_stack)
-	_stack.position.y = HEIGHT + 0.01
-	_count.font_size = 40
-	_count.pixel_size = 0.004
-	_count.outline_size = 10
-	_count.modulate = Color("efe6d2")
-	_count.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	_count.position = Vector3(0, HEIGHT + 0.22, 0)
-	add_child(_count)
+	# On the rim of the (closed-looking) basket model, so a glance shows them.
+	_stack.position.y = HEIGHT * 1.4 - 0.03
 	_refresh()
 
 
@@ -48,12 +41,12 @@ func _refresh() -> void:
 	for child in _stack.get_children():
 		child.queue_free()
 	for i in range(fish.size()):
-		var model := fish_mesh(fish[i], sizes[i] * 0.55)
+		# Head down in the mouth, tail sticking up and out: easy to count at a glance.
+		var model := fish_mesh(fish[i], sizes[i] * 0.75)
 		_stack.add_child(model)
 		var a := float(i) * 2.4
-		model.position = Vector3(cos(a) * 0.08, float(i / 3) * 0.05, sin(a) * 0.08)
-		model.rotation = Vector3(0, a + PI * 0.5, 0)
-	_count.text = str(fish.size()) if not fish.is_empty() else ""
+		model.position = Vector3(cos(a) * 0.05, 0.04 + float(i / 4) * 0.03, sin(a) * 0.05)
+		model.rotation = Vector3(0, a, 0.95)
 
 
 ## Inferred species mesh shared by the hand, basket and restaurant display.

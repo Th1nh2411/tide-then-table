@@ -76,7 +76,6 @@ static func to_dict() -> Dictionary:
 		"day": GameState.day,
 		"story_flags": GameState.story_flags.duplicate(),
 		"last_rating": GameState.last_rating,
-		"boat_hp": GameState.boat_hp,
 		"caught_species": GameState.caught_species.duplicate(),
 		"best_sizes": GameState.best_sizes.duplicate(),
 		"day_history": GameState.day_history.duplicate(true),
@@ -92,9 +91,7 @@ static func apply_dict(data: Dictionary) -> void:
 	var played: Variant = data.get("play_seconds")
 	if _is_number(played):
 		GameState.play_seconds = maxf(float(played), 0.0)
-	var hp: Variant = data.get("boat_hp")
-	if hp is float or hp is int:
-		GameState.boat_hp = clampf(float(hp), 0.0, BoatCondition.MAX_HP)
+	# Old saves may still carry "boat_hp" (no hull any more): ignored.
 
 	var caught: Variant = data.get("caught_species")
 	if caught is Dictionary:

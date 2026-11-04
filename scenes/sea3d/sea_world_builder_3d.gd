@@ -216,7 +216,7 @@ static func build_boat(sea: SeaScene3D) -> void:
 	if sea.boat_data.rowed:
 		# Stands by the right-hand rim so the paddle reaches the water outside it.
 		rider.position.x = 0.6
-		sea.paddle = _build_paddle(rider)
+		sea.paddle = ThungPaddle3D.build(rider)
 	sea.rin_figure = [rider]
 	box(sea.boat_visual, Vector3(0.58, 1.02, -0.85), Vector3(0.08, 0.82, 0.08), "e7d5b3")
 	box(sea.boat_visual, Vector3(0.58, 1.48, -0.85), Vector3(0.33, 0.22, 0.33), "f2d98a")
@@ -233,34 +233,10 @@ static func build_boat(sea: SeaScene3D) -> void:
 	lamp.shadow_enabled = true
 	sea.boat_lamp = lamp
 
-## Paddle held by the rider; pose_rower() puts it through both hands.
-static func _build_paddle(rider: Node3D) -> Node3D:
-	var paddle_node := Node3D.new()
-	paddle_node.name = "Paddle"
-	rider.add_child(paddle_node)
-	# About 2 m long in Rin's space: top hand to the blade in the water outside the rim.
-	box(paddle_node, Vector3(0, -0.86, 0), Vector3(0.035, 1.9, 0.035), "8a5a3b")
-	box(paddle_node, Vector3(0, -1.72, 0), Vector3(0.2, 0.45, 0.03), "a06b45")
-	WorldPresentation3D.cast_shadows(paddle_node)
-	return paddle_node
-
-## Poses Rin's "Row" clip at the stroke phase and lays the paddle through his hands.
-static func pose_rower(sea: SeaScene3D) -> void:
-	if sea.paddle == null or sea.rin_figure.is_empty():
-		return
-	var rider := sea.rin_figure[0] as RinPilotVisual
-	if rider == null or not rider.animation or not rider.animation.has_animation("Row"):
-		return
-	rider.sample_motion("Row", sea.row.phase * rider.animation.get_animation("Row").length)
-	var top := rider.hand_position("L")
-	var down := (rider.hand_position("R") - top).normalized()
-	var side := down.cross(Vector3.UP).normalized() if absf(down.y) < 0.99 else Vector3.RIGHT
-	sea.paddle.transform = Transform3D(Basis(side, -down, side.cross(-down)), top)
-
 ## Bob, whirlpool, wake and the follow camera.
 static func animate(sea: SeaScene3D, delta: float, forward: Vector3, forward_speed: float) -> void:
 	var t := sea.elapsed
-	pose_rower(sea)
+	ThungPaddle3D.pose(sea)
 	sea.boat_visual.position.y = sin(t * 2.5) * 0.06
 	sea.boat_visual.rotation.z = sin(t * 1.8) * 0.025 - sea.yaw_velocity * 0.025
 	sea.boat_visual.rotation.x = sin(t * 2.1) * 0.018 + forward_speed * 0.004

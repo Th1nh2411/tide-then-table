@@ -2,7 +2,7 @@ class_name SeaEdge3D
 extends RefCounted
 ## The night sea's edge, felt instead of told (no line): within MARGIN of the
 ## boat's reach (BoatData.max_depth) or the map's sides the fog thickens, the
-## lamp dims (SeaTrip3D reads `sea.edge_amount`) and a current pushes the
+## lamp dims (`sea.edge_amount`) and a current pushes the
 ## thúng back towards the dock; pressed all the way in, the bow swings round
 ## to the lighthouse on the village point. The hard clamp stays behind it.
 
@@ -12,6 +12,8 @@ const PUSH := 3.2
 const TURN := 1.6
 const EXTRA_FOG := 0.09
 const META := "sea_edge_fog"
+## The boat lamp's energy inside the band (SeaWorldBuilder3D builds it).
+const LAMP_ENERGY := 2.5
 
 
 ## 0 inside, 1 at the edge: how deep the boat at `p` is in the edge band.
@@ -33,6 +35,8 @@ static func step(sea: SeaScene3D, delta: float) -> void:
 	var t := amount(boat.position, SeaLayout3D.reach_z(sea.boat_data.max_depth), half)
 	sea.edge_amount = t
 	_fog(sea, t)
+	if is_instance_valid(sea.boat_lamp):
+		sea.boat_lamp.light_energy = LAMP_ENERGY * (1.0 - 0.6 * t)
 	if t <= 0.0:
 		return
 	var home := sea.START - boat.position

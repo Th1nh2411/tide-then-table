@@ -25,7 +25,6 @@ func _run() -> void:
 	var calm_fog := _fog(calm)
 	var calm_open := (calm.get_node("SeaWater") as SeaWater3D).shader_color("open_color")
 	_check(DarkNight3D.active(calm) == null, "calm night has no đêm âm")
-	_check(is_equal_approx(calm.oil_burn_scale, 1.0), "calm night burns oil normally")
 	_check(Sfx._bed_name == "sea", "calm night plays the 'sea' bed")
 	_check_false_sounds(calm)
 	calm.queue_free()
@@ -43,7 +42,6 @@ func _run() -> void:
 	_check(_fog(sea) > calm_fog * 2.0, "fog is thicker")
 	var dark_open := (sea.get_node("SeaWater") as SeaWater3D).shader_color("open_color")
 	_check(calm_open.a == 0.0 and dark_open == dark.look.water_open, "calm water keeps its colours, đêm âm repaints it")
-	_check(is_equal_approx(sea.oil_burn_scale, dark.oil_burn_scale) and dark.oil_burn_scale > 1.0, "oil burns faster")
 	_check(Sfx._bed_name == DarkNight3D.BED and HorrorBed.MIXES.has(DarkNight3D.BED), "đêm âm plays the 'sea_dark' bed")
 	_check(dark.find_child("RedMoon", false, false) != null, "red moon is up")
 	# Dread grows by day: mùng 10 only sounds; figures far off until 13 tháng Bảy.
