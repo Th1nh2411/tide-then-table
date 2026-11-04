@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="NpcLinesData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/npc_lines_data.gd" id="1_npc"]
+
+[resource]
+script = ExtResource("1_npc")
+speaker = "Anh Út"
+days = Array[String](["Cá bữa nay ngọt nghe Rin. Ông Tư dạy em lựa cá hả?", "Anh ngồi chỗ này riết, thằng Bảo sắp tính tiền ghế anh rồi.", "Tay anh còn ướt, em cầm tiền giùm anh nghen.", "Cá em câu tươi quá. Bữa nào chèo ra bè anh, anh mua giá cao.", "Đèn hải đăng hồi này chập chờn ghê. Cậu gác đèn mà còn chắc sửa rồi.", "Mai rằm, anh pha bình trà gừng mời em. Lâu rồi chưa ngồi với nhau.", ""])
+named = {
+"ghost": "...chỗ này... có người ngồi rồi..."
+}

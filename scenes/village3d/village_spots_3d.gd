@@ -2,8 +2,9 @@ class_name VillageSpots3D
 extends RefCounted
 ## What E does on the village map outside the restaurant's own stations:
 ## in Rin's room the thing he looks at (the door, the morning paper, the
-## "Những điều kiêng" note, the bed once the shift is over), and down on the
-## pier ông Tư's thúng (evening, if he has not been out yet tonight).
+## "Những điều kiêng" note, ông Tư's altar (AltarTu3D: incense + his
+## whisper), the bed once the shift is over), and down on the pier ông Tư's
+## thúng (evening, if he has not been out yet tonight).
 
 const NEWS: NewsData = preload("res://data/story/news.tres")
 const KIENG: NoteData = preload("res://data/story/kieng_note.tres")
@@ -11,9 +12,10 @@ const REACH := 1.3
 const BED_REACH := 1.7
 const THUNG_REACH := 2.2
 const LOOK_DOT := 0.55
-const PROMPTS := {"paper": "E  Đọc báo", "note": "E  Đọc giấy", "bed": "E  Ngủ", "thung": "E  Xuống thúng"}
+const PROMPTS := {"paper": "E  Đọc báo", "note": "E  Đọc giấy", "altar": "E  Thắp nhang", "bed": "E  Ngủ", "thung": "E  Xuống thúng"}
 
 var host: VillageScene3D
+var altar := AltarTu3D.new()
 
 
 func _init(owner: VillageScene3D) -> void:
@@ -26,13 +28,14 @@ func points() -> Dictionary:
 		"door": host.door.aim_point(),
 		"paper": VillageLayout3D.room_point(BedroomBuilder3D.PAPER),
 		"note": VillageLayout3D.room_point(BedroomBuilder3D.NOTE),
+		"altar": VillageLayout3D.room_point(AltarTu3D.AIM),
 	}
 	if host.shift_over:
 		found["bed"] = VillageLayout3D.room_point(BedroomBuilder3D.BED + Vector3(0, 0.5, 0))
 	return found
 
 
-## The thing E acts on now: "door", "paper", "note", "bed", "thung" or "".
+## The thing E acts on now: "door", "paper", "note", "altar", "bed", "thung" or "".
 func target() -> String:
 	if host.player == null or host.demo_camera == null:
 		return ""
@@ -68,6 +71,8 @@ func act(what: String) -> void:
 			read_paper()
 		"note":
 			PaperReader.read(host, "note", KIENG.title, KIENG.body())
+		"altar":
+			altar.light(host)
 		"bed":
 			VillageDay3D.sleep(host)
 		"thung":

@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="LinesData" format=3]
+[gd_resource type="Resource" script_class="NpcLinesData" format=3]
 
-[ext_resource type="Script" path="res://data/resources/lines_data.gd" id="1_lines"]
+[ext_resource type="Script" path="res://data/resources/npc_lines_data.gd" id="1_npc"]
 
 [resource]
-script = ExtResource("1_lines")
+script = ExtResource("1_npc")
 speaker = "Cô Năm"
-lines = Array[String](["Tháng cô hồn rồi đó con. Tối đừng có ai kêu tên cũng dạ nghe chưa.", "Cô bày mâm cúng trước tiệm, đừng có lấy gì trên đó nha.", "Đêm không trăng thì đừng ra khơi. Ông Tư nhà con cũng đi đêm không trăng...", "Ba người mất tích rồi đó. Cái sương ngoài kia nó ăn người hay sao á.", "Thằng Út bè tôm hùm hồi này dư tiền ghê, mua ghe mới nữa."])
+days = Array[String](["Ba người mất ngoài sương rồi đó con. Ai cũng đổ tại cái sương.", "Bữa ông Tư đi, cô nhớ trời tối om, không thấy trăng đâu hết.", "Thằng con bà Sáu vớt được sợi dây neo. Nó nói đầu dây ngọt như dao cắt.", "Bà Sáu nói mấy người mất đều bán cá cho cái bè ngoài kia.", "Cậu gác đèn năm ngoái hay ghé mua dầu. Bữa cuối cậu xin thêm giấy, nói phải ghi lại chuyện gì.", "Thằng Út dạo này dư tiền dữ. Mới đóng thêm sàn bè, giờ có ghe mới.", "Cô xếp sẵn bảy cái hoa đăng rồi. Tối thả cho mấy người chưa về."])

@@ -6,7 +6,8 @@ extends RestaurantScene3D
 ## RestaurantScene3D, so the street keeps its own coordinates and all of its
 ## shift / service / crew / traffic / omen code). Layout: VillageLayout3D;
 ## building: VillageBuilder3D; light by time and zone: VillageLighting3D;
-## E outside the restaurant: VillageSpots3D; sound by area: VillageAudio3D;
+## E outside the restaurant: VillageSpots3D; ông Tám / chú Hai:
+## VillageNpcs3D; sound by area: VillageAudio3D;
 ## day turns: VillageDay3D (each morning reloads this scene).
 ## Morning: Rin wakes in bed (judged night; NightmareWake3D after a reset).
 ## The shift opens when he first walks into the street; after it, night
@@ -34,6 +35,8 @@ var lighting: VillageLighting3D
 var spots: VillageSpots3D
 var sounds := VillageAudio3D.new()
 var dock_omens: DockOmens3D
+## Ông Tám and chú Hai (VillageNpcs3D).
+var npcs: VillageNpcs3D
 ## Evening after a shift: a subtle omen's echo waits for Rin on the waterfront.
 var _echo_pending := false
 
@@ -68,6 +71,7 @@ func _ready() -> void:
 		_start_night()
 	else:
 		_start_morning(result, was_ram)
+	npcs = VillageNpcs3D.attach(self)
 	sounds.update(player.global_position, 0.0)
 	UncannyVillage3D.attach(self)  # wrong-looking things, dosed by day
 
@@ -151,7 +155,7 @@ func _process(delta: float) -> void:
 		_echo_pending = false
 		OmenEcho3D.attach(self, VillageLayout3D.waterfront_point(WaterfrontBuilder3D.PIER_POST) + Vector3(0, 1.0, 0))
 	var what := "" if waking or get_tree().paused else spots.target()
-	text.prompt(spots.prompt(what))
+	text.prompt(npcs.prompt() if what == "" and npcs and not waking else spots.prompt(what))
 
 
 ## E: the room / pier first (VillageSpots3D), else the restaurant's stations.
@@ -161,6 +165,8 @@ func _interact() -> void:
 	var what := spots.target()
 	if what != "":
 		spots.act(what)
+		return
+	if npcs and npcs.interact():
 		return
 	super._interact()
 

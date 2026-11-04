@@ -3,13 +3,16 @@ extends Node3D
 ## The fish side of the restaurant (3-fish rule, LoopCalendar): the tray of
 ## fish Rin brought last night beside Bảo's cart (LoopCalendar.shop_fish),
 ## and Bảo's words once per shift: a grumble the day after Rin stayed home on
-## an omen night (no fish to sell), then asking for tonight's fish.
+## an omen night (no fish to sell) or a word on last night's fish, then
+## asking for tonight's fish.
 
 const NODE_NAME := "ShopFish"
 ## On a stool left of Bảo, against the cart's back corner.
 const TRAY_POSITION := Vector3(0.35, 0, -5.45)
 const ASK_LINE := "Bảo: Tối nay kiếm ít nhất 3 con nghe, mai quán cần cá."
 const GRUMBLE_LINE := "Bảo: Hôm qua mày đi đâu, hết cá bán rồi."
+## Last night's catch is on the tray (data/story/bao.tres "fish").
+const BAO: NpcLinesData = preload("res://data/story/bao.tres")
 
 ## Seconds after the shift opens before Bảo speaks, and between his lines.
 @export var talk_delay := 3.0
@@ -35,6 +38,8 @@ static func bao_lines() -> Array[String]:
 	var said: Array[String] = []
 	if GameState.has_flag(LoopCalendar.NO_FISH_FLAG):
 		said.append(GRUMBLE_LINE)
+	elif LoopCalendar.shop_fish() > 0:
+		said.append(BAO.named_line("fish"))
 	if not RamNight.is_ram():
 		said.append(ASK_LINE)
 	return said

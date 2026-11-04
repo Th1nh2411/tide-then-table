@@ -1,16 +1,14 @@
 class_name RestaurantInteract3D
 extends RefCounted
 ## What E does in the 3D restaurant, by where Rin stands: Cô Năm
-## (she talks, CO_NAM lines), Vy (looked at, hands free: VyTalk3D), tables (serve the carried plate / clean), the
-## plate table and the beer keg (a tower straight into Rin's hands).
+## (she talks, RestaurantRoles3D), Vy (looked at, hands free: VyTalk3D),
+## Bảo / anh Út (looked at, hands free: RestaurantRoles3D), tables (serve
+## the carried plate / clean), the plate table and the beer keg (a tower
+## straight into Rin's hands).
 
 const L = preload("res://scenes/restaurant3d/restaurant_layout_3d.gd")
-const CO_NAM: LinesData = preload("res://data/story/co_nam.tres")
 
 var host: Node3D
-var _co_nam_line := 0
-var _co_nam_omen_said := false
-var _co_nam_ram_said := false
 
 
 func _init(owner: Node3D) -> void:
@@ -19,21 +17,14 @@ func _init(owner: Node3D) -> void:
 
 func interact() -> void:
 	var at: Vector3 = host.player.position
+	var roles := RestaurantRoles3D.of(host)
 	if at.distance_to(L.COUNTER_POSITION) < 2.1:
-		# Rằm first, then tonight's omen, then her usual talk.
-		if RamNight.is_ram() and not _co_nam_ram_said:
-			_co_nam_ram_said = true
-			host._show_note(RamFx3D.LINES.co_nam)
-			return
-		var omen := OmenPicker.tonight()
-		if omen and omen.co_nam_line != "" and not _co_nam_omen_said:
-			_co_nam_omen_said = true
-			host._show_note("%s: %s" % [CO_NAM.speaker, omen.co_nam_line])
-			return
-		host._show_note(CO_NAM.line(_co_nam_line))
-		_co_nam_line += 1
+		if roles:
+			roles.co_nam_say()  # rằm, tonight's omen, then the day's gossip
 		return
 	if not host.shift_running:
+		if roles and host.carrying_table < 0:
+			roles.talk(at)
 		return
 	if host.carrying_table >= 0:
 		var table: int = host.carrying_table
@@ -53,6 +44,8 @@ func interact() -> void:
 	var vy: VyStaff3D = host.vy
 	if vy and vy.talk.can_talk(at, host.demo_camera):
 		host._show_note(vy.talk.say())
+		return
+	if roles and roles.talk(at):
 		return
 	if at_bench:
 		host._pickup_ready()

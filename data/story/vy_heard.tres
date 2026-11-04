@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="NpcLinesData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/npc_lines_data.gd" id="1_npc"]
+
+[resource]
+script = ExtResource("1_npc")
+speaker = "Vy"
+days = Array[String](["", "Bàn ngoài kia nói mấy vụ mất tích toàn rơi vô đêm tối trời. Tui nghe mà nổi da gà.", "Hai ông khách cãi nhau. Ông này nói dây neo bị cắt, ông kia nói sóng giật đứt.", "Bàn ba nói hồi khuya thấy đèn xanh ngoài bè tôm. Tui tưởng đèn câu mực.", "Có bà khách nói năm ngoái cậu gác đèn cũng mất đúng mùa này.", "Mấy ông đánh cá nói ai bán cá cho bè ngoài kia rồi cũng... thôi, tui không kể nữa.", "Khách nói tối nay cả xóm thả hoa đăng. Anh Rin có ra không?"])

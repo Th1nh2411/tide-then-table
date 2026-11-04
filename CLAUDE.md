@@ -194,6 +194,16 @@ Vietnamese, keep code comments in short English.
   profile names ("LeftFoot"); look bones up with `RinPilotVisual.bone("Foot.L")`.
   New model: copy FBX + PNG, `--import`, `tools/psx_chars/set_retarget_import.py`,
   `--import`, add to `CAST`. Test `psx_characters_test`.
+  Roles (PLAN §10 "Vai trò nhân vật"): each villager's E line is data,
+  `data/story/<who>.tres` (`NpcLinesData`: one entry per day, "|" splits
+  lines, omen / night / after-reset variants) shown by `NpcTalk3D` (close +
+  looked at; `VyTalk3D` extends it). Street: `RestaurantRoles3D` (Bảo, Cô
+  Năm, `AnhUtRegular3D` = anh Út at his table every shift, absent on omen
+  nights, a shadowless guest there from day 4); village: `VillageNpcs3D`
+  (ông Tám at dawn on the waterfront, `ChuHai3D` in the lane at dawn / night,
+  gone from day 6, bike left); ông Tư's altar = `AltarTu3D` via
+  `VillageSpots3D`. Same lines after a reset except ông Tám's first one on
+  mùng 9. Test `npc_roles_test`.
 - Autoloads: `GameState` (day, story_flags, last_rating, boat_hp,
   caught_species, best_sizes, day_history (`earned` only for the ending card),
   resume_at, trip_notes, play_seconds), `Sfx`, `DayClock` (display-only time of day: driven by

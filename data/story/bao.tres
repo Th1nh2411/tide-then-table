@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="NpcLinesData" format=3]
+
+[ext_resource type="Script" path="res://data/resources/npc_lines_data.gd" id="1_npc"]
+
+[resource]
+script = ExtResource("1_npc")
+speaker = "Bảo"
+days = Array[String](["Khách bàn nào cũng nhắc ông thứ ba mất tích. Mày bưng đi, đừng đứng nghe.", "Anh Út ngày nào cũng ngồi cái bàn sát bảng, gọi đúng một chai. Khách quen nhứt quán đó.", "Anh Út khen cá mày hoài. Ổng nói muốn mua cho bè ngoài kia.", "Tiền anh Út đưa lúc nào cũng ướt nhẹp. Tao phải hong cạnh bếp.", "Tờ tiền ổng đưa hôm bữa tao hong hai ngày, vẫn còn mùi dầu máy.", "Ổng ngồi quán cả buổi, có đi biển đâu. Sao tiền lúc nào cũng ướt vậy mày?", "Xong ca tao để phần cơm. Nhớ về ăn với tao nghe."])
+omen_lines = {
+"led_chao": "Tao đâu có nấu cháo trắng. Ai đụng cái bảng vậy mày?"
+}
+named = {
+"fish": "Cá mày đem về tao bày lên mâm rồi đó. Tươi rói."
+}

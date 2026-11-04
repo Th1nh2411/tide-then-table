@@ -17,6 +17,7 @@ const FIXED: Array[Rect2] = [
 	Rect2(8.2, -4.7, 3.6, 0.8),     # grocery counter
 	Rect2(-1.95, -7.6, 0.9, 0.8),    # fridge
 	Rect2(2.6, RestaurantLayout3D.CURB_PROP_Z-.2, .4, .4), # string-light pole
+	Rect2(7.85, 1.45, 2.05, 1.5),   # anh Út's table + stool (RamGuest3D.TABLE)
 ]
 
 static var shared: FloorGrid3D

@@ -36,6 +36,10 @@ static func describe(host: Node3D) -> Dictionary:
 		if not cleaning and not plate_ready and vy and vy.talk.can_talk(pos, host.demo_camera):
 			at = vy.rig.position + Vector3(0, 2.0, 0)
 			words = "[E] Nói chuyện · Vy"
+		elif not cleaning and not plate_ready and RestaurantRoles3D.of(host) and not RestaurantRoles3D.of(host).hint(pos).is_empty():
+			var talk: Dictionary = RestaurantRoles3D.of(host).hint(pos)
+			at = talk["at"]
+			words = talk["words"]
 		elif not cleaning:
 			if pos.distance_to(L.PASS_POSITION) < 1.35:
 				at = L.PASS_POSITION + Vector3(0, 1.5, 0)

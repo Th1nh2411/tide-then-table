@@ -105,6 +105,7 @@ func _ready() -> void:
 	RestaurantOmens3D.build(self)
 	RamGuest3D.attach(self)  # rằm only: anh Út and his ginger tea
 	RestaurantFish3D.build(self)  # last night's fish + Bảo asking for tonight's
+	RestaurantRoles3D.attach(self)  # Bảo / Cô Năm / anh Út lines by day (+ his table)
 	_play_arrival.call_deferred()
 	Sfx.ambience("street")
 	Sfx.bed("street")
