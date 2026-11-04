@@ -15,7 +15,8 @@ const PAIR_GAP := 0.55
 ## (its west edge, behind the opposite row) and up the lane from the waterfront.
 const ENTRANCES: Array[Array] = [
 	[Vector3(-27.0, 0, 4.4), Vector3(-19.6, 0, 4.4)],
-	[Vector3(22.3, 0, 21.0), Vector3(22.3, 0, 9.0), Vector3(19.6, 0, 7.5)],
+	# Turn at z 8.0 so the cut to the street stays off the riding lane (z > 8.35).
+	[Vector3(22.3, 0, 21.0), Vector3(22.3, 0, 8.0), Vector3(19.6, 0, 7.5)],
 	[Vector3(31.0, 0, 3.2), Vector3(19.6, 0, 3.2)],
 ]
 ## Pick weights of ENTRANCES (west is the main one).
