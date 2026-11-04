@@ -16,6 +16,7 @@ func _run() -> void:
 	for child in room.get_children():
 		if child is CustomerTraffic3D: traffic = child
 	traffic.set_process(false)
+	traffic.walk_in_share = 0.0  # parking release is checked below
 	await get_tree().process_frame
 	room.orders[0] = {"phase":"waiting"}
 	traffic._process(.016)

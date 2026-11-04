@@ -230,6 +230,14 @@ Vietnamese, keep code comments in short English.
   `GhostCast3D.figure(parent[, id])`: ghost-only ids `ma_da`, `ma_da_b`,
   `drowned_old`, `corpse` + drowned_m/f, POOL rotated, no collider, frozen;
   no primitive figures. Review: `scenes/art_pilots/horror_cast_review.tscn`.
+- **Restaurant guests (3D):** `CustomerTraffic3D` (orchestrator, reads host
+  `orders` / `guests` / `TABLES`): `GuestBikes3D` (slots, riding) +
+  `BikeRider3D` (guest drives, partner pillion, women side-saddle; sit clip
+  lifted onto the seat, driver plays `RideIdle`; get off at the curb / on
+  again), `WalkInGuests3D` (40% walk from the west fog / east bend / lane,
+  couples side by side, out the same way), `GuestSeating3D` (stool sit /
+  stand). Party size from `PartyOrders3D.guests`. The omen bike stays empty.
+  Test `traffic_check`.
   Roles (PLAN §10 "Vai trò nhân vật"): each villager's E line is data,
   `data/story/<who>.tres` (`NpcLinesData`: one entry per day, "|" splits
   lines, omen / night / after-reset variants) shown by `NpcTalk3D` (close +
