@@ -140,7 +140,15 @@ func _physics_process(delta: float) -> void:
 		return
 	var before := player.global_position
 	mover.move(delta)
+	follow_ground()
 	sounds.update(player.global_position, before.distance_to(player.global_position))
+
+
+## Walkers have no gravity: on the beach Rin's feet follow its slope.
+func follow_ground() -> void:
+	var sand := VillageLayout3D.beach_y(player.global_position)
+	if not is_nan(sand):
+		player.global_position.y = sand
 
 
 func _process(delta: float) -> void:

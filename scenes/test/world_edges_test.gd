@@ -4,7 +4,8 @@ extends Node3D
 ## on the normal routes, the fall safety net, the sea's edge pushing back,
 ## real blockers (not only invisible walls) at the visible village edges, and
 ## the dead-end alley's gate (shut, ajar on mùng 13-14, its fog turning Rin
-## back out to the same gate).
+## back out to the same gate), the pier starting on the sand and the beach's
+## slope (Rin walks sand -> pier -> thúng, and stops above the waterline).
 
 var failures := 0
 
@@ -27,6 +28,7 @@ func _run() -> void:
 	await _gate_checks(village, loop)
 	await _fall_checks(village)
 	_edge_checks(village)
+	await _pier_beach_checks(village)
 	village.queue_free()
 	await get_tree().process_frame
 	await _sea_checks()
@@ -153,6 +155,54 @@ func _edge_checks(village: VillageScene3D) -> void:
 	_check(houses == 1, "houses line the east shore path")
 	_check(village.find_children("StreetFacades", "Node3D", true, false).size() == 1 and village.find_children("OppositeRow", "Node3D", true, false).size() == 1, "house rows close both street ends and the far side of the road")
 	_check(village.find_children("Ground", "Node3D", true, false).size() >= 1, "one big ground lies under the village")
+
+
+## The pier starts on the dry sand, Rin walks it out to the thúng on solid
+## planks, and down the beach only to just above the water.
+func _pier_beach_checks(village: VillageScene3D) -> void:
+	var player := village.player
+	village.set_physics_process(false)
+	var w := VillageLayout3D.WATERFRONT
+	var pier_x := w.x + WaterfrontBuilder3D.THUNG.x
+	_check(WaterfrontBuilder3D.PIER_START_Z > ShoreBeach3D.TOP_Z + 0.5, "the pier's shore end lies on the dry sand")
+	var holes := 0
+	var z := VillageLayout3D.GROUND_Z.x + 1.5
+	while z > VillageLayout3D.PIER_END_Z + 0.3:
+		if not _ground_under(Vector3(pier_x, 0, z)):
+			holes += 1
+		z -= 0.25
+	_check(holes == 0, "ground or planks under every step from the sand to the pier end")
+	var walk := await _walk(village, Vector3(pier_x, 0, VillageLayout3D.GROUND_Z.x + 3.0), Vector3(0, 0, -3.0), 8.0)
+	var thung := VillageSpots3D.thung_point()
+	_check(walk[0] and absf(player.global_position.y) < 0.05, "sand -> pier -> pier end without falling or climbing")
+	_check(player.global_position.distance_to(thung) < VillageSpots3D.THUNG_REACH and VillageLayout3D.on_pier(player.global_position), "he ends by the thúng, on the pier")
+	var beach_x := 60.0
+	walk = await _walk(village, Vector3(beach_x, 0, VillageLayout3D.GROUND_Z.x + 1.0), Vector3(0, 0, -3.0), 4.0)
+	var p := player.global_position
+	var water_z := w.z + ShoreBeach3D.z_at_height(beach_x - w.x, WaterfrontBuilder3D.WATER_Y)
+	_check(walk[0] and p.z < VillageLayout3D.GROUND_Z.x - 1.0, "Rin walks a little way down the beach")
+	_check(p.z > water_z and p.y > WaterfrontBuilder3D.WATER_Y and p.y < -0.1, "and stops on the slope above the waterline, feet on the sand")
+	walk = await _walk(village, Vector3(VillageLayout3D.PIER_X.x - 2.0, 0, VillageLayout3D.GROUND_Z.x - 1.2), Vector3(3.0, 0, 0), 2.0)
+	_check(player.global_position.x < VillageLayout3D.PIER_X.x, "the pier's side stops him on the beach")
+	village.set_physics_process(true)
+
+
+## Walks Rin at `velocity` for `seconds` (no gravity, the beach keeps his
+## feet); [never fell, lowest y].
+func _walk(village: VillageScene3D, from: Vector3, velocity: Vector3, seconds: float) -> Array:
+	var player := village.player
+	player.global_position = from
+	await get_tree().physics_frame
+	var net := village.get_node("FallSafety") as FallSafety3D
+	var rescues := net.rescues
+	var low := 0.0
+	for i in int(seconds * 60.0):
+		player.velocity = velocity
+		player.move_and_slide()
+		village.follow_ground()
+		low = minf(low, player.global_position.y)
+		await get_tree().physics_frame
+	return [net.rescues == rescues and low > -0.5, low]
 
 
 func _sea_checks() -> void:

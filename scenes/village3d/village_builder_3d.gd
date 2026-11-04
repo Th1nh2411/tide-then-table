@@ -26,7 +26,10 @@ static func build(host: VillageScene3D) -> void:
 	host.add_child(front)
 	front.position = L.WATERFRONT
 	host.waterfront = front
-	WaterfrontBuilder3D.build_ground(front)
+	var w := Vector2(L.WATERFRONT.x, L.WATERFRONT.z)
+	var headland := Rect2(Vector2(VillageBackdrop3D.HEADLAND_X.x, VillageBackdrop3D.HEADLAND_Z) - w,
+		Vector2(VillageBackdrop3D.HEADLAND_X.y - VillageBackdrop3D.HEADLAND_X.x, VillageBackdrop3D.SHORE_Z - VillageBackdrop3D.HEADLAND_Z))
+	WaterfrontBuilder3D.build_ground(front, Vector2(L.GROUND_X.x, L.BEACH_END_X) - Vector2.ONE * w.x, L.GROUND_X.y - w.x, headland)
 	WaterfrontBuilder3D.build_scenery(front)
 	for bulb: Vector3 in WaterfrontBuilder3D.lamp_posts(front):
 		host.lighting.add_lamp(front, bulb, false)

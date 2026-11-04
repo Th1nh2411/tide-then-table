@@ -5,13 +5,13 @@ extends RefCounted
 ## horizon, rows of houses and roofs behind every street, palms and trees,
 ## and the headland north of the lane. Far things are cheap batched boxes;
 ## the fog does the rest. Coastline: land west of x = 20, the headland to
-## z = HEADLAND_Z for x 20..50, the shore at z = -2.5 east of that.
+## z = HEADLAND_Z for x 20..47, the shore at z = -2.5 east of that.
 
 const B = preload("res://scenes/restaurant3d/restaurant_room_builder_3d.gd")
 const GROUND_TOP := -0.15
 const SHORE_Z := -2.5
 const HEADLAND_Z := -9.0
-const HEADLAND_X := Vector2(20.0, 50.0)
+const HEADLAND_X := Vector2(20.0, 47.0)
 ## [centre x, centre z, width, depth, rows, seed]: blocks of back houses.
 const BACK_BLOCKS := [
 	[-30.0, -26.0, 90.0, 18.0, 2, 1],   # behind the shop row
@@ -48,11 +48,11 @@ static func _ground(root: Node3D) -> void:
 	b.box(earth, Vector3(-90.0, y, 0.0), Vector3(220.0, thick, 400.0))
 	b.box(earth, Vector3(130.0, y, (SHORE_Z + 200.0) * 0.5), Vector3(220.0, thick, 200.0 - SHORE_Z))
 	b.box(earth, Vector3((HEADLAND_X.x + HEADLAND_X.y) * 0.5, y, (HEADLAND_Z + SHORE_Z) * 0.5), Vector3(HEADLAND_X.y - HEADLAND_X.x, thick, SHORE_Z - HEADLAND_Z))
-	# Sand along every shore, a little proud of the earth.
-	b.box(sand, Vector3(160.0, GROUND_TOP + 0.02, SHORE_Z + 1.6), Vector3(160.0, 0.1, 3.2))
-	b.box(sand, Vector3(35.0, GROUND_TOP + 0.02, HEADLAND_Z + 1.2), Vector3(30.0, 0.1, 2.4))
+	# Sand along the shores, a little proud of the earth; the bay's shore and
+	# the headland's sea sides slope on into the water (ShoreBeach3D).
+	b.box(sand, Vector3((HEADLAND_X.x + HEADLAND_X.y) * 0.5, GROUND_TOP + 0.02, HEADLAND_Z + 1.2), Vector3(HEADLAND_X.y - HEADLAND_X.x, 0.1, 2.4))
 	b.box(sand, Vector3(18.8, GROUND_TOP + 0.02, -100.0), Vector3(2.4, 0.1, 182.0))
-	b.box(sand, Vector3(50.0, GROUND_TOP + 0.02, (HEADLAND_Z + SHORE_Z) * 0.5), Vector3(2.4, 0.1, SHORE_Z - HEADLAND_Z))
+	b.box(sand, Vector3(HEADLAND_X.y - 1.2, GROUND_TOP + 0.02, (HEADLAND_Z + SHORE_Z) * 0.5), Vector3(2.4, 0.1, SHORE_Z - HEADLAND_Z))
 	b.commit(root, "Ground", false)
 	# One collider under all the land (the walkers have no gravity; tests and
 	# the fall safety net read it as "ground here").

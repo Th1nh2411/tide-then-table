@@ -30,9 +30,14 @@ static func build(host: Node3D) -> void:
 	for at: Vector3 in [Vector3(49.5, 0, 10.6), Vector3(66.5, 0, 10.8), Vector3(78.5, 0, 10.6)]:
 		ConceptModel3D.spawn(host, "banana_clump", at, 2.6)
 	_wall_x(host, gz.y, gx.x, gx.y)
-	# Shore: the water's edge, open only where the pier starts; the pier's sides and end.
-	_wall_x(host, gz.x, gx.x, L.PIER_X.x)
-	_wall_x(host, gz.x, L.PIER_X.y, EAST_END_X)
+	# Shore: down the beach to just above the waterline (open only where the
+	# pier starts); the pier's sides and end.
+	var stop := L.BEACH_STOP_Z
+	_wall_x(host, gz.x, gx.x, L.BEACH_WEST_X)
+	_wall_z(host, L.BEACH_WEST_X, stop, gz.x)
+	_wall_x(host, stop, L.BEACH_WEST_X, L.PIER_X.x)
+	_wall_x(host, stop, L.PIER_X.y, gx.y)
+	_wall_x(host, gz.x, gx.y, EAST_END_X)
 	_wall_z(host, L.PIER_X.x, L.PIER_END_Z, gz.x)
 	_wall_z(host, L.PIER_X.y, L.PIER_END_Z, gz.x)
 	_wall_x(host, L.PIER_END_Z, L.PIER_X.x, L.PIER_X.y)
@@ -41,7 +46,7 @@ static func build(host: Node3D) -> void:
 	_wall_x(host, EAST_Z.y, gx.y, EAST_END_X)
 	_wall_z(host, EAST_END_X - 20.0, EAST_Z.x, EAST_Z.y)
 	_fence_z(host, gx.y, EAST_Z.y, gz.y)
-	_wall_z(host, gx.y, gz.x, EAST_Z.x)
+	_wall_z(host, gx.y, stop, EAST_Z.x)
 	var x := gx.y + 0.5
 	var i := 4
 	while x < EAST_END_X:
@@ -66,10 +71,10 @@ static func build(host: Node3D) -> void:
 static func _headland(host: Node3D, b: BoxBatch3D) -> void:
 	VillageProps3D.place(host, "vegetable_patch", Vector3(40.0, -0.02, -3.0), Vector3(6.0, 0.4, 3.6), 0.0, b)
 	VillageProps3D.place(host, "shed_tin", Vector3(32.5, -0.02, -4.6), Vector3(3.6, 2.4, 2.6), 0.0, b)
-	VillageProps3D.place(host, "boat_upturned", Vector3(45.0, -0.02, -6.6), Vector3(1.6, 0.9, 4.6), 1.4, b)
+	VillageProps3D.place(host, "boat_upturned", Vector3(43.8, -0.02, -6.6), Vector3(1.6, 0.9, 4.6), 1.4, b)
 	VillageProps3D.place(host, "bamboo_clump", Vector3(24.0, -0.02, -8.0), Vector3(4.0, 8.0, 4.0), 0.0, b)
 	ConceptModel3D.spawn(host, "banana_clump", Vector3(36.5, -0.02, -7.2), 2.8)
-	VillageProps3D.place(host, "coconut_palm", Vector3(47.5, -0.15, -8.2), Vector3(4.0, 10.0, 4.0), 2.6, b)
+	VillageProps3D.place(host, "coconut_palm", Vector3(45.6, -0.15, -7.8), Vector3(4.0, 10.0, 4.0), 2.6, b)
 
 
 ## Bamboo fence along z from z0 to z1 at x (model repeated, one collider).

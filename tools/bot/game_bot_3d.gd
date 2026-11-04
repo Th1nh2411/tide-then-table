@@ -242,7 +242,7 @@ func _run() -> void:
 			_fail("rằm evening without the hoa đăng")
 			return
 		var thung := VillageSpots3D.thung_point()
-		if not _press(village, "thung", thung + Vector3(1.0, 0, 1.0), thung):
+		if not _press(village, "thung", thung + Vector3(0.4, 0, 1.2), thung):
 			return
 		var sea: Node = await _until(SEA)
 		if not sea:

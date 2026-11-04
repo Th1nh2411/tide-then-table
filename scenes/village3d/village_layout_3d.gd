@@ -23,7 +23,14 @@ const SHIFT_X := 18.0
 const GROUND_X := Vector2(47.0, 81.0)
 const GROUND_Z := Vector2(-2.5, 9.5)
 const PIER_X := Vector2(69.1, 70.9)
-const PIER_END_Z := -15.9
+const PIER_START_Z := WATERFRONT.z + WaterfrontBuilder3D.PIER_START_Z
+const PIER_END_Z := WATERFRONT.z + WaterfrontBuilder3D.PIER_END_Z
+## The beach (ShoreBeach3D) runs on east of the waterfront to this world x.
+const BEACH_END_X := 240.0
+## Walkers stop here on the beach's slope, just above the waterline; west
+## of BEACH_WEST_X (the headland's sloped corner) at the old shore line.
+const BEACH_STOP_Z := -4.3
+const BEACH_WEST_X := 50.0
 
 
 static func room_point(local: Vector3) -> Vector3:
@@ -49,7 +56,16 @@ static func in_room(p: Vector3) -> bool:
 
 
 static func on_pier(p: Vector3) -> bool:
-	return p.x > PIER_X.x and p.x < PIER_X.y and p.z < GROUND_Z.x
+	return p.x > PIER_X.x and p.x < PIER_X.y and p.z < PIER_START_Z
+
+
+## Sand height under a walker on the waterfront's beach, NAN elsewhere
+## (and on the pier, whose planks sit at the sand's top).
+static func beach_y(p: Vector3) -> float:
+	if p.x < GROUND_X.x or p.x > GROUND_X.y or p.z > GROUND_Z.x + 1.0 or on_pier(p):
+		return NAN
+	var local := p - WATERFRONT
+	return ShoreBeach3D.height_at(local.x, local.z, GROUND_X.y - WATERFRONT.x)
 
 
 ## "house", "street", "lane" or "waterfront" (sound and light zones).
