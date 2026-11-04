@@ -31,7 +31,7 @@ func interact() -> void:
 		if at.distance_to(L.TABLES[table]) < 2.0:
 			host._serve(table)
 		else:
-			host._show_note("Đem món tới bàn %d." % (table + 1))
+			host._show_note("Món này của bàn %d." % (table + 1))
 		return
 	for i: int in range(host.dirty_tables.size()):
 		if host.dirty_tables[i] and at.distance_to(L.TABLES[i]) < 2.0:
@@ -76,6 +76,6 @@ func beer_poured(table: int) -> void:
 	host.orders[table]["cooked"] = true
 	if host.carrying_table < 0:
 		host.carrying_table = table
-		host._show_note("Đem %s tới bàn %d." % [host.orders[table]["dish"].display_name, table + 1])
+		host._show_note("%s của bàn %d." % [host.orders[table]["dish"].display_name, table + 1])
 	else:
 		host._show_note("Bia bàn %d đã xong!" % (table + 1))

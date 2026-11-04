@@ -50,10 +50,10 @@ static func drive(sea: SeaScene3D, delta: float) -> Array:
 		if before.distance_to(boat.position) < 0.3 and impact_speed > 2.0 and sea.impact_cooldown <= 0.0:
 			BoatCondition.damage(minf(14.0, impact_speed * 1.6))
 			sea.impact_cooldown = 0.85
-			sea._say("Mạn thuyền va vào vật cản!", 1.8)
+			sea._say("Ối... đụng trúng gì rồi.", 1.8)
 		sea.impact.hit(sea, boat.get_slide_collision(0), before_velocity, forward)
 		if GameState.boat_hp <= 0.0:
-			sea._say("Thuyền hỏng rồi. Có người kéo Rin về bến.", 3.0)
+			sea._say("Thúng nát rồi... may có người kéo về.", 3.0)
 			sea._end_trip(true)
 			return []
 	_keep_in_bounds(sea)

@@ -80,10 +80,11 @@ static func _stools(host: Node3D, at: Vector3) -> void:
 		stool.name = "StackedStool_%d" % i
 
 
-## Dark puddles on the road and pavement (rain earlier in the day).
+## Dark puddles on the road and pavement (rain earlier in the day); none in
+## the guests' riding lane / parking row (they read as a mat under the bikes).
 static func _puddles(b: BoxBatch3D) -> void:
 	var water := BoxBatch3D.color("161c22")
-	var spots := [Vector3(-12.0, 0, 15.2), Vector3(5.0, 0, 9.6), Vector3(-34.0, 0, 12.0), Vector3(14.0, 0, 16.0), Vector3(-52.0, 0, 10.5)]
+	var spots := [Vector3(-12.0, 0, 15.2), Vector3(5.0, 0, 13.4), Vector3(-34.0, 0, 12.0), Vector3(14.0, 0, 16.0), Vector3(-52.0, 0, 10.5)]
 	for i in spots.size():
 		var p: Vector3 = spots[i]
 		b.box(water, p + Vector3(0, -0.085, 0), Vector3(1.6 + 0.5 * float(i % 2), 0.02, 0.9 + 0.3 * float(i % 3)), 0.5 * float(i))

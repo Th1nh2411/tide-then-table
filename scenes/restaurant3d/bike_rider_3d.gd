@@ -22,6 +22,14 @@ const SECONDS := 0.7
 const RIDE_CLIP := "RideIdle"
 const REACH_UPPER_ARM := -0.8
 const REACH_FOREARM := 1.1
+## The pillion's clips: the sit clip with the arms resting (no T-pose spread).
+## Directions in the rider's own space (faces +Z), x mirrored per arm (+1 = the
+## arm on +X). Astride: both hands on the thighs. Side-saddle: the arm toward
+## the driver (-X, the bike's front) round his waist, the other on her lap.
+const PILLION_CLIP := "PillionIdle"
+const SIDE_SADDLE_CLIP := "SideSaddleIdle"
+const LAP_ARM: Array[Vector3] = [Vector3(0.1, -0.88, 0.45), Vector3(-0.4, -0.35, 0.85)]
+const HOLD_ARM: Array[Vector3] = [Vector3(0.35, -0.85, 0.35), Vector3(0.75, -0.05, 0.65)]
 
 
 static func actor(person: Node3D) -> PersonRig3D:
@@ -47,12 +55,19 @@ static func mount(person: Node3D, bike: Node3D, index: int) -> void:
 	settle(person, index)
 
 
-## Riding pose once on the seat: hands on the handlebar for the driver.
+## Riding pose once on the seat: hands on the handlebar for the driver,
+## resting (lap / driver's waist) for the pillion.
 static func settle(person: Node3D, index: int) -> void:
 	var rig := actor(person)
 	rig.set_seated(true)
-	if index == 0 and rig.visual() and _ride_clip(rig.visual()):
+	if rig.visual() == null:
+		return
+	if index == 0 and _ride_clip(rig.visual()):
 		rig.visual().set_motion(RIDE_CLIP)
+	elif index == 1:
+		var clip := _pillion_clip(rig.visual(), _side_saddle(person))
+		if clip != "":
+			rig.visual().set_motion(clip)
 
 
 ## Parents `person` to the bike, keeping where it stands; its blob shadow hides.
@@ -126,6 +141,59 @@ static func _ride_clip(visual: RinPilotVisual) -> bool:
 						clip.track_set_key_value(track, key, q * turn)
 	player.get_animation_library("").add_animation(RIDE_CLIP, clip)
 	return true
+
+
+## Builds the pillion clip once per animation player from its SitIdle: each
+## arm bone is turned so it points along LAP_ARM / HOLD_ARM.
+static func _pillion_clip(visual: RinPilotVisual, side_saddle: bool) -> String:
+	var name_ := SIDE_SADDLE_CLIP if side_saddle else PILLION_CLIP
+	var player := visual.animation
+	if player.has_animation(name_):
+		return name_
+	if not player.has_animation("SitIdle"):
+		return ""
+	visual.sample_motion("SitIdle", 0.0)
+	var sk := visual.skeleton
+	var to_sk := (sk.global_basis.inverse() * visual.global_basis).orthonormalized()
+	var clip := player.get_animation("SitIdle").duplicate(true) as Animation
+	for tag: String in ["L", "R"]:
+		var upper := visual.bone("UpperArm." + tag)
+		var fore := visual.bone("Forearm." + tag)
+		var hand := visual.bone("Hand." + tag)
+		if upper < 0 or fore < 0 or hand < 0:
+			continue
+		var pu := sk.get_bone_global_pose(upper).origin
+		var pf := sk.get_bone_global_pose(fore).origin
+		var ph := sk.get_bone_global_pose(hand).origin
+		var s := signf((to_sk.inverse() * pu).x)
+		var dirs := HOLD_ARM if side_saddle and s < 0.0 else LAP_ARM
+		var aim_upper := (to_sk * Vector3(dirs[0].x * s, dirs[0].y, dirs[0].z)).normalized()
+		var aim_fore := (to_sk * Vector3(dirs[1].x * s, dirs[1].y, dirs[1].z)).normalized()
+		# Global turn of the upper arm, then of the forearm after it moved.
+		var turn_upper := Quaternion((pf - pu).normalized(), aim_upper)
+		var parent := _global_rot(sk, sk.get_bone_parent(upper))
+		var local_upper := parent.inverse() * turn_upper * parent * sk.get_bone_pose_rotation(upper)
+		var turn_fore := Quaternion((turn_upper * (ph - pf)).normalized(), aim_fore)
+		var moved := turn_upper * _global_rot(sk, upper)
+		var local_fore := moved.inverse() * turn_fore * moved * sk.get_bone_pose_rotation(fore)
+		_key_rotation(clip, ":" + sk.get_bone_name(upper), local_upper)
+		_key_rotation(clip, ":" + sk.get_bone_name(fore), local_fore)
+	player.get_animation_library("").add_animation(name_, clip)
+	return name_
+
+
+static func _global_rot(sk: Skeleton3D, bone: int) -> Quaternion:
+	if bone < 0:
+		return Quaternion.IDENTITY
+	return sk.get_bone_global_pose(bone).basis.orthonormalized().get_rotation_quaternion()
+
+
+## Every key of the bone's rotation track (path ending in `suffix`) set to `q`.
+static func _key_rotation(clip: Animation, suffix: String, q: Quaternion) -> void:
+	for track in clip.get_track_count():
+		if clip.track_get_type(track) == Animation.TYPE_ROTATION_3D and str(clip.track_get_path(track)).ends_with(suffix):
+			for key in clip.track_get_key_count(track):
+				clip.track_set_key_value(track, key, q.normalized())
 
 
 ## Even guest ids are women (PersonRig3D.next_guest_variant).

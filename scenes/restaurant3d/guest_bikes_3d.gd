@@ -15,6 +15,11 @@ const SPEED := 5.0
 var used_slots: Dictionary = {}
 
 
+## A small soft oval blob under the wheels (the model faces +Z).
+static func ground(bike: Node3D) -> void:
+	ContactShadow3D.attach(bike, 0.26, 3.2, 0.4)
+
+
 func free_slot() -> int:
 	var free: Array[int] = []
 	for i in range(SLOT_XS.size()):
@@ -29,6 +34,7 @@ func ride_in(traffic: CustomerTraffic3D, trip: Dictionary, slot: int) -> void:
 	bike.name = "GuestBike"
 	traffic.add_child(bike)
 	RestaurantBatchVisuals.add(bike, "motorbike", Vector3.ZERO)
+	ground(bike)
 	bike.position = Vector3(WEST_EDGE_X if randf() < 0.5 else EDGE_X, 0, LANE_Z)
 	bike.rotation.y = PI * 0.5 if bike.position.x < 0.0 else -PI * 0.5
 	trip["bike"] = bike

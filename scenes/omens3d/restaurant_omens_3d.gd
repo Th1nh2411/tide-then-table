@@ -48,6 +48,7 @@ func _build_bike() -> void:
 	add_child(bike)
 	bike.position = BIKE_POSITION
 	RestaurantBatchVisuals.add(bike, "motorbike", Vector3.ZERO)
+	GuestBikes3D.ground(bike)
 	if not OmenPicker.is_tonight(BIKE_OMEN):
 		bike.rotation.y = PI * 0.5  # parked along the curb, lights off
 		return
@@ -61,6 +62,22 @@ func _build_bike() -> void:
 	beam.light_energy = 3.0
 	beam.spot_range = 9.0
 	beam.spot_angle = 22.0
-	var puddle := OmenProps3D.box(bike, Vector3(0, 0.006, 0), Vector3(0.9, 0.004, 1.9), "141c24")
-	(puddle.material_override as StandardMaterial3D).roughness = 0.1
+	# Dripped water: a small oval under the front wheel, on the pavement side
+	# of the curb (not a mat under the whole bike).
+	var puddle := MeshInstance3D.new()
+	var oval := CylinderMesh.new()
+	oval.top_radius = 0.3
+	oval.bottom_radius = 0.3
+	oval.height = 0.004
+	oval.radial_segments = 20
+	oval.rings = 1
+	puddle.mesh = oval
+	puddle.scale = Vector3(1.0, 1.0, 1.3)
+	puddle.position = Vector3(0, 0.006, 0.55)
+	puddle.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var wet := StandardMaterial3D.new()
+	wet.albedo_color = Color("141c24")
+	wet.roughness = 0.1
+	puddle.material_override = wet
 	puddle.set_meta(StylePass3D.SKIP, true)  # wet: keeps its shine
+	bike.add_child(puddle)

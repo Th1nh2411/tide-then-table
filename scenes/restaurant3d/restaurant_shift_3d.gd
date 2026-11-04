@@ -43,7 +43,7 @@ func open_shift() -> void:
 	host.seconds_left = SHIFT_SECONDS
 	host.spawn_clock = host.tuning.first_spawn_delay
 	if Guide.once("shift_h2"):
-		host._show_note("Rin: Bảo nấu, mình bưng. Bia lấy ở thùng. T: đóng sớm.")
+		host._show_note("Bảo: Tao nấu, mày bưng giùm. Bia trong thùng đó.")
 
 
 func tick(delta: float) -> void:
@@ -75,5 +75,5 @@ func close_early() -> void:
 	if not host.shift_running or host.seconds_left <= 0.0:
 		return
 	host.seconds_left = 0.0
-	host._show_note("Rin: đóng cửa, phục vụ nốt khách đang ngồi.")
+	host._show_note("Rin: Thôi, nay nghỉ sớm. Làm nốt mấy bàn đang ngồi.")
 

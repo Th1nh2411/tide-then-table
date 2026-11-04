@@ -3,7 +3,8 @@ extends Control
 ## The 3D sea's HUD, icon first (words in tooltips): a weathered plank top-left
 ## with the boat and clock, then meters for lamp oil, hull and the
 ## basket (fish count); the R action as key caps + an icon bottom-right; Rin's lines on the
-## paper SpeechStrip bottom-left; on the first night a small key card.
+## paper SpeechStrip bottom-left. No key card: the horror build shows no
+## control hints (the pause menu's settings list the keys).
 ## SeaHud3D.update calls `refresh` every frame.
 
 const SCREEN := Vector2(640, 360)
@@ -19,7 +20,6 @@ var _hold: MeterBar
 var _fish: Label
 var _prompt: HBoxContainer
 var _prompt_key := ""
-var _keys: PanelContainer
 
 
 func _ready() -> void:
@@ -39,8 +39,6 @@ func _ready() -> void:
 	speech.offset_top = -30
 	speech.offset_bottom = -8
 	speech.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_keys = _key_card()
-	add_child(_keys)
 
 
 func _build_plank() -> void:
@@ -74,23 +72,6 @@ func _build_plank() -> void:
 	(_hold.get_parent() as HBoxContainer).add_child(_fish)
 
 
-## First night only: which key does what, as key caps + icons.
-func _key_card() -> PanelContainer:
-	var card := PanelContainer.new()
-	card.theme_type_variation = &"PaperPanel"
-	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 2)
-	card.add_child(column)
-	for entry: Array in [["WASD", "boat"], ["Chuột", "hook"], ["E", "basket"], ["Esc", "pause"]]:
-		var row := _key_row(str(entry[0]), str(entry[1]), Color("3c5e8b"))
-		column.add_child(row)
-	card.position = Vector2(SCREEN.x - 70.0, 6.0)
-	card.custom_minimum_size.x = 62
-	UiFx.tilt(card, 1.2)
-	return card
-
-
 func _key_row(key: String, icon: String, color: Color) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 3)
@@ -113,7 +94,6 @@ func refresh(sea: SeaScene3D) -> void:
 	var fish: int = sea.rod.basket.count() if sea.rod else 0
 	_hold.set_value(clampf(fish / BASKET_FULL, 0.0, 1.0))
 	HudChips.show_number(_fish, fish)
-	_keys.visible = GameState.is_first_day() and not sea.fishing
 	_set_prompt(_prompt_spec(sea))
 	if sea.message.text != speech.current:
 		if sea.message.text == "":

@@ -63,7 +63,7 @@ func finish_meal(table: int) -> void:
 	host.orders[table] = {}
 	host.dirty_tables[table] = true
 	host.guests[table].visible = false
-	host.order_labels[table].text = "Bàn %d • E dọn" % (table + 1)
+	host.order_labels[table].text = "Bàn %d • chưa dọn" % (table + 1)
 	host._show_note("Cảm ơn khách bàn %d!" % (table + 1))
 	Sfx.play("coins")
 
@@ -85,7 +85,7 @@ func pickup_ready() -> bool:
 	var i := next_ready()
 	if i >= 0:
 		host.carrying_table = i
-		host._show_note("Đem %s tới bàn %d." % [host.orders[i]["dish"].display_name, i + 1])
+		host._show_note("%s của bàn %d." % [host.orders[i]["dish"].display_name, i + 1])
 		return true
 	host._show_note("Bảo: Chưa có món trên bàn nhận.")
 	return false
