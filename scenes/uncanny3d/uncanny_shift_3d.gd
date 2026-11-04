@@ -4,7 +4,8 @@ extends Node
 ## casts no shadow, one keeps turning his head to follow Rin, one holds
 ## still too long, one walks at a few frames a second or slides without a
 ## step, a face breaks into noise for a blink, the lights drop for two
-## frames and a guest is suddenly facing Rin. Plus this loop's subtitle
+## frames and a guest is suddenly facing Rin, a guest walking off (or Bảo
+## at his stove) with the same face on the back of the head. Plus this loop's subtitle
 ## trick (Bảo's line repeated / Rin called "Tư" / a line nobody says) and
 ## anh Út's tiny cues on rằm (eyes following, a smile held a bit too long).
 
@@ -37,7 +38,7 @@ func _ready() -> void:
 	var light: Array = plan.get("light", [])
 	var shift_ids: Array[String] = []
 	for id: String in light:
-		if id in ["missing_shadow", "flicker_pose", "stare", "freeze", "choppy", "wrong_walk", "glitch_face"]:
+		if id in ["missing_shadow", "flicker_pose", "stare", "freeze", "choppy", "wrong_walk", "glitch_face", "two_faces"]:
 			shift_ids.append(id)
 	for i in shift_ids.size():
 		_queue.append([first_at + spread * float(i) / maxf(shift_ids.size(), 1.0), shift_ids[i]])
@@ -89,8 +90,25 @@ func _walker() -> PersonRig3D:
 	return null
 
 
+## Someone Rin sees from behind: a guest walking off, else Bảo at his stove.
+func _back_turned() -> PersonRig3D:
+	for child in host.get_children():
+		if child is CustomerTraffic3D:
+			for trip: Dictionary in (child as CustomerTraffic3D).trips:
+				var walker: Variant = trip.get("walker")
+				if str(trip.get("phase", "")) == "walking_out" and is_instance_valid(walker):
+					var rig := (walker as Node).get_node_or_null("WalkerActor") as PersonRig3D
+					if rig and UncannyDirector.two_faces_ok(rig):
+						return rig
+	if host.bao_model and host.bao_model.visible and UncannyDirector.two_faces_ok(host.bao_model):
+		return host.bao_model
+	return null
+
+
 func _play(id: String) -> bool:
 	var rig := _walker() if id in ["choppy", "wrong_walk"] else _guest()
+	if id == "two_faces":
+		rig = _back_turned()
 	if rig == null:
 		return false
 	var actor := UncannyActor3D.attach(rig)
@@ -107,6 +125,8 @@ func _play(id: String) -> bool:
 			actor.choppy(7.0)
 		"wrong_walk":
 			actor.freeze()  # slides along its path without a step
+		"two_faces":
+			actor.two_faces(true)  # shows once Rin is behind and looks away
 		"glitch_face":
 			actor.glitch_face(true)
 			get_tree().create_timer(0.45).timeout.connect(func() -> void:

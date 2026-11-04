@@ -1,8 +1,10 @@
 extends Node3D
 ## The world's edges (PLAN §10 "Hoàn thiện thế giới"): the fog loop at both
 ## ends of the village keeps Rin's heading and puts him on ground, never fires
-## on the normal routes, the fall safety net, the sea's edge pushing back, and
-## real blockers (not only invisible walls) at the visible village edges.
+## on the normal routes, the fall safety net, the sea's edge pushing back,
+## real blockers (not only invisible walls) at the visible village edges, and
+## the dead-end alley's gate (shut, ajar on mùng 13-14, its fog turning Rin
+## back out to the same gate).
 
 var failures := 0
 
@@ -22,6 +24,7 @@ func _run() -> void:
 	_check(loop != null, "the village has its fog loop")
 	_loop_checks(village, loop)
 	_route_checks(loop)
+	await _gate_checks(village, loop)
 	await _fall_checks(village)
 	_edge_checks(village)
 	village.queue_free()
@@ -80,6 +83,49 @@ func _route_checks(loop: WorldEdgeLoop3D) -> void:
 			fired = true
 	_check(not fired, "street, lane, waterfront, pier and room never count as fog")
 	_check(loop.depth_at(Vector3(-25.0, 0, 5.0)).x < loop.haze_from + 1.5, "the first metres of the west pavement are still clear")
+
+
+func _gate_checks(village: VillageScene3D, loop: WorldEdgeLoop3D) -> void:
+	var gate := loop.gate
+	_check(gate != null and not gate.is_open, "the alley gate is there, chained shut on mùng 9")
+	var X := VillageGateAlley3D.X
+	var at_gate := Vector3((X.x + X.y) * 0.5, 0, VillageGateAlley3D.GATE_Z)
+	var player := village.player
+	_check(not _capsule_free(at_gate, player) and gate.depth_at(at_gate + Vector3(0, 0, 3)) < 0.0, "shut: it blocks the way and its fog is not a loop")
+	var open_days: Array[int] = []
+	for day in range(1, LoopCalendar.NIGHTS + 1):
+		if day in gate.open_days:
+			open_days.append(day)
+	var want: Array[int] = [5, 6]
+	_check(open_days == want, "ajar only on mùng 13-14 (shut again on rằm)")
+	gate.set_open(true)
+	await get_tree().physics_frame
+	_check(_capsule_free(at_gate + Vector3(0.4, 0, 0.0), player), "ajar: Rin fits through")
+	var tries := WorldEdgeLoop3D.gate_tries()
+	var deep := at_gate + Vector3(0.3, 0, gate.loop_depth + 0.2)
+	player.global_position = deep
+	player.rotation.y = 0.0
+	player.velocity = Vector3(0.1, 0, 1.2)
+	loop._process(0.0)
+	var p := player.global_position
+	_check(gate.depth_at(p) > 0.0 and gate.depth_at(p) < gate.loop_depth, "deep in its fog he is still in the fog")
+	_check(is_equal_approx(player.rotation.y, PI) and player.velocity.is_equal_approx(Vector3(-0.1, 0, -1.2)), "turned round: walking back towards the gate")
+	_check(absf((p.x - at_gate.x) + (deep.x - at_gate.x)) < 0.01, "his side of the corridor is mirrored with him")
+	_check(_ground_under(p) and _capsule_free(p, player), "on ground, clear of the walls")
+	_check(WorldEdgeLoop3D.gate_tries() == tries + 1, "the gate's tries are counted")
+	player.global_position = deep
+	loop._process(0.0)
+	_check(loop._gate_signs.has_sign(), "second time: a wrong thing in the gate's fog")
+	player.global_position = Vector3(30.0, 0, VillageLayout3D.LANE_Z)
+	loop._process(0.0)
+	_check(not loop._gate_signs.has_sign() and (village.get_node("RestaurantEnvironment") as WorldEnvironment).environment.fog_density < 0.1, "gone back in the lane, fog normal")
+	var lane_hits := 0
+	for x in range(20, 48):
+		for z: float in [VillageLayout3D.LANE_Z, 1.2, 5.8, 9.0, 14.0]:
+			if gate.depth_at(Vector3(x, 0, z)) >= 0.0:
+				lane_hits += 1
+	_check(lane_hits == 0, "the lane and the alley itself never count as the gate's fog")
+	gate.set_open(false)
 
 
 func _fall_checks(village: VillageScene3D) -> void:

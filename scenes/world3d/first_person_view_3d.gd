@@ -45,6 +45,11 @@ func _input(event: InputEvent) -> void:
 		_pitch = clampf(_pitch - motion.relative.y * speed.y, -1.35, 1.35)
 
 
+## Turns the look by `radians` (the alley gate's fog loop turns Rin round).
+func turn(radians: float) -> void:
+	_yaw += radians
+
+
 func _process(_delta: float) -> void:
 	var scene := get_tree().current_scene
 	if scene != _scene:

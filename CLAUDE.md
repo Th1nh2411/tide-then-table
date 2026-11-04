@@ -176,7 +176,11 @@ Vietnamese, keep code comments in short English.
   Test `vy_staff_test`.
 - **Uncanny visuals (PLAN §10 "Dị bằng hình ảnh"):** toolkit in
   `scenes/uncanny3d/` (`UncannyActor3D.attach(rig)`: stare_at / freeze /
-  choppy / glitch_face via SkeletonModifier3Ds; `UncannyMoves3D`;
+  choppy / glitch_face via SkeletonModifier3Ds, `two_faces(on, now)` = the
+  model's own face triangles copied onto the back of the head (`TwoFace3D` +
+  `TwoFaceMesh`, BoneAttachment3D on Head, shows / goes only while Rin is
+  behind and not looking; usable on any PersonRig3D, never anh Út:
+  `UncannyDirector.two_faces_ok`); `UncannyMoves3D`;
   `UnseenTrick3D` + pure `UnseenCheck`; `UncannyScene3D`; `SingleFrameFlash3D`
   obeys `GameSettings.flash_effects()`). What plays when: pure
   `UncannyDirector` (dose in `data/story/uncanny_dose.tres`, never touches
@@ -225,7 +229,11 @@ Vietnamese, keep code comments in short English.
   exists, else a stand-in (`VillageStandins3D` / `VillageNature3D`). Fog loop:
   `WorldEdgeLoop3D` (west pavement x < -20 <-> east shore path x > 81, 25 m
   into the fog = moved to the other one, same heading; tries per day,
-  `VillageFogSigns3D`); `FallSafety3D` (y < -5) in the village and the sea; sea
+  `VillageFogSigns3D`); third loop: the dead-end alley off the lane's south
+  side (`VillageGateAlley3D`, x 38-40.4, gate at z 16.2, chain `GateChain3D`):
+  shut, ajar on `open_days` (mùng 13-14), 20 m into its fog Rin is turned
+  half round (position, yaw, velocity, `FirstPersonView3D.turn`) and walks
+  back out to the same gate; `FallSafety3D` (y < -5) in the village and the sea; sea
   edge `SeaEdge3D` (no line). PsxLook keeps triplanar tiling (`psx_vertex`
   `triplanar`). Restaurant HUD = order slips only. Test `world_edges_test`.
 - Sea view matches the restaurant: the boat camera zooms x2 (Rin is 16x32

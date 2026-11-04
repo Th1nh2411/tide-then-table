@@ -6,7 +6,9 @@ extends Node3D
 ## other path at the mirrored depth, still walking the same way (both run
 ## along -X / +X), so the village simply comes back out of the fog from the
 ## other side. Tries are counted per day (not saved): from the second one a
-## small wrong thing waits in the fog (VillageFogSigns3D).
+## small wrong thing waits in the fog (VillageFogSigns3D). The third loop is
+## the dead-end alley's gate on its open days (VillageGateAlley3D): its fog
+## turns Rin round so he walks back out to the same gate (own try count).
 
 ## [mouth x, direction (+1 east, -1 west), z range] of the two fog paths.
 const WEST_MOUTH := -20.0
@@ -19,9 +21,12 @@ const EAST_MOUTH := 81.0
 ## Depths of the fog sheets hung across each path.
 @export var sheet_depths: Array[float] = [9.0, 14.0, 18.0, 22.0, 26.0, 30.0]
 @export var sheet_alpha := 0.42
+## Fog sheets behind the alley gate (depths behind it; some show through the bars).
+@export var gate_sheet_depths: Array[float] = [1.6, 4.0, 7.0, 10.5, 14.0, 17.5, 21.0, 25.0]
 
 static var _day := -1
 static var _tries := 0
+static var _gate_tries := 0
 
 var host: VillageScene3D
 var west_z := StreetFacades3D.WEST_Z
@@ -30,6 +35,8 @@ var _veil := ColorRect.new()
 var _sheets: Array[MeshInstance3D] = []
 var _sheet_material := StandardMaterial3D.new()
 var _signs: VillageFogSigns3D
+var gate: VillageGateAlley3D
+var _gate_signs := VillageFogSigns3D.new()
 
 
 static func attach(owner: VillageScene3D) -> WorldEdgeLoop3D:
@@ -63,6 +70,15 @@ func _ready() -> void:
 		_sheet(EAST_MOUTH + depth, Vector2(-34.0, 42.0))
 	_signs = VillageFogSigns3D.new()
 	add_child(_signs)
+	gate = host.get_node_or_null("Lane/" + VillageGateAlley3D.NODE_NAME) as VillageGateAlley3D
+	if gate:
+		var x := VillageGateAlley3D.X
+		for depth in gate_sheet_depths:
+			_sheet(0.0, Vector2(x.x - 2.0, x.y + 2.0), Vector3((x.x + x.y) * 0.5, 0, VillageGateAlley3D.GATE_Z + depth))
+		# Signs in a frame whose +X runs into the gate's fog (local z = -world x).
+		_gate_signs.position = Vector3(0, 0, VillageGateAlley3D.GATE_Z)
+		_gate_signs.rotation.y = -PI * 0.5
+		add_child(_gate_signs)
 
 
 ## Soft fog: thick at the bottom middle, fading to nothing at the top and sides.
@@ -77,10 +93,11 @@ func _soft_texture() -> ImageTexture:
 	return ImageTexture.create_from_image(image)
 
 
-## A fog sheet across a path at `x`, spanning z (range), facing along X.
-func _sheet(x: float, z: Vector2) -> void:
+## A fog sheet across a path at `x`, spanning z (range), facing along X;
+## with `across_z` set: across the gate corridor at that point, facing along Z.
+func _sheet(x: float, z: Vector2, across_z := Vector3.INF) -> void:
 	var quad := QuadMesh.new()
-	quad.size = Vector2(z.y - z.x, 20.0)
+	quad.size = Vector2(z.y - z.x, 20.0 if across_z == Vector3.INF else 8.0)
 	var mesh := MeshInstance3D.new()
 	mesh.mesh = quad
 	mesh.material_override = _sheet_material
@@ -88,6 +105,9 @@ func _sheet(x: float, z: Vector2) -> void:
 	add_child(mesh)
 	mesh.position = Vector3(x, 8.0, (z.x + z.y) * 0.5)
 	mesh.rotation.y = PI * 0.5
+	if across_z != Vector3.INF:
+		mesh.position = across_z + Vector3(0, 3.2, 0)
+		mesh.rotation.y = 0.0
 	_sheets.append(mesh)
 
 
@@ -122,9 +142,16 @@ func _process(_delta: float) -> void:
 		_loop(p)
 		p = host.player.global_position
 		at = depth_at(p)
-	host.lighting.set_haze(smoothstep(haze_from, haze_full, at.x) if at.y != 0.0 else 0.0)
-	_veil.modulate.a = smoothstep(veil_from, loop_depth, at.x) * veil_max if at.y != 0.0 else 0.0
+	var in_gate := gate != null and gate.depth_at(p) >= 0.0
+	if in_gate and gate.depth_at(p) >= gate.loop_depth:
+		_loop_gate(p)
+		p = host.player.global_position
+	# The gate's fog thickens like the edges', over its own shorter depth.
+	var depth := at.x if at.y != 0.0 else (gate.depth_at(p) * loop_depth / gate.loop_depth if in_gate else -1.0)
+	host.lighting.set_haze(smoothstep(haze_from, haze_full, depth) if depth >= 0.0 else 0.0)
+	_veil.modulate.a = smoothstep(veil_from, loop_depth, depth) * veil_max if depth >= 0.0 else 0.0
 	_signs.update(p, at)
+	_gate_signs.update(p, Vector2(gate.depth_at(p), 1.0) if in_gate else Vector2.ZERO)
 
 
 func _loop(p: Vector3) -> void:
@@ -132,10 +159,37 @@ func _loop(p: Vector3) -> void:
 	if _day != GameState.day:
 		_day = GameState.day
 		_tries = 0
+		_gate_tries = 0
 	_tries += 1
 	var at := depth_at(host.player.global_position)
 	if _tries >= 2:
-		_signs.show_sign(_tries, at.y, self)
+		var east := at.y > 0.0
+		_signs.show_sign(_tries, at.y, EAST_MOUTH if east else WEST_MOUTH, east_z if east else west_z)
+
+
+## The gate's fog: turned round its middle, heading and speed turned too,
+## and the first-person view with them, so nothing on screen jumps.
+func _loop_gate(p: Vector3) -> void:
+	var player := host.player
+	player.global_position = gate.looped(p)
+	player.rotation.y += PI
+	player.velocity = Vector3(-player.velocity.x, player.velocity.y, -player.velocity.z)
+	var view := SceneRouter.get_node_or_null("FirstPersonView")
+	if view and view.has_method("turn"):
+		view.call("turn", PI)
+	if _day != GameState.day:
+		_day = GameState.day
+		_tries = 0
+		_gate_tries = 0
+	_gate_tries += 1
+	if _gate_tries >= 2:
+		var x := VillageGateAlley3D.X
+		_gate_signs.show_sign(_gate_tries, 1.0, 0.0, Vector2(-x.y, -x.x))
+
+
+## Loops through the alley gate today.
+static func gate_tries() -> int:
+	return _gate_tries if _day == GameState.day else 0
 
 
 func _fog_color() -> Color:

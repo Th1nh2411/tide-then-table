@@ -25,11 +25,13 @@ static func build(host: Node3D) -> void:
 	_brick_wall(lane, brick, 29.1, 34.9, NORTH_Z)
 	_fence(lane, 35.0, L.LANE_END_X, NORTH_Z)
 	_shrine(lane, Vector3(40.5, 0, NORTH_Z + 0.4))
-	# South side: brick wall hiding the road, a house, the banana clump, the fence.
+	# South side: brick wall hiding the road, a house, the dead-end alley with
+	# its iron gate (VillageGateAlley3D), the banana clump, the fence.
 	_brick_wall(lane, brick, 20.0, 30.0, SOUTH_Z)
 	_house(lane, Vector3(34.0, 0, 9.1), Vector3(8.0, 2.8, 5.8), -1.0)
-	_banana(lane, Vector3(39.6, 0, SOUTH_Z - 0.55))
-	_fence(lane, 38.0, L.LANE_END_X, SOUTH_Z)
+	VillageGateAlley3D.build(lane)
+	_banana(lane, Vector3(42.0, 0, SOUTH_Z - 0.55))
+	_fence(lane, VillageGateAlley3D.X.y + 0.25, L.LANE_END_X, SOUTH_Z)
 	for x: float in [27.0, 43.0]:
 		_pole(lane, Vector3(x, 0, SOUTH_Z - 0.35))
 	_wire(lane, Vector3(27.0, 6.6, SOUTH_Z - 0.35), Vector3(43.0, 6.6, SOUTH_Z - 0.35))

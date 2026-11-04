@@ -5,11 +5,13 @@ extends Node3D
 ## the same loop + day, omen nights get movement only), one subtitle trick
 ## per loop, UnseenCheck, the jump-scare gates (ông Tư once, kept through a
 ## reset; never two scares on consecutive days), SubtitleTricks, the flash
-## setting, and the head-look toolkit on a real PSX rig.
+## setting, the head-look toolkit on a real PSX rig, and the two faces
+## (uncanny_two_faces_checks.gd).
 
 const LOOPS := 150
 const SCRATCH := "user://uncanny_test.cfg"
 const MOVEMENT: Array[String] = ["stare", "freeze", "choppy", "wrong_walk", "glitch_face"]
+const TwoFacesChecks = preload("res://scenes/test/uncanny_two_faces_checks.gd")
 
 
 func _ready() -> void:
@@ -20,6 +22,7 @@ func _ready() -> void:
 	failures += _check_subtitles()
 	failures += _check_flash_setting()
 	failures += await _check_head_look()
+	failures += await TwoFacesChecks.run(self, _check)
 	GameState.reset()
 	print("uncanny_test: %s" % ("ALL PASS" if failures == 0 else "%d FAIL" % failures))
 	get_tree().quit(0 if failures == 0 else 1)
