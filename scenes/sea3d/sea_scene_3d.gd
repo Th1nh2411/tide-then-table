@@ -3,7 +3,7 @@ extends Node3D
 ## Night trip in 3D (horror build): the thúng, lamp oil, hull, first-person
 ## rod fishing into a basket. No money, upgrades, weather, nets, phone or
 ## visitable places. Orchestrator: world -> SeaWorldBuilder3D, rod + basket ->
-## Fishing3D, HUD/navigation -> SeaHud3D, steering -> SeaBoatMover3D,
+## Fishing3D, HUD -> SeaHud3D, landmarks -> SeaLandmarks3D, steering -> SeaBoatMover3D,
 ## oil / trip end -> SeaTrip3D, debug keys -> SeaDebug3D.
 
 const ENDING_SCENE := SeaTrip3D.ENDING_SCENE
@@ -35,7 +35,8 @@ var WHIRLPOOL_POS: Vector3 = SeaLayout3D.to_world(SeaLayout3D.WHIRLPOOL_PX)
 var shoals: Array[SeaShoals3D.Shoal] = []
 var _wait_controls_release := false
 var _application_focused := true
-var navigation: Control
+## Lighthouse beams, pier + raft lamps, the dock bell (no HUD navigation).
+var landmarks: SeaLandmarks3D
 var yaw_velocity := 0.0
 ## Paddle strokes of a rowed boat (thúng); its phase also poses Rin and the paddle.
 var row := RowStroke.new()
@@ -82,7 +83,6 @@ func _ready() -> void:
 	SeaHud3D.build_hud(self)
 	SeaHud3D.build_shared_ui(self)
 	SeaSetup3D.build_tools(self)
-	SeaHud3D.build_navigation(self)
 	FallSafety3D.attach(self, boat)
 	DayClock.start_night()
 	var fog_tonight := Story.check_day()
@@ -225,7 +225,3 @@ func _nearest_school_index() -> int:
 			distance = d
 			nearest = i
 	return nearest
-
-
-func navigation_targets() -> Array[Dictionary]:
-	return SeaHud3D.navigation_targets(self)

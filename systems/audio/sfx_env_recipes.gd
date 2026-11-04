@@ -63,6 +63,11 @@ const SOUNDS := {
 		{"at": 0.41, "w": "sine", "f": [1865, 1862], "d": 1.7, "v": 0.06},
 		{"at": 0.7, "w": "sine", "f": [2794, 2790], "d": 1.4, "v": 0.05},
 		{"at": 1.05, "w": "sine", "f": [2349, 2346], "d": 1.5, "v": 0.04}],
+	# The small bell at the pier head (DockBell3D): a soft knock, a low bell
+	# with inharmonic partials, ringing out slowly.
+	"dock_bell": [{"w": "tri", "f": [900, 700], "d": 0.02, "v": 0.05},
+		{"at": 0.0, "w": "sine", "f": [740, 739], "d": 2.6, "v": 0.11}, {"at": 0.0, "w": "sine", "f": [1776, 1772], "d": 1.4, "v": 0.035},
+		{"at": 0.0, "w": "sine", "f": [2420, 2414], "d": 0.7, "v": 0.015}, {"at": 0.0, "w": "sine", "f": [372, 371], "d": 2.2, "v": 0.03, "a": 0.05}],
 	# Bamboo stems rubbing in the wind, then a hollow clack.
 	"bamboo_creak": [{"w": "square", "f": [58, 40], "d": 0.75, "v": 0.14, "lp": 0.18, "a": 0.18, "am": [6.0, 0.6]},
 		{"at": 0.05, "w": "tri", "f": [220, 190], "d": 0.6, "v": 0.035, "lp": 0.25, "a": 0.15},

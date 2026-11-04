@@ -93,7 +93,10 @@ func _process(delta: float) -> void:
 		return
 	_clock += delta
 	var target := 1.0 if key != "" and not get_tree().paused else 0.0
+	var was := _alpha
 	_alpha = move_toward(_alpha, target, delta * (FADE_IN if target > _alpha else FADE_OUT))
+	if was > 0.0 and _alpha <= 0.0:
+		queue_redraw()  # one last empty draw, or the faint last frame stays on screen
 	_next_dip -= delta
 	if _next_dip <= 0.0:
 		_dip = _rng.randf_range(0.04, 0.09)

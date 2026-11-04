@@ -34,6 +34,7 @@ func _ready() -> void:
 	_dead_checks(strip)
 	_box_checks()
 	_prompt_checks()
+	await _shared_checks()
 	_check("portrait slugs", DialoguePortrait.slug("Cô Năm") == "co_nam" and DialoguePortrait.slug("Bảo") == "bao"
 		and DialoguePortrait.slug("Ông Tám") == "ong_tam")
 	var lines := DialogueLibrary.parse("Rin (lo): Sắp hết dầu rồi.")
@@ -121,6 +122,48 @@ func _prompt_checks() -> void:
 	_check("prompt: steady list row sizes itself", steady.custom_minimum_size.x > 20.0 and steady.shown())
 	steady.free()
 	prompt.queue_free()
+
+
+## One strip per screen (Subtitles): every source shares one queue.
+func _shared_checks() -> void:
+	var village := OnScreenText.new()
+	var omens := OnScreenText.new()
+	add_child(village)
+	add_child(omens)
+	var shared := SpeechStrip.shared(self)
+	_check("shared: every source gets the same strip", village.strip() == shared and omens.strip() == shared)
+	omens.ambient("Nhà ai xa xa gọi: \"Tèo ơi!\"", 4.0)
+	shared.say("Bảo: Ra bến đi.", 4.0)
+	await get_tree().process_frame
+	_check("shared: two sources at once, one line on screen", _shown_lines(get_tree().root) == 1)
+	_check("shared: spoken beats ambient", shared.current == "Bảo: Ra bến đi." and shared.queued().is_empty())
+	omens.ambient("Chó sủa xa xa.", 3.0)
+	_check("shared: ambient drops when busy", shared.queued().is_empty())
+	village.say("Rin: Ừ.", 2.0)
+	village.say("Bảo: Nhanh lên.", 2.0)
+	village.say("Rin: Ừ.", 2.0)
+	_check("shared: queue keeps order, same line once", shared.queued() == ["Rin: Ừ.", "Bảo: Nhanh lên."])
+	shared.step(SpeechStrip.MIN_SECONDS + 0.1)
+	_check("shared: the next one follows", shared.current == "Rin: Ừ." and shared.queued() == ["Bảo: Nhanh lên."])
+	shared.retract("Bảo: Nhanh lên.")
+	_check("shared: retract drops only that line", shared.current == "Rin: Ừ." and shared.queued().is_empty())
+	shared.say("Đèn leo lét rồi.", 0.0, {"fallback": "Rin"})
+	shared.step(SpeechStrip.MIN_SECONDS + 0.1)
+	_check("shared: per-line fallback speaker", shared._speaker.text == "Rin:")
+	shared.reset()
+	_check("shared: reset hides at once", not shared.visible and shared.current == "")
+	village.queue_free()
+	omens.queue_free()
+
+
+func _shown_lines(node: Node) -> int:
+	var count := 0
+	var strip := node as SpeechStrip
+	if strip and strip.is_visible_in_tree() and strip.current != "":
+		count += 1
+	for child in node.get_children():
+		count += _shown_lines(child)
+	return count
 
 
 func _box_checks() -> void:

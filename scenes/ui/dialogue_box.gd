@@ -140,6 +140,9 @@ func _open() -> void:
 	if visible:
 		return
 	_enter = 0.0
+	var subtitles := Subtitles.find(get_tree())
+	if subtitles:
+		subtitles.reset()  # same spot on screen: the box's line replaces it
 	_opened_pause = not get_tree().paused
 	get_tree().paused = true
 	show()

@@ -64,4 +64,5 @@ static func gate_closed(host: Node) -> void:
 	over.layer = 31
 	Sfx.play("whisper", 0.0)
 	await RamFx3D.say_lines(over, RamFx3D.LINES.gate_closed, 1.5)
+	(over.strip().get_parent() as CanvasLayer).layer = 20
 	over.queue_free()

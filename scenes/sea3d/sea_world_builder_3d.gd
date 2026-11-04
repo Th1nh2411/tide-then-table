@@ -61,16 +61,6 @@ static func batch_model(parent: Node3D, id: String, position_: Vector3 = Vector3
 	WorldPresentation3D.cast_shadows(visual)
 	return visual
 
-static func label(parent: Node3D, text: String, pos: Vector3, size: int, hex: String) -> void:
-	var l := Label3D.new()
-	l.text = text
-	l.font_size = size
-	l.pixel_size = 0.008
-	l.modulate = Color(hex)
-	l.outline_size = 0
-	parent.add_child(l)
-	l.position = pos
-
 static func build_environment(sea: SeaScene3D) -> void:
 	var world_env := WorldEnvironment.new()
 	var env := Environment.new()
@@ -118,8 +108,6 @@ static func build_world(sea: SeaScene3D) -> void:
 	glow(sea, off + Vector3(-3.5, 2.4, 11.0), "ffc27a", 1.6, 9.0, true)
 	glow(sea, off + Vector3(4.5, 2.4, 11.0), "ffc27a", 1.2, 8.0, false)
 	batch_model(sea, "lighthouse", off + Vector3(-7.8, 0.02, 11.3), Vector3(0.6, 0.95, 0.6))
-	label(sea, "BẾN XÓM ĐÈN", off + Vector3(-2.2, 1.6, 13.1), 30, "e7d5b3")
-	(sea.get_child(sea.get_child_count() - 1) as Label3D).rotation.y = PI  # read from the water
 	var rock_index := 0
 	for rock in SeaLayout3D.rocks():
 		var pos: Vector3 = rock["pos"]
@@ -153,16 +141,13 @@ static func build_world(sea: SeaScene3D) -> void:
 static func build_pois(sea: SeaScene3D) -> void:
 	# Reach points sit in open water. Buildings behind them carry the silhouette.
 	_solid_footprint(sea, batch_model(sea, "whale_shrine", sea.SHRINE_POS + Vector3(-1.4, 0.02, -0.6)))
-	label(sea, "MIẾU CÁ ÔNG", sea.SHRINE_POS + Vector3(-1.4, 2.0, -0.6), 21, "f2d98a")
 	_solid_footprint(sea, batch_model(sea, "lighthouse", sea.LIGHTHOUSE_POS + Vector3(-1.8, 0.02, -0.6)))
-	label(sea, "ĐÁ CANH ĐÊM", sea.LIGHTHOUSE_POS + Vector3(-1.8, 3.5, -0.6), 20, "e7d5b3")
 	_solid_footprint(sea, batch_model(sea, "old_man_hut", sea.HUT_POS + Vector3(-1.4, 0.02, -0.5)))
-	label(sea, "GÒ VỎ ỐC", sea.HUT_POS + Vector3(-1.4, 2.3, -0.5), 20, "f2d98a")
-	label(sea, "BÈ TÔM HÙM ANH ÚT", sea.RAFT_POS + Vector3(0, 2.8, 0), 20, "f2d98a")
 	glow(sea, sea.SHRINE_POS + Vector3(-1.4, 2.2, 0.4), "9fe0d0", 1.4, 9.0, true)
 	glow(sea, sea.LIGHTHOUSE_POS + Vector3(-1.8, 4.0, 0.4), "fff0b0", 2.4, 16.0, true)
 	glow(sea, sea.HUT_POS + Vector3(-1.4, 2.0, 0.5), "ffc27a", 1.4, 8.0, true)
-	glow(sea, sea.RAFT_POS + Vector3(0, 2.2, 0), "ffc27a", 1.4, 8.0, true)
+	# No names over places: the way home is the lights and the bell.
+	sea.landmarks = SeaLandmarks3D.build(sea)
 	if Story.is_fog_open():
 		for i in range(18):
 			var a := TAU * float(i) / 18.0
@@ -171,7 +156,6 @@ static func build_pois(sea: SeaScene3D) -> void:
 			ring.rotation.y = -a
 			sea.whirlpool_marks.append(ring)
 		box(sea, sea.WHIRLPOOL_POS + Vector3(0, 0.22, 0), Vector3(0.5, 0.08, 0.5), "e6f6ff")
-		label(sea, "???", sea.WHIRLPOOL_POS + Vector3(0, 1.2, 0), 28, "5ff2e0")
 
 ## Invisible collider shaped like the model where it meets the water: the
 ## convex outline of its vertices below FOOTPRINT_TOP, as an upright prism

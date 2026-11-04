@@ -2,17 +2,16 @@ class_name OnScreenText
 extends CanvasLayer
 ## Plain words on the screen for the first-person scenes, no box and no
 ## portrait: the interaction prompt under the crosshair (InteractPrompt,
-## "[E] đọc") and spoken / read lines as subtitles (a SpeechStrip: typed in,
-## then faded).
+## "[E] đọc") and spoken / read lines as subtitles through the screen's one
+## shared SpeechStrip (Subtitles: typed in, then faded; one queue for every
+## source). Its `layer` lifts the shared strip when it speaks.
 
 var _prompt := InteractPrompt.new()
-var _strip := SpeechStrip.new()
 
 
 func _ready() -> void:
 	layer = 20
 	add_child(_prompt)
-	add_child(_strip)
 
 
 ## Shows `verb` ("đọc") with `key`, or fades it out with "".
@@ -28,19 +27,31 @@ func prompting() -> String:
 ## "Name: words" or plain words; stays at least `seconds`.
 func say(text: String, seconds: float = 3.0) -> void:
 	if text == "":
-		_strip.clear()
+		strip().clear()
 		return
-	_strip.say(text, seconds)
+	_lift().say(text, seconds)
+
+
+## A background line (a voice far off): dropped when anything else is
+## showing or waiting, cut short by a spoken line.
+func ambient(text: String, seconds: float = 3.0) -> void:
+	_lift().say(text, seconds, {"ambient": true})
 
 
 ## Scripted entry (SpeechStrip.say_as).
 func say_as(speaker: String, text: String, opts: Dictionary = {}) -> void:
-	_strip.say_as(speaker, text, opts)
+	_lift().say_as(speaker, text, opts)
 
 
 func saying() -> String:
-	return _strip.current
+	return strip().current
 
 
 func strip() -> SpeechStrip:
-	return _strip
+	return SpeechStrip.shared(self)
+
+
+func _lift() -> SpeechStrip:
+	var shared := strip()
+	(shared.get_parent() as CanvasLayer).layer = layer
+	return shared

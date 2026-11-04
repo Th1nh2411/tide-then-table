@@ -82,4 +82,4 @@ func _maybe_call() -> void:
 		var calm := OmenPicker.CATALOG.find("goi_ten")
 		if calm:
 			Sfx.play_at("call", HOUSE_VOICE, self, 1.3, 10.0)
-			_text.say(calm.calm_text, 4.0)
+			_text.ambient(calm.calm_text, 4.0)

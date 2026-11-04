@@ -4,24 +4,18 @@ extends Control
 ## outlined text centred low on the screen, the speaker's name just above it
 ## in their colour (SpeakerTable), no box. Each line types in word by word
 ## (SubtitleText), stays for a time based on its length, then fades out.
-## E / click / a queued line skip the typing. Dead speakers (SpeakerTable)
-## tremble in pale blue-grey under the name "...". "Bảo: ..." names Bảo;
-## other lines get `default_speaker` ("" = none). One line at a time, up to
-## MAX_QUEUE waiting.
-## It covers its parent's rect on its own, whatever anchors the owner sets.
+## E / click / a queued line skip the typing. Dead speakers tremble in pale
+## blue-grey under the name "...". "Bảo: ..." names Bảo; other lines get
+## `default_speaker` ("" = none). One line at a time, up to MAX_QUEUE waiting.
+## Game code uses the screen's one strip, `SpeechStrip.shared(node)`.
 
 const MIN_SECONDS := 0.9
 const MAX_QUEUE := 4
 const SPEAKERS: SpeakerTable = preload("res://data/story/speakers.tres")
-## Kept for older callers; colours live in data/story/speakers.tres.
-const NAME_COLORS := {"Rin": Color("4f8fba"), "Bảo": Color("de9e41"), "Mèo": Color("be772b")}
-const OTHER_NAME := Color("c0503f")
 const INK := Color("efe6d2")
 
 ## Speaker for lines without "Name:" (the sea: Rin talking to himself).
 @export var default_speaker: String = ""
-## Kept for older callers; the subtitle is as wide as the screen allows.
-@export var text_width: float = 520.0
 @export var font_size: int = 12
 @export var tuning: SubtitleTuning = SubtitleText.TUNING
 
@@ -34,6 +28,7 @@ var _text: SubtitleText
 var _hold: float = 0.0  # seconds the typed line stays; < 0 = until clear()
 var _shown_for: float = 0.0  # since the line finished typing
 var _queue: Array[Dictionary] = []
+var _line: Dictionary = {}  # the line on screen, resolved
 var _fade: Tween
 
 
@@ -57,29 +52,54 @@ func _ready() -> void:
 	_text.tuning = tuning
 
 
+## The one strip every source shares on this screen (Subtitles).
+static func shared(from: Node) -> SpeechStrip:
+	return Subtitles.of(from)
+
+
 ## Shows a line (or queues it behind the current one); `seconds` <= 0 keeps
-## it until `clear()`, otherwise it stays at least that long.
-func say(words: String, seconds: float = 4.0) -> void:
+## it until `clear()`, otherwise it stays at least that long. `opts` as in
+## `say_as` (e.g. "ambient", "fallback").
+func say(words: String, seconds: float = 4.0, opts: Dictionary = {}) -> void:
 	var speaker := words.get_slice(":", 0)
 	var named := speaker != words and speaker.length() <= 10
 	var text := words.substr(speaker.length() + 1).strip_edges() if named else words
-	say_as(speaker if named else "", text, {"seconds": seconds, "key": words})
+	var full := opts.duplicate()
+	full["seconds"] = seconds
+	full["key"] = words
+	say_as(speaker if named else "", text, full)
 
 
 ## Entry for scripted lines: `opts` may hold "seconds" (float), "dead"
 ## (bool, overrides SpeakerTable), "name" (shown name instead of the
-## speaker's), "key" (what `current` reports; default "Speaker: text").
+## speaker's), "key" (what `current` reports; default "Speaker: text"),
+## "ambient" (drops when busy, cut by any other line), "fallback" (speaker
+## for an unnamed line). Rules: SubtitleLine.decide.
 func say_as(speaker: String, text: String, opts: Dictionary = {}) -> void:
-	var line := _resolve(speaker, text, opts)
-	if line["key"] == current or _queue.any(func(item: Dictionary) -> bool: return item["key"] == line["key"]):
-		return
-	if current != "":
-		_text.finish()  # the next line is waiting: show this one whole
-		if _queue.size() >= MAX_QUEUE:
-			_queue.pop_front()
-		_queue.append(line)
-		return
-	_show_now(line)
+	var line := SubtitleLine.resolve(SPEAKERS, default_speaker, speaker, text, opts)
+	match SubtitleLine.decide(line, _line, _queue):
+		SubtitleLine.Action.SHOW:
+			_show_now(line)
+		SubtitleLine.Action.QUEUE:
+			_text.finish()  # the next line is waiting: show this one whole
+			if _queue.size() >= MAX_QUEUE:
+				_queue.pop_front()
+			_queue.append(line)
+
+
+## Drops one source's own line (on screen or queued), leaving the others.
+func retract(key: String) -> void:
+	_queue = _queue.filter(func(item: Dictionary) -> bool: return item["key"] != key)
+	if current == key:
+		clear_keep_queue()
+
+
+## Lines waiting behind the current one, oldest first (tests).
+func queued() -> Array[String]:
+	var keys: Array[String] = []
+	for item in _queue:
+		keys.append(str(item["key"]))
+	return keys
 
 
 func is_typing() -> bool:
@@ -91,19 +111,8 @@ func skip() -> void:
 	_text.finish()
 
 
-func _resolve(speaker: String, text: String, opts: Dictionary) -> Dictionary:
-	var dead := SPEAKERS.is_dead(speaker) or (speaker == "" and SPEAKERS.is_dead_whisper(text))
-	if opts.has("dead"):
-		dead = bool(opts["dead"])
-	var who := speaker if speaker != "" or dead else default_speaker
-	var shown: String = str(opts.get("name", SPEAKERS.dead_label if dead else who))
-	var key: String = str(opts.get("key", (speaker + ": " + text) if speaker != "" else text))
-	var seconds: Variant = opts.get("seconds", 4.0)
-	return {"key": key, "name": shown, "who": who, "text": text, "dead": dead,
-		"seconds": float(seconds) if (seconds is float or seconds is int) else 4.0}
-
-
 func _show_now(line: Dictionary) -> void:
+	_line = line
 	current = str(line["key"])
 	var dead: bool = line["dead"]
 	var shown: String = line["name"]
@@ -142,8 +151,17 @@ func _place() -> void:
 ## Fades the line away and drops anything queued. A line still typing shows
 ## whole for a moment first.
 func clear() -> void:
-	current = ""
 	_queue.clear()
+	clear_keep_queue()
+
+
+## Fades the current line; a queued one still follows.
+func clear_keep_queue() -> void:
+	current = ""
+	_line = {}
+	if not _queue.is_empty():
+		_show_now(_queue.pop_front())
+		return
 	if not visible:
 		return
 	var grace := 0.0 if instant or not _text.typing() else tuning.clear_grace
@@ -154,9 +172,22 @@ func clear() -> void:
 			hide())
 
 
+## Gone at once, nothing queued (a new scene).
+func reset() -> void:
+	_queue.clear()
+	current = ""
+	_line = {}
+	if _fade:
+		_fade.kill()
+	_text.text = ""
+	hide()
+
+
 func _fade_to(alpha: float, seconds: float, delay: float = 0.0) -> Tween:
 	if _fade:
 		_fade.kill()
+	if not is_inside_tree():  # the shared layer joins the root next frame
+		modulate.a = alpha
 	_fade = create_tween()
 	_fade.tween_property(self, "modulate:a", alpha, seconds).set_delay(delay)
 	return _fade
@@ -188,4 +219,4 @@ func step(seconds: float) -> void:
 		_show_now(_queue.pop_front())
 		return
 	if _hold >= 0.0 and _shown_for >= _hold:
-		clear()
+		clear_keep_queue()

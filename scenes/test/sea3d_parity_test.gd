@@ -100,10 +100,8 @@ func _check_bubbles(sea: Node) -> void:
 		var n := String(node.name).to_lower()
 		if n.contains("buoy") or n.contains("marker") or n.contains("beam"):
 			banned += 1
-	for target: Dictionary in sea.call("navigation_targets"):
-		if str(target["label"]).begins_with("Cá"):
-			banned += 1
 	check(banned == 0, "sea3d has no shoal marker or arrow")
+	_check_landmarks(sea)
 	var spot: BubbleSpot3D = spots[0]
 	var shoal: SeaShoals3D.Shoal = spot.shoal
 	var boat := sea.get("boat") as Node3D
@@ -130,3 +128,30 @@ func _check_bubbles(sea: Node) -> void:
 	for b in spot.bubbles:
 		gone = gone and not b.visible
 	check(gone and not spot.shown, "sea3d bubbles vanish when the shoal is empty")
+
+
+## Diegetic navigation: no HUD markers or floating names; lights + the bell.
+func _check_landmarks(sea: Node) -> void:
+	var texts := 0
+	for node in sea.get_children():  # world text (the basket count / bite "!" belong to the rod)
+		texts += 1 if node is Label3D else 0
+	check(texts == 0 and not sea.has_method("navigation_targets"), "sea3d has no place names or edge markers")
+	var marks := sea.get("landmarks") as SeaLandmarks3D
+	check(marks != null and marks.beams.size() == 2, "sea3d both lighthouses sweep a beam")
+	var pivot: Node3D = marks.beams[0][0] if marks else null
+	var before := pivot.rotation.y if pivot else 0.0
+	if marks:
+		marks._process(0.5)
+	check(pivot != null and not is_equal_approx(pivot.rotation.y, before), "sea3d lighthouse beam turns")
+	var green: bool = marks != null and marks.raft_lamp != null \
+		and (marks.raft_lamp.material_override as StandardMaterial3D).albedo_color.g > 0.9
+	check(green, "sea3d lobster raft keeps a green lamp")
+	var start: Vector3 = sea.get("START")
+	var bell: DockBell3D = marks.bell if marks else null
+	check(bell != null and Vector2(bell.global_position.x - start.x, bell.global_position.z - start.z).length() < 6.0
+		and DockBell3D.RANGE >= 35.0 and DockBell3D.RANGE <= 45.0, "sea3d dock bell hangs at the pier, heard within ~40 m")
+	if bell:
+		var rang := bell.rings
+		bell._process(DockBell3D.EVERY + DockBell3D.JITTER + 0.1)
+		bell._process(DockBell3D.EVERY + DockBell3D.JITTER + 0.1)
+		check(bell.rings > rang, "sea3d dock bell rings every few seconds")

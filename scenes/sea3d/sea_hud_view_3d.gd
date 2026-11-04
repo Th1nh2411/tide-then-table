@@ -4,7 +4,7 @@ extends Control
 ## with the boat and clock, then meters for lamp oil, hull and the
 ## basket (fish count); at the dock the R prompt (InteractPrompt "[R] lên bờ",
 ## under the crosshair like every other prompt); Rin's lines on the
-## paper SpeechStrip bottom-left. No key card: the horror build shows no
+## screen's shared SpeechStrip (unnamed ones are Rin's). No key card: the horror build shows no
 ## control hints (the pause menu's settings list the keys).
 ## SeaHud3D.update calls `refresh` every frame.
 
@@ -13,6 +13,7 @@ const SCREEN := Vector2(640, 360)
 const BASKET_FULL := 8.0
 
 var speech: SpeechStrip
+var _said: String = ""  # the sea message this HUD last put on the strip
 var _time: Label
 var _boat: Control
 var _oil: MeterBar
@@ -28,15 +29,7 @@ func _ready() -> void:
 	_build_plank()
 	_prompt = InteractPrompt.new()
 	add_child(_prompt)
-	speech = SpeechStrip.new()
-	speech.default_speaker = "Rin"
-	speech.text_width = 330.0
-	add_child(speech)
-	speech.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	speech.offset_left = 12
-	speech.offset_top = -30
-	speech.offset_bottom = -8
-	speech.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	speech = SpeechStrip.shared(self)
 
 
 func _build_plank() -> void:
@@ -79,11 +72,11 @@ func refresh(sea: SeaScene3D) -> void:
 	_hold.set_value(clampf(fish / BASKET_FULL, 0.0, 1.0))
 	HudChips.show_number(_fish, fish)
 	_prompt.set_text(dock_prompt(sea), "R")
-	if sea.message.text != speech.current:
-		if sea.message.text == "":
-			speech.clear()
-		else:
-			speech.say(sea.message.text, 0.0)
+	if sea.message.text != _said:
+		speech.retract(_said)  # only this HUD's own line, never another source's
+		_said = sea.message.text
+		if _said != "":
+			speech.say(_said, 0.0, {"fallback": "Rin"})
 
 
 ## "lên bờ" at the dock, unless the fish-in-hand prompt has the crosshair.

@@ -104,14 +104,14 @@ func play_note(sound: String, semitones: float) -> void:
 
 ## One-shot placed in the 3D world at `at` (under `host`, freed when done),
 ## so the player hears where it comes from. Silent when headless.
-func play_at(sound: String, at: Vector3, host: Node3D, pitch: float = 1.0, unit_size: float = 6.0) -> void:
+func play_at(sound: String, at: Vector3, host: Node3D, pitch: float = 1.0, unit_size: float = 6.0, max_distance: float = 80.0) -> void:
 	if silent or not has_sound(sound) or host == null or not host.is_inside_tree():
 		return
 	var player := AudioStreamPlayer3D.new()
 	player.stream = _stream(sound)
 	player.pitch_scale = pitch
 	player.unit_size = unit_size
-	player.max_distance = 80.0
+	player.max_distance = max_distance
 	host.add_child(player)
 	player.global_position = at
 	player.finished.connect(player.queue_free)

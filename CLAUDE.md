@@ -66,6 +66,11 @@ Vietnamese, keep code comments in short English.
   new ones in Rin's voice (first person, short); situational ones say it
   once per trip / shift (oil 25% / 10%, hold 80%, first guest lost, 15% of
   the shift left), never a permanent HUD warning.
+- Subtitles: ONE strip per screen, `SpeechStrip.shared(node)` (`Subtitles` under the root,
+  one queue; never `SpeechStrip.new()` in game code). Named / dead lines beat ambient ones
+  (`OnScreenText.ambient()`: dropped when busy); a source clears only its own line (`retract`).
+- The sea has no HUD markers or place names: the way home is `SeaLandmarks3D` (lighthouse
+  beams, pier lamps, the raft's green lamp) + `DockBell3D` (rings every few s, ~40 m).
 - Keep on-screen text short. No tutorials, pointers, rings / arrows, hint
   cards or how-to lines (the old `Guide` / `SeaGuide` / `RestaurantGuide` /
   `HelpPanel` / "tip_" flags are gone). Guidance is diegetic: a villager says

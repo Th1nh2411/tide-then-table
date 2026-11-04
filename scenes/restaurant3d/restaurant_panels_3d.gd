@@ -35,18 +35,13 @@ func _init(owner: Node3D) -> void:
 func build() -> void:
 	var layer := CanvasLayer.new()
 	host.add_child(layer)
-	_build_note(layer)
+	_note = SpeechStrip.shared(host)
 	_prompt = InteractPrompt.new()
 	layer.add_child(_prompt)
 
 
-## Subtitle line at the bottom: "Bảo: ..." shows "Bảo:" above it in his colour.
-func _build_note(layer: CanvasLayer) -> void:
-	_note = SpeechStrip.new()
-	_note.set_anchors_preset(Control.PRESET_FULL_RECT)
-	layer.add_child(_note)
-
-
+## Subtitle line at the bottom (the screen's shared strip): "Bảo: ..." shows
+## "Bảo:" above it in his colour.
 func say(words: String) -> void:
 	_note.say(words, 4.0)
 
