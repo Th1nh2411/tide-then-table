@@ -19,6 +19,8 @@ import json
 import os
 import shutil
 import time
+import httpx
+from urllib.parse import urlsplit
 from gradio_client import Client, handle_file
 
 SPACE = 'tencent/Hunyuan3D-2.1'
@@ -41,15 +43,35 @@ def wait_job(job, seconds=300):
     return job.result()
 
 
-def returned_file(value):
+def returned_file(value, client, download_dir):
     if isinstance(value, dict):
         value = value.get('value', value.get('path'))
     if isinstance(value, dict):
         value = value.get('path')
     path = Path(value)
-    if not path.is_file():
-        raise FileNotFoundError('Gradio returned no downloaded mesh: '+str(path))
-    return path
+    if path.is_file() and path.resolve().is_relative_to(download_dir.resolve()):
+        return path
+    url = value if str(value).startswith('https://') else client.src.rstrip('/')+'/file='+str(value)
+    if (urlsplit(url).scheme, urlsplit(url).netloc) != (urlsplit(client.src).scheme, urlsplit(client.src).netloc):
+        raise ValueError('Mesh result must belong to the connected Space')
+    target = download_dir/path.name
+    partial = target.with_suffix(target.suffix+'.part')
+    print('Downloading mesh:', path.name, flush=True)
+    for attempt in range(3):
+        try:
+            with httpx.stream('GET', url, headers=client.headers, cookies=client.cookies,
+                              follow_redirects=True, timeout=120.0) as response:
+                response.raise_for_status()
+                with partial.open('wb') as output:
+                    for chunk in response.iter_bytes():
+                        output.write(chunk)
+            partial.replace(target)
+            return target
+        except (httpx.TransportError, httpx.HTTPStatusError):
+            partial.unlink(missing_ok=True)
+            if attempt == 2:
+                raise
+            print('Retrying mesh download (no new GPU job)', attempt+1, flush=True)
 
 
 def digest(path):
@@ -67,6 +89,8 @@ def main():
     parser.add_argument('--seed', type=int, default=1234)
     parser.add_argument('--timeout', type=int, default=300)
     parser.add_argument('--reuse-raw', action='store_true', help='Only reduce a raw result already in the output directory')
+    parser.add_argument('--fresh', action='store_true', help='Ignore a cached remote shape result and generate again')
+    parser.add_argument('--direct-space', action='store_true', help='Connect to the same official Space URL without the Hub runtime lookup')
     args = parser.parse_args()
     assert args.image.is_file(), args.image
     assert args.name.replace('_', '').isalnum(), 'Use a filename ID, not a path'
@@ -88,7 +112,9 @@ def main():
                   'num_chunks': 8000, 'randomize_seed': False}
     provenance_path = out/'hunyuan_provenance.json'
     old = json.loads(provenance_path.read_text()) if provenance_path.exists() else {}
-    record = dict(old) if args.reuse_raw else {}
+    resume_result = (not args.fresh and old.get('input_sha256') == digest(args.image)
+                     and old.get('shape_parameters') == parameters and old.get('shape_result_reference'))
+    record = dict(old) if args.reuse_raw or resume_result else {}
     record.update({'provider': SPACE, 'space': 'https://huggingface.co/spaces/'+SPACE,
                    'client_version': 'gradio-client==1.3.0', 'started_utc': datetime.now(timezone.utc).isoformat(),
                    'input': str(args.image), 'input_sha256': digest(args.image),
@@ -99,14 +125,25 @@ def main():
     try:
         token = os.environ.get('HF_TOKEN') or False
         print('Authentication:', 'HF_TOKEN' if token else 'anonymous', flush=True)
-        client = Client(SPACE, download_files=str(download_dir), hf_token=token, verbose=False)
+        # Large GLB downloads can pause longer than httpx's short default timeout.
+        endpoint = 'https://tencent-hunyuan3d-2-1.hf.space/' if args.direct_space else SPACE
+        client = Client(endpoint, download_files=False, hf_token=token, verbose=False,
+                        httpx_kwargs={'timeout': 120.0})
         if not args.reuse_raw:
-            print('Submitting shape:', args.image, flush=True)
-            result = wait_job(client.submit(image=handle_file(str(args.image.resolve())),
+            if resume_result:
+                print('Resuming cached shape download (no new GPU job)', flush=True)
+                reference = old['shape_result_reference']
+            else:
+                print('Submitting shape:', args.image, flush=True)
+                result = wait_job(client.submit(image=handle_file(str(args.image.resolve())),
                               mv_image_front=None, mv_image_back=None, mv_image_left=None, mv_image_right=None,
                               **parameters, api_name='/shape_generation'), args.timeout)
-            shutil.copy2(returned_file(result[0]), raw)
-            record['shape_stats'] = result[2]
+                reference = result[0]
+                record['shape_result_reference'] = reference
+                record['shape_stats'] = result[2]
+                record['status'] = 'shape_generated'
+                provenance_path.write_text(json.dumps(record, indent=2, default=str)+'\n')
+            shutil.copy2(returned_file(reference, client, download_dir), raw)
             record['raw_sha256'] = digest(raw)
             record['status'] = 'shape_complete'
             provenance_path.write_text(json.dumps(record, indent=2, default=str)+'\n')
@@ -115,7 +152,9 @@ def main():
         result = wait_job(client.submit(file_out=handle_file(str(raw)), file_out2=None,
                           file_type='glb', reduce_face=True, export_texture=False,
                           target_face_num=args.faces, api_name='/on_export_click'), args.timeout)
-        shutil.copy2(returned_file(result[1]), reduced)
+        record['reduction_result_reference'] = result[1]
+        provenance_path.write_text(json.dumps(record, indent=2, default=str)+'\n')
+        shutil.copy2(returned_file(result[1], client, download_dir), reduced)
         record.update({'status': 'success', 'reduced_sha256': digest(reduced),
                        'raw': raw.name, 'reduced': reduced.name})
         if 'error' in record:

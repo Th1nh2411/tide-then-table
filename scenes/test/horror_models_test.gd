@@ -14,7 +14,7 @@ func _run() -> void:
 	var specs := ConceptModel3D.geometry("fish_ca_thu")
 	_check(not specs.is_empty(), "model geometry metadata loads")
 	var all: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/models/ready/horror_models.json"))
-	_check(all.size() == 25, "all 25 generated prop IDs are present")
+	_check(all.size() >= 25, "original model catalog is retained as new batches are added")
 	for id: String in all:
 		var model := ConceptModel3D.spawn(self, id, Vector3.ZERO, 1.0)
 		var bounds := _bounds(model)
@@ -30,6 +30,19 @@ func _run() -> void:
 					lit = lit and normal.is_finite() and normal.length_squared() > 0.9
 		_check(lit, id + " has finite normals for lamp lighting")
 		model.free()
+	var serving := Node3D.new()
+	add_child(serving)
+	ServedFoodVisual3D.show_dish(serving, load("res://data/dishes/canh_chua_ca_thu.tres") as DishData, true)
+	_check(serving.get_meta("served_food_id") == "dish_bowl_soup", "soup uses a bowl on the serving tray")
+	ServedFoodVisual3D.show_kind(serving, "beer_tower", false, true)
+	var food := serving.get_node("ServedFood")
+	_check(food.get_node("beer_glass_ice").visible and not food.get_node("dish_bowl_soup").visible,
+		"beer table swaps the bowl for a tower and glass")
+	var count := food.get_child_count()
+	for i: int in range(10):
+		ServedFoodVisual3D.show_kind(serving, "beer_tower", false, true)
+	_check(food.get_child_count() == count, "repeated service updates reuse meshes")
+	serving.free()
 	var fish := FishBasket3D.fish_mesh(load("res://data/fish/ca_mu.tres"), 1.0)
 	add_child(fish)
 	var length := _bounds(fish).size.x

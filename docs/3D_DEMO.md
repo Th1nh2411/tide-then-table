@@ -37,7 +37,7 @@ Autosave chỉ ở buổi sáng; mọi test/bot dùng `-- --no-autosave`.
 | Góc nhìn / PS1 | `FirstPersonView3D`, `PsxLook3D` |
 | NPC | `PsxCharacterVisual`; gói PSX đã có rig, không thay bằng concept anh Út / ông Tư / Chú Hai |
 
-## 25 model horror đã tích hợp
+## 25 model horror đã tích hợp — đợt đầu
 
 Model inference và provenance ở `assets/models/ready/<id>/`; bản dùng là `<id>_reduced.glb`.
 Bản gốc `<id>_raw.glb` và license được giữ cùng thư mục. Bản reduced có thêm normals
@@ -83,4 +83,23 @@ Tạo lại ảnh review bằng Godot có renderer (không dùng `--headless`):
 ```
 
 Ảnh làm việc ở `build/horror_integration/`, ảnh bàn giao ở `docs/art_reviews/`.
+
+## Brief 5 — 25 model mới, 04/11/2026
+
+Đã dựng đủ 25 concept của brief 4 bằng Hunyuan, thêm vào metadata (tổng 50 ID).
+Đợt mới **74.761 tam giác**, tổng hai đợt **143.759**. Có raw/reduced,
+provenance và license theo từng ID. Kết quả Space vượt budget được giảm tiếp
+bằng CPU; nhà C dùng mesh gốc Hunyuan rồi giảm bằng CPU do export Space lỗi mạng.
+
+Đĩa cá/tô canh/tháp bia trên tay Rin và Vy, món trên bàn khách, khay ở bàn kê và
+ly cạnh tháp bia đã dùng model mới. Mâm cúng bình thường dùng
+`altar_tray_offerings`; mâm bị ăn dở vẫn giữ model/state riêng và dấu chân ướt.
+Furniture bàn, chồng ghế, xe, lò, thùng xốp mới chỉ bàn giao asset; chưa thay
+visual quán. Prop ngoài làng do builder hiện hành tự nhận khi model có sẵn.
+
+Chi tiết, số tam giác, giới hạn material và ảnh review:
+[HORROR_CODEX_DELIVERY_5.md](HORROR_CODEX_DELIVERY_5.md).
 Source raw/reduced đã nằm trong `assets/`, không còn chỉ tồn tại trong `build/`.
+
+Cây bàng có sửa hình học sau inference: giữ bồn, dựng lại thân/cành/lá 3D theo concept;
+recipe và nguồn Blender được lưu, chi tiết trong provenance `artist_repair`.

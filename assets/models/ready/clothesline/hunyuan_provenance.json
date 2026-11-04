@@ -1,0 +1,63 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-04T06:48:31.920741+00:00",
+  "input": "assets/concepts/horror/clothesline.png",
+  "input_sha256": "e0276d73d439bf870b88e85ece5e02f27a13f2f68044beb59436e9bbf3e3b94b",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 92704,
+    "number_of_vertices": 46336,
+    "time": {
+      "remove background": 1.0129649639129639,
+      "shape generation": 10.210588455200195,
+      "export to trimesh": 0.019723892211914062,
+      "total": 11.246110200881958
+    }
+  },
+  "raw_sha256": "0fc33ca393eff1fc904d790473dff9ecaae0fba1e3564e6b4669a5d3ada747a5",
+  "status": "success",
+  "reduced_sha256": "f160f774c9af8fee13e703de07c947befbfda973a5f8f8a3d8e03fa0ab4936a9",
+  "raw": "clothesline_raw.glb",
+  "reduced": "clothesline_reduced.glb",
+  "source_reduced_sha256": "c3ad6216cb7b7e927330279ab9572cff769ca460cba66f8703620e4256a58bc3",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "source_faces": 3000,
+    "runtime_faces": 3000,
+    "tool": "tools/art/prepare_horror_models.py",
+    "material_concept_sha256": "e0276d73d439bf870b88e85ece5e02f27a13f2f68044beb59436e9bbf3e3b94b",
+    "source_directory": "build/brief5/generated/clothesline"
+  }
+}

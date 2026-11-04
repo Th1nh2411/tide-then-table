@@ -1,0 +1,63 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-04T06:40:37.812517+00:00",
+  "input": "assets/concepts/horror/food_cart_glass.png",
+  "input_sha256": "fafc0369c021a6e242ca8ce43a850a1ea3a48c60059937ae252f32256f722f64",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 292446,
+    "number_of_vertices": 146151,
+    "time": {
+      "remove background": 0.8886830806732178,
+      "shape generation": 9.62785792350769,
+      "export to trimesh": 0.06535458564758301,
+      "total": 10.584402799606323
+    }
+  },
+  "raw_sha256": "d35bbd318c53f0289ec841acb6ea7cac02a6b6f032bfaab47f7983a06dea0d32",
+  "status": "success",
+  "reduced_sha256": "8c6017cbcdaebd543582f7188e7000519cb45d94e20b3efb8a427faac764acf2",
+  "raw": "food_cart_glass_raw.glb",
+  "reduced": "food_cart_glass_reduced.glb",
+  "source_reduced_sha256": "4d3873ded31b7d8c239353fba83e770111bb48d4e82266277b602c9063eda583",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "source_faces": 3000,
+    "runtime_faces": 3000,
+    "tool": "tools/art/prepare_horror_models.py",
+    "material_concept_sha256": "fafc0369c021a6e242ca8ce43a850a1ea3a48c60059937ae252f32256f722f64",
+    "source_directory": "build/brief5/generated/food_cart_glass"
+  }
+}

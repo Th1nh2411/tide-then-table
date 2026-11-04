@@ -1,0 +1,63 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-03T06:56:06.138715+00:00",
+  "input": "assets/concepts/horror/tray_aluminium.png",
+  "input_sha256": "61391431eb559ed584123037b5ec2c58e939828fe17c24df913905cc58cdfa92",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 2000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 160436,
+    "number_of_vertices": 80220,
+    "time": {
+      "remove background": 0.865957498550415,
+      "shape generation": 9.51810908317566,
+      "export to trimesh": 0.033121347427368164,
+      "total": 10.419606685638428
+    }
+  },
+  "raw_sha256": "1f6f3683bf32b14fc26d48fd7f5369fc206a00afc1657142389ff4bc0036c836",
+  "status": "success",
+  "reduced_sha256": "b1a0b682a0725214b47e51b4d052880bb7e6bef4dc0da29ddd4ec6d59147daf9",
+  "raw": "tray_aluminium_raw.glb",
+  "reduced": "tray_aluminium_reduced.glb",
+  "source_reduced_sha256": "76ac94edbd8ac0c121fcaf7bca238048ab2c7e0858b5feed655860bfbe0c953f",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "source_faces": 2000,
+    "runtime_faces": 2000,
+    "tool": "tools/art/prepare_horror_models.py",
+    "material_concept_sha256": "61391431eb559ed584123037b5ec2c58e939828fe17c24df913905cc58cdfa92",
+    "source_directory": "build/brief5/generated/tray_aluminium"
+  }
+}

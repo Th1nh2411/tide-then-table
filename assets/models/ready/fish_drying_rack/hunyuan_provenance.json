@@ -1,0 +1,63 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-04T06:47:42.407460+00:00",
+  "input": "assets/concepts/horror/fish_drying_rack.png",
+  "input_sha256": "e1167a420c874cb616b63716015de833d78b8823f81156bc73006de6950db648",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 309310,
+    "number_of_vertices": 154537,
+    "time": {
+      "remove background": 1.0746288299560547,
+      "shape generation": 9.84564733505249,
+      "export to trimesh": 0.06899189949035645,
+      "total": 10.991945743560791
+    }
+  },
+  "raw_sha256": "289a06df79e92bebdd44610a3cdde830b5ae5df8bc7199b0510eb959698d5140",
+  "status": "success",
+  "reduced_sha256": "c0ced4ace512a40afd5a6631a8cf16eabdaa8a93253f725513b1dc06d03a455a",
+  "raw": "fish_drying_rack_raw.glb",
+  "reduced": "fish_drying_rack_reduced.glb",
+  "source_reduced_sha256": "313c302db16910b786a8364aee067c6f1ccd97a166854fee80d27f2a6b258d6b",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "source_faces": 3000,
+    "runtime_faces": 3000,
+    "tool": "tools/art/prepare_horror_models.py",
+    "material_concept_sha256": "e1167a420c874cb616b63716015de833d78b8823f81156bc73006de6950db648",
+    "source_directory": "build/brief5/generated/fish_drying_rack"
+  }
+}

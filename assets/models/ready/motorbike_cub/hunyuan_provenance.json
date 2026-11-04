@@ -1,0 +1,63 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-04T06:46:22.958027+00:00",
+  "input": "assets/concepts/horror/motorbike_cub.png",
+  "input_sha256": "25379a57c93b8da8eb7016e728cc3d443ddcbbf416c8ec0d4421e2b8cd85f2b6",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 157212,
+    "number_of_vertices": 78244,
+    "time": {
+      "remove background": 1.0065786838531494,
+      "shape generation": 10.004695415496826,
+      "export to trimesh": 0.03697609901428223,
+      "total": 11.050920009613037
+    }
+  },
+  "raw_sha256": "34757a1936855a0e3da2dd637812a321b8d6b5a7820c704c0d06e86deb656083",
+  "status": "success",
+  "reduced_sha256": "71a88aa3f99c4ef1761da9097d3cf51fc4062550158deabcf6342480e86dba97",
+  "raw": "motorbike_cub_raw.glb",
+  "reduced": "motorbike_cub_reduced.glb",
+  "source_reduced_sha256": "aebb0a936cb310599beda083ec71cb15c8fff2d798f0ed9787117cd4c936042f",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "source_faces": 3000,
+    "runtime_faces": 3000,
+    "tool": "tools/art/prepare_horror_models.py",
+    "material_concept_sha256": "25379a57c93b8da8eb7016e728cc3d443ddcbbf416c8ec0d4421e2b8cd85f2b6",
+    "source_directory": "build/brief5/generated/motorbike_cub"
+  }
+}

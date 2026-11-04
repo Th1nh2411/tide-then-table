@@ -16,7 +16,7 @@ var eaten := false
 
 func _ready() -> void:
 	eaten = OmenPicker.state(OMEN_ID) == "omen"
-	ConceptModel3D.spawn(self, "offering_tray_eaten" if eaten else "offering_tray_normal", Vector3.ZERO, TOP + 0.35)
+	ConceptModel3D.spawn(self, "offering_tray_eaten" if eaten else "altar_tray_offerings", Vector3.ZERO, TOP + 0.35)
 	if eaten:
 		# Wet footprints from under the table out to the road.
 		for i: int in range(6):

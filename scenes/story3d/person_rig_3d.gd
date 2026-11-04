@@ -162,9 +162,7 @@ func _build_rin_pilot() -> void:
 		var hips := _pilot.skeleton.get_bone_global_rest(_pilot.skeleton.find_bone("Hips")).origin.y
 		plate.position *= hips / 0.92
 	plate.visible = false
-	_box(plate, Vector3.ZERO, Vector3(0.36, 0.035, 0.3), "e8d9b7")
-	for i in range(3):
-		_box(plate, Vector3(-0.1 + i * 0.1, 0.045, 0), Vector3(0.075, 0.05, 0.18), "c97649")
+	ServedFoodVisual3D.show_dish(plate, null)
 	_sync_pilot_anchors()
 
 func _update_pilot_motion() -> void:

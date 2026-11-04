@@ -1,7 +1,9 @@
-"""Stage the 25 completed Hunyuan props and derive runtime scale/material data.
+"""Stage completed Hunyuan props and derive runtime scale/material data.
 
-uv run --with trimesh --with pillow python tools/art/prepare_horror_models.py
+uv run --with trimesh --with pillow --with scipy --with fast-simplification python tools/art/prepare_horror_models.py
 No inference, paid calls, scene edits, or changes to the source concepts.
+Use --manifest tools/art/horror_brief5_models.json --ids <completed IDs> for
+the second batch. Existing catalog IDs are retained; Space downloads remain intact.
 """
 from pathlib import Path
 import argparse
@@ -9,6 +11,7 @@ import hashlib
 import json
 import shutil
 import struct
+import tempfile
 from datetime import datetime
 import numpy as np
 import trimesh
@@ -35,7 +38,9 @@ def with_normals(source):
     for mesh in doc['meshes']:
         for primitive in mesh['primitives']:
             if 'NORMAL' in primitive['attributes']:
-                continue
+                existing = read_accessor(doc, binary, primitive['attributes']['NORMAL'])
+                if np.isfinite(existing).all() and np.allclose(np.linalg.norm(existing, axis=1), 1.0, atol=0.01):
+                    continue
             points = read_accessor(doc, binary, primitive['attributes']['POSITION'])
             faces = read_accessor(doc, binary, primitive['indices']).reshape(-1, 3).astype(int)
             cross = np.cross(points[faces[:, 1]]-points[faces[:, 0]], points[faces[:, 2]]-points[faces[:, 0]])
@@ -78,7 +83,13 @@ def with_normals(source):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', type=Path, default=ROOT/'build/hunyuan_free')
+    parser.add_argument('--manifest', type=Path, help='Budget -> model IDs JSON (defaults to the first batch)')
+    parser.add_argument('--ids', nargs='+', help='Stage only these completed IDs; keep all existing metadata')
     args = parser.parse_args()
+    groups = {int(k): v for k, v in json.loads(args.manifest.read_text()).items()} if args.manifest else GROUPS
+    if args.ids:
+        assert set(args.ids) <= {name for names in groups.values() for name in names}, 'Unknown model ID'
+        groups = {budget: [name for name in names if name in args.ids] for budget, names in groups.items()}
     backup = ROOT/'.art_backups/horror_prepare'/datetime.now().strftime('%Y%m%d_%H%M%S_%f')
     backups = []
 
@@ -94,9 +105,11 @@ def main():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
 
-    metadata = {}
+    existing = ROOT/'assets/models/ready/horror_models.json'
+    metadata = json.loads(existing.read_text()) if existing.exists() else {}
+    prepared = 0
     triangles = 0
-    for budget, names in GROUPS.items():
+    for budget, names in groups.items():
         for name in names:
             source = args.source/name
             provenance = json.loads((source/'hunyuan_provenance.json').read_text())
@@ -105,18 +118,35 @@ def main():
                 path = source/f'{name}_{kind}.glb'
                 assert hashlib.sha256(path.read_bytes()).hexdigest() == provenance[kind+'_sha256'], path
             mesh = trimesh.load(source/f'{name}_reduced.glb', force='mesh')
-            assert 0 < len(mesh.faces) <= budget and np.isfinite(mesh.vertices).all(), name
+            assert 0 < len(mesh.faces) and np.isfinite(mesh.vertices).all(), name
+            source_faces = len(mesh.faces)
+            locally_reduced = source_faces > budget
+            if locally_reduced:
+                # The Space export occasionally exceeds its requested target.
+                # Keep that download intact and enforce the budget on the runtime derivative.
+                mesh = mesh.simplify_quadric_decimation(face_count=budget)
+                assert 0 < len(mesh.faces) <= budget and np.isfinite(mesh.vertices).all(), name
             triangles += len(mesh.faces)
+            prepared += 1
             for filename in [f'{name}_raw.glb', 'LICENSE-HUNYUAN.txt']:
                 write(ROOT/'assets/models/ready'/name/filename, (source/filename).read_bytes())
-            finished, added = with_normals(source/f'{name}_reduced.glb')
+            if locally_reduced:
+                with tempfile.TemporaryDirectory() as directory:
+                    temporary = Path(directory)/'reduced.glb'
+                    mesh.export(temporary, include_normals=True)
+                    finished, added = with_normals(temporary)
+            else:
+                finished, added = with_normals(source/f'{name}_reduced.glb')
             write(ROOT/'assets/models/ready'/name/f'{name}_reduced.glb', finished)
             provenance['source_reduced_sha256'] = provenance['reduced_sha256']
             provenance['reduced_sha256'] = hashlib.sha256(finished).hexdigest()
-            provenance['integration'] = dict(normals_added_primitives=added, geometry_unchanged=True,
+            provenance['integration'] = dict(normals_added_primitives=added, geometry_unchanged=not locally_reduced,
+                                             source_faces=source_faces, runtime_faces=len(mesh.faces),
                                              tool='tools/art/prepare_horror_models.py',
                                              material_concept_sha256=hashlib.sha256((ROOT/f'assets/concepts/horror/{name}.png').read_bytes()).hexdigest(),
                                              source_directory=source.relative_to(ROOT).as_posix() if source.is_relative_to(ROOT) else str(source))
+            if locally_reduced:
+                provenance['integration']['local_reduction'] = 'trimesh.simplify_quadric_decimation / fast-simplification'
             write(ROOT/'assets/models/ready'/name/'hunyuan_provenance.json', (json.dumps(provenance, indent=2)+'\n').encode())
             vertices = mesh.vertices
             center = mesh.bounds.mean(axis=0)
@@ -144,7 +174,7 @@ def main():
     write(destination/'horror_models.gd', ('\n'.join(lines+['}'])+'\n').encode())
     if backups:
         (backup/'manifest.json').write_text(json.dumps(backups, indent=2))
-    print(f'Prepared {len(metadata)} props; {triangles:,} triangles; {len(backups)} changed files backed up.')
+    print(f'Prepared {prepared} props; {triangles:,} triangles; metadata retains {len(metadata)} IDs; {len(backups)} changed files backed up.')
 
 
 if __name__ == '__main__':

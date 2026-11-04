@@ -1,0 +1,63 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-03T06:58:51.970917+00:00",
+  "input": "assets/concepts/horror/altar_tray_offerings.png",
+  "input_sha256": "c20f2b7b779ed8f3786fba956b54376dff96bcb1eb9bbade8b84bd1a11423df1",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 388050,
+    "number_of_vertices": 193810,
+    "time": {
+      "remove background": 1.0137650966644287,
+      "shape generation": 9.636035919189453,
+      "export to trimesh": 0.08323836326599121,
+      "total": 10.735413074493408
+    }
+  },
+  "raw_sha256": "f2a33f295e391e255f501a7aff5b362e507863cff5e06d2495bc84f14336904d",
+  "status": "success",
+  "reduced_sha256": "ca9cab834681aea329f75aa26c8572249d9f08be820fdeb00a512ea471632188",
+  "raw": "altar_tray_offerings_raw.glb",
+  "reduced": "altar_tray_offerings_reduced.glb",
+  "source_reduced_sha256": "2223792409b62c2f28154075f3199e47478176b4db8de3fd7c2e1dc985c5080e",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "source_faces": 3000,
+    "runtime_faces": 3000,
+    "tool": "tools/art/prepare_horror_models.py",
+    "material_concept_sha256": "c20f2b7b779ed8f3786fba956b54376dff96bcb1eb9bbade8b84bd1a11423df1",
+    "source_directory": "build/brief5/generated/altar_tray_offerings"
+  }
+}

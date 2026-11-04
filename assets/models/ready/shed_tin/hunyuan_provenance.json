@@ -1,0 +1,92 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-04T07:03:24.043057+00:00",
+  "input": "assets/concepts/horror/shed_tin.png",
+  "input_sha256": "cf0b2e4192323262cb4a8e62c5caf3e28aea57311e82667f3e4e89c36861353b",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_result_reference": {
+    "value": {
+      "path": "/tmp/gradio/3057219d5c194a11a5904f32a4e50cdcef0d96e7f7ba46c62c151e1e4bec9e66/white_mesh.glb",
+      "url": "https://tencent-hunyuan3d-2-1.hf.space/file=/tmp/gradio/3057219d5c194a11a5904f32a4e50cdcef0d96e7f7ba46c62c151e1e4bec9e66/white_mesh.glb",
+      "size": 12015548,
+      "orig_name": "white_mesh.glb",
+      "mime_type": null,
+      "is_stream": false,
+      "meta": {
+        "_type": "gradio.FileData"
+      }
+    },
+    "__type__": "update"
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 667592,
+    "number_of_vertices": 333598,
+    "time": {
+      "remove background": 0.9756026268005371,
+      "shape generation": 9.957890272140503,
+      "export to trimesh": 0.1945812702178955,
+      "total": 11.131134748458862
+    }
+  },
+  "status": "success",
+  "raw_sha256": "3057219d5c194a11a5904f32a4e50cdcef0d96e7f7ba46c62c151e1e4bec9e66",
+  "reduction_result_reference": {
+    "interactive": true,
+    "value": {
+      "path": "/tmp/gradio/14c602b554b3d90aaa4f082ce5797cbed733ad72903f11a44bd14a29f8580118/white_mesh.glb",
+      "url": "https://tencent-hunyuan3d-2-1.hf.space/file=/tmp/gradio/14c602b554b3d90aaa4f082ce5797cbed733ad72903f11a44bd14a29f8580118/white_mesh.glb",
+      "size": null,
+      "orig_name": "white_mesh.glb",
+      "mime_type": null,
+      "is_stream": false,
+      "meta": {
+        "_type": "gradio.FileData"
+      }
+    },
+    "__type__": "update"
+  },
+  "reduced_sha256": "57833358a436f1ff4583e05ce27eea9b7b56412d1844b656109ccd34d1895c41",
+  "raw": "shed_tin_raw.glb",
+  "reduced": "shed_tin_reduced.glb",
+  "source_reduced_sha256": "14c602b554b3d90aaa4f082ce5797cbed733ad72903f11a44bd14a29f8580118",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "source_faces": 3000,
+    "runtime_faces": 3000,
+    "tool": "tools/art/prepare_horror_models.py",
+    "material_concept_sha256": "cf0b2e4192323262cb4a8e62c5caf3e28aea57311e82667f3e4e89c36861353b",
+    "source_directory": "build/brief5/generated/shed_tin"
+  }
+}

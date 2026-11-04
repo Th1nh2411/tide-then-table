@@ -43,8 +43,6 @@ func setup(owner: Node3D) -> void:
 	rig = PersonRig3D.build(host, "vy")
 	rig.name = "Vy"
 	rig.visible = false
-	var held: Node3D = rig.plate
-	RestaurantBatchVisuals.add(held, "beer_tower", Vector3(0, 0.02, 0)).name = "BeerTower"
 	talk = VyTalk3D.new(self)
 
 
@@ -147,7 +145,7 @@ func _finish_pause() -> void:
 				_rest(0.5)
 				return
 			rig.set_carrying(true)
-			RestaurantService3D._show_beer(rig.plate, (host.orders[table]["dish"] as DishData).instant_serve)
+			ServedFoodVisual3D.show_dish(rig.plate, host.orders[table]["dish"] as DishData)
 			_go("carry", _service_point(table))
 		"serve":
 			if _still_mine():

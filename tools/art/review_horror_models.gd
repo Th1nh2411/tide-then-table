@@ -7,8 +7,12 @@ func _initialize() -> void:
 
 func _render() -> void:
 	root.size = Vector2i(512, 512)
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(512, 512)
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	root.add_child(viewport)
 	var world := Node3D.new()
-	root.add_child(world)
+	viewport.add_child(world)
 	var environment := WorldEnvironment.new()
 	var settings := Environment.new()
 	settings.background_mode = Environment.BG_COLOR
@@ -26,7 +30,10 @@ func _render() -> void:
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
 	world.add_child(camera)
 	camera.make_current()
-	var ids: Array = JSON.parse_string(FileAccess.get_file_as_string("res://build/hunyuan_free/verified.json"))["complete"]
+	var ids: Array = []
+	var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/models/ready/horror_models.json"))
+	for id: String in catalog:
+		ids.append({"name": id})
 	DirAccess.make_dir_recursive_absolute("res://build/horror_integration/review")
 	for entry: Dictionary in ids:
 		var id := String(entry["name"])
@@ -46,9 +53,11 @@ func _render() -> void:
 			camera.position = center + Vector3(sin(yaw), 0.55, cos(yaw)) * extent * 2.0
 			camera.look_at(center)
 			await process_frame
-			await RenderingServer.frame_post_draw
-			root.get_texture().get_image().save_png("res://build/horror_integration/review/%s_%d.png" % [id, angle])
+			# An offscreen target keeps captures moving even when another window
+			# covers this review. Do not wait for a visible-window redraw signal.
+			RenderingServer.force_draw(false)
+			viewport.get_texture().get_image().save_png("res://build/horror_integration/review/%s_%d.png" % [id, angle])
 		model.queue_free()
 		await process_frame
-	print("HORROR REVIEW: 25 models, 3 angles each")
+	print("HORROR REVIEW: %d models, 3 angles each" % ids.size())
 	quit()

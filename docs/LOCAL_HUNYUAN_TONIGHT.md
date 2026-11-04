@@ -1,6 +1,14 @@
 # Dựng model local tối nay (Hunyuan3D-2mini-turbo, máy Windows)
 
-## Đợt hiện tại: brief 5, ngày 03/11/2026
+## Cập nhật 04/11/2026: brief 5 đã dựng đủ 25/25
+
+Đã tiếp tục bằng hai token được người dùng cho phép và dựng đủ 25 model mới.
+Output đã được kiểm hash, budget và normals; **74.761 tam giác**, metadata tổng
+50 ID. Nhà C dùng raw Hunyuan và giảm mặt bằng CPU do export Space lỗi kết nối.
+Danh sách pending hiện bằng **0**; chưa cần chạy batch Windows cho đợt này.
+Chi tiết và review: [HORROR_CODEX_DELIVERY_5.md](HORROR_CODEX_DELIVERY_5.md).
+
+## Lịch sử dừng quota và cách chạy lại local
 
 25 model của đợt đầu bên dưới đã xong. **25 concept brief 4 còn chờ dựng**:
 Space miễn phí từ chối ngay `dish_plate_fish` do quota anonymous (90 giây yêu cầu,

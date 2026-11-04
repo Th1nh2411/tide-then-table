@@ -1,0 +1,63 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-04T06:41:31.219617+00:00",
+  "input": "assets/concepts/horror/ice_box_styrofoam.png",
+  "input_sha256": "7f123932e21d4f472872cb236599c15a6c8982854a6189bf2ad7bca6ca2c4b70",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 305472,
+    "number_of_vertices": 152738,
+    "time": {
+      "remove background": 0.9428768157958984,
+      "shape generation": 9.75427508354187,
+      "export to trimesh": 0.06696963310241699,
+      "total": 10.766674041748047
+    }
+  },
+  "raw_sha256": "cb7e12ff69fa6687d59520b0ead39069e13704a115818cdfb229d995d0ef925f",
+  "status": "success",
+  "reduced_sha256": "69c67ac1327c8d96bdffc4342d3560351ed3996d6ef34e4d0cd95cd29ffa8589",
+  "raw": "ice_box_styrofoam_raw.glb",
+  "reduced": "ice_box_styrofoam_reduced.glb",
+  "source_reduced_sha256": "911dc0eb271339c4c474d46d078fe63a8b9cdccc8f4d03d19e90ce4ee9ac58ff",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "source_faces": 3000,
+    "runtime_faces": 3000,
+    "tool": "tools/art/prepare_horror_models.py",
+    "material_concept_sha256": "7f123932e21d4f472872cb236599c15a6c8982854a6189bf2ad7bca6ca2c4b70",
+    "source_directory": "build/brief5/generated/ice_box_styrofoam"
+  }
+}

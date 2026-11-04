@@ -1,0 +1,202 @@
+[
+  {
+    "id": "dish_plate_fish",
+    "budget": 2000,
+    "triangles": 2000,
+    "source_triangles": 5818,
+    "local_reduction": true,
+    "sha256": "cb5cf03d2e4852b6efacfd357b73c763407183832e7c136691166c803f02188d"
+  },
+  {
+    "id": "dish_bowl_soup",
+    "budget": 2000,
+    "triangles": 2000,
+    "source_triangles": 2000,
+    "local_reduction": false,
+    "sha256": "0e1693403f8373f398f818411ef37f464c85ed6e36b6365d24d25f7a98f22a66"
+  },
+  {
+    "id": "beer_glass_ice",
+    "budget": 2000,
+    "triangles": 2000,
+    "source_triangles": 2000,
+    "local_reduction": false,
+    "sha256": "aceab1cacd1b7558bb8899786e16f8b3d87749c7067d9254b3a2c746b1554016"
+  },
+  {
+    "id": "tray_aluminium",
+    "budget": 2000,
+    "triangles": 2000,
+    "source_triangles": 2000,
+    "local_reduction": false,
+    "sha256": "b1a0b682a0725214b47e51b4d052880bb7e6bef4dc0da29ddd4ec6d59147daf9"
+  },
+  {
+    "id": "buoy_pile",
+    "budget": 2000,
+    "triangles": 2000,
+    "source_triangles": 2000,
+    "local_reduction": false,
+    "sha256": "0ff91d8a1b00fb7012ad5a1371ff38fd25aa3467c2e51c87ba44d98a35533d49"
+  },
+  {
+    "id": "beer_tower",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "6609be53fb341edb72de91dbf8d05dfe71584a78c344b49879b4f5840dfa9501"
+  },
+  {
+    "id": "table_stall_folding",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "47ab95aaa8bff8e9758db6476ebc15822acc720da1cabdcf0381ff786412f8cf"
+  },
+  {
+    "id": "stool_plastic_stack",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "c8cf3151f16c2f9f21047b02c7f86bf6bf841638feac71ec33a08590f7593cbc"
+  },
+  {
+    "id": "charcoal_stove_clay",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "50de83e68e9562eefdc970f2ef7a6a01db3d1818c20d6fc15cc733d0babc2996"
+  },
+  {
+    "id": "food_cart_glass",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "8c6017cbcdaebd543582f7188e7000519cb45d94e20b3efb8a427faac764acf2"
+  },
+  {
+    "id": "ice_box_styrofoam",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "69c67ac1327c8d96bdffc4342d3560351ed3996d6ef34e4d0cd95cd29ffa8589"
+  },
+  {
+    "id": "altar_tray_offerings",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "ca9cab834681aea329f75aa26c8572249d9f08be820fdeb00a512ea471632188"
+  },
+  {
+    "id": "lamp_post_village",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "ae392e0b838bcef628530a4b4a05f1afc7de767c6ec3981da2584016d0d58f8f"
+  },
+  {
+    "id": "coconut_palm",
+    "budget": 3000,
+    "triangles": 2998,
+    "source_triangles": 5338,
+    "local_reduction": true,
+    "sha256": "d8cc426aff7c1535ed66bc55e445a060a2e6c9c6a9667dbfe29b238da3fb1d0f"
+  },
+  {
+    "id": "motorbike_cub",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "71a88aa3f99c4ef1761da9097d3cf51fc4062550158deabcf6342480e86dba97"
+  },
+  {
+    "id": "fish_drying_rack",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "c0ced4ace512a40afd5a6631a8cf16eabdaa8a93253f725513b1dc06d03a455a"
+  },
+  {
+    "id": "clothesline",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "f160f774c9af8fee13e703de07c947befbfda973a5f8f8a3d8e03fa0ab4936a9"
+  },
+  {
+    "id": "boat_pulled_up",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "592d6a0f8f8501af3e0a7976d31b6035cedb70b775877663654ebb64d831168b"
+  },
+  {
+    "id": "thung_boat",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "275dafa1f42aa621cce6042119925a0bf9bc3fce9bfa8d9a08ccc70954efc065"
+  },
+  {
+    "id": "shed_tin",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "57833358a436f1ff4583e05ce27eea9b7b56412d1844b656109ccd34d1895c41"
+  },
+  {
+    "id": "boat_upturned",
+    "budget": 3000,
+    "triangles": 3000,
+    "source_triangles": 3000,
+    "local_reduction": false,
+    "sha256": "74f0e1c37ca93a9bfa11eeb70eb2cb2a045e9ae4c191adaa066e3337923838b8"
+  },
+  {
+    "id": "planter_tree_street",
+    "budget": 3000,
+    "triangles": 1763,
+    "source_triangles": 1763,
+    "local_reduction": false,
+    "sha256": "0ef4344382bbe4c2e83e6e77a164000332a490dfe2427a162d1a40227061aea1"
+  },
+  {
+    "id": "tube_house_a",
+    "budget": 5000,
+    "triangles": 5000,
+    "source_triangles": 5000,
+    "local_reduction": false,
+    "sha256": "668ee7d136d6130b70acef69cf11760c08dd57034ac3be75473d4b3c7d2df9c7"
+  },
+  {
+    "id": "tube_house_b",
+    "budget": 5000,
+    "triangles": 5000,
+    "source_triangles": 5000,
+    "local_reduction": false,
+    "sha256": "a1ee7623561283c08c710e99d66d8b38bd576708495c666258cc03aa836a5ef1"
+  },
+  {
+    "id": "tube_house_c",
+    "budget": 5000,
+    "triangles": 5000,
+    "source_triangles": 5000,
+    "local_reduction": false,
+    "sha256": "62e934cd989b3e0f875df0a15d28125cab78efcb99f934c4944c0d731336c2b8"
+  }
+]

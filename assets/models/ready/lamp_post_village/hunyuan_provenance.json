@@ -1,0 +1,63 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-04T06:42:45.656841+00:00",
+  "input": "assets/concepts/horror/lamp_post_village.png",
+  "input_sha256": "b3b55a547af72dfa9b26faf3e862c5eb20374661476d43da42a954b6f3f5742e",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 3000,
+    "file_type": "glb",
+    "reduce_face": true,
+    "export_texture": false
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 40624,
+    "number_of_vertices": 20308,
+    "time": {
+      "remove background": 1.1080470085144043,
+      "shape generation": 9.597373247146606,
+      "export to trimesh": 0.009432315826416016,
+      "total": 10.717349290847778
+    }
+  },
+  "raw_sha256": "049fe5ecc55bbec9cd11dbe4beb64de7d21703cfd9556fc4c843f2a2a7b0af11",
+  "status": "success",
+  "reduced_sha256": "ae392e0b838bcef628530a4b4a05f1afc7de767c6ec3981da2584016d0d58f8f",
+  "raw": "lamp_post_village_raw.glb",
+  "reduced": "lamp_post_village_reduced.glb",
+  "source_reduced_sha256": "0895a7005b532e6c473fafb829d2ff2c4041faa06a629c3c4593da9734f3039b",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "source_faces": 3000,
+    "runtime_faces": 3000,
+    "tool": "tools/art/prepare_horror_models.py",
+    "material_concept_sha256": "b3b55a547af72dfa9b26faf3e862c5eb20374661476d43da42a954b6f3f5742e",
+    "source_directory": "build/brief5/generated/lamp_post_village"
+  }
+}

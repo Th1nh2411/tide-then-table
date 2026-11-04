@@ -92,11 +92,40 @@ Chạy test rồi bot tuần tự sau import: ALL OK / BOT OK; log xác nhận c
 và tiếp tục sau reset tới kết thật. Đường dẫn log local:
 `build/horror_integration/brief4_tests0_final.log`, `brief4_bot0_final.log`.
 
-## Brief 5 — dừng ở quota (03/11/2026)
+## Brief 5 — 25 model mới (04/11/2026)
 
-Space anonymous từ chối job đầu tiên `dish_plate_fish`: 90 giây yêu cầu,
-86 giây quota còn lại. Đã dừng theo brief, **0/25 model mới**, chưa có số tam giác
-hay render 3 góc của đợt mới. 25 model cũ vẫn 68.998 tam giác.
-Không thêm ID chưa có mesh vào metadata/runtime. Danh sách pending đầy đủ,
-budget 2.000/3.000/5.000, batch Windows và điểm nối chờ mesh:
+Đã tiếp tục với hai token được cho phép, đủ 25 raw/reduced + provenance/license.
+Đợt mới **74,761 tam giác**, tổng hai đợt **143,759**; metadata giữ 50 ID.
+Raw Hunyuan giữ nguyên; giảm CPU nếu Space vượt budget. Nhà C giảm trực tiếp
+raw bằng CPU do export Space lỗi mạng. Cây bàng giữ bồn Hunyuan, sửa thân/cành/lá thành hình học 3D theo concept (recipe Python và nguồn Blender, ghi trong artist_repair).
+
+| ID | Budget | Runtime triangles | Source reduced triangles |
+|---|---:|---:|---:|
+| `dish_plate_fish` | 2,000 | 2,000 | 5,818 |
+| `dish_bowl_soup` | 2,000 | 2,000 | 2,000 |
+| `beer_glass_ice` | 2,000 | 2,000 | 2,000 |
+| `tray_aluminium` | 2,000 | 2,000 | 2,000 |
+| `buoy_pile` | 2,000 | 2,000 | 2,000 |
+| `beer_tower` | 3,000 | 3,000 | 3,000 |
+| `table_stall_folding` | 3,000 | 3,000 | 3,000 |
+| `stool_plastic_stack` | 3,000 | 3,000 | 3,000 |
+| `charcoal_stove_clay` | 3,000 | 3,000 | 3,000 |
+| `food_cart_glass` | 3,000 | 3,000 | 3,000 |
+| `ice_box_styrofoam` | 3,000 | 3,000 | 3,000 |
+| `altar_tray_offerings` | 3,000 | 3,000 | 3,000 |
+| `lamp_post_village` | 3,000 | 3,000 | 3,000 |
+| `coconut_palm` | 3,000 | 2,998 | 5,338 |
+| `motorbike_cub` | 3,000 | 3,000 | 3,000 |
+| `fish_drying_rack` | 3,000 | 3,000 | 3,000 |
+| `clothesline` | 3,000 | 3,000 | 3,000 |
+| `boat_pulled_up` | 3,000 | 3,000 | 3,000 |
+| `thung_boat` | 3,000 | 3,000 | 3,000 |
+| `shed_tin` | 3,000 | 3,000 | 3,000 |
+| `boat_upturned` | 3,000 | 3,000 | 3,000 |
+| `planter_tree_street` | 3,000 | 1,763 | 1,763 |
+| `tube_house_a` | 5,000 | 5,000 | 5,000 |
+| `tube_house_b` | 5,000 | 5,000 | 5,000 |
+| `tube_house_c` | 5,000 | 5,000 | 5,000 |
+
+75 góc review, food/drink/mâm cúng đã nối, plan furniture và giới hạn UV/material:
 [HORROR_CODEX_DELIVERY_5.md](HORROR_CODEX_DELIVERY_5.md).

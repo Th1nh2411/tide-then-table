@@ -1,0 +1,86 @@
+{
+  "provider": "tencent/Hunyuan3D-2.1",
+  "space": "https://huggingface.co/spaces/tencent/Hunyuan3D-2.1",
+  "client_version": "gradio-client==1.3.0",
+  "started_utc": "2026-11-04T07:08:35.897691+00:00",
+  "input": "assets/concepts/horror/tube_house_c.png",
+  "input_sha256": "ac63ff7f6acec2036a8fc2a836cfbcff08be4a324cd82eff6cd45801689010c3",
+  "shape_parameters": {
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "seed": 1234,
+    "octree_resolution": 192,
+    "check_box_rembg": true,
+    "num_chunks": 8000,
+    "randomize_seed": false
+  },
+  "texture_generated": false,
+  "rig_generated": false,
+  "reduction": {
+    "target_face_num": 5000,
+    "file_type": "glb",
+    "tool": "trimesh.simplify_quadric_decimation / fast-simplification",
+    "input": "Hunyuan raw GLB",
+    "input_faces": 394068,
+    "reason": "Space export failed twice during network/SSE; local CPU reduction, no new inference"
+  },
+  "shape_result_reference": {
+    "value": {
+      "path": "/tmp/gradio/1747ccf31d03722b5cfa6fa2d21b1a28814c8ba79d92144abba7bb0b40277678/white_mesh.glb",
+      "url": "https://tencent-hunyuan3d-2-1.hf.space/file=/tmp/gradio/1747ccf31d03722b5cfa6fa2d21b1a28814c8ba79d92144abba7bb0b40277678/white_mesh.glb",
+      "size": 7094080,
+      "orig_name": "white_mesh.glb",
+      "mime_type": null,
+      "is_stream": false,
+      "meta": {
+        "_type": "gradio.FileData"
+      }
+    },
+    "__type__": "update"
+  },
+  "shape_stats": {
+    "model": {
+      "shapegen": "tencent/Hunyuan3D-2.1/hunyuan3d-dit-v2-1",
+      "texgen": "tencent/Hunyuan3D-2.1"
+    },
+    "params": {
+      "caption": null,
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "seed": 1234,
+      "octree_resolution": 192,
+      "check_box_rembg": true,
+      "num_chunks": 8000
+    },
+    "number_of_faces": 394068,
+    "number_of_vertices": 197000,
+    "time": {
+      "remove background": 1.005734920501709,
+      "shape generation": 9.80585789680481,
+      "export to trimesh": 0.09641170501708984,
+      "total": 10.910636186599731
+    }
+  },
+  "status": "success",
+  "raw_sha256": "1747ccf31d03722b5cfa6fa2d21b1a28814c8ba79d92144abba7bb0b40277678",
+  "previous_failures": [
+    {
+      "error_type": "ReadTimeout",
+      "error": "The read operation timed out"
+    }
+  ],
+  "raw": "tube_house_c_raw.glb",
+  "reduced": "tube_house_c_reduced.glb",
+  "reduced_sha256": "62e934cd989b3e0f875df0a15d28125cab78efcb99f934c4944c0d731336c2b8",
+  "reduced_faces": 5000,
+  "source_reduced_sha256": "63792b5fcfc6d4714c10a3284c3441d8a0ad80c74d83fe7b4dd445cba65a42b6",
+  "integration": {
+    "normals_added_primitives": 1,
+    "geometry_unchanged": true,
+    "source_faces": 5000,
+    "runtime_faces": 5000,
+    "tool": "tools/art/prepare_horror_models.py",
+    "material_concept_sha256": "ac63ff7f6acec2036a8fc2a836cfbcff08be4a324cd82eff6cd45801689010c3",
+    "source_directory": "build/brief5/generated/tube_house_c"
+  }
+}

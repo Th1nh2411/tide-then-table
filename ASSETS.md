@@ -424,3 +424,18 @@ Bốn concept cũ `bamboo_fence`, `power_pole`, `roadside_shrine`,
 `fishing_nets_drying` nay 1024×1024 RGBA để loại nền khỏi projection;
 backup PNG/sidecar gốc trong `.art_backups/brief4_projection_20261103/`.
 Inference GLB và tên file giữ nguyên. Review đủ 3 góc/model trong delivery 4.
+
+## Horror brief 5 — models, 2026-11-04
+
+Đủ 25 ID trong `tools/art/horror_brief5_models.json`, output
+`assets/models/ready/<id>/<id>_raw.glb` + `<id>_reduced.glb`, provenance và license.
+Đợt mới 74.761 tam giác; metadata `horror_models.gd/.json` giữ đủ 50 ID của hai đợt.
+Raw là inference Hunyuan; reduced được kiểm budget/normals, có ghi giảm CPU
+trong provenance khi cần. Không thay concept PNG hay asset sprite approved.
+
+Đã nối đĩa/tô/tháp bia/ly/khay phục vụ và mâm cúng bình thường. Furniture quán
+chưa thay, prop làng được builder hiện hành tự nhận; không chỉnh placement/world.
+Chi tiết triangle, review và giới hạn: `docs/HORROR_CODEX_DELIVERY_5.md`.
+
+Cây bàng giữ bồn Hunyuan, sửa thân/cành/lá 3D bằng recipe Python; nguồn Blender
+ở `art_source/horror/planter_tree_street_repair.blend` (Godot bỏ qua thư mục source).

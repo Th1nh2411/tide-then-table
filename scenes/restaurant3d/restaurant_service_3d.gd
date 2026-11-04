@@ -156,18 +156,14 @@ func sync_food_visuals() -> void:
 		host.table_plates[i].visible = host.dirty_tables[i] or (not order.is_empty() and str(order.get("phase", "waiting")) == "eating")
 
 		var displayed_dish: DishData = order.get("dish")
-		var is_beer := displayed_dish != null and displayed_dish.instant_serve
-		for plate: Node3D in [host.ready_plates[i], host.table_plates[i]]:
-			_show_beer(plate, is_beer)
+		ServedFoodVisual3D.show_dish(host.ready_plates[i], displayed_dish, true)
+		if not order.is_empty() or not host.dirty_tables[i]:
+			ServedFoodVisual3D.show_dish(host.table_plates[i], displayed_dish, false, true)
 	# What Rin carries: a beer tower or a plate.
 	var held: Node3D = host.body.plate
-	if not held.has_node("BeerTower"):
-		RestaurantBatchVisuals.add(held, "beer_tower", Vector3(0, 0.02, 0)).name = "BeerTower"
 	var carried: DishData = host.orders[host.carrying_table].get("dish") if host.carrying_table >= 0 else null
-	_show_beer(held, carried != null and carried.instant_serve)
+	ServedFoodVisual3D.show_dish(held, carried)
 
 
 static func _show_beer(plate: Node3D, is_beer: bool) -> void:
-	for part: Node in plate.get_children():
-		if part is Node3D:
-			part.visible = is_beer if part.name == "BeerTower" else not is_beer
+	ServedFoodVisual3D.show_kind(plate, "beer_tower" if is_beer else "dish_plate_fish")
