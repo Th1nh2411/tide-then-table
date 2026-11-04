@@ -10,6 +10,7 @@ const LOOKS := {
 	"guest_1": {}, "guest_2": {}, "guest_3": {}, "guest_4": {}, "guest_5": {},
 	"guest_6": {}, "guest_7": {}, "guest_8": {}, "guest_9": {},
 	"guest_regular": {}, "drowned_m": {}, "drowned_f": {},
+	"ma_da": {}, "ma_da_b": {}, "drowned_old": {}, "corpse": {},
 	"guest": {}, "drowned": {},
 }
 const GUEST_POOL := 9

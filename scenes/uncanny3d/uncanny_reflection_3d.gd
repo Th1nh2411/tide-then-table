@@ -3,7 +3,7 @@ extends Node3D
 ## A figure that is only in the water (fake reflection): when Rin stands on
 ## the pier and looks down, the water in front of him shows someone standing
 ## right behind him, upside down. Nobody is behind him. Once he turns round,
-## or looks away up, it is gone for good. Kept simple: a dark silhouette
+## or looks away up, it is gone for good. A drowned body (GhostCast3D)
 ## mirrored under the water line, drawn faintly over the water.
 
 ## Camera pitch (degrees below the horizon) that counts as "looking down".
@@ -28,8 +28,12 @@ static func spawn(parent: Node3D, water_y_: float) -> UncannyReflection3D:
 
 func _ready() -> void:
 	top_level = true
-	_figure = UncannyScene3D.silhouette(self, height, alpha, true)
-	_figure.scale = Vector3(1, -1, 1)  # mirrored: head down in the water
+	var rig := GhostCast3D.figure(self, "", true)
+	for m in GhostCast3D.materials(rig):
+		GhostLook3D.set_opacity(m, alpha)
+	GhostCast3D.draw_over(rig)
+	_figure = rig
+	_figure.scale = Vector3(1, -1, 1) * height / 1.7  # mirrored: head down in the water
 	_figure.visible = false
 
 

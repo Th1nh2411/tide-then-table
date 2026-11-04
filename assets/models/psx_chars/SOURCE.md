@@ -24,6 +24,16 @@
 | Character_Male_53 | guest_9 |
 | Character_Male_57 | drowned_m (drowned ghost) |
 | Character_31_Female | drowned_f (drowned ghost) |
+| Character_Female_09 | ma_da (long-haired drowned woman; ghost look only) |
+| Character_47_Female | ma_da_b (second ma da; ghost look only) |
+| Character_32 | drowned_old (thin old man; ghost look only) |
+| Character_Killer_06 (`Rig/Killer_M`) | corpse (long-drowned body; ghost look only, never plain: its own texture is a bloody slasher) |
+
+Ghost cast review (`scenes/art_pilots/horror_cast_review.tscn`, shots in
+`build/shot/horror_cast/`): also tried and dropped (not copied): Character_Monster
+(alien face, rig imports without a skeleton), Character_Killer_08 (pig mask,
+slasher), Female 36/37/40/44/49/Female_08 (short hair, office / rock / lace
+clothes), Male 29/41/43 (Character_32 reads older and thinner).
 
 - Not from the pack: `clip_source.glb` is a copy of the game's own
   `assets/models/ready/bao/bao.glb` (batch rig with Idle / Walk / Carry), used

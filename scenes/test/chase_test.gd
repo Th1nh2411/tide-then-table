@@ -204,9 +204,9 @@ func _excluded(village: VillageScene3D) -> void:
 
 
 func _figure(village: VillageScene3D, at: Vector3, kind: ProximityZone3D.Kind) -> Dictionary:
-	var body := UncannyScene3D.silhouette(village, 1.7, 0.9)
+	var body := GhostCast3D.figure(village)
 	body.global_position = at
-	var zone := ProximityZone3D.guard(body, kind)
+	var zone := ProximityZone3D.guard(body, kind, GhostCast3D.actor_of(body))
 	zone.set_process(false)
 	await get_tree().process_frame
 	return {"body": body, "zone": zone}

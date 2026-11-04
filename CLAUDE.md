@@ -225,7 +225,11 @@ Vietnamese, keep code comments in short English.
   (batch Idle/Walk/Carry) are humanoid-retargeted on import, bones renamed to
   profile names ("LeftFoot"); look bones up with `RinPilotVisual.bone("Foot.L")`.
   New model: copy FBX + PNG, `--import`, `tools/psx_chars/set_retarget_import.py`,
-  `--import`, add to `CAST`. Test `psx_characters_test`.
+  `--import`, add to `CAST`. Test `psx_characters_test`. Ghost figures
+  (fog / chase / pier head / extra person / đêm âm / faces) are
+  `GhostCast3D.figure(parent[, id])`: ghost-only ids `ma_da`, `ma_da_b`,
+  `drowned_old`, `corpse` + drowned_m/f, POOL rotated, no collider, frozen;
+  no primitive figures. Review: `scenes/art_pilots/horror_cast_review.tscn`.
   Roles (PLAN §10 "Vai trò nhân vật"): each villager's E line is data,
   `data/story/<who>.tres` (`NpcLinesData`: one entry per day, "|" splits
   lines, omen / night / after-reset variants) shown by `NpcTalk3D` (close +

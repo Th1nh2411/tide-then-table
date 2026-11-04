@@ -45,12 +45,12 @@ static func close_door_unseen(host: Node, door: VillageDoor3D, gate: Callable = 
 
 
 ## One person too many: shows at `at` between two looks, gone after the
-## next one; `cycles` times. Returns the figure (hidden at first).
-static func extra_figure(host: Node3D, at: Vector3, face: Vector3, kind: String = "guest", cycles: int = 2) -> PersonRig3D:
-	var rig := PersonRig3D.build(host, kind)
+## next one; `cycles` times. A drowned one from the ghost cast (`kind` ""
+## = the next of GhostCast3D.POOL). Returns the figure (hidden at first).
+static func extra_figure(host: Node3D, at: Vector3, face: Vector3, kind: String = "", cycles: int = 2) -> PersonRig3D:
+	var rig := GhostCast3D.figure(host, kind)
 	rig.global_position = at
 	UncannyMoves3D.face_dir(rig, face - at)
-	UncannyMoves3D.ghost_body(rig)
 	rig.visible = false
 	UnseenTrick3D.watch(rig, func(_s: int) -> void:
 			rig.visible = not rig.visible,
@@ -95,52 +95,3 @@ static func lights_under(root: Node) -> Array[Node3D]:
 		if not light is DirectionalLight3D:
 			found.append(light as Node3D)
 	return found
-
-
-## A dark figure built from primitives (no skeleton): body, head, pale eyes.
-## `no_depth`: drawn over everything (the reflection).
-static func silhouette(parent: Node3D, height: float, alpha: float, no_depth: bool = false) -> Node3D:
-	var root := Node3D.new()
-	root.name = "Silhouette"
-	parent.add_child(root)
-	var dark := StandardMaterial3D.new()
-	dark.albedo_color = Color(0.03, 0.04, 0.04, alpha)
-	dark.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	dark.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	dark.no_depth_test = no_depth
-	var torso := CapsuleMesh.new()
-	torso.radius = height * 0.1
-	torso.height = height * 0.42
-	_part(root, torso, Vector3(0, height * 0.64, 0), dark)
-	var limb := CapsuleMesh.new()
-	limb.radius = height * 0.035
-	limb.height = height * 0.5
-	for side: float in [-1.0, 1.0]:
-		_part(root, limb, Vector3(side * height * 0.055, height * 0.25, 0), dark)  # legs
-		_part(root, limb, Vector3(side * height * 0.135, height * 0.6, 0), dark)  # arms hanging
-	var head := SphereMesh.new()
-	head.radius = height * 0.065
-	head.height = height * 0.14
-	_part(root, head, Vector3(0, height * 0.91, 0), dark)
-	var pale := StandardMaterial3D.new()
-	pale.albedo_color = Color(0.85, 0.9, 0.85, minf(alpha * 1.8, 1.0))
-	pale.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	pale.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	pale.no_depth_test = no_depth
-	pale.render_priority = 1
-	var eye := SphereMesh.new()
-	eye.radius = height * 0.009
-	eye.height = height * 0.018
-	for side: float in [-1.0, 1.0]:
-		_part(root, eye, Vector3(side * height * 0.024, height * 0.915, height * 0.06), pale)
-	return root
-
-
-static func _part(root: Node3D, mesh: PrimitiveMesh, at: Vector3, material: Material) -> MeshInstance3D:
-	var part := MeshInstance3D.new()
-	part.mesh = mesh
-	part.material_override = material
-	part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	part.position = at
-	root.add_child(part)
-	return part

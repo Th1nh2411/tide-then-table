@@ -1,19 +1,21 @@
 class_name DarkNightFigure3D
 extends Node3D
-## Something at the edge of the lamp on đêm âm (DarkNight3D). STAND: a dark
-## person standing on the water, pale eyes. SWIM: only a head and eyes
-## gliding sideways, half under. Either one is gone the moment Rin looks
-## straight at it (or when its time is up, sinking quietly).
+## Something at the edge of the lamp on đêm âm (DarkNight3D). STAND: a
+## drowned person (GhostCast3D) standing on the water, pale eyes. SWIM: only
+## the head and eyes gliding sideways, the body under the water. Either one
+## is gone the moment Rin looks straight at it (or when its time is up,
+## sinking quietly).
 
 signal vanished(seen: bool)
 
 enum Kind { STAND, SWIM }
 
+const SWIM_HEAD_Y := 0.08
+
 @export var look_angle_deg := 13.0
 @export var fade_seconds := 0.18
 @export var lifetime := 9.0
 @export var swim_speed := 1.4
-@export var body_color := Color("0b0d0c")
 @export var eye_color := Color("dfe9e2")
 
 var kind := Kind.STAND
@@ -21,22 +23,22 @@ var swim_dir := Vector3.RIGHT
 var _age := 0.0
 var _leaving := false
 var _materials: Array[StandardMaterial3D] = []
+var _rig: PersonRig3D
 
 
 func _ready() -> void:
-	var head_y := 1.62 if kind == Kind.STAND else 0.08
-	if kind == Kind.STAND:
-		GhostLook3D.apply(ConceptModel3D.spawn(self, "drowned_figure", Vector3.ZERO, 1.72))
-	else:
-		var head := SphereMesh.new()
-		head.radius = 0.15
-		head.height = 0.32
-		_part(head, Vector3(0, head_y, 0), body_color, false)
+	# A drowned body from the ghost cast; swimming, only its head is above water.
+	_rig = GhostCast3D.figure(self, "", true)
+	var head := to_local(GhostCast3D.actor_of(_rig).head_position())
+	var head_y := head.y
+	if kind == Kind.SWIM:
+		_rig.position.y = SWIM_HEAD_Y - head.y
+		head_y = SWIM_HEAD_Y
 	var eye := SphereMesh.new()
-	eye.radius = 0.025
-	eye.height = 0.05
-	for side: float in [-0.055, 0.055]:
-		_part(eye, Vector3(side, head_y + 0.02, 0.13), eye_color, true)
+	eye.radius = 0.018
+	eye.height = 0.036
+	for side: float in [-0.035, 0.035]:
+		_part(eye, Vector3(side, head_y - 0.03, head.z + 0.1), eye_color, true)
 
 
 func _process(delta: float) -> void:
@@ -66,6 +68,7 @@ func vanish(seen: bool) -> void:
 	var tween := create_tween().set_parallel()
 	for material in _materials:
 		tween.tween_property(material, "albedo_color:a", 0.0, fade_seconds if seen else 1.2)
+	GhostCast3D.fade(tween, _rig, 0.0, fade_seconds if seen else 1.2)
 	if not seen:
 		tween.tween_property(self, "position:y", position.y - 1.6, 1.2)
 	await tween.finished

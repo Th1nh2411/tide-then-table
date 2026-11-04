@@ -8,8 +8,8 @@ const DIR := "res://assets/models/psx_chars/"
 const CLIP_SOURCE := DIR + "clip_source.glb"
 const ONE_SHOTS := ["Cast", "SitDown", "StandUp"]
 const SPINE := ["Spine", "Chest", "UpperChest", "Neck", "Head"]
-## The dead (GhostLook3D): drowned figures and ông Tư.
-const GHOSTS := ["drowned_m", "drowned_f", "ong_tu"]
+## The dead (GhostLook3D): drowned figures (GhostCast3D.POOL) and ông Tư.
+const GHOSTS := ["drowned_m", "drowned_f", "ong_tu", "ma_da", "ma_da_b", "drowned_old", "corpse"]
 ## Variant id -> pack model (file name without .fbx). Several ids may share one.
 const CAST := {
 	"bao": "Character_Male_46", "co_nam": "Character_51_Female",
@@ -25,6 +25,10 @@ const CAST := {
 	# Chú Bảy, the dead regular: his model is kept out of the guest pool.
 	"chu_bay": "Character_Male_53",
 	"drowned_m": "Character_Male_57", "drowned_f": "Character_31_Female",
+	# Ghost-only models (never plain): long-haired women (ma da), a thin old
+	# man, a long-drowned body.
+	"ma_da": "Character_Female_09", "ma_da_b": "Character_47_Female",
+	"drowned_old": "Character_32", "corpse": "Character_Killer_06",
 }
 
 static var _clips: Array[Animation] = []
@@ -32,6 +36,8 @@ static var _clip_names: Array[String] = []
 static var _materials: Dictionary = {}
 
 var asset_id: String = "bao"
+## False keeps a ghost id in its plain pack look (review scenes).
+var ghost_look := true
 
 
 func _ready() -> void:
@@ -43,13 +49,15 @@ func load_variant(id: String) -> void:
 	if model:
 		remove_child(model)
 		model.queue_free()
-	model = load(DIR + str(CAST.get(id, CAST["guest_1"])) + ".fbx").instantiate()
+	# Unknown ids may name a pack file directly (review scenes).
+	var file := str(CAST.get(id, id if ResourceLoader.exists(DIR + id + ".fbx") else CAST["guest_1"]))
+	model = load(DIR + file + ".fbx").instantiate()
 	add_child(model)
 	WorldPresentation3D.cast_shadows(model)
 	skeleton = model.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
 	animation = model.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
 	_style_materials()
-	if id in GHOSTS:
+	if id in GHOSTS and ghost_look:
 		GhostLook3D.apply(self)
 	elif has_meta(StylePass3D.SKIP):
 		remove_meta(StylePass3D.SKIP)  # was a ghost variant before

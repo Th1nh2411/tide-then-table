@@ -24,11 +24,11 @@ func show_sign(count: int, side: float, mouth: float, range_z: Vector2) -> void:
 	_side = side
 	_mouth = mouth
 	if count >= 3:
-		_figure = UncannyScene3D.silhouette(self, 1.7, 0.9)
+		_figure = GhostCast3D.figure(self)
 		# On the sea side of the path: if it chases, Rin runs landward (ChaseRules).
 		_figure.position = Vector3(mouth + side * figure_depth, 0, range_z.x + 0.6)
 		_figure.rotation.y = side * PI * 0.5  # eyes (+Z) towards Rin coming out of the fog
-		ProximityZone3D.guard(_figure, ProximityZone3D.Kind.CHASE)
+		ProximityZone3D.guard(_figure, ProximityZone3D.Kind.CHASE, GhostCast3D.actor_of(_figure))
 		return
 	var gold := StandardMaterial3D.new()
 	gold.albedo_color = Color("c9a24a")

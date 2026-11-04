@@ -56,7 +56,8 @@ func _start_evening() -> void:
 				and host.player.global_position.distance_to(host.door.global_position) > 6.0)
 	# Avoidable sights get a "too close" zone (ProximityZone3D).
 	if UncannyDirector.has(plan, "extra_figure"):
-		ProximityZone3D.guard(UncannyScene3D.extra_figure(self, EXTRA_FIGURE, EXTRA_FIGURE + Vector3(0, 0, -3)))
+		var extra := UncannyScene3D.extra_figure(self, EXTRA_FIGURE, EXTRA_FIGURE + Vector3(0, 0, -3))
+		ProximityZone3D.guard(extra, ProximityZone3D.Kind.SCARE, GhostCast3D.actor_of(extra))
 	if UncannyDirector.has(plan, "glowing_eyes"):
 		var lamp := OmenProps3D.light(self, EYES_LAMP, "ffcf8a", 0.25, 5.0)
 		var eyes := UncannyEyes3D.spawn(self, EYES, EYES + Vector3(0, 0, -4), lamp)
@@ -100,7 +101,7 @@ func _pier_figure_blocks() -> void:
 func _guard_pier_figure() -> void:
 	var figure := _pier_figure()
 	if figure:
-		var zone := ProximityZone3D.guard(figure, ProximityZone3D.Kind.CHASE)
+		var zone := ProximityZone3D.guard(figure, ProximityZone3D.Kind.CHASE, GhostCast3D.actor_of(figure))
 		if zone:
 			zone.no_chase = func() -> bool: return VillageLayout3D.on_pier(host.player.global_position)
 
@@ -108,7 +109,7 @@ func _guard_pier_figure() -> void:
 func _pier_figure() -> Node3D:
 	if not OmenPicker.is_tonight("bong_cau_tau") or host.dock_omens == null:
 		return null
-	return host.dock_omens.get_node_or_null("Model_drowned_figure") as Node3D
+	return host.dock_omens.get_node_or_null(DockOmens3D.PIER_FIGURE) as Node3D
 
 
 ## Rin's area on the map ("house" / "street" / "lane" / "waterfront").

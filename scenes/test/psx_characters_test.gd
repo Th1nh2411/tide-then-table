@@ -61,8 +61,40 @@ func _run() -> void:
 	var a := PersonRig3D.build(self, "drowned")
 	var b := PersonRig3D.build(self, "drowned")
 	check(a.get_variant() != b.get_variant() and a.get_variant().begins_with("drowned"), "Drowned ghosts alternate the two models")
+	await _ghost_cast()
 	print("PSX CHARACTERS ", "PASS" if failures == 0 else "FAIL")
 	get_tree().quit(1 if failures else 0)
+
+
+## Every ghost-cast id loads its own model with the ghost look; the pool
+## rotates without repeating a face; a ghost figure has no collider.
+func _ghost_cast() -> void:
+	var files: Dictionary = {}
+	var ok := true
+	for id: String in GhostCast3D.POOL:
+		ok = ok and PsxCharacterVisual.CAST.has(id) and id in PsxCharacterVisual.GHOSTS and PersonRig3D.LOOKS.has(id)
+		files[PsxCharacterVisual.CAST.get(id, "")] = true
+	check(ok and files.size() == GhostCast3D.POOL.size(), "ghost cast: %d ids, each its own model, all ghosts" % GhostCast3D.POOL.size())
+	var seen: Array[String] = []
+	for i in GhostCast3D.POOL.size():
+		seen.append(GhostCast3D.next_id())
+	var unique := true
+	for i in seen.size():
+		unique = unique and seen.count(seen[i]) == 1
+	check(unique, "the pool shows every face once before repeating")
+	var rig := GhostCast3D.figure(self, "ma_da")
+	await get_tree().process_frame
+	var blocker := rig.get_node_or_null("PersonBlocker") as StaticBody3D
+	var ghost := not GhostCast3D.materials(rig).is_empty() and rig.visual().has_meta(StylePass3D.SKIP)
+	check(ghost and blocker != null and blocker.collision_layer == 0 and GhostCast3D.actor_of(rig) != null, "ma_da: ghost look, no collider, an uncanny actor")
+	var faded := GhostCast3D.figure(self, "corpse", true)
+	var tween := create_tween()
+	GhostCast3D.fade(tween, faded, 0.0, 0.05)
+	await tween.finished
+	var m := GhostCast3D.materials(faded)
+	check(not m.is_empty() and GhostLook3D.opacity(m[0]) < 0.01 and GhostLook3D.opacity(GhostCast3D.materials(rig)[0]) > 0.99, "a unique ghost fades alone")
+	rig.queue_free()
+	faded.queue_free()
 
 
 func _local(visual: RinPilotVisual, bone: int) -> Vector3:

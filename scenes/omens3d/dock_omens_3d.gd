@@ -15,6 +15,8 @@ const LANTERNS := 5
 const LANTERN_SPEED := 0.22
 const BEACON_CALM := "ffe2a0"
 const BEACON_OMEN := "39ff8a"
+## The drowned figure at the pier head (bong_cau_tau), a GhostCast3D rig.
+const PIER_FIGURE := "PierFigure"
 
 ## Set by build(): the pier-head post, the beacons' tops, and where the lanterns float.
 var pier_post: Vector3
@@ -75,7 +77,11 @@ func _build_pier_head(post: Vector3, figure: bool) -> void:
 		OmenProps3D.light(self, post + Vector3(0, 0.9, 0.3), "ffb347", 1.0, 4.0)
 		return
 	OmenProps3D.box(self, post + Vector3(0, 0.8, 0.14), Vector3(0.14, 0.18, 0.14), "3a3226")
-	GhostLook3D.apply(ConceptModel3D.spawn(self, "drowned_figure", post + Vector3(-0.8, 0, 0.1), 1.72, PI))
+	# Back to the shore, looking out to sea; the long-haired ma da.
+	var ghost := GhostCast3D.figure(self, "ma_da")
+	ghost.name = PIER_FIGURE
+	ghost.position = post + Vector3(-0.8, 0, 0.1)
+	ghost.rotation.y = PI
 
 
 ## Small notes dropped along the pier, from the shore out towards its head.

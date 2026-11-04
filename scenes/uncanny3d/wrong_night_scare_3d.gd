@@ -68,11 +68,9 @@ static func due_at_wake(result: LoopCalendar.Result) -> int:
 
 func _ready() -> void:
 	top_level = true
-	_figure = PersonRig3D.build(self, "drowned_f" if variant == 1 else "drowned_m")
-	UncannyMoves3D.ghost_body(_figure)
-	UncannyMoves3D.remove_shadow(_figure)
-	var actor := UncannyActor3D.attach(_figure)
-	actor.freeze()
+	# 0 a drowned man, 1 the ma da hanging upside down (hair falls), 2 a woman.
+	_figure = GhostCast3D.figure(self, GhostCast3D.FACES[posmod(variant, GhostCast3D.FACES.size())])
+	var actor := GhostCast3D.actor_of(_figure)
 	if variant == 2:
 		actor.glitch_face(true)
 
