@@ -3,7 +3,8 @@ extends Node
 ## The uncanny toolkit for one person (PersonRig3D, PSX humanoid rig): a
 ## head that keeps facing Rin past the shoulder (stare_at), a pose held too
 ## long (freeze), a body moving at 6-8 fps in a 60 fps world (choppy), a
-## face of pixel noise (glitch_face). Movement tricks: UncannyMoves3D.
+## face of pixel noise (glitch_face), the same face again on the back of
+## the head (two_faces, TwoFace3D). Movement tricks: UncannyMoves3D.
 ## Survives the rig swapping its model (set_variant): re-attaches.
 ## attach(rig) adds it as the rig's child "Uncanny".
 
@@ -105,6 +106,14 @@ func glitch_face(on: bool) -> void:
 		look.jitter = 0.09 if on else 0.0
 		if on and look.influence < 1.0 and not _staring:
 			look.influence = 1.0
+
+
+## A second face on the back of the head, shown only while Rin is behind
+## and not looking (TwoFace3D); now = at once (review). Returns the node.
+func two_faces(on: bool, now := false) -> TwoFace3D:
+	var faces := TwoFace3D.attach(rig)
+	faces.set_wanted(on, now)
+	return faces
 
 
 func head_position() -> Vector3:

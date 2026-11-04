@@ -13,15 +13,16 @@ extends Node3D
 var _papers: Array[MeshInstance3D] = []
 var _figure: Node3D
 var _side := 0.0
+var _mouth := 0.0
 var _clock := 0.0
 
 
-## Shows tonight's sign on the path `side` (-1 west, +1 east) for try `count`.
-func show_sign(count: int, side: float, loop: WorldEdgeLoop3D) -> void:
+## Shows tonight's sign on the path `side` (-1 runs to -X, +1 to +X, in this
+## node's space) starting at x = `mouth` over `range_z`, for try `count`.
+func show_sign(count: int, side: float, mouth: float, range_z: Vector2) -> void:
 	_clear()
 	_side = side
-	var range_z := loop.east_z if side > 0.0 else loop.west_z
-	var mouth := WorldEdgeLoop3D.EAST_MOUTH if side > 0.0 else WorldEdgeLoop3D.WEST_MOUTH
+	_mouth = mouth
 	if count >= 3:
 		_figure = UncannyScene3D.silhouette(self, 1.7, 0.9)
 		_figure.position = Vector3(mouth + side * figure_depth, 0, range_z.y - 0.6)
@@ -58,9 +59,8 @@ func update(player: Vector3, at: Vector2) -> void:
 		paper.position.x += _side * paper_speed * delta * (0.7 + 0.1 * float(i % 4))
 		paper.position.y = 0.3 + float(i % 5) * 0.35 + sin(_clock * 2.0 + float(i)) * 0.25
 		paper.rotation = Vector3(_clock * 3.0 + float(i), _clock * 1.7, _clock * 2.3 + float(i))
-		var mouth := WorldEdgeLoop3D.EAST_MOUTH if _side > 0.0 else WorldEdgeLoop3D.WEST_MOUTH
-		if absf(paper.position.x - mouth) > 24.0:
-			paper.position.x = mouth + _side * 5.0
+		if absf(paper.position.x - _mouth) > 24.0:
+			paper.position.x = _mouth + _side * 5.0
 	if _figure and player.distance_to(_figure.global_position) < figure_gone_within:
 		_figure.queue_free()
 		_figure = null

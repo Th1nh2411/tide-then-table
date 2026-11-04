@@ -3,7 +3,7 @@ extends RefCounted
 ## Which "uncanny" visuals may play tonight (pure). Deterministic per
 ## (loop, day) like OmenPicker, so reloads / tests / the bot agree. Dose
 ## (UncannyDose): mùng 9-10 only moved props / unseen tricks, from 11 small
-## sights, from 12 wrong movement, 13-14 the heavy ones (appear beside Rin,
+## sights, from 12 wrong movement and two faces (once a night), 13-14 the heavy ones (appear beside Rin,
 ## dash, one-frame flash), never more than one heavy per night. Never
 ## touches omens: OmenPicker alone decides which nights are wrong.
 ## Jump scares are gated here too: never two on consecutive days.
@@ -32,7 +32,9 @@ static func plan(loop: int, day: int, omen: bool, dose: UncannyDose = DOSE) -> D
 	var pool := allowed_light(day, dose)
 	var count := mini(dose.light_base + int(dose.light_per_day * float(day - 1)), dose.light_cap)
 	for i in (count if not pool.is_empty() else 0):
-		light.append(pool[rng.randi() % pool.size()])
+		var id := pool[rng.randi() % pool.size()]
+		if not (id in dose.once_per_night and id in light):
+			light.append(id)
 	var heavy := ""
 	var heavies := allowed_heavy(day, dose)
 	if not heavies.is_empty() and rng.randf() < dose.heavy_chance:
@@ -84,6 +86,17 @@ static func subtitle_day(loop: int, dose: UncannyDose = DOSE) -> int:
 ## Tonight's plan from GameState.
 static func tonight() -> Dictionary:
 	return plan(LoopCalendar.loops(), GameState.day, GameState.has_flag(LoopCalendar.OMEN_FLAG))
+
+
+## Two faces may go on this person: never anh Út (his face stays his own
+## until RamReveal3D), nor Rin.
+static func two_faces_ok(rig: Node) -> bool:
+	var node := rig
+	while node:
+		if node is RamGuest3D or node.name == "AnhUt":
+			return false
+		node = node.get_parent()
+	return rig is PersonRig3D and (rig as PersonRig3D).get_variant() != "rin"
 
 
 static func has(plan_: Dictionary, id: String) -> bool:

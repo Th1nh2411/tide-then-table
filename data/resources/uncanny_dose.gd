@@ -3,12 +3,16 @@ extends Resource
 ## How much "uncanny" each day may carry (UncannyDirector). Days are
 ## GameState.day: 1 = mùng 9 ... 7 = rằm.
 
-## Light effects -> first day they may play. Light ones can repeat.
+## Light effects -> first day they may play (two_faces: the same face on
+## the back of a head, TwoFace3D).
 @export var light_from_day: Dictionary = {
 	"props_turned": 1, "door_closed": 1,
 	"extra_figure": 3, "missing_shadow": 3, "glowing_eyes": 3, "reflection": 3, "flicker_pose": 3,
 	"stare": 4, "freeze": 4, "choppy": 4, "wrong_walk": 4, "glitch_face": 4,
+	"two_faces": 4,
 }
+## Light effects that may play at most once a night (the rest can repeat).
+@export var once_per_night: Array[String] = ["two_faces"]
 ## Heavy effects -> first day. At most one heavy effect per night.
 @export var heavy_from_day: Dictionary = {"appear_close": 5, "dash": 5, "flash": 5}
 ## No heavy effect after this day (rằm has its own reveal).

@@ -1,23 +1,28 @@
 extends Node3D
 ## Visual review of the uncanny toolkit (not a test): plays each effect on a
 ## PSX character one by one, Space = next. With `-- --shots` it saves a PNG
-## of each into build/shot/ and quits (run windowed: --resolution 1280x720).
+## of each into build/shot/ and quits (run windowed: --resolution 1280x720);
+## `-- --only=two_faces` keeps the steps starting with that.
 
 const SHOT_DIR := "res://build/shot/"
 const STEPS: Array[String] = ["stare", "freeze", "choppy", "glitch_face", "wrong_walk", "dash",
-	"appear_close", "wrong_night_face", "tu_points", "reflection"]
+	"appear_close", "wrong_night_face", "tu_points", "reflection", "two_faces", "two_faces_far", "two_faces_side", "two_faces_bao"]
 
 var camera := Camera3D.new()
 var rig: PersonRig3D
 var actor: UncannyActor3D
 var label := Label.new()
 var _index := -1
+var _steps: Array[String] = STEPS.duplicate()
 var _shots := false
 var _extra: Array[Node] = []
 
 
 func _ready() -> void:
 	_shots = "--shots" in OS.get_cmdline_user_args()
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--only="):
+			_steps = _steps.filter(func(id: String) -> bool: return id.begins_with(arg.trim_prefix("--only=")))
 	var env := WorldEnvironment.new()
 	env.environment = Environment.new()
 	env.environment.background_mode = Environment.BG_COLOR
@@ -57,15 +62,15 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _next() -> void:
 	_index += 1
-	if _index >= STEPS.size():
+	if _index >= _steps.size():
 		if _shots:
 			get_tree().quit()
 			return
 		_index = 0
-	await _play(STEPS[_index])
+	await _play(_steps[_index])
 	if _shots:
 		await get_tree().create_timer(0.3).timeout
-		_shot(STEPS[_index])
+		_shot(_steps[_index])
 		_next()
 
 
@@ -84,8 +89,8 @@ func _reset_stage(kind: String = "guest_3") -> void:
 
 
 func _play(step: String) -> void:
-	label.text = "%d/%d  %s  (Space: tiếp)" % [_index + 1, STEPS.size(), step]
-	_reset_stage("drowned" if step == "appear_close" else "guest_3")
+	label.text = "%d/%d  %s  (Space: tiếp)" % [_index + 1, _steps.size(), step]
+	_reset_stage("drowned" if step == "appear_close" else ("bao" if step == "two_faces_bao" else "guest_3"))
 	match step:
 		"stare":
 			# Body turned 150° away from the camera; the head still finds it.
@@ -128,6 +133,16 @@ func _play(step: String) -> void:
 			_extra.append(tu)
 			await get_tree().create_timer(0.1).timeout
 			camera.rotate_y(PI)  # Rin turns round
+		"two_faces", "two_faces_far", "two_faces_side", "two_faces_bao":
+			# From behind: the back of the head looks back at Rin (side:
+			# three-quarter back, both faces at once).
+			rig.rotation.y = PI * (0.62 if step == "two_faces_side" else 1.0)
+			await get_tree().process_frame
+			actor.two_faces(true, true)
+			var head := actor.head_position()
+			var away := 3.0 if step == "two_faces_far" else 0.55
+			camera.global_position = head + Vector3(0.1, 0.05, away)
+			camera.look_at(head)
 		"reflection":
 			rig.visible = false
 			var water := UncannyReflection3D.spawn(self, 0.02)
