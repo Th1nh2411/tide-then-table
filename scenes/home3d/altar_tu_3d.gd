@@ -19,6 +19,7 @@ func light(host: RestaurantScene3D) -> void:
 	if incense == null:
 		incense = _incense(host)
 		Sfx.play("tock")
+	talk.focus = VillageLayout3D.room_point(AIM)
 	host._show_note(talk.say())
 
 

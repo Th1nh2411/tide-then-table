@@ -3,7 +3,8 @@ extends RefCounted
 ## E on a villager: a short subtitle from their NpcLinesData, picked by day
 ## and how often Rin asked today (deterministic, the same after a loop reset).
 ## Rin must stand close and look at them. Standing people turn to Rin while
-## the line shows (holding()); seated ones (`turn` false) stay put.
+## the line shows (holding()); seated ones (`turn` false) stay put. Each
+## line turns Rin's view to their head (LookAtSpeaker3D).
 
 const LOOK_DOT := 0.5
 const HOLD_SECONDS := 1.6
@@ -14,6 +15,8 @@ var reach := 1.8
 ## Eye-line height on the rig for the look check (seated people are lower).
 var head_height := 1.4
 var turn := true
+## Where Rin's view turns for a line when there is no rig (a counter, the altar).
+var focus := Vector3.INF
 ## Who they turn to (Rin's body).
 var listener: Node3D
 ## Lines said before the day's own this scene (rằm, tonight's omen...).
@@ -71,6 +74,10 @@ func say() -> String:
 	var words := all[talks % all.size()]
 	talks += 1
 	_hold = HOLD_SECONDS
+	if rig:
+		LookAtSpeaker3D.person(rig, head_height + 0.1)
+	elif focus != Vector3.INF:
+		LookAtSpeaker3D.at(focus)
 	return words
 
 

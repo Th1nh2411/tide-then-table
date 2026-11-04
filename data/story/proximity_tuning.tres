@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ProximityTuning" format=3]
+
+[ext_resource type="Script" path="res://data/resources/proximity_tuning.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+warn_distance = 4.0
+notice_distance = 1.5
+duck_level = 0.15
+chase_seconds_min = 10.0
+chase_seconds_max = 20.0
+start_wait = 0.5
+unseen_speed = 1.9
+dash_after_unseen = 0.25
+dash_cooldown = 3.0
+dash_distance = 1.5
+dash_seconds = 0.3
+catch_distance = 0.7
+lose_distance = 22.0
+light_radius = 2.4
+light_min_energy = 0.8
+light_min_range = 3.5
+shrine_radius = 2.6
+scare_duck_seconds = 0.3
+scare_face_seconds = 0.35

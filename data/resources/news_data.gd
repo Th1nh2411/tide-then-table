@@ -17,10 +17,14 @@ func page(day: int) -> String:
 ## The mùng 9 paper after a wrong night: one vague line on what was missed
 ## (LoopCalendar.missed(): an omen id or MISSED_CALM). Empty otherwise.
 @export var calm_missed_hint: String = ""
+## After Rin was caught by a chaser (LoopCalendar.MISSED_CAUGHT).
+@export var caught_missed_hint: String = ""
 
 
 func hint(missed: String) -> String:
 	if missed == LoopCalendar.MISSED_CALM:
 		return calm_missed_hint
+	if missed == LoopCalendar.MISSED_CAUGHT:
+		return caught_missed_hint
 	var omen := OmenPicker.CATALOG.find(missed) if missed != "" else null
 	return omen.missed_hint if omen else ""

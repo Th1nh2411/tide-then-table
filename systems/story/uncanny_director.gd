@@ -18,6 +18,8 @@ const FAKE_FLAG := "note_scare_fake"
 ## Set when this loop's subtitle trick played (cleared on reset).
 const SUBTITLE_FLAG := "uncanny_subtitle"
 const SUBTITLE_KINDS: Array[String] = ["repeat", "wrong_name", "extra"]
+## Day of this loop's chase (normal flag): one chase a night.
+const CHASE_FLAG := "uncanny_chase_day"
 const HEAVY: Array[String] = ["appear_close", "dash", "flash"]
 ## Light effects that may also play on an omen night (wrong movement only).
 const OMEN_NIGHT_LIGHT: Array[String] = ["stare", "freeze", "choppy", "wrong_walk", "door_closed"]
@@ -91,6 +93,8 @@ static func tonight() -> Dictionary:
 ## Two faces may go on this person: never anh Út (his face stays his own
 ## until RamReveal3D), nor Rin.
 static func two_faces_ok(rig: Node) -> bool:
+	if ChaseRules.skipped(rig):
+		return false  # meta uncanny_skip (chú Bảy)
 	var node := rig
 	while node:
 		if node is RamGuest3D or node.name == "AnhUt":
@@ -101,6 +105,31 @@ static func two_faces_ok(rig: Node) -> bool:
 
 static func has(plan_: Dictionary, id: String) -> bool:
 	return plan_.get("heavy", "") == id or (plan_.get("light", []) as Array).has(id)
+
+
+# --- Too close (ProximityZone3D / Chase3D) ---
+
+## A bot drives the game: phenomena never react to it (its teleports pass
+## right by them), so runs stay deterministic.
+static var bot := false
+
+
+## A noticed drowned / fog figure may chase Rin tonight: from chase_from_day,
+## never on rằm, once a night. Only the proximity rule ever starts one.
+static func chase_allowed(day: int = -1, dose: UncannyDose = DOSE) -> bool:
+	var d := GameState.day if day < 0 else day
+	return d >= dose.chase_from_day and d <= dose.chase_last_day \
+		and int(GameState.story_flags.get(CHASE_FLAG, -1)) != d
+
+
+static func mark_chase(day: int = -1) -> void:
+	GameState.set_flag(CHASE_FLAG, GameState.day if day < 0 else day)
+
+
+## A noticed phenomenon may show its face (else it only vanishes).
+static func close_scare_allowed(day: int = -1, dose: UncannyDose = DOSE) -> bool:
+	var d := GameState.day if day < 0 else day
+	return d >= dose.close_scare_from_day and scare_allowed(d)
 
 
 # --- Jump scares ---

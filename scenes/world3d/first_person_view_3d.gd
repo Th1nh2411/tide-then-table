@@ -20,6 +20,11 @@ var _pitch := -0.15
 var _hidden: Array[VisualInstance3D] = []
 var _lamp: SpotLight3D
 var _lamp_home := Transform3D()
+## look_toward(): yaw / pitch from -> to over _turn_time; mouse motion ends it.
+var _turn_from := Vector2.ZERO
+var _turn_to := Vector2.ZERO
+var _turn_time := 0.0
+var _turn_left := 0.0
 
 
 func _ready() -> void:
@@ -41,6 +46,7 @@ func _input(event: InputEvent) -> void:
 	var motion := event as InputEventMouseMotion
 	if motion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		var speed := GameSettings.mouse_speed()  # sensitivity + invert Y (Cài đặt)
+		_turn_left = 0.0  # the player looks for himself
 		_yaw -= motion.relative.x * speed.x
 		_pitch = clampf(_pitch - motion.relative.y * speed.y, -1.35, 1.35)
 
@@ -50,7 +56,45 @@ func turn(radians: float) -> void:
 	_yaw += radians
 
 
-func _process(_delta: float) -> void:
+## Turns the view smoothly (eased) to face `point` (a speaker's head) over
+## `seconds`; nothing is locked, moving the mouse takes over at once. False
+## (no turn) while paused / in a menu or while the line is out fishing.
+func look_toward(point: Vector3, seconds: float = 0.3) -> bool:
+	if _scene == null or get_tree().paused or _fishing():
+		return false
+	var to := point - _camera.global_position
+	var flat := Vector2(to.x, to.z).length()
+	if flat < 0.05:
+		return false
+	var base := (_scene as SeaScene3D).boat.global_rotation.y if _scene is SeaScene3D else 0.0
+	var yaw := atan2(-to.x, -to.z) - base
+	_turn_from = Vector2(_yaw, _pitch)
+	_turn_to = Vector2(_yaw + wrapf(yaw - _yaw, -PI, PI), clampf(atan2(to.y, flat), -0.7, 0.7))
+	_turn_time = maxf(seconds, 0.01)
+	_turn_left = _turn_time
+	return true
+
+
+## A look_toward() turn is still going.
+func turning() -> bool:
+	return _turn_left > 0.0
+
+
+func _fishing() -> bool:
+	var fishing := _scene.get_node_or_null("Fishing")
+	return fishing != null and fishing.has_method("line_out") and bool(fishing.call("line_out"))
+
+
+func _step_turn(delta: float) -> void:
+	if _turn_left <= 0.0:
+		return
+	_turn_left = maxf(_turn_left - delta, 0.0)
+	var t := smoothstep(0.0, 1.0, 1.0 - _turn_left / _turn_time)
+	_yaw = lerpf(_turn_from.x, _turn_to.x, t)
+	_pitch = lerpf(_turn_from.y, _turn_to.y, t)
+
+
+func _process(delta: float) -> void:
 	var scene := get_tree().current_scene
 	if scene != _scene:
 		_detach()
@@ -60,6 +104,7 @@ func _process(_delta: float) -> void:
 	if not _camera.current:
 		_camera.make_current()
 	_update_mouse()
+	_step_turn(delta)
 	if _walks(_scene):
 		_follow_walker(_scene)
 	elif _scene is SeaScene3D:

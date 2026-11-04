@@ -7,6 +7,8 @@ const B = preload("res://scenes/restaurant3d/restaurant_room_builder_3d.gd")
 const L = preload("res://scenes/village3d/village_layout_3d.gd")
 const NORTH_Z := 0.8
 const SOUTH_Z := 6.2
+## The roadside shrine (world; a safe place in a chase, SafeZones3D).
+const SHRINE := Vector3(40.5, 0, NORTH_Z + 0.4)
 
 
 static func build(host: Node3D) -> void:
@@ -24,7 +26,7 @@ static func build(host: Node3D) -> void:
 	_house(lane, Vector3(24.6, 0, -2.6), Vector3(9.0, 3.0, 6.6), 1.0)
 	_brick_wall(lane, brick, 29.1, 34.9, NORTH_Z)
 	_fence(lane, 35.0, L.LANE_END_X, NORTH_Z)
-	_shrine(lane, Vector3(40.5, 0, NORTH_Z + 0.4))
+	_shrine(lane, SHRINE)
 	# South side: brick wall hiding the road, a house, the dead-end alley with
 	# its iron gate (VillageGateAlley3D), the banana clump, the fence.
 	_brick_wall(lane, brick, 20.0, 30.0, SOUTH_Z)

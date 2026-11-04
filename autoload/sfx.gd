@@ -152,6 +152,13 @@ func hold(sound: String, on: bool) -> void:
 		looping.stop()
 
 
+## Pitch of a held loop (a heartbeat that quickens).
+func hold_pitch(sound: String, pitch: float) -> void:
+	var looping := _holds.get(sound) as AudioStreamPlayer
+	if looping:
+		looping.pitch_scale = pitch
+
+
 ## Background loop for the current scene ("" = none).
 func ambience(sound: String) -> void:
 	if sound == _ambience_name:

@@ -7,6 +7,8 @@ extends RefCounted
 const L = preload("res://scenes/restaurant3d/restaurant_layout_3d.gd")
 const STOOL_PILOT = preload("res://assets/models/ready/stool/stool.glb")
 const TABLE_PILOT = preload("res://assets/models/ready/table/table.glb")
+## Cô Năm behind her counter (RestaurantRoles3D turns Rin's view to her).
+const CO_NAM_SPOT := L.COUNTER_POSITION + Vector3(-2.1, 0, -0.85)
 
 static func mat(hex: String) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
@@ -274,7 +276,7 @@ static func _kitchen(host: Node3D) -> void:
 	RestaurantBatchVisuals.add(host, "crate", L.COUNTER_POSITION + Vector3(2.45, 0, 0))
 	RestaurantBatchVisuals.add(host, "bottle", L.COUNTER_POSITION + Vector3(1.2, 1.36, 0.12))
 	label(host, "TẠP HOÁ CÔ NĂM", L.COUNTER_POSITION + Vector3(0, 2.4, -0.45), 24, "f2d98a")
-	PersonRig3D.build(host, "co_nam").position = L.COUNTER_POSITION + Vector3(-2.1, 0, -0.85)
+	PersonRig3D.build(host, "co_nam").position = CO_NAM_SPOT
 	# Bảo cooks independently, leaving grill and beer to Rin.
 	host.bao_model = PersonRig3D.build(host, "bao")
 	host.bao_model.position = L.GRILL_POSITION + Vector3(-1.5, 0, -0.85)

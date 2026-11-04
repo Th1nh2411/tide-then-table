@@ -37,3 +37,10 @@ extends Resource
 @export var fake_scare_days: Array[int] = [2, 3]
 ## Faces for the wrong-night scare, rotated by reset count.
 @export var wrong_night_variants: int = 3
+@export_group("Too close (ProximityZone3D)")
+## A drowned / fog figure that notices Rin may chase him from this day
+## (4 = 12 tháng Bảy) to chase_last_day, at most once a night.
+@export var chase_from_day: int = 4
+@export var chase_last_day: int = 6
+## Before this day a noticed phenomenon only vanishes (no jump scare).
+@export var close_scare_from_day: int = 3

@@ -89,6 +89,7 @@ func _start_morning(result: LoopCalendar.Result, was_ram: bool) -> void:
 		NightmareWake3D.play(self, "Hộc... hộc...", visited, WrongNightScare3D.due_at_wake(result))
 		if was_ram:
 			VillageDay3D.gate_closed(self)  # rằm went by with nothing found
+	Chase3D.leave_trace(self)  # got away last night: wet steps up to the door
 	GameState.resume_at = "home"
 	SaveSystem.autosave("home")
 

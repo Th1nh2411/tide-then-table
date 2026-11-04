@@ -37,6 +37,7 @@ func _ready() -> void:
 	bao.turn = false
 	bao.head_height = 1.5
 	co_nam = NpcTalk3D.new(null, CO_NAM)
+	co_nam.focus = RestaurantRoomBuilder3D.CO_NAM_SPOT + Vector3(0, 1.5, 0)
 	if RamNight.is_ram():
 		co_nam.first.append(RamFx3D.LINES.co_nam)
 	var omen := OmenPicker.tonight()
@@ -57,6 +58,7 @@ func talk(at: Vector3) -> bool:
 		host._show_note(ut.talk.say())
 		return true
 	if ut and ut.ghost_near(at):
+		LookAtSpeaker3D.person(ut.ghost, 1.2)
 		host._show_note(ut.ghost_line())
 		return true
 	if bao.can_talk(at, camera):

@@ -4,8 +4,9 @@ extends Node3D
 ## through resets): mùng 13 at night on the waterfront. The sound drops
 ## away, a slow breath and dripping water right behind Rin. When he turns
 ## round, ông Tư (drowned, pale) stands an arm's length away, pointing out
-## to sea towards the raft; a moment later he is gone. If Rin never turns,
-## he leaves unseen and tries again later that night.
+## to sea towards the raft; a moment later he is gone. The breath turns
+## Rin's view round to him (LookAtSpeaker3D, a fast turn = the reveal); if
+## the view can't turn and Rin never looks, he leaves unseen and tries again later.
 
 ## Seconds on the waterfront (facing the sea) before it starts.
 @export var after_seconds := 5.0
@@ -15,6 +16,8 @@ extends Node3D
 @export var retry_seconds := 25.0
 ## Out to sea, towards the raft (village -Z is the sea).
 @export var raft_direction := Vector3(0.45, 0.12, -1.0)
+## The turn towards the breath (s): slower than a talk, a startled look round.
+@export var turn_seconds := 0.55
 
 ## Returns true while Rin is where this may happen (waterfront, not busy).
 var gate: Callable
@@ -89,6 +92,9 @@ func _appear(camera: Camera3D) -> void:
 	if _ghost and not _done:
 		Sfx.play_at("breath_close", feet + Vector3.UP * 1.6, self, 1.0, 2.0)
 		Sfx.play_at("drip", feet + Vector3.UP * 0.2, self, 1.0, 2.0)
+		await get_tree().create_timer(0.35).timeout
+		if _ghost and not _done:
+			LookAtSpeaker3D.at(_actor.head_position(), turn_seconds)
 
 
 func _finish(seen: bool) -> void:

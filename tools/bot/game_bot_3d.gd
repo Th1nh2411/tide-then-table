@@ -174,6 +174,7 @@ func _roundtrip() -> void:
 
 func _run() -> void:
 	SaveSystem.autosave_off = true
+	UncannyDirector.bot = true  # its teleports pass right by phenomena: no "too close" reactions
 	SceneRouter.fade_duration = 0.01
 	GameState.reset()
 	SceneRouter.go_to(VILLAGE)

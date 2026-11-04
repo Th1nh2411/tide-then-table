@@ -28,6 +28,9 @@ const KEPT_PREFIXES: Array[String] = ["note_", "tip_"]
 ## paper prints a vague hint about it (NewsData.hint_for).
 const MISSED_FLAG := "note_missed"
 const MISSED_CALM := "calm"
+## Set when a chaser (Chase3D) caught Rin tonight: the next morning is a reset.
+const CAUGHT_FLAG := "night_caught"
+const MISSED_CAUGHT := "caught"
 
 enum Result { NONE, NEXT, RESET, END }
 
@@ -61,6 +64,11 @@ static func choose(went_out: bool, fish: int = 0) -> void:
 	GameState.set_flag(CATCH_FLAG, fish if went_out else 0)
 
 
+## Caught by a chaser: whatever Rin chose, the night ends in a reset.
+static func caught() -> void:
+	GameState.set_flag(CAUGHT_FLAG)
+
+
 static func shop_fish() -> int:
 	return int(GameState.story_flags.get(SHOP_FISH_FLAG, 0))
 
@@ -74,6 +82,11 @@ static func take_result() -> Result:
 	GameState.story_flags.erase(CATCH_FLAG)
 	last_choice = str(choice)
 	last_calm_miss = false
+	if GameState.has_flag(CAUGHT_FLAG):
+		GameState.story_flags.erase(CAUGHT_FLAG)
+		last_choice = MISSED_CAUGHT
+		_remember_miss(MISSED_CAUGHT)
+		return Result.RESET
 	if choice != "out" and choice != "home":
 		return Result.NONE
 	var went_out: bool = choice == "out"

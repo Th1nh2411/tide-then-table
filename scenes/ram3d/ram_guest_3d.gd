@@ -94,6 +94,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func talk() -> void:
 	_talking = true
 	_text.prompt("")
+	LookAtSpeaker3D.person(_rig, 1.15)  # seated at his table
 	var lines := RamLinesData.parse(L.ut_offer)
 	for i in lines.size():
 		_box.show_line(lines[i]["speaker"], lines[i]["text"])

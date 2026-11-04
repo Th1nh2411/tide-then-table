@@ -188,6 +188,24 @@ Vietnamese, keep code comments in short English.
   Jump scares: `WrongNightScare3D`, `TuGhostScare3D`, `FakeFishScare3D`, the
   turn in `RamReveal3D`; never on consecutive days. Look at them in
   `scenes/test/uncanny_review.tscn`; test `uncanny_test`.
+- **Too close = chased (PLAN §10 "Lại gần là bị đuổi"):** `ProximityZone3D.guard(thing,
+  kind)` on avoidable phenomena only (extra figure, eyes, fog / gate figures,
+  pier-head figure, shadowless guest; never Bảo / Vy / guests in service /
+  NPC lines / altar / thúng / plates; never anything with meta
+  `uncanny_skip`, e.g. chú Bảy): from 4 m `ProximityFx3D` (vignette + grain,
+  heartbeat via `Sfx.hold_pitch`, `Sfx.duck`), at 1.5 m it notices Rin ->
+  `Chase3D` (drowned / fog figures, from mùng 12, once a night,
+  `UncannyDirector.chase_allowed`; moves only unseen + dashes, only ever
+  pushes him landward: `ChaseRules.pushes_landward`) or a face
+  (`ProximityScare3D`) or it vanishes. Safe: `SafeZones3D` (lamps, shrine,
+  room with door shut, street in the shift). Caught -> `LoopCalendar.caught()`
+  -> reset (missed "caught"); escaped -> wet steps by the door next morning.
+  Numbers `data/story/proximity_tuning.tres`, pure `ChaseRules`; the bot sets
+  `UncannyDirector.bot`. Test `chase_test`.
+- **Talk camera:** a line (NpcTalk3D.say, altar, Cô Năm, anh Út's tea, the
+  shadowless guest, ông Tư's breath behind Rin) turns the view to the speaker:
+  `LookAtSpeaker3D.at / person` -> `FirstPersonView3D.look_toward(point, s)`
+  (~0.3 s eased, mouse takes over, none while paused / line out fishing).
 - **People (3D):** every actor is a `PersonRig3D.build(parent, id)` (walk /
   carry / sit / drive_ground_motion API). Rin keeps his own rig
   (`RinPilotVisual`, rin_pilot.glb); every NPC is `PsxCharacterVisual`

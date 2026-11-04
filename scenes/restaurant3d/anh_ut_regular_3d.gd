@@ -58,6 +58,12 @@ func _ready() -> void:
 		ghost = _seated(ghost_variant)
 		UncannyMoves3D.remove_shadow(ghost)
 		UncannyMoves3D.ghost_body(ghost)
+		# Too close and he turns his face on Rin, then the stool is empty.
+		var zone := ProximityZone3D.guard(ghost)
+		if zone:
+			zone.on_gone = func() -> void:
+				ghost.queue_free()
+				ghost = null
 	talk = NpcTalk3D.new(ut, LINES, REACH)
 	talk.turn = false
 	talk.head_height = 1.1

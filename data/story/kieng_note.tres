@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1_note")
 title = "Những điều kiêng"
-lines = Array[String](["Đêm nào trăng sáng, biển êm thì ra khơi, đừng để quán hổng có cá.", "Đi biển thì ráng câu cho đủ ba con hẵng về, đừng có về tay không.", "Ở quán, ngoài đường hay dưới bến mà thấy cái gì lạ thì tối đó đừng có xuống thúng.", "Mâm cúng mà có ai đụng tới thì ở nhà, đừng đi đâu hết.", "Khuya có ai kêu tên thì đừng có dạ. Coi chừng tụi nó.", "Tiền rớt ngoài đường đừng có lượm, hổng phải của mình."])
+lines = Array[String](["Đêm nào trăng sáng, biển êm thì ra khơi, đừng để quán hổng có cá.", "Đi biển thì ráng câu cho đủ ba con hẵng về, đừng có về tay không.", "Ở quán, ngoài đường hay dưới bến mà thấy cái gì lạ thì đứng xa xa, đừng có lại gần, tối đó cũng đừng có xuống thúng.", "Mâm cúng mà có ai đụng tới thì ở nhà, đừng đi đâu hết.", "Khuya có ai kêu tên thì đừng có dạ. Coi chừng tụi nó.", "Tiền rớt ngoài đường đừng có lượm, hổng phải của mình."])
 signature = "Tháng Bảy rồi, nhớ lời bà nghe con."
