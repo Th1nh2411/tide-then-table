@@ -2,7 +2,9 @@ extends Control
 ## MVP ending: white screen, Rin's lines appear one by one, then "Còn tiếp...";
 ## the lines then give way to a short card about the run (EndingStats) and a
 ## thank-you for playtesters, as a taped newspaper clipping (RunClipping)
-## with a "CÒN TIẾP" stamp. Any key / click after that returns to the main menu.
+## with a "CÒN TIẾP" stamp. A while later a faint "[phím bất kỳ]" shows at
+## the bottom (InteractPrompt, the game's one prompt style); any key / click
+## then returns to the main menu.
 ## After đêm rằm (RamNight.ending_id()) the lines are that ending's card,
 ## shown as narration over that ending's painting (EndingPainting, lower
 ## third, outlined); the painting dims for the run card.
@@ -21,31 +23,28 @@ const MAIN_MENU_PATH: String = "res://scenes/main_menu/main_menu.tscn"
 ## Shown under the run card (the playtest build's thank-you / where to send feedback).
 @export var thanks_text: String = "Cảm ơn bạn đã chơi thử bản đầu! Góp ý gì cũng quý."
 @export var fish_catalog: FishCatalog
+## Seconds after the clipping before the continue prompt fades in.
+@export var prompt_delay: float = 2.5
 
 var _can_leave: bool = false
 var _narration := false
 var _dark := false
 var _painting: EndingPainting
+var _continue := InteractPrompt.new()
 
 @onready var _lines_box: VBoxContainer = %LinesBox
 @onready var _to_be_continued: Label = %ToBeContinuedLabel
-@onready var _hint_label: Label = %HintLabel
 
 
 func _ready() -> void:
 	Sfx.ambience("")
 	_to_be_continued.modulate.a = 0.0
 	_to_be_continued.theme_type_variation = &"HeadingLabel"
-	_hint_label.modulate.a = 0.0
-	_hint_label.theme_type_variation = &"KeyLabel"
-	_hint_label.text = "Space"
-	_hint_label.tooltip_text = "Bấm phím bất kỳ để về màn hình chính"
-	var home := UiIcons.make("house", 12, Color("394a50"))
-	_hint_label.add_sibling(home)
-	home.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	home.modulate.a = 0.0
-	_hint_label.set_meta("home", home)
-	_hint_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_continue.anchor_point = Vector2(0.5, 1.0)
+	_continue.offset_px = Vector2(0, -24)
+	_continue.peak_alpha = 0.6
+	_continue.key_size = 10
+	add_child(_continue)
 	_use_ram_card()
 	_play()
 
@@ -94,8 +93,11 @@ func _play() -> void:
 	await _fade_in(_to_be_continued)
 	await get_tree().create_timer(seconds_between_lines).timeout
 	await _show_run_card()
-	_fade_in(_hint_label.get_meta("home") as CanvasItem)
-	await _fade_in(_hint_label)
+	# Ink on the white page; pale on the dark ones.
+	_continue.color = InteractPrompt.INK if _dark else Color("394a50")
+	_continue.shadow = _dark
+	await get_tree().create_timer(prompt_delay).timeout
+	_continue.show_key("phím bất kỳ")
 	_can_leave = true
 
 
@@ -111,7 +113,6 @@ func _show_run_card() -> void:
 		await _painting.dim()
 		($CenterContainer as Control).anchor_top = 0.0
 		($CenterContainer as Control).anchor_bottom = 1.0
-		EndingPainting.outline(_hint_label, Color("ece6d8"))
 	_lines_box.modulate.a = 1.0
 	var total := fish_catalog.fish.size() if fish_catalog else 0
 	var clipping := RunClipping.new()

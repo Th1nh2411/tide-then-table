@@ -75,7 +75,7 @@ func _process(delta: float) -> void:
 		_text.prompt("")
 		return
 	tick(delta)
-	_text.prompt("E  Bỏ vào giỏ" if state == State.HOLDING and looking_at_basket() else "")
+	_text.prompt("bỏ vào giỏ" if basket_prompt() else "")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -178,6 +178,11 @@ func drop_in_basket() -> bool:
 	sea._update_hud()
 	fish_dropped.emit(basket.count())
 	return true
+
+
+## A landed fish in hand and the basket in view (E drops it in).
+func basket_prompt() -> bool:
+	return state == State.HOLDING and looking_at_basket()
 
 
 func looking_at_basket() -> bool:

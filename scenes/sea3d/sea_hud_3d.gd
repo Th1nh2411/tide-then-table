@@ -1,7 +1,8 @@
 class_name SeaHud3D
 extends RefCounted
-## HUD (SeaHudView3D: icon chips, key caps, speech strip), the pause menu,
-## edge navigation and first-time guides of the 3D sea.
+## HUD (SeaHudView3D: icon chips, the dock prompt, speech strip), the pause menu,
+## edge navigation of the 3D sea. No how-to pointers: ông Tám tells Rin
+## about the bubbles at dawn (data/story/ong_tam.tres).
 ## Host (SeaScene3D) fields written: hud_view, message, navigation.
 
 static func build_hud(sea: SeaScene3D) -> void:
@@ -33,16 +34,12 @@ static func build_navigation(sea: SeaScene3D) -> void:
 	navigation.set("camera", sea.camera)
 	layer.add_child(navigation)
 	sea.navigation = navigation
-	var guide := Guide.new()
-	guide.blocked = func() -> bool: return sea.fishing or sea.ending
-	sea.add_child(guide)
-	# No pointer to shoals: the hint is the bubbles themselves.
-	guide.add("sea3d_bubbles", "Tìm bọt khí trên mặt biển", func() -> bool: return not sea.fishing and sea._casts_used_total() == 0,
-		func() -> Vector2: return navigation.call("screen_point", sea.boat.position + Vector3(0, 3.0, 0)),
-		func() -> bool: return sea.fishing or sea._casts_used_total() > 0)
 
 static func navigation_targets(sea: SeaScene3D) -> Array[Dictionary]:
-	var targets: Array[Dictionary] = [{"pos": sea.START, "label": "Bến", "color": "f2d98a"}]
+	var targets: Array[Dictionary] = []
+	# At the dock the "[R] lên bờ" prompt sits under the crosshair instead.
+	if not sea._at_dock():
+		targets.append({"pos": sea.START, "label": "Bến", "color": "f2d98a"})
 	for entry: Array in [[sea.SHRINE_POS, "Miếu"], [sea.HUT_POS, "Ông Tám"], [sea.LIGHTHOUSE_POS, "Hải đăng"], [sea.RAFT_POS, "Bè tôm"]]:
 		var pos: Vector3 = entry[0]
 		if sea.boat.position.distance_to(pos) < 20.0:

@@ -90,4 +90,4 @@ func interact() -> bool:
 
 func prompt() -> String:
 	var talk := talker()
-	return "" if talk == null else "E  Hỏi chuyện"
+	return "" if talk == null else "hỏi"

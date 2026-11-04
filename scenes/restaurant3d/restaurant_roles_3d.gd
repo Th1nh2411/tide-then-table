@@ -74,13 +74,13 @@ func talk(at: Vector3) -> bool:
 	return false
 
 
-## "[E] Nói chuyện · ..." for RestaurantPrompt3D ({} = none).
+## "[E] hỏi" for RestaurantPrompt3D ({} = none).
 func hint(at: Vector3) -> Dictionary:
 	var camera := host.demo_camera
 	if ut and ut.seated() and ut.talk.can_talk(at, camera):
-		return {"at": AnhUtRegular3D.SEAT + Vector3(0, 1.7, 0), "words": "[E] Nói chuyện · Anh Út"}
+		return {"at": AnhUtRegular3D.SEAT + Vector3(0, 1.7, 0), "words": "[E] hỏi"}
 	if bay and bay.present() and bay.talk.can_talk(at, camera):
 		return bay.hint()
 	if bao.can_talk(at, camera):
-		return {"at": host.bao_model.global_position + Vector3(0, 2.0, 0), "words": "[E] Nói chuyện · Bảo"}
+		return {"at": host.bao_model.global_position + Vector3(0, 2.0, 0), "words": "[E] hỏi"}
 	return {}

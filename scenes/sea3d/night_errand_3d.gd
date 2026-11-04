@@ -60,7 +60,7 @@ func _process(delta: float) -> void:
 	_ring.scale = Vector3.ONE * (1.0 + 0.12 * sin(_time * 1.6))
 	_item.position.y = 0.22 + sin(_time * 1.3) * 0.05
 	_item.rotation.y += delta * 0.3
-	_text.prompt("E  Vớt lên" if _near() else "")
+	_text.prompt("vớt lên" if _near() else "")
 
 
 func _near() -> bool:

@@ -146,7 +146,6 @@ func _physics_process(delta: float) -> void:
 func _process(delta: float) -> void:
 	super._process(delta)
 	if leaving:
-		text.prompt("")
 		return
 	var at := player.global_position
 	lighting.set_inside(VillageLayout3D.in_room(at))
@@ -155,8 +154,19 @@ func _process(delta: float) -> void:
 	if _echo_pending and sounds.area == "waterfront":
 		_echo_pending = false
 		OmenEcho3D.attach(self, VillageLayout3D.waterfront_point(WaterfrontBuilder3D.PIER_POST) + Vector3(0, 1.0, 0))
-	var what := "" if waking or get_tree().paused else spots.target()
-	text.prompt(npcs.prompt() if what == "" and npcs and not waking else spots.prompt(what))
+
+
+## The room / pier first, then villagers, then the restaurant's stations.
+func prompt_verb() -> String:
+	var what := spots.target() if spots else ""
+	if what != "":
+		return spots.prompt(what)
+	var said := npcs.prompt() if npcs else ""
+	return said if said != "" else super.prompt_verb()
+
+
+func _prompt_blocked() -> bool:
+	return leaving or waking or super._prompt_blocked()
 
 
 ## E: the room / pier first (VillageSpots3D), else the restaurant's stations.

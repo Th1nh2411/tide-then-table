@@ -98,7 +98,7 @@ func _build() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 3)
 	_panel.add_child(box)
-	box.add_child(HorrorUi.label("TẠM DỪNG", 16, HorrorUi.LAMP))
+	box.add_child(HorrorUi.label("tạm dừng", 16, HorrorUi.LAMP))
 	_date = HorrorUi.label("", 10, HorrorUi.DIM)
 	box.add_child(_date)
 	var gap := Control.new()

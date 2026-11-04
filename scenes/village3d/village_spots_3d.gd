@@ -12,7 +12,8 @@ const REACH := 1.3
 const BED_REACH := 1.7
 const THUNG_REACH := 2.2
 const LOOK_DOT := 0.55
-const PROMPTS := {"paper": "E  Đọc báo", "note": "E  Đọc giấy", "altar": "E  Thắp nhang", "bed": "E  Ngủ", "thung": "E  Xuống thúng"}
+## The verb under the crosshair (InteractPrompt) per thing.
+const PROMPTS := {"paper": "đọc", "note": "đọc", "altar": "thắp nhang", "bed": "ngủ", "thung": "xuống thúng"}
 
 var host: VillageScene3D
 var altar := AltarTu3D.new()
@@ -59,7 +60,7 @@ func target() -> String:
 
 func prompt(what: String) -> String:
 	if what == "door":
-		return "E  Đóng cửa" if host.door.is_open else "E  Mở cửa"
+		return "đóng cửa" if host.door.is_open else "mở cửa"
 	return PROMPTS.get(what, "")
 
 

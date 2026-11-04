@@ -76,14 +76,11 @@ var ready_plates: Array[Node3D] = []
 var bao_model: PersonRig3D
 var bao_label: Label3D
 var vy: VyStaff3D
-var goal_pulse: TargetPulse3D
 
 func _next_spawn_interval() -> float:
 	return shift.next_spawn_interval()
 
 func _ready() -> void:
-	goal_pulse = TargetPulse3D.new()
-	add_child(goal_pulse)
 	rng.randomize()
 	tuning = RestaurantShift3D.pick_tuning()
 	panels = RestaurantPanels3D.new(self)
@@ -134,14 +131,18 @@ func _physics_process(delta: float) -> void:
 	mover.move(delta)
 
 func _process(delta: float) -> void:
-	panels.refresh_prompt(demo_camera, get_tree().paused or mover.focus_lost or modal_open())
-	# The next goal pulses softly instead of text over tables and stations.
-	if goal_pulse:
-		goal_pulse.set_target(null if modal_open() else RestaurantGoal3D.target(self))
+	panels.refresh_prompt(prompt_verb(), _prompt_blocked())
 	panels.tick(delta)
 	if not shift_running or get_tree().paused:
 		return
 	shift.tick(delta)
+
+## The verb under the crosshair (VillageScene3D adds the room / pier / villagers).
+func prompt_verb() -> String:
+	return RestaurantPanels3D.verb_of(RestaurantPrompt3D.describe(self))
+
+func _prompt_blocked() -> bool:
+	return get_tree().paused or mover.focus_lost or modal_open()
 
 # --- Orders ---
 func _unhandled_key_input(event: InputEvent) -> void:

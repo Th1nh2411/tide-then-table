@@ -65,7 +65,7 @@ func _process(_delta: float) -> void:
 		if late or host.shift_over:
 			arrive()
 		return
-	_text.prompt("E  Ngồi với anh Út" if can_talk() else "")
+	_text.prompt("ngồi" if can_talk() else "")
 
 
 func arrive() -> void:

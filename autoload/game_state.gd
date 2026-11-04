@@ -14,7 +14,7 @@ var day: int = STARTING_DAY:
 		day = value
 		day_changed.emit(day)
 
-## flag_name -> value: story, loop count, notebook ("note_*"), tips ("tip_*").
+## flag_name -> value: story, loop count, notebook ("note_*").
 var story_flags: Dictionary = {}
 
 ## Stars (1-5) from the last shift; drives customer frequency the next day.

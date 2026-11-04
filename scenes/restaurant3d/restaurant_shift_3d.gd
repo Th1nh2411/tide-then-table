@@ -13,6 +13,8 @@ const TUNINGS := [
 	preload("res://data/restaurant/service_day5.tres"),
 ]
 
+const BAO_FIRST_LINE := "Bảo: Tao nấu, mày bưng giùm. Bia trong thùng đó."
+
 var host: Node3D
 
 
@@ -42,8 +44,9 @@ func open_shift() -> void:
 	host.shift_running = true
 	host.seconds_left = SHIFT_SECONDS
 	host.spawn_clock = host.tuning.first_spawn_delay
-	if Guide.once("shift_h2"):
-		host._show_note("Bảo: Tao nấu, mày bưng giùm. Bia trong thùng đó.")
+	# Mùng 9 (every loop: the day repeats): Bảo says who does what.
+	if GameState.day == 1:
+		host._show_note(BAO_FIRST_LINE)
 
 
 func tick(delta: float) -> void:

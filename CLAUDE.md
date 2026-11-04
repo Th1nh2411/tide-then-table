@@ -66,12 +66,20 @@ Vietnamese, keep code comments in short English.
   new ones in Rin's voice (first person, short); situational ones say it
   once per trip / shift (oil 25% / 10%, hold 80%, first guest lost, 15% of
   the shift left), never a permanent HUD warning.
-- Keep on-screen text short. How-to hints are first-time pointers (`Guide`:
-  ring + arrow on the thing + 3-6 words, shown once per id, story flag
-  "tip_<id>"; rules in `RestaurantGuide` / `SeaGuide`; minigame hints via
-  `Guide.once()`), any day a feature first shows up. The full guide is the
-  `HelpPanel` ("Hướng dẫn", from the pause menu and the main menu) — add new
-  controls there and a Guide rule for a new feature, never permanent HUD text.
+- Keep on-screen text short. No tutorials, pointers, rings / arrows, hint
+  cards or how-to lines (the old `Guide` / `SeaGuide` / `RestaurantGuide` /
+  `HelpPanel` / "tip_" flags are gone). Guidance is diegetic: a villager says
+  it the first time it matters, through their `NpcLinesData` (ông Tám on
+  mùng 9: "Chỗ nào sủi bọt là có cá đó con."; Bảo at the mùng 9 shift),
+  never naming a key. The only on-screen control hint is the interaction
+  prompt `InteractPrompt` (scenes/ui): no box, dim off-white Patrick Hand,
+  just under the crosshair, the key as a tiny glyph in a thin border + one
+  lowercase verb ("[E] đọc", "[R] lên bờ"), fading in only when the thing is
+  in reach, faint flicker + grain, hidden while paused. Callers pass the
+  verb: `OnScreenText.prompt(verb, key)`, the restaurant / village via
+  `prompt_verb()`; the ending's "[phím bất kỳ]" uses it too. The key list
+  lives in Cài đặt (`SettingsPanel.KEYS`, drawn with the same glyphs); menus
+  use `HorrorUi` (same font and colours).
 - Place names are invented (Xóm Đèn, dải đảo Ngủ Quên, Gò Vỏ Ốc, Đá Canh
   Đêm, Miếu Cá Ông). Never use or echo real place names in game text or docs.
 
@@ -152,7 +160,7 @@ Vietnamese, keep code comments in short English.
   = landed. `Rod3D` draws rod bend, ImmediateMesh line (pale -> red), bobber,
   "!", the fish in hand; `ReelBar` a tiny bar under the crosshair. Landed fish
   is held until Rin looks at the basket (`FishBasket3D` in the boat) and
-  presses E ("E  Bỏ vào giỏ" via OnScreenText); no casting while holding.
+  presses E (prompt "[E] bỏ vào giỏ"); no casting while holding.
   Species / size from `SeaShoals3D` + `CatchRoll`; `GameState.record_catch`
   still feeds the ending card. The lamp burns while the line is out.
 - **3-fish rule:** a calm night is only right if Rin docks with
@@ -302,10 +310,10 @@ Vietnamese, keep code comments in short English.
   `HoldManager` + `HoldUI` (grid hold, overflow queue, Tab; a species caught
   for the first time is tagged NEW and `new_species_caught` shows
   `NewCatchCard`: shadow → slow reveal → "NEW!", name, weight), `HullController`
-  (collision damage, F repair at dock; the first hit of a trip makes Rin say how to repair, SeaGuide points at the hull readout, then "F: sửa thuyền" at the dock; a nearly full hold → Rin + pointer "Về bến dỡ bớt cá"), `LampOil` (trip limit + displayed
+  (collision damage, F repair at dock), `LampOil` (trip limit + displayed
   time; no burn in minigames or at the dock), `BoatLamp` (light radius from
   oil; the night tint is dark, so lamps are how the player sees), `FogArea` (story), `DayTint` (night → dawn), `SeaHud`,
-  `OffscreenMarkers` (edge arrows), `SeaGuide` (first-time pointers), `PauseMenu` (Esc;
+  `OffscreenMarkers` (edge arrows), `PauseMenu` (Esc;
   must sit before `HoldUI` in the tree so the hold can eat Esc first).
 - 3D sea collisions: `SeaBoatImpact3D` (`sea.impact`, called from `SeaBoatMover3D`): bounce off the normal, spin, hull rocking spring, camera shake, splash; test boat_impact_test.
 - Night variety: `BoatRange` (foam line from `BoatData.max_depth`, pushes
@@ -429,8 +437,7 @@ Vietnamese, keep code comments in short English.
   per night / per shift (2, +1 per 3 aberrant fish, max 4). Once he has it:
   big / aberrant fish fight harder, grill dishes from 80k are trickier, and
   the restaurant has a rush hour (`ServiceTuning.rush_*`). Lines: vy_mark,
-  cat_mark, Ông Tám once (flag "tam_mark"). First-time pointers "wave" (SeaGuide)
-  / "wave_shop" (RestaurantGuide) on the mark (`Guide.wave_badge_target`).
+  cat_mark, Ông Tám once (flag "tam_mark").
   Test: scenes/test/wave_test.tscn.
 - The cat: `PetCat` (restaurant: on top of the fridge), rides at the stern at sea (`Boat._draw_cat`), flags `cat_adopted` / `cat_gone` /
   `pet_name`; use `{pet}` in dialogue/cutscene text.

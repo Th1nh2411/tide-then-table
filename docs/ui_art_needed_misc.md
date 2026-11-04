@@ -34,7 +34,6 @@ xoá file cũ, thả file mới cùng size + lề, chạy `--import` rồi
 
 | Thứ | Ở đâu | Ghi chú |
 |---|---|---|
-| Vòng chỉ + mũi tên gợi ý | `scenes/ui/guide.gd` `_draw_pointer` | Vòng 2 nấc mực + vàng, mũi tên Đỏ biển hiệu; thẻ chữ = khung `tag.png` |
 | Khay "cá mới" (viền phấn đứt nét), ô Bỏ (đĩa đỏ + thùng rác), ô Bán (đĩa xanh + đồng xu + giá) | `scenes/ui/hold_grid_painter.gd` | Có thể thay bằng `frames/hold_tray.png`, `frames/hold_trash.png`, `frames/hold_sell.png` (60x30) nếu muốn — cần thêm 3 dòng code |
 | Ảnh báo "thuyền đi vào sương" | `scenes/ending/run_clipping.gd` `_Photo` | Thay bằng `assets/sprites/ui/stickers/ending_photo.png` 96x72 (ảnh đen trắng sần) — cần 1 dòng code |
 | Đĩa món tạm (khi chưa có `dishes/<id>.png`) | `scenes/rest/rest_card_view.gd` `DishIcon` | Art món đã có danh sách trong ASSETS.md |

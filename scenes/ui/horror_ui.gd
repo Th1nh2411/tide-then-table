@@ -1,14 +1,17 @@
 class_name HorrorUi
 extends RefCounted
 ## Shared look of the horror build's menus (main menu, pause, settings):
-## plain text on dark glass, one warm lamp colour for focus / hover.
+## the same handwriting and dim off-white as the in-game prompt
+## (InteractPrompt), on near-black glass, a faded lamp colour for focus /
+## hover. No bright game-UI colours.
 
-const INK := Color(0.86, 0.83, 0.76)
+const HAND: FontFile = preload("res://assets/fonts/PatrickHand-Regular.ttf")
+const INK := InteractPrompt.INK
 const DIM := Color(0.55, 0.53, 0.5)
-const LAMP := Color(0.96, 0.7, 0.36)
-const BLOOD := Color(0.85, 0.42, 0.36)
-const GLASS := Color(0.03, 0.035, 0.05, 0.86)
-const EDGE := Color(0.96, 0.7, 0.36, 0.28)
+const LAMP := Color(0.8, 0.62, 0.42)
+const BLOOD := Color(0.72, 0.36, 0.32)
+const GLASS := Color(0.02, 0.022, 0.03, 0.9)
+const EDGE := Color(0.86, 0.83, 0.76, 0.1)
 
 
 static func panel_style() -> StyleBoxFlat:
@@ -25,11 +28,12 @@ static func button(text: String, font_size: int = 13) -> Button:
 	var b := Button.new()
 	b.text = text
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	b.add_theme_font_size_override("font_size", font_size)
+	b.add_theme_font_override("font", HAND)
+	b.add_theme_font_size_override("font_size", font_size + 2)
 	for state: String in ["normal", "disabled"]:
 		b.add_theme_stylebox_override(state, _flat(Color(0, 0, 0, 0), 0))
 	for state: String in ["hover", "focus", "pressed", "hover_pressed"]:
-		b.add_theme_stylebox_override(state, _flat(Color(LAMP, 0.1), 2))
+		b.add_theme_stylebox_override(state, _flat(Color(LAMP, 0.06), 1))
 	b.add_theme_color_override("font_color", INK)
 	b.add_theme_color_override("font_focus_color", LAMP)
 	b.add_theme_color_override("font_hover_color", LAMP)
@@ -44,7 +48,8 @@ static func button(text: String, font_size: int = 13) -> Button:
 static func label(text: String, font_size: int = 11, color: Color = INK) -> Label:
 	var l := Label.new()
 	l.text = text
-	l.add_theme_font_size_override("font_size", font_size)
+	l.add_theme_font_override("font", HAND)
+	l.add_theme_font_size_override("font_size", font_size + 2)
 	l.add_theme_color_override("font_color", color)
 	return l
 

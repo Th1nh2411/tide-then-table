@@ -1,12 +1,11 @@
 class_name RestaurantPanels3D
 extends RefCounted
-## The restaurant's 2D overlay: spoken lines as subtitles and the action hint. Looks come from the project
-## theme (assets/ui/game_theme.tres).
+## The restaurant's 2D overlay: spoken lines as subtitles and the E prompt
+## under the crosshair (InteractPrompt, the one prompt style of the game).
 
 var host: Node3D
 var _note: SpeechStrip
-var _prompt: PanelContainer
-var _prompt_text: Label
+var _prompt: InteractPrompt
 
 
 ## Flat stand-in for the theme's dark board (square, 2 px ink outline, no
@@ -37,16 +36,8 @@ func build() -> void:
 	var layer := CanvasLayer.new()
 	host.add_child(layer)
 	_build_note(layer)
-	_prompt = PanelContainer.new()
-	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_prompt.theme = ui_theme()
-	_prompt.theme_type_variation = &"RowPanel"
+	_prompt = InteractPrompt.new()
 	layer.add_child(_prompt)
-	_prompt_text = Label.new()
-	_prompt_text.theme_type_variation = &"CardLabel"
-	_prompt_text.add_theme_font_size_override("font_size", 11)
-	_prompt.add_child(_prompt_text)
-	_prompt.hide()
 
 
 ## Subtitle line at the bottom: "Bảo: ..." shows "Bảo:" above it in his colour.
@@ -65,20 +56,18 @@ func tick(_delta: float) -> void:
 	pass
 
 
-## Action hint over the thing E acts on; hidden while something else owns the screen.
-func refresh_prompt(camera: Camera3D, blocked: bool) -> void:
-	_prompt.hide()
-	if blocked:
-		return
-	var hint: Dictionary = RestaurantPrompt3D.describe(host)
-	# Only the key when E would act; where to go is shown by the goal pulse.
+## The verb E would do now ("" = nothing): "[E] rót bia" -> "rót bia".
+static func verb_of(hint: Dictionary) -> String:
 	if hint.is_empty() or not str(hint["words"]).begins_with("[E]"):
-		return
-	_prompt_text.text = "E"
-	_prompt.tooltip_text = str(hint["words"]).trim_prefix("[E] ")
-	_prompt.reset_size()
-	var screen: Vector2 = camera.unproject_position(hint["at"])
-	var size: Vector2 = host.get_viewport().get_visible_rect().size
-	_prompt.position = Vector2(clampf(screen.x - _prompt.size.x * 0.5, 6.0, maxf(6.0, size.x - _prompt.size.x - 6.0)), clampf(screen.y, 32.0, size.y - 55.0))
-	_prompt.show()
+		return ""
+	return str(hint["words"]).trim_prefix("[E]").strip_edges()
 
+
+## The prompt under the crosshair; hidden while something else owns the screen.
+func refresh_prompt(verb: String, blocked: bool) -> void:
+	_prompt.set_text("" if blocked else verb)
+
+
+## The verb on screen now (tests).
+func prompting() -> String:
+	return _prompt.verb

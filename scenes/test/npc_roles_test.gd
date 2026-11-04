@@ -105,7 +105,9 @@ func _village_day() -> void:
 	# Talk to ông Tám.
 	_look(village, npcs.tam.global_position + Vector3(-0.6, 0, 1.2), npcs.tam.global_position + Vector3(0, 1.1, 0))
 	_check("E on ông Tám: his line of the day", npcs.interact() and npcs.tam_talk.talks == 1 and village.text != null)
-	_check("E prompt near him", npcs.prompt() != "")
+	_check("E prompt near him: one lowercase verb, no key words", npcs.prompt() == "hỏi" and village.prompt_verb() == "hỏi")
+	var tam_first: String = npcs.tam_talk.today()[0]
+	_check("mùng 9: ông Tám tells where the fish are", tam_first.contains("sủi bọt") and not tam_first.contains("E "))
 	# Rin walks into the lane: chú Hai pushes the bike a few steps, still off the route.
 	village.player.position = Vector3(VillageLayout3D.EXIT_X + 8.0, 0, VillageLayout3D.LANE_Z)
 	for i in 400:
@@ -140,7 +142,7 @@ func _village_day() -> void:
 	_check("night: the route is clear", _route_clear(village))
 	# Ông Tư's altar.
 	_look(village, VillageLayout3D.room_point(AltarTu3D.AIM + Vector3(0.2, -1.6, -0.75)), VillageLayout3D.room_point(AltarTu3D.AIM))
-	_check("E on the altar", village.spots.target() == "altar")
+	_check("E on the altar", village.spots.target() == "altar" and village.prompt_verb() == "thắp nhang")
 	village.spots.act("altar")
 	_check("... incense and ông Tư's whisper", village.spots.altar.incense != null and village.spots.altar.talk.talks == 1)
 	await _free(village)

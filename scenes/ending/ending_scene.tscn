@@ -48,10 +48,3 @@ theme_override_font_sizes/font_size = 28
 text = "Còn tiếp..."
 horizontal_alignment = 1
 
-[node name="HintLabel" type="Label" parent="CenterContainer/VBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.45, 0.5, 1)
-theme_override_font_sizes/font_size = 10
-text = "Bấm phím bất kỳ để về màn hình chính"
-horizontal_alignment = 1

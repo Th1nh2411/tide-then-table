@@ -8,9 +8,10 @@ extends CanvasLayer
 signal closed
 
 const KEYS: Array[Array] = [
-	["W A S D", "Đi / chèo thúng"], ["Chuột", "Nhìn quanh"],
-	["Chuột trái", "Quăng câu, giữ để kéo"], ["E", "Tương tác"],
-	["N", "Sổ tay"], ["Alt", "Hiện con trỏ"], ["Esc", "Tạm dừng"], ["F11", "Toàn màn hình"],
+	["W A S D", "đi / chèo thúng"], ["Chuột", "nhìn quanh"],
+	["Chuột trái", "quăng câu, giữ để kéo"], ["E", "lấy, mở, hỏi"],
+	["R", "lên bờ (ở bến)"], ["F", "vá thúng (ở bến)"], ["N", "sổ tay"],
+	["Alt", "hiện con trỏ"], ["Esc", "tạm dừng"], ["F11", "toàn màn hình"],
 ]
 
 var _panel: PanelContainer
@@ -57,7 +58,7 @@ func _build() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	_panel.add_child(box)
-	box.add_child(HorrorUi.label("CÀI ĐẶT", 16, HorrorUi.LAMP))
+	box.add_child(HorrorUi.label("cài đặt", 16, HorrorUi.LAMP))
 	var columns := HBoxContainer.new()
 	columns.add_theme_constant_override("separation", 22)
 	box.add_child(columns)
@@ -137,16 +138,11 @@ func _sync() -> void:
 		button.text = "Bật" if on else "Tắt"
 
 
+## The key list, drawn like the in-game prompt (InteractPrompt, steady).
 func _keys_column() -> VBoxContainer:
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 2)
-	column.add_child(HorrorUi.label("Phím", 11, HorrorUi.LAMP))
-	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 8)
-	grid.add_theme_constant_override("v_separation", 1)
-	column.add_child(grid)
+	column.add_theme_constant_override("separation", 3)
+	column.add_child(HorrorUi.label("phím", 11, HorrorUi.DIM))
 	for pair: Array in KEYS:
-		grid.add_child(HorrorUi.label(str(pair[0]), 9, HorrorUi.INK))
-		grid.add_child(HorrorUi.label(str(pair[1]), 9, HorrorUi.DIM))
+		column.add_child(InteractPrompt.new(str(pair[1]), str(pair[0]), true))
 	return column

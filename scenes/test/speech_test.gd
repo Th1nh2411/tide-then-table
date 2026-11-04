@@ -2,7 +2,8 @@ extends Node
 ## Standalone test for SpeechStrip (run with F6): speaker names, the default
 ## speaker, typing word by word + skip, hold by length + fade, the queue,
 ## dead voices ("..." name, pale trembling, slower), DialogueBox's dead
-## style; plus the speaker slugs / moods parsed by the dialogue code.
+## style; plus the speaker slugs / moods parsed by the dialogue code and the
+## interaction prompt (InteractPrompt).
 
 var _failures: int = 0
 
@@ -32,6 +33,7 @@ func _ready() -> void:
 	await _fade_checks(strip)
 	_dead_checks(strip)
 	_box_checks()
+	_prompt_checks()
 	_check("portrait slugs", DialoguePortrait.slug("Cô Năm") == "co_nam" and DialoguePortrait.slug("Bảo") == "bao"
 		and DialoguePortrait.slug("Ông Tám") == "ong_tam")
 	var lines := DialogueLibrary.parse("Rin (lo): Sắp hết dầu rồi.")
@@ -97,6 +99,28 @@ func _dead_checks(strip: SpeechStrip) -> void:
 	strip.say_as("", "[ai đó]", {"dead": true})
 	_check("say_as: forced dead, brackets kept", strip._text.dead and strip._text.get_parsed_text() == "[ai đó]")
 	strip.clear()
+
+
+## InteractPrompt: fades in, a key-only mode, fades out keeping its words.
+func _prompt_checks() -> void:
+	var prompt := InteractPrompt.new()
+	add_child(prompt)
+	prompt.set_text("đọc")
+	_check("prompt: starts faded", not prompt.shown())
+	for i in 30:
+		prompt._process(1.0 / 60.0)
+	_check("prompt: fades in under half a second", prompt.shown() and prompt.key == "E")
+	prompt.clear()
+	prompt._process(1.0 / 60.0)
+	_check("prompt: clear fades out, the old words still drawn", prompt.verb == "" and prompt._drawn_verb == "đọc")
+	prompt.show_key("phím bất kỳ")
+	for i in 30:
+		prompt._process(1.0 / 60.0)
+	_check("prompt: key-only glyph", prompt.shown() and prompt.verb == "" and prompt.key == "phím bất kỳ")
+	var steady := InteractPrompt.new("sổ tay", "N", true)
+	_check("prompt: steady list row sizes itself", steady.custom_minimum_size.x > 20.0 and steady.shown())
+	steady.free()
+	prompt.queue_free()
 
 
 func _box_checks() -> void:

@@ -143,4 +143,4 @@ func give_sketch() -> void:
 
 
 func hint() -> Dictionary:
-	return {"at": SEAT + Vector3(0, 2.0, 0), "words": "[E] Nói chuyện · Chú Bảy"}
+	return {"at": SEAT + Vector3(0, 2.0, 0), "words": "[E] hỏi"}

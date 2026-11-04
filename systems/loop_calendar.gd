@@ -4,7 +4,7 @@ extends RefCounted
 ## rằm tháng Bảy. Each night Rin picks a street end; with no omen tonight the
 ## right pick is the dock (a fisherman goes out), with an omen it is home.
 ## Right = next day; wrong = back to mùng 9 with only Rin's notebook
-## ("note_*"), first-time tips ("tip_*") and the loop count kept. The last
+## ("note_*") and the loop count kept (old saves' "tip_*" flags just drop). The last
 ## night (rằm) has no omen: RamNight judges it (anh Út's tea, the raft).
 
 const FIRST_LUNAR := 9
@@ -22,7 +22,7 @@ const MIN_FISH := 3
 ## "stayed home on an omen night" (Bảo grumbles, no penalty).
 const SHOP_FISH_FLAG := "shop_fish"
 const NO_FISH_FLAG := "bao_no_fish"
-const KEPT_PREFIXES: Array[String] = ["note_", "tip_"]
+const KEPT_PREFIXES: Array[String] = ["note_"]
 ## What the last wrong night missed (kept through resets, "note_"): the omen
 ## id, or MISSED_CALM for a calm night at home / short of fish. The mùng 9
 ## paper prints a vague hint about it (NewsData.hint_for).
