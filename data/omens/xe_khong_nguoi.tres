@@ -11,4 +11,4 @@ text = ""
 calm_text = ""
 co_nam_line = "Chiếc xe đó đậu từ chiều, đèn còn sáng. Cô hổng thấy ai bước xuống hết."
 subtlety = 0.4
-missed_hint = "Người già dặn: xe ai đậu trước nhà mà không ai bước xuống thì đừng ra bến."
+missed_hint = "Người già dặn: Xe ai đậu sáng đèn mà hổng thấy ai bước xuống, thì đừng ra bến."

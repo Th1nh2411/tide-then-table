@@ -14,4 +14,4 @@ custom = true
 subtlety = 0.7
 echo_line = "Bà Sáu: Gió đâu mà lùa tro giấy tiền ra tới bến vầy nè trời..."
 echo_sound = "gust"
-missed_hint = "Người già dặn: giấy tiền đốt mà bay ngược gió là có người chưa nhận. Đêm đó đừng đi."
+missed_hint = "Người già dặn: Giấy tiền đốt mà bay ngược gió là có người chưa nhận. Đêm đó đừng có đi."

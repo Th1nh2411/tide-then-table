@@ -13,4 +13,4 @@ co_nam_line = "Hồi nãy cô thấy tiền lẻ rớt dọc đường ra bến.
 subtlety = 0.6
 echo_line = "Bà Sáu: Đứa nào rải tiền lẻ ra tới cầu tàu vậy? Đừng có lượm nghe."
 echo_sound = "coins_wood"
-missed_hint = "Người già dặn: tiền rơi dọc đường là tiền mua đường. Đừng đi theo nó."
+missed_hint = "Người già dặn: Tiền rớt dọc đường là tiền mua đường. Đừng có lượm, đừng đi theo nó."
