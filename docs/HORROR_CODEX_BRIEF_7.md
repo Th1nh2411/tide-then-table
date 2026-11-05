@@ -41,6 +41,16 @@ table_stall_folding, thung_boat, tray_aluminium, tube_house_a/b/c, fish_ca_thu.
   variants (invented names, rural, e.g. tạp hoá, sửa xe, tiệm thuốc bắc) or a sign-free variant, chosen
   per instance (tell me the hook; placement code is ours).
 
+## 2b. Picture-in-picture (added by the user)
+
+Some models show, on one of their faces, the concept picture itself: a small copy of the whole model
+(and its background) painted onto the surface, like a photo stuck on the object, instead of the material.
+Likely causes: the projection frame is bigger than / offset from the mesh, flat bases, plinths, lids or
+backs facing the projection, or a face that takes the full concept frame. Check every one of the 50
+models from all sides (not only the 3 review angles: also top, bottom, back) for any face that shows a
+mini drawing of the model, the concept's background colour or its frame edge, and fix those (own UVs /
+tiled material, or tighten the projection). List in the delivery which models had it.
+
 ## 3. Done when
 
 The same 3-view sheet shows no flat white / lavender regions on any model in table 1, plus an in-game shot
