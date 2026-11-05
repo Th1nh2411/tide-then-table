@@ -1,0 +1,266 @@
+{
+  "date": "2026-11-05",
+  "catalog_models": 50,
+  "total_triangles": 133808,
+  "changed": {
+    "fish_ca_mu": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "578cf34c119f0fb939018bd57e1412142ff5742a98f64dbfd6f7dbcda7683a10"
+    },
+    "fish_muc": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "804cbe03282715b4bdf328236b146353da6bcfb49c6420da9d7e89521972b1be"
+    },
+    "fish_cua": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "fd0ed535d3bbbd1ac49b0c95b3f17afe08b23a96ed6cf8ea4bdc7ccb9efc5c1c"
+    },
+    "fish_tom": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "317f6b9002b5924ae587edeab8bfcc5b0d5438059444a7078f40d72c6016fb31"
+    },
+    "fish_oc_huong": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "8c47c20890305eedf91e11e25a8c69091af04f099b5e185c723fc943d428dd83"
+    },
+    "fish_glowing": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "46cddf85b976ed8a0621333e427ca1956f132012b281c871c01cc8f560b815b8"
+    },
+    "fishing_bobber": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "c62f587a5990eb316b4b039279e7483a5d63b24cc1dce9b7d91f8e48a5bfdc35"
+    },
+    "hat_hook": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "d3a3badccdc23e3e579777bc651945b259c82e02f05ae0c18a273c3e9ba9b11c"
+    },
+    "water_jar": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "cbfbbcd379c0775446220bb0b858f43ff2e4b2e9abd7917514be186468e25da1"
+    },
+    "altar_ong_tu": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "52ed4a32cae568cfcf5c1e80cbb50ed408660750ced2edef9338a98ca95a7e1b"
+    },
+    "fish_basket": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "7aaf6d97b8a90658b264e4ec51a40b57e5344ee66f4ab6db3051b1b73e6dafb7"
+    },
+    "banana_clump": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "4a6cc10af99f499b92ff68240efe3f79c944382d603d92ded525a977947cddc0"
+    },
+    "power_pole": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "89fcdf9910f02dfba72ac3f1367dc65f895c795c2d34073a624ad2e5b57c4a35"
+    },
+    "roadside_shrine": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "654cf3bcd4cdd0548ffcfbcdbb7b9f585f100cb7fbb7d1b42291f1d1d1ec1bb7"
+    },
+    "stone_steps": {
+      "triangles": 2998,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "122678b7b801c440faac1c41dc0cdf22d40de2800d6d44646c54d5ad4146529f"
+    },
+    "wooden_bed": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "036bcd85f94da915cba6649e0e534b373d48a35601025830f18232da53ea4496"
+    },
+    "wooden_wardrobe": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "9d00c36b5ea3895a44312bb3bc6f92dec5a215ab25dc6edea54a0458c35278ae"
+    },
+    "dish_plate_fish": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "73b43b5e65ddb5254a1a46cd0c553dbc13a6fec180e76277525e1a23ae740272"
+    },
+    "dish_bowl_soup": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "a28b17731098540e8102cd1c1ae56817738a4ccb1be1db2198d979f1a66b8f29"
+    },
+    "beer_glass_ice": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "2c9238451b59ce8abbb06264a7f8587b3ee80654fe7eae8ed685b75fb25aaa3d"
+    },
+    "tray_aluminium": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "4c36fcfaea4a2250b886cde3896c711b440f7c935ac6d203a8d16670ea4c1bf3"
+    },
+    "buoy_pile": {
+      "triangles": 2000,
+      "budget": 2000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "9cc92652021fd7a867927730907c13436fc3e2491c85fb61a6859e529f18126e"
+    },
+    "beer_tower": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "33ce0e3670f5569db6475f56f40e4e1506b25e4c042044ff807c8d40a52ebd09"
+    },
+    "charcoal_stove_clay": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "4584c082d256ca9001261bd14c7f5c60a20247bb9faa9c2a1dc8f5fbea2082d8"
+    },
+    "food_cart_glass": {
+      "triangles": 1876,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "83d43cb25490bcfb6afc4d81bd6b09dc527c7171e4cab65d99469234e0ca0d66"
+    },
+    "ice_box_styrofoam": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "985658641ce209e369869c96b07fb34acb27b19e15f7b2c12885df1e903a01e3"
+    },
+    "coconut_palm": {
+      "triangles": 2998,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "99a3f8831d8fb25e49891117a9c291c4355dcc1bcc1f2d7d32134a81c04f20d2"
+    },
+    "motorbike_cub": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "70227cbe255c3e6f1b6bd8a3896657120936c4a448541efa8926bf2eb1e661b7"
+    },
+    "boat_pulled_up": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "f8d1d92f9c439fafdb1a504470606e5f95eb2c19958af7a4529586432ddc1930"
+    },
+    "shed_tin": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "99b57e299df49862a1acb69a7c344c1605c3e8ecbc598eed2f0b4d2ba5856f0f"
+    },
+    "boat_upturned": {
+      "triangles": 3000,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "40cae2b67b60aa2eed2decf46a24c5458303075b03d4503e1b3a57451ff52880"
+    },
+    "planter_tree_street": {
+      "triangles": 2436,
+      "budget": 3000,
+      "raw_unchanged": true,
+      "uv_normals_finite": true,
+      "reduced_sha256": "f500f8aecd5441d8175496247c72a322ee33a9651790ba5ec67d1daa0c65e69d"
+    }
+  },
+  "unchanged": [
+    "fish_ca_thu",
+    "low_table_tea",
+    "fishing_rod",
+    "bamboo_fence",
+    "fishing_nets_drying",
+    "rin_house",
+    "neighbour_house_a",
+    "neighbour_house_b",
+    "table_stall_folding",
+    "stool_plastic_stack",
+    "altar_tray_offerings",
+    "lamp_post_village",
+    "fish_drying_rack",
+    "clothesline",
+    "thung_boat",
+    "tube_house_a",
+    "tube_house_b",
+    "tube_house_c"
+  ],
+  "audit_directions": [
+    "front",
+    "back",
+    "left",
+    "right",
+    "top",
+    "bottom"
+  ],
+  "source_manifest_verified": true,
+  "tests": {
+    "suite": "ALL OK",
+    "bot": "BOT OK",
+    "coverage": "PASS"
+  },
+  "backup_manifest_verified": true
+}

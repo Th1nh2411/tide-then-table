@@ -47,7 +47,7 @@
   },
   "raw_sha256": "2ee5254a692ac2b3fce8539ae737cfbc504d5d59f00dbe00f90fa1e180726544",
   "status": "success",
-  "reduced_sha256": "db99b1f27c7ebbaca7c5429a203a69e1376a97f52a6ec0a35fcc8fa90cdbbd6f",
+  "reduced_sha256": "c62f587a5990eb316b4b039279e7483a5d63b24cc1dce9b7d91f8e48a5bfdc35",
   "raw": "fishing_bobber_raw.glb",
   "reduced": "fishing_bobber_reduced.glb",
   "source_reduced_sha256": "121964d32cfb4956e5c9bafe6d36938a2ec8be7408062299a10570e6638ab55a",
@@ -55,6 +55,18 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/fishing_bobber"
+    "source_directory": "build/hunyuan_free/fishing_bobber",
+    "runtime_faces": 2000
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "db99b1f27c7ebbaca7c5429a203a69e1376a97f52a6ec0a35fcc8fa90cdbbd6f",
+    "triangles": 2000,
+    "budget": 2000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/fishing_bobber.blend",
+    "note": "Padded true-UV triangle atlas preserves painted concept detail; sRGB background samples replaced with spatially varied species/material colour, including ends and undersides."
   }
 }

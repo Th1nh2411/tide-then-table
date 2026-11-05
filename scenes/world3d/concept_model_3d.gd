@@ -119,6 +119,10 @@ static func spawn(parent: Node3D, id: String, at: Vector3, height: float, yaw: f
 	model.position = Vector3(-bounds.get_center().x * s, -bounds.position.y * s, -bounds.get_center().z * s)
 	root.position = at
 	root.rotation.y = yaw
+	if id == "tube_house_b":
+		var keys := ["tap_hoa", "sua_xe", "thuoc_bac", "plain"]
+		var index := posmod(hash(Vector2i(roundi(at.x * 10), roundi(at.z * 10))), keys.size())
+		set_sign_variant(root, keys[index])
 	return root
 
 
@@ -144,3 +148,22 @@ static func _crop(id: String) -> Vector4:
 		"bottle_letter":
 			return Vector4(0.3, 0.03, 0.4, 0.94)
 	return Vector4(0, 0, 1, 1)
+
+
+## Per-instance sign hook; never changes the shared imported mesh/material.
+## A/C already have no painted shop sign. B supports these four facade variants.
+static func set_sign_variant(root: Node3D, key: String) -> bool:
+	if str(root.get_meta("horror_model_id", "")) != "tube_house_b" or key not in ["tap_hoa", "sua_xe", "thuoc_bac", "plain"]:
+		return false
+	var texture := load("res://assets/models/ready/tube_house_b/sign_variants/%s.png" % key) as Texture2D
+	if texture == null:
+		return false
+	for instance: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
+		for surface: int in range(instance.mesh.get_surface_count()):
+			var source := instance.mesh.surface_get_material(surface) as BaseMaterial3D
+			if source and source.resource_name == "HorrorUV_ConceptFront":
+				var copy := source.duplicate() as BaseMaterial3D
+				copy.albedo_texture = texture
+				instance.set_surface_override_material(surface, StylePass3D.style(copy, instance) if StylePass3D.enabled else copy)
+	root.set_meta("sign_variant", key)
+	return true

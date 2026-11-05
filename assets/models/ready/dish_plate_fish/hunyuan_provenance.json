@@ -47,18 +47,29 @@
   },
   "raw_sha256": "72e78d8d03abedaa6adca826b86f5f00fe98f110d648d29b3ee69c20d679a3f1",
   "status": "success",
-  "reduced_sha256": "cb5cf03d2e4852b6efacfd357b73c763407183832e7c136691166c803f02188d",
+  "reduced_sha256": "73b43b5e65ddb5254a1a46cd0c553dbc13a6fec180e76277525e1a23ae740272",
   "raw": "dish_plate_fish_raw.glb",
   "reduced": "dish_plate_fish_reduced.glb",
   "source_reduced_sha256": "484e8ba0ca48cdfa5d072be21ac23aa3841fd7cd6349022e135ac5efff34a5ce",
   "integration": {
     "normals_added_primitives": 0,
-    "geometry_unchanged": false,
+    "geometry_unchanged": true,
     "source_faces": 5818,
     "runtime_faces": 2000,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "aad72941be19d4463b1c9e15b85953190203471a94e98261f7680e3f7c8dca58",
     "source_directory": "build/brief5/generated/dish_plate_fish",
     "local_reduction": "trimesh.simplify_quadric_decimation / fast-simplification"
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "cb5cf03d2e4852b6efacfd357b73c763407183832e7c136691166c803f02188d",
+    "triangles": 2000,
+    "budget": 2000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/dish_plate_fish.blend",
+    "note": "Six-direction semantic pass: only true front/food detail keeps artwork; broad backs, lids, rims and undersides use own tiled material, never a complete concept photo."
   }
 }

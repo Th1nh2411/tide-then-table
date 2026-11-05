@@ -47,7 +47,7 @@
   },
   "raw_sha256": "563a878510534001f158fcfc2112aceaab047851cde7734f628dcd42fe4acad9",
   "status": "success",
-  "reduced_sha256": "cd5c4a2063b2f6655f943af27bf52f5ff26c2c65b7bd6db6e8ffd8221016caeb",
+  "reduced_sha256": "7aaf6d97b8a90658b264e4ec51a40b57e5344ee66f4ab6db3051b1b73e6dafb7",
   "raw": "fish_basket_raw.glb",
   "reduced": "fish_basket_reduced.glb",
   "source_reduced_sha256": "4be55a27e812c996f0481b22f3f3edb75b0702179fcec9f61e6d739cc8e936a3",
@@ -55,6 +55,18 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/fish_basket"
+    "source_directory": "build/hunyuan_free/fish_basket",
+    "runtime_faces": 3000
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "cd5c4a2063b2f6655f943af27bf52f5ff26c2c65b7bd6db6e8ffd8221016caeb",
+    "triangles": 3000,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/fish_basket.blend",
+    "note": "Padded true-UV triangle atlas preserves painted concept detail; sRGB background samples replaced with spatially varied species/material colour, including ends and undersides."
   }
 }

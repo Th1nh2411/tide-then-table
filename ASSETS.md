@@ -445,3 +445,12 @@ Cây bàng giữ bồn Hunyuan, sửa thân/cành/lá 3D bằng recipe Python; n
 Đã sửa UV/material và hình học 17 model, gồm mục 7 bàn/xe/thúng.
 Catalog 50 ID: 135.131 tam giác. Nguồn: `art_source/horror/brief6/`.
 Kiểm thử ALL OK; bot BOT OK. Báo cáo và ảnh: `docs/HORROR_CODEX_DELIVERY_6.md`.
+
+## Horror brief 7 — 05/11/2026
+
+Đã sửa UV/material 32 model, gồm mảng trắng/tím và ảnh concept lặp ở mặt khuất;
+kiểm tra đủ 50 model × 6 hướng, thêm ảnh hải sản trên tay/lò/thuyền/dừa trong game.
+Bàng có ba tầng tán dày; xe có kính trong và tô/thức ăn; nhà B có ba biển hiệu
+Việt và bản không chữ qua `ConceptModel3D.set_sign_variant(instance, key)`.
+Catalog 50 ID hiện có **133.808 tam giác**. Nguồn: `art_source/horror/brief7/`.
+Test ALL OK; bot BOT OK. Chi tiết và ảnh: `docs/HORROR_CODEX_DELIVERY_7.md`.

@@ -76,13 +76,13 @@
     },
     "__type__": "update"
   },
-  "reduced_sha256": "11140499bdf81f133aacd8f4fb8ffb00c805d3a8f5c3d1703f190176ca47077f",
+  "reduced_sha256": "99b57e299df49862a1acb69a7c344c1605c3e8ecbc598eed2f0b4d2ba5856f0f",
   "raw": "shed_tin_raw.glb",
   "reduced": "shed_tin_reduced.glb",
   "source_reduced_sha256": "14c602b554b3d90aaa4f082ce5797cbed733ad72903f11a44bd14a29f8580118",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": false,
+    "geometry_unchanged": true,
     "source_faces": 3000,
     "runtime_faces": 3000,
     "tool": "tools/art/prepare_horror_models.py",
@@ -99,5 +99,16 @@
     "note": "Retain signed concept-facing detail; non-front surfaces use authored worn UVs/material instead of streaked projection.",
     "blend_source": "art_source/horror/brief6/shed_tin.blend",
     "finished": "2026-11-05"
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "11140499bdf81f133aacd8f4fb8ffb00c805d3a8f5c3d1703f190176ca47077f",
+    "triangles": 3000,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/shed_tin.blend",
+    "note": "Six-direction semantic pass: only true front/food detail keeps artwork; broad backs, lids, rims and undersides use own tiled material, never a complete concept photo."
   }
 }

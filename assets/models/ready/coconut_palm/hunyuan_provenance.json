@@ -47,18 +47,29 @@
   },
   "raw_sha256": "8a9a70ca0aedb3e217a07e514eb53d3f8a7b1a5ffc4655359096246e7c5a8635",
   "status": "success",
-  "reduced_sha256": "d8cc426aff7c1535ed66bc55e445a060a2e6c9c6a9667dbfe29b238da3fb1d0f",
+  "reduced_sha256": "99a3f8831d8fb25e49891117a9c291c4355dcc1bcc1f2d7d32134a81c04f20d2",
   "raw": "coconut_palm_raw.glb",
   "reduced": "coconut_palm_reduced.glb",
   "source_reduced_sha256": "520046ede3f3ebbcc94abdfb7aea7ba3e894c5a74569d0ebc0bdeb68103600b5",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": false,
+    "geometry_unchanged": true,
     "source_faces": 5338,
     "runtime_faces": 2998,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "948551239d1fce4c6be62afb5f66fcd923fdbc28c73c2ae55cbaea893135f99d",
     "source_directory": "build/brief5/generated/coconut_palm",
     "local_reduction": "trimesh.simplify_quadric_decimation / fast-simplification"
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "d8cc426aff7c1535ed66bc55e445a060a2e6c9c6a9667dbfe29b238da3fb1d0f",
+    "triangles": 2998,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/coconut_palm.blend",
+    "note": "Padded true-UV triangle atlas preserves painted concept detail; sRGB background samples replaced with spatially varied species/material colour, including ends and undersides."
   }
 }

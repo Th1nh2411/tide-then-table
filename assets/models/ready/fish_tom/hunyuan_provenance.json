@@ -47,7 +47,7 @@
   },
   "raw_sha256": "54f17bb30304f195b56f31eb3e53e4a2307c982e4d4511351de6d348588944be",
   "status": "success",
-  "reduced_sha256": "9fdfc81b21932518c90900730a16cc28405024d5e3d261590b162e7fcb456411",
+  "reduced_sha256": "317f6b9002b5924ae587edeab8bfcc5b0d5438059444a7078f40d72c6016fb31",
   "raw": "fish_tom_raw.glb",
   "reduced": "fish_tom_reduced.glb",
   "source_reduced_sha256": "553392bf131e5d5fc47b90f72d4a07fb403ea5a7497950af61521f474325386a",
@@ -55,6 +55,18 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/fish_tom"
+    "source_directory": "build/hunyuan_free/fish_tom",
+    "runtime_faces": 2000
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "9fdfc81b21932518c90900730a16cc28405024d5e3d261590b162e7fcb456411",
+    "triangles": 2000,
+    "budget": 2000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/fish_tom.blend",
+    "note": "Padded true-UV triangle atlas preserves painted concept detail; sRGB background samples replaced with spatially varied species/material colour, including ends and undersides."
   }
 }

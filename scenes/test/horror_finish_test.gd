@@ -25,6 +25,10 @@ func _run() -> void:
 	for instance: MeshInstance3D in cart.find_children("*", "MeshInstance3D", true, false):
 		if instance.material_override is ShaderMaterial:
 			front_only = bool((instance.material_override as ShaderMaterial).get_shader_parameter("front_face_only"))
+		for surface: int in range(instance.mesh.get_surface_count()):
+			var source := instance.mesh.surface_get_material(surface) as BaseMaterial3D
+			if source and source.resource_name == "HorrorUV_BaoLettering":
+				front_only = source.cull_mode == BaseMaterial3D.CULL_BACK
 	_check(front_only, "cart lettering cannot render through the back of its front panel")
 	cart.free()
 	var holder := Node3D.new()

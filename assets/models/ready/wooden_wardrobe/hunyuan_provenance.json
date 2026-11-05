@@ -47,7 +47,7 @@
   },
   "raw_sha256": "fe9b6eaf0e85cb9923b2f9f5a8e186624c94259055841d477dc73c496c79d342",
   "status": "success",
-  "reduced_sha256": "103d1971f7254cfe022b3280851d59f0d2311fa9360df45e7956943d3fcc2953",
+  "reduced_sha256": "9d00c36b5ea3895a44312bb3bc6f92dec5a215ab25dc6edea54a0458c35278ae",
   "raw": "wooden_wardrobe_raw.glb",
   "reduced": "wooden_wardrobe_reduced.glb",
   "source_reduced_sha256": "410d9a86d0d17e893be410ca5d8af54cf08039f3006d27bd304ddfd2f123cee7",
@@ -55,6 +55,18 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/wooden_wardrobe"
+    "source_directory": "build/hunyuan_free/wooden_wardrobe",
+    "runtime_faces": 3000
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "103d1971f7254cfe022b3280851d59f0d2311fa9360df45e7956943d3fcc2953",
+    "triangles": 3000,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/wooden_wardrobe.blend",
+    "note": "Six-direction semantic pass: only true front/food detail keeps artwork; broad backs, lids, rims and undersides use own tiled material, never a complete concept photo."
   }
 }

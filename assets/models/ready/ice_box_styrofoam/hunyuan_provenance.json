@@ -47,13 +47,13 @@
   },
   "raw_sha256": "cb7e12ff69fa6687d59520b0ead39069e13704a115818cdfb229d995d0ef925f",
   "status": "success",
-  "reduced_sha256": "1a6872d73b892912cda68f638df8fc27132170d09949452b9ce8306d2c6a6486",
+  "reduced_sha256": "985658641ce209e369869c96b07fb34acb27b19e15f7b2c12885df1e903a01e3",
   "raw": "ice_box_styrofoam_raw.glb",
   "reduced": "ice_box_styrofoam_reduced.glb",
   "source_reduced_sha256": "911dc0eb271339c4c474d46d078fe63a8b9cdccc8f4d03d19e90ce4ee9ac58ff",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": false,
+    "geometry_unchanged": true,
     "source_faces": 3000,
     "runtime_faces": 3000,
     "tool": "tools/art/prepare_horror_models.py",
@@ -70,5 +70,16 @@
     "note": "Retain signed concept-facing detail; non-front surfaces use authored worn UVs/material instead of streaked projection.",
     "blend_source": "art_source/horror/brief6/ice_box_styrofoam.blend",
     "finished": "2026-11-05"
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "1a6872d73b892912cda68f638df8fc27132170d09949452b9ce8306d2c6a6486",
+    "triangles": 3000,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/ice_box_styrofoam.blend",
+    "note": "Own repeating dirty foam/tape texture covers lid, back, sides and bottom; no unpainted planes."
   }
 }

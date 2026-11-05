@@ -53,7 +53,7 @@
   },
   "raw_sha256": "4bf00617c14d545d9887ac761a357fa1e833eb7c4f8c039f5f13b504d847df70",
   "status": "success",
-  "reduced_sha256": "240ddd56d70a8ce879853fa717286306c536a1b322479cdb27b62d859d5c3ba3",
+  "reduced_sha256": "122678b7b801c440faac1c41dc0cdf22d40de2800d6d44646c54d5ad4146529f",
   "raw": "stone_steps_raw.glb",
   "reduced": "stone_steps_reduced.glb",
   "previous_failures": [
@@ -67,6 +67,18 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/stone_steps"
+    "source_directory": "build/hunyuan_free/stone_steps",
+    "runtime_faces": 2998
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "240ddd56d70a8ce879853fa717286306c536a1b322479cdb27b62d859d5c3ba3",
+    "triangles": 2998,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/stone_steps.blend",
+    "note": "Six-direction semantic pass: only true front/food detail keeps artwork; broad backs, lids, rims and undersides use own tiled material, never a complete concept photo."
   }
 }

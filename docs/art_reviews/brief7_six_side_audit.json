@@ -1,0 +1,452 @@
+{
+  "fish_ca_thu": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fish_ca_mu": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fish_muc": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fish_cua": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fish_tom": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fish_oc_huong": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fish_glowing": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fishing_bobber": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "hat_hook": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "Hat picture/detail repeated inside the cone; now woven straw.",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "water_jar": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": true,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "low_table_tea": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "altar_ong_tu": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fish_basket": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": true,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fishing_rod": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "bamboo_fence": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "banana_clump": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "power_pole": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": true,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "roadside_shrine": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": true,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fishing_nets_drying": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "stone_steps": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "Staircase detail stretched/repeated across top and flat bottom; now stone.",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "wooden_bed": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "wooden_wardrobe": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": true,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "rin_house": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "neighbour_house_a": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "neighbour_house_b": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "dish_plate_fish": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "Complete fish/plate image on the underside; now ceramic coverage.",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "dish_bowl_soup": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": true,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "beer_glass_ice": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": true,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "tray_aluminium": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "Complete tray/rim picture repeated on the underside; now scratched metal UVs.",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "buoy_pile": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "beer_tower": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "table_stall_folding": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "stool_plastic_stack": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "altar_tray_offerings": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "charcoal_stove_clay": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": true,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "food_cart_glass": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": true,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "ice_box_styrofoam": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "lamp_post_village": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "coconut_palm": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "motorbike_cub": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "fish_drying_rack": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "clothesline": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "boat_pulled_up": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": true,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "thung_boat": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "shed_tin": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "boat_upturned": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": true,
+    "geometry_changed": false,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "planter_tree_street": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": true,
+    "uv_or_material_changed": true,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "tube_house_a": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "tube_house_b": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  },
+  "tube_house_c": {
+    "directions": 6,
+    "reviewed": true,
+    "full_picture_or_frame": "",
+    "other_concept_spill": false,
+    "geometry_changed": false,
+    "uv_or_material_changed": false,
+    "after": "No complete model picture, concept frame or background patch observed."
+  }
+}

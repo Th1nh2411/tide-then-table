@@ -47,7 +47,7 @@
   },
   "raw_sha256": "18dbd92e07640e6e3397482434227ad5ecfaf6070f91095b3c34670beb4e1dd4",
   "status": "success",
-  "reduced_sha256": "44c1b0848e2e86096c2e44809efb74c9e7f0b5809ad4bf89f6756b9ddfd3e37e",
+  "reduced_sha256": "cbfbbcd379c0775446220bb0b858f43ff2e4b2e9abd7917514be186468e25da1",
   "raw": "water_jar_raw.glb",
   "reduced": "water_jar_reduced.glb",
   "source_reduced_sha256": "6f82ee1a09739f298a821bf7f5dfdae9cc6fbf37a0242052b9ef614a031c40cb",
@@ -55,6 +55,18 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/water_jar"
+    "source_directory": "build/hunyuan_free/water_jar",
+    "runtime_faces": 2000
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "44c1b0848e2e86096c2e44809efb74c9e7f0b5809ad4bf89f6756b9ddfd3e37e",
+    "triangles": 2000,
+    "budget": 2000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/water_jar.blend",
+    "note": "Padded true-UV triangle atlas preserves painted concept detail; sRGB background samples replaced with spatially varied species/material colour, including ends and undersides."
   }
 }

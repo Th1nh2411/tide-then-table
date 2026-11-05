@@ -1,0 +1,45 @@
+== Test scenes
+scenes/test/art_test.tscn                      87 pass  0 fail  0 errors
+scenes/test/boat_impact_test.tscn               4 pass  0 fail  0 errors
+scenes/test/catch_test.tscn                    15 pass  0 fail  0 errors
+scenes/test/character_scale_test.tscn           0 pass  0 fail  0 errors
+scenes/test/chase_test.tscn                    36 pass  0 fail  0 errors
+scenes/test/dark_night_test.tscn               20 pass  0 fail  0 errors
+scenes/test/dialogue_test.tscn                 12 pass  0 fail  0 errors
+scenes/test/fishing3d_test.tscn                15 pass  0 fail  0 errors
+scenes/test/game3d_loop_test.tscn              26 pass  0 fail  0 errors
+scenes/test/ghost_visit_test.tscn              17 pass  0 fail  0 errors
+scenes/test/horror_coverage_test.tscn          38 pass  0 fail  0 errors
+scenes/test/horror_finish_test.tscn             8 pass  0 fail  0 errors
+scenes/test/horror_models_test.tscn           111 pass  0 fail  0 errors
+scenes/test/loop_calendar_test.tscn            30 pass  0 fail  0 errors
+scenes/test/night_errand_test.tscn              6 pass  0 fail  0 errors
+scenes/test/notebook_test.tscn                 16 pass  0 fail  0 errors
+scenes/test/npc_roles_test.tscn                49 pass  0 fail  0 errors
+scenes/test/omen_test.tscn                     23 pass  0 fail  0 errors
+scenes/test/paper_test.tscn                    19 pass  0 fail  0 errors
+scenes/test/psx_characters_test.tscn          137 pass  0 fail  0 errors
+scenes/test/ram_night_test.tscn                22 pass  0 fail  0 errors
+scenes/test/reel_logic_test.tscn               14 pass  0 fail  0 errors
+scenes/test/save_test.tscn                     27 pass  0 fail  0 errors
+scenes/test/sea3d_hazards_test.tscn            12 pass  0 fail  0 errors
+scenes/test/sea3d_parity_test.tscn             24 pass  0 fail  0 errors
+scenes/test/settings_test.tscn                  9 pass  0 fail  0 errors
+scenes/test/sfx_library_test.tscn              70 pass  0 fail  0 errors
+scenes/test/sfx_test.tscn                      46 pass  0 fail  0 errors
+scenes/test/speech_test.tscn                   43 pass  0 fail  0 errors
+scenes/test/story_twist_test.tscn              59 pass  0 fail  0 errors
+scenes/test/style_test.tscn                    19 pass  0 fail  0 errors
+scenes/test/thung_rowing_test.tscn             13 pass  0 fail  0 errors
+scenes/test/uncanny_test.tscn                  50 pass  0 fail  0 errors
+scenes/test/vy_staff_test.tscn                 22 pass  0 fail  0 errors
+scenes/test/world_edges_test.tscn              35 pass  0 fail  0 errors
+scenes/test/restaurant3d_debug_smoke.tscn       1 pass  0 fail  0 errors
+== Smoke runs
+scenes/main_menu/main_menu.tscn                 0 pass  0 fail  0 errors
+scenes/village3d/village_scene_3d.tscn          0 pass  0 fail  0 errors
+scenes/ending/ending_scene.tscn                 0 pass  0 fail  0 errors
+scenes/sea3d/sea_scene_3d_smoke.tscn            1 pass  0 fail  0 errors
+scenes/restaurant3d/restaurant_flow_check.tscn   8 pass  0 fail  0 errors
+scenes/restaurant3d/traffic_check.tscn         21 pass  0 fail  0 errors
+ALL OK

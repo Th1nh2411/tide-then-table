@@ -53,7 +53,7 @@
   },
   "raw_sha256": "2ad9ded1cfa55c7d33bc9447eb1aff6b55de5898797cc2063e796ab55e98d4a9",
   "status": "success",
-  "reduced_sha256": "f3e5c656400257fdd1234d7aab540705ae0f438f4ae44f8389bd180596e8805e",
+  "reduced_sha256": "4a6cc10af99f499b92ff68240efe3f79c944382d603d92ded525a977947cddc0",
   "raw": "banana_clump_raw.glb",
   "reduced": "banana_clump_reduced.glb",
   "source_reduced_sha256": "10fee0b36bdda8d22dfad42e5be7fded73b5a23def6ca43a8303ca8fc4d8bed6",
@@ -61,6 +61,18 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/banana_clump"
+    "source_directory": "build/hunyuan_free/banana_clump",
+    "runtime_faces": 3000
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "f3e5c656400257fdd1234d7aab540705ae0f438f4ae44f8389bd180596e8805e",
+    "triangles": 3000,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/banana_clump.blend",
+    "note": "Padded true-UV triangle atlas preserves painted concept detail; sRGB background samples replaced with spatially varied species/material colour, including ends and undersides."
   }
 }

@@ -30,14 +30,24 @@ func _render() -> void:
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
 	world.add_child(camera)
 	camera.make_current()
+	var all_sides := OS.get_cmdline_user_args().has("--all-sides")
+	var baseline := OS.get_cmdline_user_args().has("--baseline")
+	if baseline and not FileAccess.file_exists("res://build/brief7/baseline_model.gd"):
+		push_error("Run python3 tools/art/stage_horror_brief7_baseline.py first")
+		quit(1)
+		return
+	var factory = load("res://build/brief7/baseline_model.gd") if baseline else ConceptModel3D
+	var folder := "res://build/brief7/sides_before" if baseline else "res://build/brief7/sides_after"
+	if not all_sides:
+		folder = "res://build/horror_integration/review"
 	var ids: Array = []
 	var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/models/ready/horror_models.json"))
 	for id: String in catalog:
 		ids.append({"name": id})
-	DirAccess.make_dir_recursive_absolute("res://build/horror_integration/review")
+	DirAccess.make_dir_recursive_absolute(folder)
 	for entry: Dictionary in ids:
 		var id := String(entry["name"])
-		var model := ConceptModel3D.spawn(world, id, Vector3.ZERO, 2.0)
+		var model: Node3D = factory.spawn(world, id, Vector3.ZERO, 2.0)
 		await process_frame
 		var bounds := AABB()
 		var first := true
@@ -48,16 +58,21 @@ func _render() -> void:
 		var center := bounds.get_center()
 		var extent := bounds.size.length()
 		camera.size = maxf(extent * 1.05, 1.0)
-		for angle: int in range(3):
+		for angle: int in range(6 if all_sides else 3):
 			var yaw := float(angle) * 2.1 + 0.35
 			camera.position = center + Vector3(sin(yaw), 0.55, cos(yaw)) * extent * 2.0
-			camera.look_at(center)
+			if all_sides:
+				var directions := [Vector3.BACK, Vector3.FORWARD, Vector3.LEFT, Vector3.RIGHT, Vector3.UP, Vector3.DOWN]
+				camera.position = center + directions[angle] * extent * 2.0
+				camera.look_at(center, Vector3.FORWARD if angle >= 4 else Vector3.UP)
+			else:
+				camera.look_at(center)
 			await process_frame
 			# An offscreen target keeps captures moving even when another window
 			# covers this review. Do not wait for a visible-window redraw signal.
 			RenderingServer.force_draw(false)
-			viewport.get_texture().get_image().save_png("res://build/horror_integration/review/%s_%d.png" % [id, angle])
+			viewport.get_texture().get_image().save_png(folder + "/%s_%d.png" % [id, angle])
 		model.queue_free()
 		await process_frame
-	print("HORROR REVIEW: %d models, 3 angles each" % ids.size())
+	print("HORROR REVIEW: %d models, %d angles each" % [ids.size(), 6 if all_sides else 3])
 	quit()

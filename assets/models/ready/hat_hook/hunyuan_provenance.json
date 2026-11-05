@@ -47,7 +47,7 @@
   },
   "raw_sha256": "5d36cdd72b6d23d878fb0cd1384d10b0c816c2a310768addd2edac46bcdc1455",
   "status": "success",
-  "reduced_sha256": "51ebb694463cbca430940819e3d8613da7058ebbaa48efba280e3c126bc75b60",
+  "reduced_sha256": "d3a3badccdc23e3e579777bc651945b259c82e02f05ae0c18a273c3e9ba9b11c",
   "raw": "hat_hook_raw.glb",
   "reduced": "hat_hook_reduced.glb",
   "source_reduced_sha256": "21bb3b11f90c8d59d0cf2e0d521d1ef1662387013e42ab21eb92d8a3cb8afdd1",
@@ -55,6 +55,18 @@
     "normals_added_primitives": 1,
     "geometry_unchanged": true,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/hat_hook"
+    "source_directory": "build/hunyuan_free/hat_hook",
+    "runtime_faces": 2000
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "51ebb694463cbca430940819e3d8613da7058ebbaa48efba280e3c126bc75b60",
+    "triangles": 2000,
+    "budget": 2000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/hat_hook.blend",
+    "note": "Padded true-UV triangle atlas preserves painted concept detail; sRGB background samples replaced with spatially varied species/material colour, including ends and undersides."
   }
 }

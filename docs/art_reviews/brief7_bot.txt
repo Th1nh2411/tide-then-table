@@ -1,0 +1,30 @@
+HOME | Mùng 9 tháng Bảy | loops 0 | omen - | customs vang_ma
+DAY 1 | served 40 (Vy 4 plates, 0 tables) | lost 0 | rating 5 | fish on the tray 0 | Bảo: Tối nay kiếm ít nhất 3 con nghe, mai quán cần cá.
+SEA | Mùng 9 tháng Bảy | basket 3
+HOME | Mùng 10 tháng Bảy | loops 0 | omen led_chao | customs vang_ma
+DAY 2 | served 40 (Vy 5 plates, 0 tables) | lost 0 | rating 5 | fish on the tray 3 | Bảo: Cá mày đem về tao bày lên mâm rồi đó. Tươi rói. / Bảo: Tối nay kiếm ít nhất 3 con nghe, mai quán cần cá.
+HOME WAKE | waiting for control after reset
+HOME WAKE | frame 600 paused false tweens 1
+HOME WAKE | control restored
+LOOP RESET | out on an omen night -> Mùng 9 tháng Bảy | paper: Người già dặn: Quán mà bày ra món không ai nấu, là có người khác ăn rồi. Tối đó ở nhà.
+HOME | Mùng 9 tháng Bảy | loops 1 | omen - | customs vang_ma,hoa_dang
+DAY 1 | served 40 (Vy 4 plates, 0 tables) | lost 0 | rating 5 | fish on the tray 0 | Bảo: Tối nay kiếm ít nhất 3 con nghe, mai quán cần cá.
+SEA | Mùng 9 tháng Bảy | basket 3
+HOME | Mùng 10 tháng Bảy | loops 1 | omen hai_dang | customs mam_cung
+DAY 2 | served 40 (Vy 5 plates, 0 tables) | lost 0 | rating 5 | fish on the tray 3 | Bảo: Cá mày đem về tao bày lên mâm rồi đó. Tươi rói. / Bảo: Tối nay kiếm ít nhất 3 con nghe, mai quán cần cá.
+HOME | 11 tháng Bảy | loops 1 | omen goi_ten | customs mam_cung
+DAY 3 | served 40 (Vy 5 plates, 0 tables) | lost 0 | rating 5 | fish on the tray 0 | Bảo: Hôm qua mày đi đâu, hết cá bán rồi. / Bảo: Tối nay kiếm ít nhất 3 con nghe, mai quán cần cá.
+HOME | 12 tháng Bảy | loops 1 | omen - | customs mam_cung
+DAY 4 | served 40 (Vy 5 plates, 0 tables) | lost 0 | rating 5 | fish on the tray 0 | Bảo: Hôm qua mày đi đâu, hết cá bán rồi. / Bảo: Tối nay kiếm ít nhất 3 con nghe, mai quán cần cá.
+SEA | 12 tháng Bảy | basket 3
+HOME | 13 tháng Bảy | loops 1 | omen tien_le | customs mam_cung
+DAY 5 | served 40 (Vy 5 plates, 0 tables) | lost 0 | rating 5 | fish on the tray 3 | Bảo: Cá mày đem về tao bày lên mâm rồi đó. Tươi rói. / Bảo: Tối nay kiếm ít nhất 3 con nghe, mai quán cần cá.
+HOME | 14 tháng Bảy | loops 1 | omen - | customs mam_cung,vang_ma
+DAY 6 | served 40 (Vy 5 plates, 0 tables) | lost 0 | rating 5 | fish on the tray 0 | Bảo: Hôm qua mày đi đâu, hết cá bán rồi. / Bảo: Tối nay kiếm ít nhất 3 con nghe, mai quán cần cá.
+SEA | 14 tháng Bảy | basket 3
+HOME | Rằm tháng Bảy | loops 1 | omen - | customs mam_cung,vang_ma
+DAY 7 | served 40 (Vy 4 plates, 0 tables) | lost 0 | rating 5 | fish on the tray 3 | Bảo: Cá mày đem về tao bày lên mâm rồi đó. Tươi rói.
+RAM | Rằm tháng Bảy | anh Út's ginger tea refused
+RAM ENDING | true | refused the tea, saw anh Út at the raft | clues 0
+RUN ENDING | 3D | day 7 | loops 1
+BOT OK

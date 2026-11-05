@@ -47,7 +47,7 @@
   },
   "raw_sha256": "4645bd10c81d2c0d310a5d99bb7120ef52c91ef3219499255685cb8971fa227a",
   "status": "success",
-  "reduced_sha256": "50de83e68e9562eefdc970f2ef7a6a01db3d1818c20d6fc15cc733d0babc2996",
+  "reduced_sha256": "4584c082d256ca9001261bd14c7f5c60a20247bb9faa9c2a1dc8f5fbea2082d8",
   "raw": "charcoal_stove_clay_raw.glb",
   "reduced": "charcoal_stove_clay_reduced.glb",
   "source_reduced_sha256": "83e7f955d749027921308285ad5ed5050f317c61d393c6b3155eed063e7e2ca0",
@@ -59,5 +59,16 @@
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "3f8e052444801a95bc6f11d010251725113468f34b3bc6fc06bc92f207f0fe2b",
     "source_directory": "build/brief5/generated/charcoal_stove_clay"
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "50de83e68e9562eefdc970f2ef7a6a01db3d1818c20d6fc15cc733d0babc2996",
+    "triangles": 3000,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/charcoal_stove_clay.blend",
+    "note": "Padded true-UV triangle atlas preserves painted concept detail; sRGB background samples replaced with spatially varied species/material colour, including ends and undersides."
   }
 }

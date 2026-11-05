@@ -47,7 +47,7 @@
   },
   "raw_sha256": "e37bfdab55a286ad39d423099f94a4f0697cd5850d7b1357a4745b5430def107",
   "status": "success",
-  "reduced_sha256": "74f0e1c37ca93a9bfa11eeb70eb2cb2a045e9ae4c191adaa066e3337923838b8",
+  "reduced_sha256": "40cae2b67b60aa2eed2decf46a24c5458303075b03d4503e1b3a57451ff52880",
   "raw": "boat_upturned_raw.glb",
   "reduced": "boat_upturned_reduced.glb",
   "source_reduced_sha256": "839e72c485ddfa921fa7d6a805198177d94b04a22bf639e6487c3f12634f35c1",
@@ -59,5 +59,16 @@
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "1127090ce51337fe4882140d72b736478e43ce421bf79c64dc889fa66ef5e4c4",
     "source_directory": "build/brief5/generated/boat_upturned"
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "74f0e1c37ca93a9bfa11eeb70eb2cb2a045e9ae4c191adaa066e3337923838b8",
+    "triangles": 3000,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/boat_upturned.blend",
+    "note": "Six-direction semantic pass: only true front/food detail keeps artwork; broad backs, lids, rims and undersides use own tiled material, never a complete concept photo."
   }
 }

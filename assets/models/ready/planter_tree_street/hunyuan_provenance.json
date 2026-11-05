@@ -76,7 +76,7 @@
     },
     "__type__": "update"
   },
-  "reduced_sha256": "26165aa70513642b16feeddcf31dd955666c94d605e5cdf0be6777cd150eeb77",
+  "reduced_sha256": "f500f8aecd5441d8175496247c72a322ee33a9651790ba5ec67d1daa0c65e69d",
   "raw": "planter_tree_street_raw.glb",
   "reduced": "planter_tree_street_reduced.glb",
   "artist_repair": {
@@ -93,7 +93,7 @@
     "normals_added_primitives": 0,
     "geometry_unchanged": false,
     "source_faces": 1763,
-    "runtime_faces": 2635,
+    "runtime_faces": 2436,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "d820857cff52c88481bbfa545400c47e4e4dee7714e36ebf6d71799777dd30f8",
     "source_directory": "build/brief5/tree_geometry_repair/planter_tree_street"
@@ -108,5 +108,16 @@
     "note": "Terminalia street tree: straight tapering trunk, four horizontal tiers of broad rounded leaves; inferred planter retained. Local height about 4.1 m, width under 2.4 m so the existing fit yields 4.2 m.",
     "blend_source": "art_source/horror/brief6/planter_tree_street.blend",
     "finished": "2026-11-05"
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "26165aa70513642b16feeddcf31dd955666c94d605e5cdf0be6777cd150eeb77",
+    "triangles": 2436,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": true,
+    "blend_source": "art_source/horror/brief7/planter_tree_street.blend",
+    "note": "Thick short trunk, three broad dense horizontal crowns with 252 overlapping rounded leaves; crown wider than its vertical depth. Original planter retained."
   }
 }

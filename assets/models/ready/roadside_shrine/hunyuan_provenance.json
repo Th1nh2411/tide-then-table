@@ -47,7 +47,7 @@
   },
   "raw_sha256": "6212e04d7f6923eb6f5a658c15a61e236198b475114cd99f8e8706486b740185",
   "status": "success",
-  "reduced_sha256": "dc2b6a013a626e83462d2a69e8c57039cb674dfb774b1592ae419038b1a40913",
+  "reduced_sha256": "654cf3bcd4cdd0548ffcfbcdbb7b9f585f100cb7fbb7d1b42291f1d1d1ec1bb7",
   "raw": "roadside_shrine_raw.glb",
   "reduced": "roadside_shrine_reduced.glb",
   "source_reduced_sha256": "ef90c9c6664bf2a369dec4d0ff67de930360183f88d4e1f3f112f091d0795459",
@@ -57,6 +57,18 @@
     "tool": "tools/art/prepare_horror_models.py",
     "source_directory": "build/hunyuan_free/roadside_shrine",
     "material_concept_sha256": "676400e6495b6038865f37583d81099abbc51cd50183e2816504f5b97ee6736d",
-    "original_concept_backup": ".art_backups/brief4_projection_20261103/assets/concepts/horror/roadside_shrine.png"
+    "original_concept_backup": ".art_backups/brief4_projection_20261103/assets/concepts/horror/roadside_shrine.png",
+    "runtime_faces": 3000
+  },
+  "brief7": {
+    "date": "2026-11-05",
+    "tool": "tools/art/finish_horror_brief7.py",
+    "input_reduced_sha256": "dc2b6a013a626e83462d2a69e8c57039cb674dfb774b1592ae419038b1a40913",
+    "triangles": 3000,
+    "budget": 3000,
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "blend_source": "art_source/horror/brief7/roadside_shrine.blend",
+    "note": "Real UV plaster pillar; preserve roof and altar detail with full colour coverage."
   }
 }

@@ -1,0 +1,130 @@
+{
+  "altar_ong_tu": {
+    "runtime_glb_sha256": "52ed4a32cae568cfcf5c1e80cbb50ed408660750ced2edef9338a98ca95a7e1b",
+    "blend_sha256": "154eb4ab171c7030363c0e000c23c618bae73ec03f8138d8629ea5b7ecb10eb0"
+  },
+  "banana_clump": {
+    "runtime_glb_sha256": "4a6cc10af99f499b92ff68240efe3f79c944382d603d92ded525a977947cddc0",
+    "blend_sha256": "9d147564057164cb953ecaf2a82bd2b30798aa8eb39ab6d97c02f9cbd1243f10"
+  },
+  "beer_glass_ice": {
+    "runtime_glb_sha256": "2c9238451b59ce8abbb06264a7f8587b3ee80654fe7eae8ed685b75fb25aaa3d",
+    "blend_sha256": "63babb49b146ef424c1a4cb8e1ca56389a81b0fa6a4fd94a812dbb263de45615"
+  },
+  "beer_tower": {
+    "runtime_glb_sha256": "33ce0e3670f5569db6475f56f40e4e1506b25e4c042044ff807c8d40a52ebd09",
+    "blend_sha256": "53d106be605dfd24fa0dcbd53db50944b599eb00b07b538889ad688342b007d1"
+  },
+  "boat_pulled_up": {
+    "runtime_glb_sha256": "f8d1d92f9c439fafdb1a504470606e5f95eb2c19958af7a4529586432ddc1930",
+    "blend_sha256": "055f1c02ca7d2873ecf495355b878dd2e18bb86e8721a5cb94c5eaaa13992e47"
+  },
+  "boat_upturned": {
+    "runtime_glb_sha256": "40cae2b67b60aa2eed2decf46a24c5458303075b03d4503e1b3a57451ff52880",
+    "blend_sha256": "94054837dcfa221ddc1e0a9de06e9953f069ea69ccb3b56614b3f016e44220f8"
+  },
+  "buoy_pile": {
+    "runtime_glb_sha256": "9cc92652021fd7a867927730907c13436fc3e2491c85fb61a6859e529f18126e",
+    "blend_sha256": "a65c488876b753c3767c8aa2a9fde5d2c08551174964f7f4bdd81a5e6e8ec7c0"
+  },
+  "charcoal_stove_clay": {
+    "runtime_glb_sha256": "4584c082d256ca9001261bd14c7f5c60a20247bb9faa9c2a1dc8f5fbea2082d8",
+    "blend_sha256": "6c54ba2855f76485386b0c1a6965b019c9d3a3c5b401ab39c7b055c4be900643"
+  },
+  "coconut_palm": {
+    "runtime_glb_sha256": "99a3f8831d8fb25e49891117a9c291c4355dcc1bcc1f2d7d32134a81c04f20d2",
+    "blend_sha256": "da6a94fe65c917ebb1505fde10fb18d5440b5e7b419d4ed2a4882da11083b359"
+  },
+  "dish_bowl_soup": {
+    "runtime_glb_sha256": "a28b17731098540e8102cd1c1ae56817738a4ccb1be1db2198d979f1a66b8f29",
+    "blend_sha256": "d3f1e5d6dadaa3a50d45a37ca6ff6600e6855dc8210efaf81527008f2747a86d"
+  },
+  "dish_plate_fish": {
+    "runtime_glb_sha256": "73b43b5e65ddb5254a1a46cd0c553dbc13a6fec180e76277525e1a23ae740272",
+    "blend_sha256": "0b4e67183894e870abb3e760ee9743d95a327e77f919be19ea1abeea2f2c552f"
+  },
+  "fish_basket": {
+    "runtime_glb_sha256": "7aaf6d97b8a90658b264e4ec51a40b57e5344ee66f4ab6db3051b1b73e6dafb7",
+    "blend_sha256": "e8c0dbe4bb497c476f11ee8f4f25307619b0f893717c2f6becf5aaca57aa1576"
+  },
+  "fish_ca_mu": {
+    "runtime_glb_sha256": "578cf34c119f0fb939018bd57e1412142ff5742a98f64dbfd6f7dbcda7683a10",
+    "blend_sha256": "9b987aa82a668ad06d051c8a6ff9ca34512c3cd536303528ccaee5d8eaa940ba"
+  },
+  "fish_cua": {
+    "runtime_glb_sha256": "fd0ed535d3bbbd1ac49b0c95b3f17afe08b23a96ed6cf8ea4bdc7ccb9efc5c1c",
+    "blend_sha256": "63c81521e748d4c89c89a9f53a8359512320092188f5e244a3703efd986f1f77"
+  },
+  "fish_glowing": {
+    "runtime_glb_sha256": "46cddf85b976ed8a0621333e427ca1956f132012b281c871c01cc8f560b815b8",
+    "blend_sha256": "782ff7237dfbfef5b47916bb9f72e3b315ed997bb26bfabe4645b9c902b5a6f3"
+  },
+  "fish_muc": {
+    "runtime_glb_sha256": "804cbe03282715b4bdf328236b146353da6bcfb49c6420da9d7e89521972b1be",
+    "blend_sha256": "22a659bf04c7c75e4ae59d67f4657ebd3b4d664e0ff67dfc0eeeb9b4a157b6ec"
+  },
+  "fish_oc_huong": {
+    "runtime_glb_sha256": "8c47c20890305eedf91e11e25a8c69091af04f099b5e185c723fc943d428dd83",
+    "blend_sha256": "9ac976786fc0f68f5fccb53cb15d7f188f5592302617111eb0c1bc7faa479d01"
+  },
+  "fish_tom": {
+    "runtime_glb_sha256": "317f6b9002b5924ae587edeab8bfcc5b0d5438059444a7078f40d72c6016fb31",
+    "blend_sha256": "c24f2587584a0b75f017746f793da20857aae2f667b47f809b07398665b2aa0e"
+  },
+  "fishing_bobber": {
+    "runtime_glb_sha256": "c62f587a5990eb316b4b039279e7483a5d63b24cc1dce9b7d91f8e48a5bfdc35",
+    "blend_sha256": "06a92631101da4e6635c28218f563b066be7bef2e9346c17539849c96aa0d1cc"
+  },
+  "food_cart_glass": {
+    "runtime_glb_sha256": "83d43cb25490bcfb6afc4d81bd6b09dc527c7171e4cab65d99469234e0ca0d66",
+    "blend_sha256": "0ba8e2114e537354bc703cd1be0345c3597e2b3f3c21e32226ca024475c438c0"
+  },
+  "hat_hook": {
+    "runtime_glb_sha256": "d3a3badccdc23e3e579777bc651945b259c82e02f05ae0c18a273c3e9ba9b11c",
+    "blend_sha256": "d53d3455b239b8453f0e2d284ff749b0eabdd3e7e3416658851f86744b6aea70"
+  },
+  "ice_box_styrofoam": {
+    "runtime_glb_sha256": "985658641ce209e369869c96b07fb34acb27b19e15f7b2c12885df1e903a01e3",
+    "blend_sha256": "0b583fd2101b260f526e86c332e006ed25dc0c7cc54bdb07ff98cc3e046c62c4"
+  },
+  "motorbike_cub": {
+    "runtime_glb_sha256": "70227cbe255c3e6f1b6bd8a3896657120936c4a448541efa8926bf2eb1e661b7",
+    "blend_sha256": "5392113c77be0542adbd3aa409bb9fda2462659a98899324f7d023099820a142"
+  },
+  "planter_tree_street": {
+    "runtime_glb_sha256": "f500f8aecd5441d8175496247c72a322ee33a9651790ba5ec67d1daa0c65e69d",
+    "blend_sha256": "830d7e09aeecfe0dc7611f2daff1efee19b778dadb7b748dddebb09a4e7404d2"
+  },
+  "power_pole": {
+    "runtime_glb_sha256": "89fcdf9910f02dfba72ac3f1367dc65f895c795c2d34073a624ad2e5b57c4a35",
+    "blend_sha256": "9145dc19514a6314a92a1952aa015f161a53e9168856032a76dc36565742ae19"
+  },
+  "roadside_shrine": {
+    "runtime_glb_sha256": "654cf3bcd4cdd0548ffcfbcdbb7b9f585f100cb7fbb7d1b42291f1d1d1ec1bb7",
+    "blend_sha256": "cc3bfae8e02089ac82f836be79913264d630e653c06e87d70729ccb1dffcf653"
+  },
+  "shed_tin": {
+    "runtime_glb_sha256": "99b57e299df49862a1acb69a7c344c1605c3e8ecbc598eed2f0b4d2ba5856f0f",
+    "blend_sha256": "d12fd57fd4d290f6662de4e9f74685e2169885aff94051f619b70fdb6d97b707"
+  },
+  "stone_steps": {
+    "runtime_glb_sha256": "122678b7b801c440faac1c41dc0cdf22d40de2800d6d44646c54d5ad4146529f",
+    "blend_sha256": "6df56e201a312fe54699f4f9414f505f9090f727be5889d34b318e9747a68600"
+  },
+  "tray_aluminium": {
+    "runtime_glb_sha256": "4c36fcfaea4a2250b886cde3896c711b440f7c935ac6d203a8d16670ea4c1bf3",
+    "blend_sha256": "b8a2a3f8faf78167660e87438548fb9b9b739973a11b289fb33c9c58196d5dc9"
+  },
+  "water_jar": {
+    "runtime_glb_sha256": "cbfbbcd379c0775446220bb0b858f43ff2e4b2e9abd7917514be186468e25da1",
+    "blend_sha256": "9e46a72124375776542954c570b5ecd14ede24afce753127708bc77fab9ef006"
+  },
+  "wooden_bed": {
+    "runtime_glb_sha256": "036bcd85f94da915cba6649e0e534b373d48a35601025830f18232da53ea4496",
+    "blend_sha256": "97cff5021ebf7dea7e9ee929d4d53edf8bc46bdc4787a706405d9ffc1ff6bf66"
+  },
+  "wooden_wardrobe": {
+    "runtime_glb_sha256": "9d00c36b5ea3895a44312bb3bc6f92dec5a215ab25dc6edea54a0458c35278ae",
+    "blend_sha256": "ecdb8bd45052b928aa4c13be9350e8dc32c36e7a01f4400b92272e00921a952b"
+  }
+}
