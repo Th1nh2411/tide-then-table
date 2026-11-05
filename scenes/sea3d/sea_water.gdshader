@@ -22,6 +22,14 @@ uniform vec2 boat_shadow = vec2(1.45, 1.45);  // half extents, boat local x / z
 uniform float boat_yaw = 0.0;
 uniform float hull_hole = 0.8;  // no water drawn inside the hull (open thúng)
 uniform float alpha = 0.9;
+// Lamp highlights: low roughness = sharp glints (open sea); the village sets
+// them broad and dim so a lamp beside the pier is no hard white patch.
+uniform float gloss = 0.12;
+uniform float specular_amount = 0.6;
+// Moon glint: sharp + stepped at sea; glint_soft 1 = a smooth dim sheen.
+uniform float glint_power = 220.0;
+uniform float glint_soft = 0.0;
+uniform float glint_strength = 1.0;
 uniform vec3 moon_dir = vec3(0.3, 0.75, -0.6);  // towards the moon
 uniform vec3 moon_color : source_color = vec3(0.75, 0.82, 0.8);
 uniform sampler2D depth_tex : hint_depth_texture, filter_nearest;
@@ -113,13 +121,13 @@ void fragment() {
 	// Moon path: a sharp, stepped glint of the moon in the ripples.
 	vec3 world_n = normalize((INV_VIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);
 	vec3 world_view = normalize((INV_VIEW_MATRIX * vec4(VIEW, 0.0)).xyz);
-	float glint = pow(max(dot(reflect(-world_view, world_n), moon_dir), 0.0), 220.0);
-	glint = step(0.25, glint) * (1.0 - foam);
+	float glint = pow(max(dot(reflect(-world_view, world_n), moon_dir), 0.0), glint_power);
+	glint = mix(step(0.25, glint), smoothstep(0.0, 0.8, glint), glint_soft) * glint_strength * (1.0 - foam);
 	// Night sky caught at grazing angles.
 	float fresnel = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 4.0);
 	ALBEDO = mix(col, foam_color, foam);
 	EMISSION = sky_color * fresnel * 0.35 * (1.0 - foam) + moon_color * glint;
-	ROUGHNESS = mix(0.12, 0.9, foam);
-	SPECULAR = 0.6;
+	ROUGHNESS = mix(gloss, 0.9, foam);
+	SPECULAR = specular_amount;
 	ALPHA = mix(alpha, 1.0, foam);
 }

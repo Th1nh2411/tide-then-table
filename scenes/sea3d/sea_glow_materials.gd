@@ -4,6 +4,8 @@ extends RefCounted
 ## additive, untouched by the fog and StylePass3D. Each call makes a new one
 ## (lamps animate their own alpha).
 
+const BEAM_SHADER := preload("res://scenes/sea3d/lighthouse_beam.gdshader")
+
 static var _soft: GradientTexture2D
 
 
@@ -25,11 +27,13 @@ static func halo(hex: String, alpha: float) -> StandardMaterial3D:
 	return m
 
 
-## A lighthouse beam: faint, fading out by vertex alpha (SeaLandmarks3D).
-static func beam(hex: String) -> StandardMaterial3D:
-	var m := _base(hex, 0.22)
-	m.vertex_color_use_as_albedo = true
-	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+## A lighthouse beam (SeaLandmarks3D): soft sweep, fades along its length,
+## to its edges and near the camera (lighthouse_beam.gdshader).
+static func beam(hex: String) -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	m.shader = BEAM_SHADER
+	m.set_shader_parameter("beam_color", Color(hex))
+	m.set_meta("style_skip", true)
 	return m
 
 

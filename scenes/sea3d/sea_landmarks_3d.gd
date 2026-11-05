@@ -6,8 +6,10 @@ extends Node3D
 ## DockBell3D rings at the pier head. Halos are fixed-size and ignore the fog,
 ## so a lamp still reads as a point of light from across the bay.
 
-const BEAM_LENGTH := 24.0
-const BEAM_RADIUS := 1.2
+## Beam: metres long, radius at the lamp and at the far end (lighthouse_beam.gdshader fades it).
+const BEAM_LENGTH := 30.0
+const BEAM_START_RADIUS := 0.12
+const BEAM_RADIUS := 0.9
 ## Seconds per turn: the point's lighthouse, then Đá Canh Đêm.
 const TURNS := [11.0, 15.0]
 ## Halo sizes (fixed-size quads: 0.01 ~ 2.5 px of a 360 px screen).
@@ -75,25 +77,26 @@ func _lighthouse(top: Vector3, hex: String, turn: float) -> void:
 	beams.append([pivot, head, turn])
 
 
-## A cone along +x (or -x) from the lamp: bright at the lamp, fading to
-## nothing at its far rim (vertex alpha), tipped up a little so it passes
-## over the thúng instead of through Rin's eyes.
+## A thin cone along +x (or -x) from the lamp, tipped up a little so it
+## passes over the thúng; UV.x = 0 at the lamp -> 1 at the far end, normals
+## point outwards (the beam shader fades it along, to its edges, near Rin).
 static func _beam_mesh(side: float) -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var far := Vector3(side * BEAM_LENGTH, BEAM_LENGTH * 0.02, 0.0)
-	var segments := 10
+	var segments := 16
 	for i in segments:
 		var a0 := TAU * float(i) / segments
 		var a1 := TAU * float(i + 1) / segments
-		for corner: Vector3 in [Vector3.ZERO, _rim(far, a0), _rim(far, a1)]:
-			st.set_color(Color(1, 1, 1, 1.0 if corner == Vector3.ZERO else 0.0))
-			st.add_vertex(corner)
+		var quad := [[0.0, a0], [1.0, a0], [1.0, a1], [0.0, a0], [1.0, a1], [0.0, a1]]
+		for corner: Array in quad:
+			var u: float = corner[0]
+			var angle: float = corner[1]
+			var ring := Vector3(0.0, cos(angle), sin(angle))
+			st.set_normal(ring)
+			st.set_uv(Vector2(u, angle / TAU))
+			st.add_vertex(far * u + ring * lerpf(BEAM_START_RADIUS, BEAM_RADIUS, u))
 	return st.commit()
-
-
-static func _rim(far: Vector3, angle: float) -> Vector3:
-	return far + Vector3(0.0, cos(angle), sin(angle)) * BEAM_RADIUS
 
 
 func _lamp(at: Vector3, hex: String, radius: float, halo: float, alpha: float) -> MeshInstance3D:

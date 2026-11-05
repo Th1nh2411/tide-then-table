@@ -20,6 +20,10 @@ const PIER_POST := Vector3(7.0, 0.12, -9.4)
 const NEAR_LIGHTHOUSE := Vector3(-11.0, -0.2, -4.0)
 const FAR_LIGHTHOUSE := Vector3(30.0, -0.2, -60.0)
 const WATER_Y := -0.35
+## Lamp highlights on the village water (sea_water.gdshader): broad and dim.
+const WATER_GLOSS := 0.5
+const WATER_SPECULAR := 0.2
+const WATER_GLINT := 0.08
 ## The charm on the pier thúng: rim top towards (x, z) from its centre, facing the shore, clear of the planks.
 const PIER_CHARM := Vector3(-0.35, 0, 1.13)
 
@@ -145,6 +149,13 @@ static func water(host: Node3D, size: Vector2 = Vector2(160, 110), centre_x: flo
 	m.set_shader_parameter("reef_z", -40.0 + world_z)
 	m.set_shader_parameter("near_z", -8.0 + world_z)
 	m.set_shader_parameter("boat_pos", Vector3(0, -100, 9999))  # no boat here: no hull hole / ring
+	# Seen from the pier the moon's glint and the pier-head lamp land right
+	# under ông Tư's thúng: soft dim sheens there, not hard white patches.
+	m.set_shader_parameter("gloss", WATER_GLOSS)
+	m.set_shader_parameter("specular_amount", WATER_SPECULAR)
+	m.set_shader_parameter("glint_power", 40.0)
+	m.set_shader_parameter("glint_soft", 1.0)
+	m.set_shader_parameter("glint_strength", WATER_GLINT)
 	water.material_override = m
 	host.add_child(water)
 	water.position = Vector3(centre_x, WATER_Y, SHORE_Z - size.y * 0.5)
