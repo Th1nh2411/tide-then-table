@@ -76,7 +76,7 @@
     },
     "__type__": "update"
   },
-  "reduced_sha256": "0ef4344382bbe4c2e83e6e77a164000332a490dfe2427a162d1a40227061aea1",
+  "reduced_sha256": "26165aa70513642b16feeddcf31dd955666c94d605e5cdf0be6777cd150eeb77",
   "raw": "planter_tree_street_raw.glb",
   "reduced": "planter_tree_street_reduced.glb",
   "artist_repair": {
@@ -91,11 +91,22 @@
   "source_reduced_sha256": "0ef4344382bbe4c2e83e6e77a164000332a490dfe2427a162d1a40227061aea1",
   "integration": {
     "normals_added_primitives": 0,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "source_faces": 1763,
-    "runtime_faces": 1763,
+    "runtime_faces": 2635,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "d820857cff52c88481bbfa545400c47e4e4dee7714e36ebf6d71799777dd30f8",
     "source_directory": "build/brief5/tree_geometry_repair/planter_tree_street"
+  },
+  "brief6": {
+    "input_reduced_sha256": "0ef4344382bbe4c2e83e6e77a164000332a490dfe2427a162d1a40227061aea1",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": true,
+    "triangles": 2635,
+    "note": "Terminalia street tree: straight tapering trunk, four horizontal tiers of broad rounded leaves; inferred planter retained. Local height about 4.1 m, width under 2.4 m so the existing fit yields 4.2 m.",
+    "blend_source": "art_source/horror/brief6/planter_tree_street.blend",
+    "finished": "2026-11-05"
   }
 }

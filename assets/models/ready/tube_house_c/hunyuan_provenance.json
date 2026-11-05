@@ -71,16 +71,27 @@
   ],
   "raw": "tube_house_c_raw.glb",
   "reduced": "tube_house_c_reduced.glb",
-  "reduced_sha256": "62e934cd989b3e0f875df0a15d28125cab78efcb99f934c4944c0d731336c2b8",
+  "reduced_sha256": "ec738ecb474d51b35b1a8f7443c0e8fae0c8c1fdbca341e2dee6bf2f884893b3",
   "reduced_faces": 5000,
   "source_reduced_sha256": "63792b5fcfc6d4714c10a3284c3441d8a0ad80c74d83fe7b4dd445cba65a42b6",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "source_faces": 5000,
     "runtime_faces": 5000,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "ac63ff7f6acec2036a8fc2a836cfbcff08be4a324cd82eff6cd45801689010c3",
     "source_directory": "build/brief5/generated/tube_house_c"
+  },
+  "brief6": {
+    "input_reduced_sha256": "62e934cd989b3e0f875df0a15d28125cab78efcb99f934c4944c0d731336c2b8",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "triangles": 5000,
+    "note": "Concept facade projected only onto canonical +Z front; authored UV plaster walls/back and tin roof. A/B reoriented to match the placement contract without changing footprint/height.",
+    "blend_source": "art_source/horror/brief6/tube_house_c.blend",
+    "finished": "2026-11-05"
   }
 }

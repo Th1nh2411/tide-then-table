@@ -47,17 +47,28 @@
   },
   "raw_sha256": "9c4d4652129200dca9c41e3da6a794a13d9a76a44db04cb26d9d869e521ecc5a",
   "status": "success",
-  "reduced_sha256": "47ab95aaa8bff8e9758db6476ebc15822acc720da1cabdcf0381ff786412f8cf",
+  "reduced_sha256": "deb99b0793384efb42e174d2217bfa325f66f21cb093e91969e7749a3412438e",
   "raw": "table_stall_folding_raw.glb",
   "reduced": "table_stall_folding_reduced.glb",
   "source_reduced_sha256": "32c72d7bcc481c75f815cfa5ba412e63c0fb6febaaf86b6887599dc7fd295dcb",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "source_faces": 3000,
     "runtime_faces": 3000,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "c989b5baae71d5c96cc9e50968a211b4f16aed8d0e085aba942f10708ee8757c",
     "source_directory": "build/brief5/generated/table_stall_folding"
+  },
+  "brief6": {
+    "input_reduced_sha256": "47ab95aaa8bff8e9758db6476ebc15822acc720da1cabdcf0381ff786412f8cf",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "triangles": 3000,
+    "note": "Project only the floral tabletop quadrilateral into real UVs; rusty X-legs use aged metal UVs, never the grey background.",
+    "blend_source": "art_source/horror/brief6/table_stall_folding.blend",
+    "finished": "2026-11-05"
   }
 }

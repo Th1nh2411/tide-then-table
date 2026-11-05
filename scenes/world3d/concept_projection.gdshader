@@ -5,6 +5,8 @@ render_mode cull_disabled;
 // Rough by design: the colours land about where the concept painted them.
 
 uniform sampler2D concept : source_color, filter_nearest_mipmap;
+uniform bool use_baked_uv = false;
+uniform sampler2D baked_albedo : source_color, filter_nearest_mipmap, repeat_enable;
 uniform vec3 bounds_min = vec3(-1.0);
 uniform vec3 bounds_size = vec3(2.0);
 uniform vec4 crop = vec4(0.0, 0.0, 1.0, 1.0);  // the object's box inside the image (u, v, w, h)
@@ -24,6 +26,7 @@ uniform bool surface_textures = false;
 // Buildings need surface materials on every facade: the concept includes
 // freestanding furniture that must never become paint on a wall.
 uniform bool project_front_detail = true;
+uniform bool front_face_only = false;
 uniform sampler2D wall_texture : source_color, filter_nearest_mipmap, repeat_enable;
 uniform sampler2D roof_texture : source_color, filter_nearest_mipmap, repeat_enable;
 
@@ -45,6 +48,9 @@ bool is_background(vec3 c) {
 }
 
 void fragment() {
+	if (front_face_only && !FRONT_FACING) {
+		discard;
+	}
 	vec3 normalized = (local - bounds_min) / max(bounds_size, vec3(0.0001));
 	vec2 k = vec2(dot(normalized, projection_u), dot(normalized, projection_v));
 	vec2 uv = crop.xy + vec2(k.x, 1.0 - k.y) * crop.zw;
@@ -56,6 +62,9 @@ void fragment() {
 		if (inner.a < 0.5 || is_background(c)) {
 			c = fallback_color;
 		}
+	}
+	if (use_baked_uv) {
+		c = texture(baked_albedo, UV).rgb;
 	}
 	// Front detail comes from the concept; side walls / roof use actual repeating
 	// materials instead of stretching a single row of the concept over the mesh.

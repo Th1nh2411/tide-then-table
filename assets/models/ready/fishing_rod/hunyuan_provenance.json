@@ -47,14 +47,26 @@
   },
   "raw_sha256": "e13d03658d2e68f8ec464deb75f83d6bffffe5d39a2f3773ee71185ce4c39e3c",
   "status": "success",
-  "reduced_sha256": "dc85e786b1e7b744e3284584dc1b0a9ed3cd1cc0413536d249057e3d18494f3e",
+  "reduced_sha256": "3d91987025d86ba6101ad3d6ec66a7ecf552126643fcd68544fbc8c1a3b91051",
   "raw": "fishing_rod_raw.glb",
   "reduced": "fishing_rod_reduced.glb",
   "source_reduced_sha256": "b60f4d6cbf494aa5f4ca7ec865207155790024c61f7c6d50cbf7ef28eb153b28",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/fishing_rod"
+    "source_directory": "build/hunyuan_free/fishing_rod",
+    "runtime_faces": 3000
+  },
+  "brief6": {
+    "input_reduced_sha256": "dc85e786b1e7b744e3284584dc1b0a9ed3cd1cc0413536d249057e3d18494f3e",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "triangles": 3000,
+    "note": "Cylindrical real wood UVs; keep the existing concept shader bend interface used by Rod3D.",
+    "blend_source": "art_source/horror/brief6/fishing_rod.blend",
+    "finished": "2026-11-05"
   }
 }

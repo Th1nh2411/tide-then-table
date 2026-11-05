@@ -76,17 +76,28 @@
     },
     "__type__": "update"
   },
-  "reduced_sha256": "275dafa1f42aa621cce6042119925a0bf9bc3fce9bfa8d9a08ccc70954efc065",
+  "reduced_sha256": "0553192a88168e06db58918975a597c1541cddd03274d5291bce10ddc6179094",
   "raw": "thung_boat_raw.glb",
   "reduced": "thung_boat_reduced.glb",
   "source_reduced_sha256": "e7ccd0388ab11970c3592a189e0fbba0282d7bd3ec563a39389f0e7fd3fdcc1b",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "source_faces": 3000,
-    "runtime_faces": 3000,
+    "runtime_faces": 2592,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "4bad58ec6cf6e1b8bb20a6f1422cce1c3dd62e207324858bf8d0fe6677700775",
     "source_directory": "build/brief5/generated/thung_boat"
+  },
+  "brief6": {
+    "input_reduced_sha256": "275dafa1f42aa621cce6042119925a0bf9bc3fce9bfa8d9a08ccc70954efc065",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": true,
+    "triangles": 2592,
+    "note": "Paddle-free basket hull with true circumferential bamboo UVs; no grey background on rim/walls. Live paddle and sea placement untouched.",
+    "blend_source": "art_source/horror/brief6/thung_boat.blend",
+    "finished": "2026-11-05"
   }
 }

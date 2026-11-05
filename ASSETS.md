@@ -439,3 +439,9 @@ Chi tiết triangle, review và giới hạn: `docs/HORROR_CODEX_DELIVERY_5.md`.
 
 Cây bàng giữ bồn Hunyuan, sửa thân/cành/lá 3D bằng recipe Python; nguồn Blender
 ở `art_source/horror/planter_tree_street_repair.blend` (Godot bỏ qua thư mục source).
+
+## Brief 6 — 05/11/2026
+
+Đã sửa UV/material và hình học 17 model, gồm mục 7 bàn/xe/thúng.
+Catalog 50 ID: 135.131 tam giác. Nguồn: `art_source/horror/brief6/`.
+Kiểm thử ALL OK; bot BOT OK. Báo cáo và ảnh: `docs/HORROR_CODEX_DELIVERY_6.md`.

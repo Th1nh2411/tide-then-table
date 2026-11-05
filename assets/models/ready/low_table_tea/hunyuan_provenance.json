@@ -47,14 +47,26 @@
   },
   "raw_sha256": "263d130d0fb07055553dc469b68d0587a9cff16348c881931ff6fdf0ef875eb7",
   "status": "success",
-  "reduced_sha256": "c361f0a7c53d5482d06418eea76fc2ebb9eb8f344bdaf3c1d36963cc4d9dd3f7",
+  "reduced_sha256": "d0e74e60c3c398f8f5b80f54fa15fdb1a4baa9bf58186fb8fde5fde20527851e",
   "raw": "low_table_tea_raw.glb",
   "reduced": "low_table_tea_reduced.glb",
   "source_reduced_sha256": "c6de15184afb85bf6dc7c3f8b5fee8d576751c6564a50211d30aa79097d2cba4",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "tool": "tools/art/prepare_horror_models.py",
-    "source_directory": "build/hunyuan_free/low_table_tea"
+    "source_directory": "build/hunyuan_free/low_table_tea",
+    "runtime_faces": 2000
+  },
+  "brief6": {
+    "input_reduced_sha256": "c361f0a7c53d5482d06418eea76fc2ebb9eb8f344bdaf3c1d36963cc4d9dd3f7",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "triangles": 2000,
+    "note": "Authored wood UV and muted mat/ceramic material; concept background cannot paint the object white.",
+    "blend_source": "art_source/horror/brief6/low_table_tea.blend",
+    "finished": "2026-11-05"
   }
 }

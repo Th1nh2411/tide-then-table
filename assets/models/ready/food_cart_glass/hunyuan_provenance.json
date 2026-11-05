@@ -47,17 +47,28 @@
   },
   "raw_sha256": "d35bbd318c53f0289ec841acb6ea7cac02a6b6f032bfaab47f7983a06dea0d32",
   "status": "success",
-  "reduced_sha256": "8c6017cbcdaebd543582f7188e7000519cb45d94e20b3efb8a427faac764acf2",
+  "reduced_sha256": "8245aa11a68782edd1f1a08eacd6f277a9ddcd67c0bb67634ef4f9c70dc9cd6d",
   "raw": "food_cart_glass_raw.glb",
   "reduced": "food_cart_glass_reduced.glb",
   "source_reduced_sha256": "4d3873ded31b7d8c239353fba83e770111bb48d4e82266277b602c9063eda583",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "source_faces": 3000,
     "runtime_faces": 3000,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "fafc0369c021a6e242ca8ce43a850a1ea3a48c60059937ae252f32256f722f64",
     "source_directory": "build/brief5/generated/food_cart_glass"
+  },
+  "brief6": {
+    "input_reduced_sha256": "8c6017cbcdaebd543582f7188e7000519cb45d94e20b3efb8a427faac764acf2",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "triangles": 3000,
+    "note": "Lettering stays only on outward +Z front; UV tin sides/rear, dull glass and dark wheels.",
+    "blend_source": "art_source/horror/brief6/food_cart_glass.blend",
+    "finished": "2026-11-05"
   }
 }

@@ -76,17 +76,28 @@
     },
     "__type__": "update"
   },
-  "reduced_sha256": "57833358a436f1ff4583e05ce27eea9b7b56412d1844b656109ccd34d1895c41",
+  "reduced_sha256": "11140499bdf81f133aacd8f4fb8ffb00c805d3a8f5c3d1703f190176ca47077f",
   "raw": "shed_tin_raw.glb",
   "reduced": "shed_tin_reduced.glb",
   "source_reduced_sha256": "14c602b554b3d90aaa4f082ce5797cbed733ad72903f11a44bd14a29f8580118",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "source_faces": 3000,
     "runtime_faces": 3000,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "cf0b2e4192323262cb4a8e62c5caf3e28aea57311e82667f3e4e89c36861353b",
     "source_directory": "build/brief5/generated/shed_tin"
+  },
+  "brief6": {
+    "input_reduced_sha256": "57833358a436f1ff4583e05ce27eea9b7b56412d1844b656109ccd34d1895c41",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "triangles": 3000,
+    "note": "Retain signed concept-facing detail; non-front surfaces use authored worn UVs/material instead of streaked projection.",
+    "blend_source": "art_source/horror/brief6/shed_tin.blend",
+    "finished": "2026-11-05"
   }
 }

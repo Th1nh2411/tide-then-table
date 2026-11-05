@@ -47,17 +47,28 @@
   },
   "raw_sha256": "049fe5ecc55bbec9cd11dbe4beb64de7d21703cfd9556fc4c843f2a2a7b0af11",
   "status": "success",
-  "reduced_sha256": "ae392e0b838bcef628530a4b4a05f1afc7de767c6ec3981da2584016d0d58f8f",
+  "reduced_sha256": "644e8d6f6a79836b6bfcfb0864ee718e97b873f32aedf5c73fa0bf837600cc66",
   "raw": "lamp_post_village_raw.glb",
   "reduced": "lamp_post_village_reduced.glb",
   "source_reduced_sha256": "0895a7005b532e6c473fafb829d2ff2c4041faa06a629c3c4593da9734f3039b",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "source_faces": 3000,
-    "runtime_faces": 3000,
+    "runtime_faces": 200,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "b3b55a547af72dfa9b26faf3e862c5eb20374661476d43da42a954b6f3f5742e",
     "source_directory": "build/brief5/generated/lamp_post_village"
+  },
+  "brief6": {
+    "input_reduced_sha256": "ae392e0b838bcef628530a4b4a05f1afc7de767c6ec3981da2584016d0d58f8f",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": true,
+    "triangles": 200,
+    "note": "Connected bent metal arm, continuous concrete pole and tin shade; existing world lights retained.",
+    "blend_source": "art_source/horror/brief6/lamp_post_village.blend",
+    "finished": "2026-11-05"
   }
 }

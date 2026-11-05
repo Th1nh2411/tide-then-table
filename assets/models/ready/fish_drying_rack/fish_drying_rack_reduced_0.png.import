@@ -1,0 +1,45 @@
+[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+uid="uid://6wk7lg3vxgko"
+path.s3tc="res://.godot/imported/fish_drying_rack_reduced_0.png-4a95a892b2e488a64c3ffd6593c32fbf.s3tc.ctex"
+path.etc2="res://.godot/imported/fish_drying_rack_reduced_0.png-4a95a892b2e488a64c3ffd6593c32fbf.etc2.ctex"
+metadata={
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
+}
+generator_parameters={
+"md5": "03bc0dcda6fa4f135cbd864aa56705fd"
+}
+
+[deps]
+
+source_file="res://assets/models/ready/fish_drying_rack/fish_drying_rack_reduced_0.png"
+dest_files=["res://.godot/imported/fish_drying_rack_reduced_0.png-4a95a892b2e488a64c3ffd6593c32fbf.s3tc.ctex", "res://.godot/imported/fish_drying_rack_reduced_0.png-4a95a892b2e488a64c3ffd6593c32fbf.etc2.ctex"]
+
+[params]
+
+compress/mode=2
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/uastc_level=0
+compress/rdo_quality_loss=0.0
+compress/hdr_compression=1
+compress/normal_map=0
+compress/channel_pack=0
+mipmaps/generate=true
+mipmaps/limit=-1
+roughness/mode=0
+roughness/src_normal=""
+process/channel_remap/red=0
+process/channel_remap/green=1
+process/channel_remap/blue=2
+process/channel_remap/alpha=3
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=0

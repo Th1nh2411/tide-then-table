@@ -54,6 +54,7 @@ static func spawn(parent: Node3D, id: String, at: Vector3, height: float, yaw: f
 	var scene := load("res://assets/models/ready/%s/%s_reduced.glb" % [id, id]) as PackedScene
 	var root := Node3D.new()
 	root.name = "Model_" + id
+	root.set_meta("horror_model_id", id)
 	parent.add_child(root)
 	if scene == null:
 		return root
@@ -70,6 +71,8 @@ static func spawn(parent: Node3D, id: String, at: Vector3, height: float, yaw: f
 	material.set_shader_parameter("bounds_min", bounds.position)
 	material.set_shader_parameter("bounds_size", bounds.size)
 	material.set_shader_parameter("crop", _crop(id))
+	if id in ["tube_house_a", "tube_house_b", "tube_house_c", "food_cart_glass"]:
+		material.set_shader_parameter("front_face_only", true)
 	var spec := geometry(id)
 	if spec.has("fallback"):
 		var c: Array = spec["fallback"]
@@ -91,8 +94,26 @@ static func spawn(parent: Node3D, id: String, at: Vector3, height: float, yaw: f
 		material.set_shader_parameter("wall_texture", load("res://assets/textures/horror/%s.png" % wall))
 		material.set_shader_parameter("roof_texture", load("res://assets/textures/horror/%s.png" % roof))
 	for mesh in meshes:
-		(mesh as MeshInstance3D).material_override = material
-		(mesh as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+		var instance := mesh as MeshInstance3D
+		var authored := false
+		for surface: int in range(instance.mesh.get_surface_count()):
+			var source := instance.mesh.surface_get_material(surface)
+			if source and (source.resource_name.begins_with("HorrorUV_") or source.resource_name.begins_with("HorrorSolid_")):
+				authored = true
+		if authored:
+			# These GLB surfaces carry authored UVs/materials. The shared style
+			# pass still grades them; only the front uses concept projection.
+			for surface: int in range(instance.mesh.get_surface_count()):
+				var source := instance.mesh.surface_get_material(surface)
+				var native := source and (source.resource_name.begins_with("HorrorUV_") or source.resource_name.begins_with("HorrorSolid_"))
+				instance.set_surface_override_material(surface, source if native else material)
+		else:
+			instance.material_override = material
+			var baked := instance.mesh.surface_get_material(0) as BaseMaterial3D
+			if baked and baked.resource_name.begins_with("HorrorBend_"):
+				material.set_shader_parameter("use_baked_uv", true)
+				material.set_shader_parameter("baked_albedo", baked.albedo_texture)
+		instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	var s := height / maxf(bounds.size.y, 0.001)
 	model.scale = Vector3.ONE * s
 	model.position = Vector3(-bounds.get_center().x * s, -bounds.position.y * s, -bounds.get_center().z * s)

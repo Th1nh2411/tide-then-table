@@ -103,3 +103,9 @@ Source raw/reduced đã nằm trong `assets/`, không còn chỉ tồn tại tro
 
 Cây bàng có sửa hình học sau inference: giữ bồn, dựng lại thân/cành/lá 3D theo concept;
 recipe và nguồn Blender được lưu, chi tiết trong provenance `artist_repair`.
+
+## Brief 6 — 05/11/2026
+
+Đã sửa UV/material và hình học 17 model, gồm mục 7 bàn/xe/thúng.
+Catalog 50 ID: 135.131 tam giác. Nguồn: `art_source/horror/brief6/`.
+Kiểm thử ALL OK; bot BOT OK. Báo cáo và ảnh: [HORROR_CODEX_DELIVERY_6.md](HORROR_CODEX_DELIVERY_6.md).

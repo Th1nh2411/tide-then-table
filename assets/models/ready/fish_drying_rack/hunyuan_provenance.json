@@ -47,17 +47,28 @@
   },
   "raw_sha256": "289a06df79e92bebdd44610a3cdde830b5ae5df8bc7199b0510eb959698d5140",
   "status": "success",
-  "reduced_sha256": "c0ced4ace512a40afd5a6631a8cf16eabdaa8a93253f725513b1dc06d03a455a",
+  "reduced_sha256": "10edb239b312c82d8c8c42ac272d6fc9bee0630ac69e14daa72865019316a1a2",
   "raw": "fish_drying_rack_raw.glb",
   "reduced": "fish_drying_rack_reduced.glb",
   "source_reduced_sha256": "313c302db16910b786a8364aee067c6f1ccd97a166854fee80d27f2a6b258d6b",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "source_faces": 3000,
-    "runtime_faces": 3000,
+    "runtime_faces": 1236,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "e1167a420c874cb616b63716015de833d78b8823f81156bc73006de6950db648",
     "source_directory": "build/brief5/generated/fish_drying_rack"
+  },
+  "brief6": {
+    "input_reduced_sha256": "c0ced4ace512a40afd5a6631a8cf16eabdaa8a93253f725513b1dc06d03a455a",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": true,
+    "triangles": 1236,
+    "note": "Continuous bamboo frame/slats and 28 split drying fish; clean thin support geometry.",
+    "blend_source": "art_source/horror/brief6/fish_drying_rack.blend",
+    "finished": "2026-11-05"
   }
 }

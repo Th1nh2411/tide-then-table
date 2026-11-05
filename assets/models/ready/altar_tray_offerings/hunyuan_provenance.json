@@ -47,17 +47,28 @@
   },
   "raw_sha256": "f2a33f295e391e255f501a7aff5b362e507863cff5e06d2495bc84f14336904d",
   "status": "success",
-  "reduced_sha256": "ca9cab834681aea329f75aa26c8572249d9f08be820fdeb00a512ea471632188",
+  "reduced_sha256": "42c7e21eb5205b38e7b22ab122b6efe6b4179fc723e277de7bb3b257737d2095",
   "raw": "altar_tray_offerings_raw.glb",
   "reduced": "altar_tray_offerings_reduced.glb",
   "source_reduced_sha256": "2223792409b62c2f28154075f3199e47478176b4db8de3fd7c2e1dc985c5080e",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "source_faces": 3000,
-    "runtime_faces": 3000,
+    "runtime_faces": 1164,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "c20f2b7b779ed8f3786fba956b54376dff96bcb1eb9bbade8b84bd1a11423df1",
     "source_directory": "build/brief5/generated/altar_tray_offerings"
+  },
+  "brief6": {
+    "input_reduced_sha256": "ca9cab834681aea329f75aa26c8572249d9f08be820fdeb00a512ea471632188",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": true,
+    "triangles": 1164,
+    "note": "Clean low table, tray, rice/salt bowls, cakes, cane, paper clothes and continuous incense stems; normal/eaten runtime logic unchanged.",
+    "blend_source": "art_source/horror/brief6/altar_tray_offerings.blend",
+    "finished": "2026-11-05"
   }
 }

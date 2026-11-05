@@ -47,17 +47,28 @@
   },
   "raw_sha256": "cb7e12ff69fa6687d59520b0ead39069e13704a115818cdfb229d995d0ef925f",
   "status": "success",
-  "reduced_sha256": "69c67ac1327c8d96bdffc4342d3560351ed3996d6ef34e4d0cd95cd29ffa8589",
+  "reduced_sha256": "1a6872d73b892912cda68f638df8fc27132170d09949452b9ce8306d2c6a6486",
   "raw": "ice_box_styrofoam_raw.glb",
   "reduced": "ice_box_styrofoam_reduced.glb",
   "source_reduced_sha256": "911dc0eb271339c4c474d46d078fe63a8b9cdccc8f4d03d19e90ce4ee9ac58ff",
   "integration": {
     "normals_added_primitives": 1,
-    "geometry_unchanged": true,
+    "geometry_unchanged": false,
     "source_faces": 3000,
     "runtime_faces": 3000,
     "tool": "tools/art/prepare_horror_models.py",
     "material_concept_sha256": "7f123932e21d4f472872cb236599c15a6c8982854a6189bf2ad7bca6ca2c4b70",
     "source_directory": "build/brief5/generated/ice_box_styrofoam"
+  },
+  "brief6": {
+    "input_reduced_sha256": "69c67ac1327c8d96bdffc4342d3560351ed3996d6ef34e4d0cd95cd29ffa8589",
+    "tool": "tools/art/finish_horror_brief6.py",
+    "date": "2026-11-04",
+    "true_uv": true,
+    "rebuilt_geometry": false,
+    "triangles": 3000,
+    "note": "Retain signed concept-facing detail; non-front surfaces use authored worn UVs/material instead of streaked projection.",
+    "blend_source": "art_source/horror/brief6/ice_box_styrofoam.blend",
+    "finished": "2026-11-05"
   }
 }
