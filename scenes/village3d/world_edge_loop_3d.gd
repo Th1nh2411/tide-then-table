@@ -13,6 +13,7 @@ extends Node3D
 ## [mouth x, direction (+1 east, -1 west), z range] of the two fog paths.
 const WEST_MOUTH := -20.0
 const EAST_MOUTH := 81.0
+const SHEET_SHADER := preload("res://scenes/village3d/edge_fog_sheet.gdshader")
 @export var loop_depth := 25.0
 @export var haze_from := 4.0
 @export var haze_full := 22.0
@@ -33,7 +34,8 @@ var west_z := StreetFacades3D.WEST_Z
 var east_z := VillageEdges3D.EAST_Z
 var _veil := ColorRect.new()
 var _sheets: Array[MeshInstance3D] = []
-var _sheet_material := StandardMaterial3D.new()
+## One soft veil for every sheet (edge_fog_sheet.gdshader: no hard edge from any angle).
+var _sheet_material := ShaderMaterial.new()
 var _signs: VillageFogSigns3D
 var gate: VillageGateAlley3D
 var _gate_signs := VillageFogSigns3D.new()
@@ -60,11 +62,11 @@ func _ready() -> void:
 	_veil.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_veil.modulate.a = 0.0
 	layer.add_child(_veil)
-	_sheet_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_sheet_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_sheet_material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	_sheet_material.disable_fog = true
-	_sheet_material.albedo_texture = _soft_texture()
+	_sheet_material.shader = SHEET_SHADER
+	_sheet_material.set_shader_parameter("alpha", sheet_alpha)
+	if host and host.lighting:
+		host.lighting.phase_applied.connect(_tint)
+		_tint()
 	for depth in sheet_depths:
 		_sheet(WEST_MOUTH - depth, Vector2(-30.0, 46.0))
 		_sheet(EAST_MOUTH + depth, Vector2(-34.0, 42.0))
@@ -79,18 +81,6 @@ func _ready() -> void:
 		_gate_signs.position = Vector3(0, 0, VillageGateAlley3D.GATE_Z)
 		_gate_signs.rotation.y = -PI * 0.5
 		add_child(_gate_signs)
-
-
-## Soft fog: thick at the bottom middle, fading to nothing at the top and sides.
-func _soft_texture() -> ImageTexture:
-	var image := Image.create(64, 32, false, Image.FORMAT_RGBA8)
-	for y in 32:
-		for x in 64:
-			var u := absf(float(x) / 63.0 * 2.0 - 1.0)
-			var v := float(y) / 31.0
-			var a := (1.0 - u * u * u) * smoothstep(0.05, 0.75, v) * sheet_alpha
-			image.set_pixel(x, y, Color(1, 1, 1, a))
-	return ImageTexture.create_from_image(image)
 
 
 ## A fog sheet across a path at `x`, spanning z (range), facing along X;
@@ -133,9 +123,6 @@ func looped(p: Vector3) -> Vector3:
 func _process(_delta: float) -> void:
 	if host == null or host.player == null or host.lighting == null:
 		return
-	var tint := _fog_color()
-	_sheet_material.albedo_color = Color(tint, 1.0)
-	_veil.color = tint
 	var p := host.player.global_position
 	var at := depth_at(p)
 	if at.y != 0.0 and at.x >= loop_depth:
@@ -192,10 +179,8 @@ static func gate_tries() -> int:
 	return _gate_tries if _day == GameState.day else 0
 
 
-func _fog_color() -> Color:
-	match host.lighting.phase:
-		VillageLighting3D.Phase.MORNING:
-			return Color("98a2aa")
-		VillageLighting3D.Phase.SHIFT:
-			return Color("7d6e70")
-	return Color("161d2e")
+## Sheets and veil take the sky's own fog colour (dim grey-blue at night, never brighter).
+func _tint() -> void:
+	var tint := host.lighting.fog_color()
+	_sheet_material.set_shader_parameter("fog_color", tint)
+	_veil.color = tint

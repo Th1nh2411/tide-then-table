@@ -8,6 +8,9 @@ extends Node
 ## the sky swap never shows. Lamps and glows are swapped by visibility (the
 ## PS1 look copies materials once, so emission can't be changed live).
 
+## The environment changed (phase or inside / outside): edge fog re-tints.
+signal phase_applied
+
 enum Phase { MORNING, SHIFT, NIGHT }
 const STYLE_PHASES: Array[String] = ["morning", "shift", "night"]
 
@@ -129,6 +132,12 @@ func set_inside(now_inside: bool) -> void:
 		return
 	inside = now_inside
 	_world.environment = _current()
+	phase_applied.emit()
+
+
+## The current sky's fog colour (WorldEdgeLoop3D's sheets match it).
+func fog_color() -> Color:
+	return _current().fog_light_color if _world else Color("172038")
 
 
 func _current() -> Environment:
@@ -153,6 +162,7 @@ func _apply() -> void:
 		if is_instance_valid(key):
 			(key as Node3D).visible = (_shown_in[key] as Array).has(phase)
 	_tint_islands()
+	phase_applied.emit()
 
 
 func _tint_islands() -> void:
